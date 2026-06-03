@@ -27,6 +27,16 @@ Etkilenen alan: ...
 Devam için onay gerekli.
 ```
 
+## Zorunlu handoff dosyaları
+
+Cursor her faz sonunda şu 3 dosyayı günceller:
+
+1. `docs/cursor/LATEST_HANDOFF.md` — son fazın tek bakış özeti.
+2. `docs/cursor/CURSOR_RUN_LOG.md` — her faz için tek satır geçmiş.
+3. `docs/cursor/RISK_REPORT.md` — yalnızca risk varsa güncellenir; risk yoksa `Status: clear` kalır.
+
+Bu üç dosya sayesinde dış incelemede tüm repo tekrar taranmaz. Önce `LATEST_HANDOFF.md`, sonra gerekiyorsa commit diff ve değişen dosyalar okunur.
+
 ## Sabit kurallar
 
 - Her fazda sadece `Oku` listesindeki dosyaları incele; tüm repoyu tarama.
@@ -53,6 +63,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 
 **Yap:** Auth/session, RBAC, API guard, demo-memory production riski, test dosyaları, generated dosya durumunu kontrol et.
 
+**Handoff:** `LATEST_HANDOFF.md` ve `CURSOR_RUN_LOG.md` güncelle. Risk yoksa `RISK_REPORT.md` clear kalsın.
+
 **Çıktı:** En fazla 8 satır. Commit yok. Dur.
 
 ---
@@ -69,6 +81,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 
 **Commit:** `chore: add repo guardrails`.
 
+**Handoff:** Commit sonrası 3 handoff dosyasını güncelle ve aynı commit'e dahil et.
+
 ---
 
 ## PROMPT 02 — Production memory guard ve API guard standardı
@@ -83,6 +97,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 
 **Commit:** `fix: guard production demo memory mode`.
 
+**Handoff:** Commit sonrası 3 handoff dosyasını güncelle.
+
 ---
 
 ## PROMPT 03 — İlk gerçek testler
@@ -96,6 +112,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 **Test:** `pnpm --filter @uyanik/web test`, `pnpm --filter @uyanik/web test:e2e`, `pnpm typecheck`.
 
 **Commit:** `test: add auth rbac and shared utility tests`.
+
+**Handoff:** Commit sonrası 3 handoff dosyasını güncelle.
 
 ---
 
@@ -113,6 +131,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 
 **Dur:** Destructive migration varsa `RISK REPORT`.
 
+**Handoff:** Commit veya risk sonrası 3 handoff dosyasını güncelle.
+
 ---
 
 ## PROMPT 05 — Koç ödev formunu alpha seviyeye çıkar
@@ -126,6 +146,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 **Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test:e2e`.
 
 **Commit:** `feat: upgrade coach assignment form`.
+
+**Handoff:** Commit sonrası 3 handoff dosyasını güncelle.
 
 ---
 
@@ -141,6 +163,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 
 **Commit:** `feat: show assignment details in student and parent views`.
 
+**Handoff:** Commit sonrası 3 handoff dosyasını güncelle.
+
 ---
 
 ## PROMPT 07 — AI Koç Yakında yüzeyi
@@ -154,6 +178,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 **Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test:e2e`.
 
 **Commit:** `feat: add ai coach coming soon surface`.
+
+**Handoff:** Commit sonrası 3 handoff dosyasını güncelle.
 
 ---
 
@@ -169,6 +195,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 
 **Commit:** `feat: add rules based risk suggestions`.
 
+**Handoff:** Commit sonrası 3 handoff dosyasını güncelle.
+
 ---
 
 ## PROMPT 09 — DB-backed alpha doğrulaması
@@ -182,6 +210,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 **Test:** `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm typecheck`.
 
 **Commit:** `fix: verify db backed alpha flow`.
+
+**Handoff:** Commit veya risk sonrası 3 handoff dosyasını güncelle.
 
 ---
 
@@ -197,6 +227,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 
 **Commit:** `feat: add minimal branch admin shells`.
 
+**Handoff:** Commit sonrası 3 handoff dosyasını güncelle.
+
 ---
 
 ## PROMPT 11 — CI kalite kapısı
@@ -210,6 +242,8 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 **Test:** `pnpm typecheck`, `pnpm lint`, `pnpm test:unit`.
 
 **Commit:** `ci: add basic quality gate`.
+
+**Handoff:** Commit sonrası 3 handoff dosyasını güncelle.
 
 ---
 
@@ -225,24 +259,28 @@ Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBA
 
 **Commit:** `docs: document deployment decision`.
 
+**Handoff:** Commit veya risk sonrası 3 handoff dosyasını güncelle.
+
 ---
 
 ## PROMPT 13 — Alpha durum raporu
 
 **Amaç:** Kod değiştirmeden sprint sonu kısa durum raporu üret.
 
-**Oku:** README, AGENTS, package dosyaları, Prisma schema, assignment API route'ları, test klasörleri.
+**Oku:** README, AGENTS, package dosyaları, Prisma schema, assignment API route'ları, test klasörleri, `LATEST_HANDOFF.md`, `CURSOR_RUN_LOG.md`, `RISK_REPORT.md`.
 
 **Yap:** `docs/reports/ALPHA_STATUS_REPORT.md` oluştur. İçerik kısa: tamamlananlar, riskler, test, DB alpha, mobil/worker, AI Koç, sonraki 5 öncelik.
 
 **Commit:** `docs: add alpha status report`.
+
+**Handoff:** `LATEST_HANDOFF.md` sprint kapanışı olarak güncelle.
 
 ---
 
 ## Cursor'a verilecek başlangıç mesajı
 
 ```text
-Bu dosyadaki fazları sırayla uygula. Şu anda yalnızca PROMPT 00'ı çalıştır. Rapor en fazla 8 satır olsun. Uzun tablo kullanma. Risk varsa sadece RISK REPORT formatını yaz ve dur. Test geçmeden commit atma.
+Bu dosyadaki fazları sırayla uygula. Şu anda yalnızca PROMPT 01'i çalıştır. Rapor en fazla 8 satır olsun. Her faz sonunda docs/cursor/LATEST_HANDOFF.md ve docs/cursor/CURSOR_RUN_LOG.md dosyalarını güncelle. Risk varsa docs/cursor/RISK_REPORT.md dosyasını güncelle ve dur. Test geçmeden commit atma.
 ```
 
-Önerilen sıra: `00 → 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 09`, sonra `10 → 11 → 12 → 13`.
+Önerilen sıra: `01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 09`, sonra `10 → 11 → 12 → 13`.
