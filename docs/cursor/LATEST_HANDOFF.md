@@ -1,7 +1,7 @@
 # Latest Handoff
 
 **Son tamamlanan faz:** PROMPT 04 — Assignment alpha veri modeli  
-**Commits:** _(pending)_  
+**Commits:** `26221d8` — feat: expand assignment alpha model  
 **Branch:** main  
 
 ## Durum
