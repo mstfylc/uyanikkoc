@@ -1,9 +1,7 @@
 # Latest Handoff
 
 **Son tamamlanan faz:** PROMPT 03 — İlk gerçek testler  
-**Branch:** main  
-
-## Durum
+**Commits:** `6f87c3d` (P02) · `3425bbd` (P03)
 
 - PROMPT 02: production memory guard + `withApiAuth` + 3 API route refactor
 - PROMPT 03: env/rbac unit testleri, auth-rbac E2E, playwright port 3011, lint `.next` fix
