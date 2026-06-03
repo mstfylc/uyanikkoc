@@ -1,11 +1,35 @@
-export type AssignmentRecord = {
-  id: string;
+export type AssignmentType = "homework" | "exam_prep" | "reading" | "practice" | "other";
+export type AssignmentPriority = "low" | "medium" | "high";
+export type AssignmentStatus = "pending" | "in_progress" | "completed" | "cancelled";
+
+export type AssignmentCreateInput = {
   title: string;
   coachId: string;
   studentId: string;
   parentId: string;
   branchId: string;
+  description?: string | null;
+  type?: AssignmentType;
+  priority?: AssignmentPriority;
+  subject?: string | null;
+  dueDate?: string | null;
+};
+
+export type AssignmentRecord = {
+  id: string;
+  title: string;
+  description: string | null;
+  type: AssignmentType;
+  priority: AssignmentPriority;
+  status: AssignmentStatus;
+  subject: string | null;
+  dueDate: string | null;
+  coachId: string;
+  studentId: string;
+  parentId: string;
+  branchId: string;
   createdAt: string;
+  updatedAt: string;
   completed: boolean;
   completedAt: string | null;
 };

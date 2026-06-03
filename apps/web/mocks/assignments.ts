@@ -1,14 +1,12 @@
-export type Assignment = {
-  id: string;
-  title: string;
-  coachId: string;
-  studentId: string;
-  parentId: string;
-  branchId: string;
-  createdAt: string;
-  completed: boolean;
-  completedAt: string | null;
-};
+import type {
+  AssignmentCreateInput,
+  AssignmentPriority,
+  AssignmentRecord,
+  AssignmentStatus,
+  AssignmentType,
+} from "@uyanik/database";
+
+export type Assignment = AssignmentRecord;
 
 export type ParentSummary = {
   totalAssignments: number;
@@ -28,21 +26,27 @@ const globalStore = globalThis as typeof globalThis & {
 
 const assignments = globalStore.__uyanikAssignments ?? (globalStore.__uyanikAssignments = []);
 
-export function createAssignment(input: {
-  title: string;
-  coachId: string;
-  studentId: string;
-  parentId: string;
-  branchId?: string;
-}): Assignment {
+function nowIso(): string {
+  return new Date().toISOString();
+}
+
+export function createAssignment(input: AssignmentCreateInput): Assignment {
+  const timestamp = nowIso();
   const assignment: Assignment = {
     id: `assignment_${assignments.length + 1}`,
     title: input.title,
+    description: input.description ?? null,
+    type: input.type ?? "homework",
+    priority: input.priority ?? "medium",
+    status: "pending",
+    subject: input.subject ?? null,
+    dueDate: input.dueDate ?? null,
     coachId: input.coachId,
     studentId: input.studentId,
     parentId: input.parentId,
     branchId: input.branchId ?? DEMO_BRANCH_ID,
-    createdAt: new Date().toISOString(),
+    createdAt: timestamp,
+    updatedAt: timestamp,
     completed: false,
     completedAt: null,
   };
@@ -72,14 +76,18 @@ export function completeAssignment(assignmentId: string, studentId: string): Ass
     return null;
   }
 
+  assignment.status = "completed";
   assignment.completed = true;
-  assignment.completedAt = new Date().toISOString();
+  assignment.completedAt = nowIso();
+  assignment.updatedAt = nowIso();
   return assignment;
 }
 
 export function getParentSummary(parentId: string): ParentSummary {
   const parentAssignments = listAssignmentsForParent(parentId);
-  const completedCount = parentAssignments.filter((assignment) => assignment.completed).length;
+  const completedCount = parentAssignments.filter(
+    (assignment) => assignment.status === "completed" || assignment.completed,
+  ).length;
 
   return {
     totalAssignments: parentAssignments.length,
@@ -92,3 +100,5 @@ export function getParentSummary(parentId: string): ParentSummary {
 export function resetAssignmentsForTests(): void {
   assignments.length = 0;
 }
+
+export type { AssignmentCreateInput, AssignmentPriority, AssignmentStatus, AssignmentType };

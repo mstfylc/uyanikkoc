@@ -1,17 +1,20 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 03 — İlk gerçek testler  
-**Commits:** `6f87c3d` (P02) · `3425bbd` (P03)
+**Son tamamlanan faz:** PROMPT 04 — Assignment alpha veri modeli  
+**Commits:** _(pending)_  
+**Branch:** main  
 
-- PROMPT 02: production memory guard + `withApiAuth` + 3 API route refactor
-- PROMPT 03: env/rbac unit testleri, auth-rbac E2E, playwright port 3011, lint `.next` fix
-- Tüm testler geçti (typecheck, lint, unit 12, e2e 8)
+## Durum
+
+- Assignment alpha alanları: description, type, priority, status, subject, dueDate, updatedAt
+- Additive migration `20260604040000_assignment_alpha_fields` (veri kaybı yok)
+- Mock + DB repository + API uyumlu; title-only POST çalışıyor
+- Unit test: 15/15 (3 yeni assignment testi)
 
 ## Sonraki faz
 
-**PROMPT 04** — Assignment alpha veri modeli (**onay bekleniyor**)
+**PROMPT 05** — Koç ödev formu alpha (**onay bekleniyor**)
 
-## Açık riskler
+## Not
 
-- PROMPT 04 Prisma migration gerekebilir — onay sonrası değerlendirilecek
-- Vercel deploy 404 (dashboard ayarı, PROMPT 12)
+Supabase/production'da `pnpm db:migrate` ile yeni migration uygulanmalı.

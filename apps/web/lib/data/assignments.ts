@@ -1,4 +1,4 @@
-import type { AssignmentRecord, ParentSummaryRecord } from "@uyanik/database";
+import type { AssignmentCreateInput, AssignmentRecord, ParentSummaryRecord } from "@uyanik/database";
 
 import { shouldUseDatabase } from "@/lib/data/env";
 import {
@@ -9,17 +9,11 @@ import {
   listAssignmentsForCoach as listMemoryAssignmentsForCoach,
 } from "@/mocks/assignments";
 
-export type { AssignmentRecord, ParentSummaryRecord };
+export type { AssignmentCreateInput, AssignmentRecord, ParentSummaryRecord };
 
 export { DEMO_PARENT_ID, DEMO_STUDENT_ID } from "@/mocks/assignments";
 
-export async function createAssignment(input: {
-  title: string;
-  coachId: string;
-  studentId: string;
-  parentId: string;
-  branchId: string;
-}): Promise<AssignmentRecord> {
+export async function createAssignment(input: AssignmentCreateInput): Promise<AssignmentRecord> {
   if (shouldUseDatabase()) {
     const { assignmentRepository } = await import("@uyanik/database");
     return assignmentRepository.createAssignment(input);

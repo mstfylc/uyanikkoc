@@ -15,6 +15,27 @@ enum DbRole {
   ORG_ADMIN
 }
 
+enum AssignmentType {
+  homework
+  exam_prep
+  reading
+  practice
+  other
+}
+
+enum AssignmentPriority {
+  low
+  medium
+  high
+}
+
+enum AssignmentStatus {
+  pending
+  in_progress
+  completed
+  cancelled
+}
+
 model Organization {
   id       String   @id
   name     String
@@ -83,21 +104,29 @@ model ParentProfile {
 }
 
 model Assignment {
-  id          String         @id @default(cuid())
+  id          String             @id @default(cuid())
   title       String
+  description String?
+  type        AssignmentType     @default(homework)
+  priority    AssignmentPriority @default(medium)
+  status      AssignmentStatus   @default(pending)
+  subject     String?
+  dueDate     DateTime?
   coachId     String
   studentId   String
   parentId    String
   branchId    String
-  completed   Boolean        @default(false)
+  completed   Boolean            @default(false)
   completedAt DateTime?
-  createdAt   DateTime       @default(now())
-  coach       CoachProfile   @relation("CoachAssignments", fields: [coachId], references: [id], onDelete: Cascade)
-  student     StudentProfile @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
-  branch      Branch         @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  coach       CoachProfile       @relation("CoachAssignments", fields: [coachId], references: [id], onDelete: Cascade)
+  student     StudentProfile     @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
+  branch      Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([parentId])
   @@index([branchId])
+  @@index([status])
   @@map("assignments")
 }

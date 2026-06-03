@@ -1,40 +1,57 @@
 import { prisma } from "../client";
-import type { AssignmentRecord, ParentSummaryRecord } from "../types";
+import type {
+  AssignmentCreateInput,
+  AssignmentRecord,
+  ParentSummaryRecord,
+} from "../types";
 
 function mapAssignment(assignment: {
   id: string;
   title: string;
+  description: string | null;
+  type: AssignmentRecord["type"];
+  priority: AssignmentRecord["priority"];
+  status: AssignmentRecord["status"];
+  subject: string | null;
+  dueDate: Date | null;
   coachId: string;
   studentId: string;
   parentId: string;
   branchId: string;
   createdAt: Date;
+  updatedAt: Date;
   completed: boolean;
   completedAt: Date | null;
 }): AssignmentRecord {
   return {
     id: assignment.id,
     title: assignment.title,
+    description: assignment.description,
+    type: assignment.type,
+    priority: assignment.priority,
+    status: assignment.status,
+    subject: assignment.subject,
+    dueDate: assignment.dueDate?.toISOString() ?? null,
     coachId: assignment.coachId,
     studentId: assignment.studentId,
     parentId: assignment.parentId,
     branchId: assignment.branchId,
     createdAt: assignment.createdAt.toISOString(),
+    updatedAt: assignment.updatedAt.toISOString(),
     completed: assignment.completed,
     completedAt: assignment.completedAt?.toISOString() ?? null,
   };
 }
 
-export async function createAssignment(input: {
-  title: string;
-  coachId: string;
-  studentId: string;
-  parentId: string;
-  branchId: string;
-}): Promise<AssignmentRecord> {
+export async function createAssignment(input: AssignmentCreateInput): Promise<AssignmentRecord> {
   const assignment = await prisma.assignment.create({
     data: {
       title: input.title,
+      description: input.description ?? null,
+      type: input.type ?? "homework",
+      priority: input.priority ?? "medium",
+      subject: input.subject ?? null,
+      dueDate: input.dueDate ? new Date(input.dueDate) : null,
       coachId: input.coachId,
       studentId: input.studentId,
       parentId: input.parentId,
@@ -71,13 +88,14 @@ export async function completeAssignment(
     where: { id: assignmentId, studentId },
   });
 
-  if (!existing) {
-    return null;
+  if (!existing || existing.status === "completed") {
+    return existing ? mapAssignment(existing) : null;
   }
 
   const assignment = await prisma.assignment.update({
     where: { id: assignmentId },
     data: {
+      status: "completed",
       completed: true,
       completedAt: new Date(),
     },
@@ -93,7 +111,7 @@ export async function getParentSummary(parentId: string): Promise<ParentSummaryR
   });
 
   const mapped = assignments.map(mapAssignment);
-  const completedCount = mapped.filter((a) => a.completed).length;
+  const completedCount = mapped.filter((a) => a.status === "completed" || a.completed).length;
 
   return {
     totalAssignments: mapped.length,
