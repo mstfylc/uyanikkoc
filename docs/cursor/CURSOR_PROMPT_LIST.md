@@ -1,38 +1,24 @@
 # Uyanık Koç — Cursor Aşamalı Prompt Listesi
 
-Bu dosya Cursor'a tek seferde verilebilir. Cursor **yalnızca istenen fazı uygular**, faz sonunda rapor verir ve durur. Bir sonraki faz için kullanıcıdan açık komut bekler.
+Bu dosya Cursor'a tek seferde verilebilir; ancak Cursor **yalnızca istenen fazı uygular**, rapor verir ve durur. Amaç: token kullanımını düşük tutarak önce Auth + RBAC + DB-backed koç → öğrenci → veli akışını testli hale getirmek.
 
-Ana hedef: projeyi şişirmeden, önce Auth + RBAC + DB-backed koç → öğrenci → veli akışını testli hale getirmek.
+## Sabit kurallar
 
----
+- Her fazda sadece `Oku` listesindeki dosyaları incele; tüm repoyu tarama.
+- Faz başına en fazla 8-10 dosya değiştir; aşılacaksa `RISK REPORT` ver ve dur.
+- Yeni ekran şişmesi yapma; önce mevcut dikey akışı güçlendir.
+- AI Koç canlı entegrasyonu yapma; yalnızca `Yakında` yüzeyi kalacak.
+- Production ortamda demo-memory store çalışamaz.
+- CRM dosyalarına, CRM DB/env/upload/log alanlarına dokunma.
+- Lisanslı Metronic assetlerini repoya ekleme.
+- Generated/cache dosyalarını commit etme: `.next`, `.turbo`, `node_modules`, `*.tsbuildinfo`, loglar.
+- Test/typecheck geçmeden commit atma.
 
-## Genel çalışma kuralları
+## Riskte dur
 
-1. Her fazda yalnızca `Okunacak dosyalar` bölümündeki dosyaları oku.
-2. Tüm repoyu tarama; ek dosya gerekirse önce raporla.
-3. Bir fazda en fazla 8-10 dosya değiştir. Daha fazlası gerekiyorsa dur.
-4. Yeni ekran açma; mevcut dikey akışı güçlendir.
-5. AI Koç canlı entegrasyonu yapma. AI Koç sadece `Yakında` olarak görünür kalacak.
-6. Production ortamda demo-memory çalışma moduna izin verme.
-7. CRM ile ilgili dosya, ortam değişkeni, veri tabanı veya upload alanına dokunma.
-8. Lisanslı Metronic assetlerini repoya ekleme.
-9. Build/cache çıktısı commit etme: `.next`, `.turbo`, `node_modules`, `*.tsbuildinfo`, log dosyaları.
-10. Test geçmeden commit atma.
+Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBAC belirsizliği, korumasız API route, yeni external servis/major dependency, production-demo ayar karışması, 10+ dosya değişikliği, test sebebi belirsiz fail, Vercel/self-host kararını etkileyen deploy değişikliği, secret/lisanslı asset riski.
 
-## Riskte durma kuralları
-
-Aşağıdaki durumda kod yazmayı bırak ve `RISK REPORT` üret:
-
-- Prisma migration veri kaybı yaratabilir.
-- Auth veya RBAC davranışı belirsizleşir.
-- API route korumasız kalır.
-- 10'dan fazla dosya değişmesi gerekir.
-- Yeni servis veya yeni major dependency gerekir.
-- Production/demo ayarları karışır.
-- Testler çalışmaz ve sebep net değildir.
-- Deploy ayarı Vercel/self-host kararını etkiler.
-
-## Her faz sonunda rapor formatı
+## Her faz raporu
 
 ```text
 Değişen dosyalar:
@@ -43,385 +29,237 @@ Sonraki öneri:
 
 ---
 
-# PROMPT 00 — Başlangıç denetimi
+## PROMPT 00 — Başlangıç denetimi
 
-**Amaç:** Kod değiştirmeden repo durumunu raporla.
+**Amaç:** Kod değiştirmeden gerçek durumu raporla.
 
-**Okunacak dosyalar:**
+**Oku:** `package.json`, `pnpm-workspace.yaml`, `apps/web/package.json`, `apps/web/auth.ts`, `apps/web/middleware.ts`, `apps/web/lib/rbac.ts`, `apps/web/lib/data/env.ts`, `packages/database/prisma/schema.prisma`, `packages/database/prisma/seed.ts`, `.gitignore`.
 
-- `package.json`
-- `pnpm-workspace.yaml`
-- `apps/web/package.json`
-- `apps/web/auth.ts`
-- `apps/web/middleware.ts`
-- `apps/web/lib/rbac.ts`
-- `apps/web/lib/data/env.ts`
-- `packages/database/prisma/schema.prisma`
-- `packages/database/prisma/seed.ts`
-- `.gitignore`
-
-**Yapılacaklar:**
-
-1. Auth var mı, session içinde hangi alanlar var raporla.
-2. RBAC hangi pathleri koruyor raporla.
-3. API route güvenliği route içinde mi, middleware içinde mi raporla.
-4. Demo-memory modu production'a sızabilir mi kontrol et.
-5. Test dosyaları gerçekten var mı kontrol et.
-6. Commitlenmiş generated dosya var mı kontrol et.
+**Yap:** Auth/session alanları, RBAC pathleri, API guard yaklaşımı, demo-memory production riski, gerçek test dosyaları, generated dosya varlığı raporu.
 
 **Çıktı:** Durum, kritik riskler, Faz 01'e geçilebilir mi?
 
-**Dur:** Bu faz sonunda dur.
+**Dur:** Bu faz sonunda dur. Commit yok.
 
 ---
 
-# PROMPT 01 — Repo hijyeni ve çalışma talimatları
+## PROMPT 01 — Repo hijyeni ve çalışma talimatları
 
-**Amaç:** Proje davranışını değiştirmeden Cursor/Codex güvenlik kurallarını repoya yerleştir.
+**Amaç:** Davranışı değiştirmeden repo guardrail ekle.
 
-**Okunacak dosyalar:** `.gitignore`, `package.json`, `apps/web/package.json`, varsa `README.md`, varsa `AGENTS.md`.
+**Oku:** `.gitignore`, `package.json`, `apps/web/package.json`, varsa `README.md`, varsa `AGENTS.md`.
 
-**Yapılacaklar:**
+**Yap:** README yoksa ekle; AGENTS yoksa ekle. AGENTS kararları: Uyanık Koç, CRM'den izole çalışma, AI Koç Yakında, production memory yasak, yeni ekran şişmesi yasak. `.gitignore` içine `*.tsbuildinfo` ekle; commitlenmiş `*.tsbuildinfo` varsa kaldır.
 
-1. `README.md` yoksa kısa ve gerçek durumu anlatan README ekle.
-2. `AGENTS.md` yoksa ekle. Kararlar: Uyanık Koç adı, CRM'den izole çalışma, AI Koç Yakında, production memory yasak, yeni ekran şişmesi yasak.
-3. `.gitignore` içine `*.tsbuildinfo` ekle.
-4. Repoda commitlenmiş `*.tsbuildinfo` varsa kaldır.
+**Test:** `pnpm typecheck`.
 
-**Test:** `pnpm typecheck`
-
-**Commit mesajı:** `chore: add repo guardrails`
+**Commit:** `chore: add repo guardrails`.
 
 **Dur:** Typecheck geçmezse commit atma.
 
 ---
 
-# PROMPT 02 — Production memory guard ve API guard standardı
+## PROMPT 02 — Production memory guard ve API guard standardı
 
-**Amaç:** Demo-memory modun production'a sızmasını engelle ve API korumasını standartlaştır.
+**Amaç:** Demo-memory production'a sızmasın; API guard standardı netleşsin.
 
-**Okunacak dosyalar:**
+**Oku:** `apps/web/lib/data/env.ts`, `packages/database/src/client.ts`, `.env.example`, `apps/web/.env.production.example`, `apps/web/lib/auth/api-guard.ts`, `apps/web/app/api/coach/assignments/route.ts`, `apps/web/app/api/student/assignments/route.ts`, `apps/web/app/api/parent/summary/route.ts`.
 
-- `apps/web/lib/data/env.ts`
-- `packages/database/src/client.ts`
-- `.env.example`
-- `apps/web/.env.production.example`
-- `apps/web/lib/auth/api-guard.ts`
-- `apps/web/app/api/coach/assignments/route.ts`
-- `apps/web/app/api/student/assignments/route.ts`
-- `apps/web/app/api/parent/summary/route.ts`
+**Yap:** Production'da demo-memory açıksa açık hata ver. `requireAuth` kullanımını netleştir; gerekirse küçük `withApiAuth` wrapper ekle. Mevcut 3 API route korumalı kalmalı.
 
-**Yapılacaklar:**
+**Yapma:** Auth provider veya endpoint path değiştirme.
 
-1. Production'da demo-memory açık kalırsa açık hata ver.
-2. `requireAuth` kullanımını netleştir.
-3. Gerekirse küçük `withApiAuth` wrapper ekle.
-4. Mevcut 3 API route'un korumalı kaldığını doğrula.
+**Test:** `pnpm typecheck`, `pnpm lint`.
 
-**Yapılmayacaklar:** Auth provider değiştirme, endpoint path değiştirme.
-
-**Test:** `pnpm typecheck`, `pnpm lint`
-
-**Commit mesajı:** `fix: guard production demo memory mode`
+**Commit:** `fix: guard production demo memory mode`.
 
 **Dur:** Auth/session davranışı değişirse raporla.
 
 ---
 
-# PROMPT 03 — İlk gerçek testler
+## PROMPT 03 — İlk gerçek testler
 
-**Amaç:** Var olan test configlerini gerçek testlerle desteklemek.
+**Amaç:** Test configlerini gerçek testlerle destekle.
 
-**Okunacak dosyalar:**
+**Oku:** `apps/web/vitest.config.ts`, `apps/web/playwright.config.ts`, `apps/web/package.json`, `apps/web/lib/rbac.ts`, `packages/shared/src/index.ts`, `apps/web/components/auth/LoginForm.tsx`, `apps/web/app/post-login/page.tsx`.
 
-- `apps/web/vitest.config.ts`
-- `apps/web/playwright.config.ts`
-- `apps/web/package.json`
-- `apps/web/lib/rbac.ts`
-- `packages/shared/src/index.ts`
-- `apps/web/components/auth/LoginForm.tsx`
-- `apps/web/app/post-login/page.tsx`
+**Yap:** Unit test ekle: `canAccessPath`, `getUnauthorizedRedirect`, `calculateNet`, `calculateStreak`, `calculateRiskScore`. E2E iskeleti ekle: login açılır, coach login olur, yanlış role route engellenir. Testler demo-memory ile çalışsın.
 
-**Yapılacaklar:**
+**Test:** `pnpm --filter @uyanik/web test`, `pnpm --filter @uyanik/web test:e2e`, `pnpm typecheck`.
 
-1. Unit test ekle: `canAccessPath`, `getUnauthorizedRedirect`, `calculateNet`, `calculateStreak`, `calculateRiskScore`.
-2. E2E iskeleti ekle: login sayfası açılır, coach login olur, yanlış role route engellenir.
-3. Testler demo-memory modda çalışsın.
+**Commit:** `test: add auth rbac and shared utility tests`.
 
-**Test:** `pnpm --filter @uyanik/web test`, `pnpm --filter @uyanik/web test:e2e`, `pnpm typecheck`
-
-**Commit mesajı:** `test: add auth rbac and shared utility tests`
-
-**Dur:** Playwright veya NextAuth testte çalışmazsa raporla.
+**Dur:** Playwright/NextAuth testte çalışmazsa raporla.
 
 ---
 
-# PROMPT 04 — Assignment alpha veri modeli
+## PROMPT 04 — Assignment alpha veri modeli
 
-**Amaç:** Ödev akışını production'a yaklaşan minimum modele taşımak.
+**Amaç:** Ödev akışını minimum production modeline yaklaştır.
 
-**Okunacak dosyalar:**
+**Oku:** `packages/database/prisma/schema.prisma`, `packages/database/prisma/seed.ts`, `packages/database/src/types.ts`, `packages/database/src/repositories/assignments.ts`, `apps/web/lib/data/assignments.ts`, `apps/web/mocks/assignments.ts`, `apps/web/app/api/coach/assignments/route.ts`, `apps/web/app/api/student/assignments/route.ts`.
 
-- `packages/database/prisma/schema.prisma`
-- `packages/database/prisma/seed.ts`
-- `packages/database/src/types.ts`
-- `packages/database/src/repositories/assignments.ts`
-- `apps/web/lib/data/assignments.ts`
-- `apps/web/mocks/assignments.ts`
-- `apps/web/app/api/coach/assignments/route.ts`
-- `apps/web/app/api/student/assignments/route.ts`
+**Yap:** Assignment için `description`, `type`, `priority`, `status`, `subject`, `dueDate`, `updatedAt` destekle. Prisma, repository, memory mock ve API tiplerini uyumlu yap. Sadece `title` ile POST hâlâ çalışsın. `completeAssignment` tamamlandı durumunu tutarlı güncellesin.
 
-**Yapılacaklar:**
+**Test:** `pnpm db:generate`, `pnpm typecheck`, `pnpm --filter @uyanik/web test`.
 
-Assignment için şu alanları ekle veya destekle:
+**Commit:** `feat: expand assignment alpha model`.
 
-```text
-description, type, priority, status, subject, dueDate, updatedAt
-```
-
-1. Prisma schema, repository, memory mock ve API tiplerini uyumlu yap.
-2. Sadece `title` ile POST hâlâ çalışsın.
-3. `completeAssignment` tamamlandı durumunu tutarlı güncellesin.
-
-**Test:** `pnpm db:generate`, `pnpm typecheck`, `pnpm --filter @uyanik/web test`
-
-**Commit mesajı:** `feat: expand assignment alpha model`
-
-**Dur:** Destructive migration gerekiyorsa önce `RISK REPORT — Prisma migration` üret.
+**Dur:** Destructive migration gerekiyorsa `RISK REPORT — Prisma migration` ver.
 
 ---
 
-# PROMPT 05 — Koç ödev formunu alpha seviyeye çıkar
+## PROMPT 05 — Koç ödev formunu alpha seviyeye çıkar
 
-**Amaç:** Basit başlık formunu gerçek alpha forma dönüştürmek.
+**Amaç:** Basit başlık formunu gerçek alpha forma dönüştür.
 
-**Okunacak dosyalar:**
+**Oku:** `apps/web/app/coach/assignments/create/page.tsx`, `apps/web/components/demo-flow/CreateAssignmentPanel.tsx`, `apps/web/app/api/coach/assignments/route.ts`.
 
-- `apps/web/app/coach/assignments/create/page.tsx`
-- `apps/web/components/demo-flow/CreateAssignmentPanel.tsx`
-- `apps/web/app/api/coach/assignments/route.ts`
+**Yap:** Forma `title`, `description`, `type`, `priority`, `subject`, `dueDate` ekle. Basit client validation ekle. Başarılı kayıtta ödev özeti göster. Mobilde tek kolon düzen kullan.
 
-**Yapılacaklar:**
+**Yapma:** Quill, Dropzone, Select2, çoklu öğrenci, bulk akış ekleme.
 
-1. Forma `title`, `description`, `type`, `priority`, `subject`, `dueDate` ekle.
-2. Basit client validation ekle.
-3. Başarılı kayıt sonrası ödev özeti göster.
-4. Mobilde tek kolon düzen kullan.
+**Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test:e2e`.
 
-**Yapılmayacaklar:** Quill, Dropzone, Select2, çoklu öğrenci, bulk akış ekleme.
+**Commit:** `feat: upgrade coach assignment form`.
 
-**Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test:e2e`
-
-**Commit mesajı:** `feat: upgrade coach assignment form`
-
-**Dur:** Yeni dependency gerekirse raporla.
+**Dur:** Yeni dependency gerekiyorsa raporla.
 
 ---
 
-# PROMPT 06 — Öğrenci ve veli ekranlarını yeni ödev verisine bağla
+## PROMPT 06 — Öğrenci ve veli ekranlarını yeni ödev verisine bağla
 
-**Amaç:** Assignment alpha alanlarını öğrenci ve veli tarafında görünür yapmak.
+**Amaç:** Assignment alpha alanlarını öğrenci ve veli tarafında görünür yap.
 
-**Okunacak dosyalar:**
+**Oku:** `apps/web/components/demo-flow/StudentAssignmentList.tsx`, `apps/web/components/student/StudentDashboard.tsx`, `apps/web/components/parent/ParentDashboard.tsx`, `apps/web/app/api/student/assignments/route.ts`, `apps/web/app/api/parent/summary/route.ts`.
 
-- `apps/web/components/demo-flow/StudentAssignmentList.tsx`
-- `apps/web/components/student/StudentDashboard.tsx`
-- `apps/web/components/parent/ParentDashboard.tsx`
-- `apps/web/app/api/student/assignments/route.ts`
-- `apps/web/app/api/parent/summary/route.ts`
+**Yap:** Öğrenci listesinde durum, öncelik, son tarih, ders/tür göster. Tamamla butonu sadece açık ödevlerde görünsün. Veli dashboard'a kural tabanlı haftalık yorum kartı ekle. OpenAI çağrısı yapma.
 
-**Yapılacaklar:**
+**Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test`, `pnpm --filter @uyanik/web test:e2e`.
 
-1. Öğrenci listesinde durum, öncelik, son tarih, ders/tür göster.
-2. Tamamla butonu sadece açık ödevlerde görünsün.
-3. Veli dashboard'a kural tabanlı haftalık yorum kartı ekle.
-4. OpenAI veya başka AI çağrısı yapma.
-
-**Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test`, `pnpm --filter @uyanik/web test:e2e`
-
-**Commit mesajı:** `feat: show assignment details in student and parent views`
+**Commit:** `feat: show assignment details in student and parent views`.
 
 **Dur:** Demo akışı kırılırsa raporla.
 
 ---
 
-# PROMPT 07 — AI Koç Yakında yüzeyi
+## PROMPT 07 — AI Koç Yakında yüzeyi
 
-**Amaç:** AI canlı değilken ürün farklılaştırmasını görünür tutmak.
+**Amaç:** AI canlı değilken farklılaştırmayı görünür tut.
 
-**Okunacak dosyalar:**
+**Oku:** `apps/web/components/layout/Sidebar.tsx`, `apps/web/components/student/StudentDashboard.tsx`, `.env.example`, `apps/web/.env.production.example`.
 
-- `apps/web/components/layout/Sidebar.tsx`
-- `apps/web/components/student/StudentDashboard.tsx`
-- `.env.example`
-- `apps/web/.env.production.example`
+**Yap:** `/student/ai-coach` sayfası ekle: `AI Koç Yakında`. Sidebar'a `AI Koç · Yakında` ekle. Student dashboard'a küçük yakında bandı ekle. `/api/ai-coach` placeholder route ekle; feature flag kapalıysa canlı cevap üretmesin.
 
-**Yapılacaklar:**
+**Yapma:** OpenAI SDK, streaming, upload, vision ekleme.
 
-1. `/student/ai-coach` sayfası ekle: `AI Koç Yakında`.
-2. Sidebar'a `AI Koç · Yakında` ekle.
-3. Student dashboard'a küçük yakında bandı ekle.
-4. `/api/ai-coach` placeholder ekle. Feature flag kapalıysa canlı cevap üretmesin.
+**Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test:e2e`.
 
-**Yapılmayacaklar:** OpenAI SDK, streaming, upload, vision ekleme.
-
-**Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test:e2e`
-
-**Commit mesajı:** `feat: add ai coach coming soon surface`
+**Commit:** `feat: add ai coach coming soon surface`.
 
 **Dur:** External API çağrısı gerekecekse raporla.
 
 ---
 
-# PROMPT 08 — Rules-v1 risk ve öneri
+## PROMPT 08 — Rules-v1 risk ve öneri
 
-**Amaç:** AI kullanmadan ilk akıllı değer katmanını eklemek.
+**Amaç:** AI kullanmadan ilk akıllı değer katmanı.
 
-**Okunacak dosyalar:**
+**Oku:** `packages/shared/src/index.ts`, `apps/web/components/coach/CoachDashboard.tsx`, `apps/web/components/parent/ParentDashboard.tsx`, `apps/web/components/student/StudentDashboard.tsx`, `apps/web/lib/data/assignments.ts`.
 
-- `packages/shared/src/index.ts`
-- `apps/web/components/coach/CoachDashboard.tsx`
-- `apps/web/components/parent/ParentDashboard.tsx`
-- `apps/web/components/student/StudentDashboard.tsx`
-- `apps/web/lib/data/assignments.ts`
+**Yap:** Pure helperlar ekle: completion rate, overdue count, rules-based risk, coach suggestion, parent weekly comment. Koç dashboard'a risk kartı, veli dashboard'a yorum kartı, öğrenci dashboard'a bugünkü öncelik kartı ekle.
 
-**Yapılacaklar:**
+**Yapma:** RiskScore DB tablosu, cron, worker, AI ekleme.
 
-1. Pure helper fonksiyonlar ekle: completion rate, overdue count, rules-based risk, coach suggestion, parent weekly comment.
-2. Koç dashboard'da risk kartı göster.
-3. Veli dashboard'da yorum kartı göster.
-4. Öğrenci dashboard'da bugünkü öncelik kartı göster.
+**Test:** `pnpm --filter @uyanik/shared test`, `pnpm typecheck`, `pnpm --filter @uyanik/web test`.
 
-**Yapılmayacaklar:** DB RiskScore tablosu, cron, worker, AI ekleme.
+**Commit:** `feat: add rules based risk suggestions`.
 
-**Test:** `pnpm --filter @uyanik/shared test`, `pnpm typecheck`, `pnpm --filter @uyanik/web test`
-
-**Commit mesajı:** `feat: add rules based risk suggestions`
-
-**Dur:** Pure helperlar UI içine gömülecekse raporla.
+**Dur:** Helperlar UI içine gömülecekse raporla.
 
 ---
 
-# PROMPT 09 — DB-backed alpha doğrulaması
+## PROMPT 09 — DB-backed alpha doğrulaması
 
-**Amaç:** Memory store dışında gerçek PostgreSQL ile akışın çalışmasını sağlamak.
+**Amaç:** Memory store dışında PostgreSQL ile akışı doğrula.
 
-**Okunacak dosyalar:**
+**Oku:** `packages/database/src/client.ts`, `packages/database/src/repositories/auth.ts`, `packages/database/src/repositories/assignments.ts`, `packages/database/prisma/schema.prisma`, `packages/database/prisma/seed.ts`, `apps/web/lib/auth/resolve-user.ts`, `apps/web/lib/data/env.ts`.
 
-- `packages/database/src/client.ts`
-- `packages/database/src/repositories/auth.ts`
-- `packages/database/src/repositories/assignments.ts`
-- `packages/database/prisma/schema.prisma`
-- `packages/database/prisma/seed.ts`
-- `apps/web/lib/auth/resolve-user.ts`
-- `apps/web/lib/data/env.ts`
+**Yap:** `DEMO_AUTH_ALLOW_IN_MEMORY=false` ve `DATABASE_URL` varken auth DB'den çalışsın. Seed sonrası demo kullanıcılar login olabilsin. Koç ödevi DB'ye yazsın, öğrenci tamamlayınca DB update olsun, veli summary DB'den gelsin.
 
-**Yapılacaklar:**
+**Test:** `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm typecheck`.
 
-1. `DEMO_AUTH_ALLOW_IN_MEMORY=false` ve `DATABASE_URL` varken auth DB'den çalışsın.
-2. Seed sonrası demo kullanıcılar login olabilsin.
-3. Koç ödev oluşturunca DB'ye yazılsın.
-4. Öğrenci tamamlayınca DB update olsun.
-5. Veli summary DB'den gelsin.
-
-**Test:** `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm typecheck`
-
-**Commit mesajı:** `fix: verify db backed alpha flow`
+**Commit:** `fix: verify db backed alpha flow`.
 
 **Dur:** Migration veya seed idempotent değilse raporla.
 
 ---
 
-# PROMPT 10 — Branch/Admin minimal shell
+## PROMPT 10 — Branch/Admin minimal shell
 
-**Amaç:** RBAC'ta var olan branch/admin rolleri boş görünmesin, franchise karmaşıklığı açılmasın.
+**Amaç:** RBAC'ta var olan branch/admin rolleri boş görünmesin; franchise karmaşıklığı açılmasın.
 
-**Okunacak dosyalar:**
+**Oku:** `apps/web/app/branch/dashboard/page.tsx`, `apps/web/app/admin/dashboard/page.tsx`, `apps/web/components/layout/Sidebar.tsx`, `apps/web/lib/rbac.ts`.
 
-- `apps/web/app/branch/dashboard/page.tsx`
-- `apps/web/app/admin/dashboard/page.tsx`
-- `apps/web/components/layout/Sidebar.tsx`
-- `apps/web/lib/rbac.ts`
+**Yap:** Branch/admin için minimal AppLayout kullan. Branch menüsü: Dashboard, Öğrenciler, Koçlar, Raporlar. Admin menüsü: Dashboard, Kullanıcılar, Sistem Sağlığı. Sayfalara `single-branch alpha` açıklaması ekle.
 
-**Yapılacaklar:**
+**Yapma:** CRUD, organization switcher, CRM entegrasyonu ekleme.
 
-1. Branch ve admin için minimal AppLayout kullan.
-2. Branch menüsü: Dashboard, Öğrenciler, Koçlar, Raporlar.
-3. Admin menüsü: Dashboard, Kullanıcılar, Sistem Sağlığı.
-4. Sayfalara `single-branch alpha` açıklaması ekle.
+**Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test:e2e`.
 
-**Yapılmayacaklar:** CRUD, organization switcher, CRM entegrasyonu ekleme.
-
-**Test:** `pnpm typecheck`, `pnpm --filter @uyanik/web test:e2e`
-
-**Commit mesajı:** `feat: add minimal branch admin shells`
+**Commit:** `feat: add minimal branch admin shells`.
 
 **Dur:** 10 dosya sınırı aşılırsa raporla.
 
 ---
 
-# PROMPT 11 — CI kalite kapısı
+## PROMPT 11 — CI kalite kapısı
 
 **Amaç:** Her push'ta minimum kalite kontrolü çalışsın.
 
-**Okunacak dosyalar:** `package.json`, `apps/web/package.json`, `pnpm-workspace.yaml`, `turbo.json`, varsa `.github/workflows/*`.
+**Oku:** `package.json`, `apps/web/package.json`, `pnpm-workspace.yaml`, `turbo.json`, varsa `.github/workflows/*`.
 
-**Yapılacaklar:**
+**Yap:** `.github/workflows/ci.yml` ekle. CI: install, db generate, typecheck, lint, unit test. E2E başlangıçta manual veya ayrı job olabilir. External secret gerektirme.
 
-1. `.github/workflows/ci.yml` ekle.
-2. CI adımları: install, db generate, typecheck, lint, unit test.
-3. E2E başlangıçta manual veya ayrı job olabilir.
-4. External secret gerektirme.
+**Test:** `pnpm typecheck`, `pnpm lint`, `pnpm test:unit`.
 
-**Test:** `pnpm typecheck`, `pnpm lint`, `pnpm test:unit`
-
-**Commit mesajı:** `ci: add basic quality gate`
+**Commit:** `ci: add basic quality gate`.
 
 **Dur:** CI external secret isterse raporla.
 
 ---
 
-# PROMPT 12 — Deploy kararı dokümantasyonu
+## PROMPT 12 — Deploy kararı dokümantasyonu
 
-**Amaç:** Production self-host, Vercel preview/demo kararını netleştirmek.
+**Amaç:** Production self-host, Vercel preview/demo kararını netleştir.
 
-**Okunacak dosyalar:** `.env.example`, `apps/web/.env.production.example`, varsa `deploy/*`, varsa `README.md`, varsa `vercel.json`.
+**Oku:** `.env.example`, `apps/web/.env.production.example`, varsa `deploy/*`, varsa `README.md`, varsa `vercel.json`.
 
-**Yapılacaklar:**
+**Yap:** `docs/deploy/DEPLOYMENT_DECISION.md` ekle. Production: kendi sunucu + ayrı app/db/upload/log. Vercel: preview/demo/landing. CRM izolasyon kararını yaz. Vercel config değiştirme; gerekirse raporla.
 
-1. `docs/deploy/DEPLOYMENT_DECISION.md` ekle.
-2. Production: kendi sunucu + ayrı app/db/upload/log.
-3. Vercel: preview/demo/landing için kullanılabilir.
-4. CRM izolasyon kararını yaz.
-5. Vercel config değiştirme; gerekirse raporla.
+**Test:** `pnpm typecheck`.
 
-**Test:** `pnpm typecheck`
-
-**Commit mesajı:** `docs: document deployment decision`
+**Commit:** `docs: document deployment decision`.
 
 **Dur:** Deploy config değişikliği gerekiyorsa raporla.
 
 ---
 
-# PROMPT 13 — Alpha durum raporu
+## PROMPT 13 — Alpha durum raporu
 
-**Amaç:** Kod değiştirmeden sprint sonu durum raporu üretmek.
+**Amaç:** Kod değiştirmeden sprint sonu durum raporu üret.
 
-**Okunacak dosyalar:** README, AGENTS, package dosyaları, Prisma schema, assignment API route'ları, test klasörleri.
+**Oku:** README, AGENTS, package dosyaları, Prisma schema, assignment API route'ları, test klasörleri.
 
-**Yapılacaklar:**
+**Yap:** `docs/reports/ALPHA_STATUS_REPORT.md` oluştur. İçerik: tamamlananlar, riskler, test durumu, DB-backed alpha, mobil/worker, AI Koç, sonraki 5 öncelik. Kod değiştirme.
 
-1. `docs/reports/ALPHA_STATUS_REPORT.md` oluştur.
-2. İçerik: tamamlananlar, riskler, test durumu, DB-backed alpha, mobil/worker, AI Koç, sonraki 5 öncelik.
-3. Kod değiştirme.
+**Commit:** `docs: add alpha status report`.
 
-**Commit mesajı:** `docs: add alpha status report`
-
-**Dur:** Bu sprint kapanışıdır. Yeni feature başlatma.
+**Dur:** Sprint kapanışıdır. Yeni feature başlatma.
 
 ---
 
-## Cursor'a verilecek başlatma mesajı
+## Cursor'a verilecek başlangıç mesajı
 
 ```text
 Bu dosyadaki fazları sırayla uygula. Şu anda yalnızca PROMPT 00'ı çalıştır. Faz sonunda dur, rapor ver ve sonraki faz için onay bekle. Risk raporu gerektiren durumda kod yazmayı bırak. Test geçmeden commit atma.
