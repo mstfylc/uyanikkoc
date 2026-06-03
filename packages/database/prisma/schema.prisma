@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DbRole {
+  STUDENT
+  COACH
+  PARENT
+  BRANCH_MANAGER
+  ORG_ADMIN
+}
+
+model Organization {
+  id       String   @id
+  name     String
+  branches Branch[]
+  users    User[]
+
+  @@map("organizations")
+}
+
+model Branch {
+  id             String       @id
+  organizationId String
+  name           String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users          User[]
+  assignments    Assignment[]
+
+  @@index([organizationId])
+  @@map("branches")
+}
+
+model User {
+  id             String          @id
+  email          String          @unique
+  passwordHash   String
+  role           DbRole
+  organizationId String
+  branchId       String
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch         Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  studentProfile StudentProfile?
+  coachProfile   CoachProfile?
+  parentProfile  ParentProfile?
+
+  @@index([organizationId, branchId])
+  @@map("users")
+}
+
+model StudentProfile {
+  id          String       @id
+  userId      String       @unique
+  parentId    String?
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent      ParentProfile? @relation(fields: [parentId], references: [id], onDelete: SetNull)
+  assignments Assignment[] @relation("StudentAssignments")
+
+  @@map("student_profiles")
+}
+
+model CoachProfile {
+  id          String       @id
+  userId      String       @unique
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignments Assignment[] @relation("CoachAssignments")
+
+  @@map("coach_profiles")
+}
+
+model ParentProfile {
+  id       String           @id
+  userId   String           @unique
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  children StudentProfile[]
+
+  @@map("parent_profiles")
+}
+
+model Assignment {
+  id          String         @id @default(cuid())
+  title       String
+  coachId     String
+  studentId   String
+  parentId    String
+  branchId    String
+  completed   Boolean        @default(false)
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+  coach       CoachProfile   @relation("CoachAssignments", fields: [coachId], references: [id], onDelete: Cascade)
+  student     StudentProfile @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
+  branch      Branch         @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([parentId])
+  @@index([branchId])
+  @@map("assignments")
+}

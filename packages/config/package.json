@@ -1,0 +1,9 @@
+{
+  "name": "@uyanik/config",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./eslint": "./eslint.json",
+    "./tsconfig": "./tsconfig.json"
+  }
+}

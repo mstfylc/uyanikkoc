@@ -1,0 +1,36 @@
+{
+  "name": "@uyanik/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3010",
+    "build": "next build",
+    "start": "next start -p 3010",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@uyanik/contracts": "workspace:*",
+    "@uyanik/database": "workspace:*",
+    "@uyanik/shared": "workspace:*",
+    "@uyanik/tokens": "workspace:*",
+    "@uyanik/ui-web": "workspace:*",
+    "bcryptjs": "^3.0.3",
+    "next": "^15.1.2",
+    "next-auth": "5.0.0-beta.25",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "eslint-config-next": "^15.1.2",
+    "vitest": "^3.0.5"
+  }
+}

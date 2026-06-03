@@ -1,0 +1,12 @@
+{
+  "name": "@uyanik/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0",
+    "dev": "node -e \"console.log('worker dev placeholder')\"",
+    "test": "node --test"
+  }
+}

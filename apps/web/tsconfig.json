@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "jsx": "preserve",
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./*"],
+      "@uyanik/contracts": ["../../packages/contracts/src/index.ts"],
+      "@uyanik/database": ["../../packages/database/src/index.ts"],
+      "@uyanik/shared": ["../../packages/shared/src/index.ts"],
+      "@uyanik/tokens": ["../../packages/tokens/src/index.ts"],
+      "@uyanik/ui-web": ["../../packages/ui-web/src/index.tsx"]
+    },
+    "allowJs": true,
+    "incremental": true
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
