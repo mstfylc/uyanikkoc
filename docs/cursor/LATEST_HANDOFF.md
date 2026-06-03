@@ -1,7 +1,7 @@
 # Latest Handoff
 
 **Son tamamlanan faz:** PROMPT 01 — Repo hijyeni  
-**Commit:** _(aşağıdaki commit hash ile güncellenecek)_  
+**Commit:** `135b51b` — chore: add repo guardrails  
 **Branch:** main  
 
 ## Durum
