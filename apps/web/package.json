@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev -p 3010",
     "prebuild": "node scripts/check-metronic.mjs",
-    "build": "next build",
+    "build": "pnpm --filter @uyanik/database generate && next build",
     "start": "next start -p 3010",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0",

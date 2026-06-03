@@ -1,6 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rootDirectory": "apps/web",
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm db:generate && pnpm --filter @uyanik/web build"
+  "rootDirectory": "apps/web"
 }
