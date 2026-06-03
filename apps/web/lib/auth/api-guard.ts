@@ -1,14 +1,27 @@
 import type { AppRole } from "@uyanik/tokens";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { assertProductionMemoryPolicy } from "@/lib/data/env";
+
 import { auth } from "../../auth";
 import type { SessionRoleSnapshot } from "../rbac";
+
+export type ApiAuthContext = {
+  session: SessionRoleSnapshot;
+};
+
+export type ApiRouteHandler = (
+  req: NextRequest,
+  ctx: ApiAuthContext,
+) => Promise<NextResponse> | NextResponse;
 
 export async function requireAuth(
   req: NextRequest,
   allowedRoles: AppRole[],
 ): Promise<{ session: SessionRoleSnapshot } | NextResponse> {
   void req;
+
+  assertProductionMemoryPolicy();
 
   const session = await auth();
 
@@ -32,5 +45,16 @@ export async function requireAuth(
         parentId: session.user.parentId ?? null,
       },
     },
+  };
+}
+
+export function withApiAuth(allowedRoles: AppRole[], handler: ApiRouteHandler) {
+  return async (req: NextRequest): Promise<NextResponse> => {
+    const authResult = await requireAuth(req, allowedRoles);
+    if (authResult instanceof NextResponse) {
+      return authResult;
+    }
+
+    return handler(req, { session: authResult.session });
   };
 }

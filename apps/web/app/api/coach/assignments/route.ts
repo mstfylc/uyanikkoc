@@ -1,6 +1,6 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
-import { requireAuth } from "@/lib/auth/api-guard";
+import { withApiAuth } from "@/lib/auth/api-guard";
 import {
   DEMO_PARENT_ID,
   DEMO_STUDENT_ID,
@@ -8,29 +8,17 @@ import {
   listAssignmentsForCoach,
 } from "@/lib/data/assignments";
 
-export async function GET(req: NextRequest) {
-  const authResult = await requireAuth(req, ["coach"]);
-
-  if (authResult instanceof NextResponse) {
-    return authResult;
-  }
-
-  const coachId = authResult.session.user.coachId;
+export const GET = withApiAuth(["coach"], async (_req, { session }) => {
+  const coachId = session.user.coachId;
   if (!coachId) {
     return NextResponse.json({ error: "Coach profile missing" }, { status: 400 });
   }
 
   const assignments = await listAssignmentsForCoach(coachId);
   return NextResponse.json({ assignments }, { status: 200 });
-}
+});
 
-export async function POST(req: NextRequest) {
-  const authResult = await requireAuth(req, ["coach"]);
-
-  if (authResult instanceof NextResponse) {
-    return authResult;
-  }
-
+export const POST = withApiAuth(["coach"], async (req, { session }) => {
   const body = (await req.json()) as { title?: string };
   const title = body.title?.trim();
 
@@ -38,8 +26,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Title is required" }, { status: 400 });
   }
 
-  const coachId = authResult.session.user.coachId;
-  const branchId = authResult.session.user.branchId;
+  const coachId = session.user.coachId;
+  const branchId = session.user.branchId;
   if (!coachId || !branchId) {
     return NextResponse.json({ error: "Coach profile missing" }, { status: 400 });
   }
@@ -53,4 +41,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ assignment }, { status: 200 });
-}
+});

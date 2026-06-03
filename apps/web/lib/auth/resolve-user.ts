@@ -1,7 +1,7 @@
 import type { AuthUserRecord } from "@uyanik/database";
 import type { DbRole } from "@uyanik/tokens";
 
-import { shouldUseDatabase } from "@/lib/data/env";
+import { shouldUseDatabase, assertProductionMemoryPolicy } from "@/lib/data/env";
 import { demoUsers, type DemoUser } from "./demo-users";
 
 function mapDemoUser(user: DemoUser): AuthUserRecord {
@@ -20,6 +20,7 @@ function mapDemoUser(user: DemoUser): AuthUserRecord {
 
 export async function resolveUserByEmail(email: string): Promise<AuthUserRecord | null> {
   if (!shouldUseDatabase()) {
+    assertProductionMemoryPolicy();
     const user = demoUsers.find((demoUser) => demoUser.email === email);
     return user ? mapDemoUser(user) : null;
   }
