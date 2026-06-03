@@ -93,7 +93,7 @@ export async function getParentSummary(parentId: string): Promise<ParentSummaryR
   });
 
   const mapped = assignments.map(mapAssignment);
-  const completedCount = mapped.filter((assignment) => assignment.completed).length;
+  const completedCount = mapped.filter((a) => a.completed).length;
 
   return {
     totalAssignments: mapped.length,
