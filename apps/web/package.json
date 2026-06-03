@@ -9,7 +9,7 @@
     "build": "pnpm --filter @uyanik/database generate && next build",
     "start": "next start -p 3010",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 0",
+    "lint": "eslint app auth.ts components e2e hooks lib middleware.ts mocks types __tests__ --max-warnings 0",
     "test": "vitest run",
     "test:e2e": "playwright test"
   },

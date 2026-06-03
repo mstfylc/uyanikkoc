@@ -1,26 +1,19 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 01 — Repo hijyeni  
-**Commit:** `135b51b` — chore: add repo guardrails  
+**Son tamamlanan faz:** PROMPT 03 — İlk gerçek testler  
 **Branch:** main  
 
 ## Durum
 
-- README.md ve AGENTS.md eklendi
-- `.gitignore` → `*.tsbuildinfo`
-- 8 adet commitlenmiş tsbuildinfo git'ten kaldırıldı
-- `pnpm typecheck` geçti
+- PROMPT 02: production memory guard + `withApiAuth` + 3 API route refactor
+- PROMPT 03: env/rbac unit testleri, auth-rbac E2E, playwright port 3011, lint `.next` fix
+- Tüm testler geçti (typecheck, lint, unit 12, e2e 8)
 
 ## Sonraki faz
 
-**PROMPT 02** — Production memory guard + API guard standardı
+**PROMPT 04** — Assignment alpha veri modeli (**onay bekleniyor**)
 
-## Açık riskler (özet)
+## Açık riskler
 
-1. Production'da demo-memory guard henüz kodda yok (PROMPT 02)
-2. Vercel dashboard Output Directory → 404 (deploy, PROMPT 12)
-3. Seed'de örnek Assignment yok (PROMPT 09)
-
-## Onay bekleniyor
-
-PROMPT 02 için kullanıcı onayı.
+- PROMPT 04 Prisma migration gerekebilir — onay sonrası değerlendirilecek
+- Vercel deploy 404 (dashboard ayarı, PROMPT 12)

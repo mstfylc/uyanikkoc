@@ -69,11 +69,17 @@ export function ParentDashboard() {
   const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5" data-testid="parent-summary">
       <div>
         <h1 className="text-xl font-semibold text-mono">Veli Dashboard</h1>
         <p className="text-sm text-muted-foreground">Öğrencinizin ilerleme özeti</p>
       </div>
+
+      {!isLoading && summary ? (
+        <p className="sr-only">
+          Tamamlanan: {completed}
+        </p>
+      ) : null}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
         <StatCard label="Toplam Ödev" value={isLoading ? "—" : total} icon="ki-notepad-edit" />

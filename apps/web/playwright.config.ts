@@ -3,23 +3,26 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const configDir = path.dirname(fileURLToPath(import.meta.url));
+const e2ePort = 3011;
+const baseURL = `http://localhost:${e2ePort}`;
 
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
+  workers: 1,
   retries: 0,
   timeout: 120_000,
   use: {
-    baseURL: "http://localhost:3010",
+    baseURL,
     trace: "on-first-retry",
     navigationTimeout: 45_000,
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: "pnpm exec next dev -p 3010",
+    command: `pnpm exec next dev -p ${e2ePort}`,
     cwd: configDir,
-    url: "http://localhost:3010",
-    reuseExistingServer: true,
+    url: `${baseURL}/api/health`,
+    reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },
 });
