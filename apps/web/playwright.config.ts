@@ -24,5 +24,9 @@ export default defineConfig({
     url: `${baseURL}/api/health`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    env: {
+      ...process.env,
+      DEMO_AUTH_ALLOW_IN_MEMORY: "true",
+    },
   },
 });

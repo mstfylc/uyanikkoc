@@ -1,25 +1,26 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** BACKLOG PROMPT 14 — Assignment service layer  
-**Son commit:** `2945c0f` — `refactor: introduce assignment service layer`  
+**Son tamamlanan faz:** BACKLOG PROMPT 17 — Kullanıcı tanımlı konu takibi  
+**Son commit:** _(commit sonrası)_ — `feat: add user defined topic tracking`  
 **Branch:** main  
 
-## PROMPT 14 özeti
+## PROMPT 17 özeti
 
-- `apps/web/server/services/assignment.service.ts` — mock/DB seçimi, coach create (demo student/parent), list/complete/summary
-- API route'lar: auth → parse → service → response (`coach/student/parent` assignments + summary)
-- `lib/data/assignments.ts` — geriye dönük ince re-export (davranış aynı)
+- Prisma: `Subject`, `Topic`, `TopicProgress` + `TopicExamType` (TYT/AYT/LGS/GENEL)
+- Migration: `20260604180000_user_defined_topics`
+- API: `/api/student/topics` (GET/POST), `/api/student/topics/[id]` (PATCH/DELETE)
+- UI: dashboard konu özeti kartı, `/student/topics` CRUD paneli
+- Bellek + DB adapter; seed örnek konular (silinebilir)
 
 ## Durum
 
-- Sprint 1: PROMPT 00–13 tamamlandı
-- Faz 2: PROMPT 14 (service layer) tamamlandı; backlog dosyasındaki “roster” maddesi kullanıcı yönlendirmesiyle **service layer** olarak uygulandı
-- Sonraki: `CURSOR_NEXT_BACKLOG.md` sırasına göre **17** (veya roster ihtiyacı ayrı faz olarak planlanabilir)
+- Faz 2: 14 ✓, **17 ✓** — sıradaki **18** (deneme sonuçları YKS)
+- Yerel DB: `pnpm db:migrate` + `pnpm db:seed` (yeni tablolar için)
 
-## Test özeti (P14)
+## Test özeti (P17)
 
-typecheck ✓ · unit 28 ✓ · e2e 10 ✓
+db:generate ✓ · typecheck ✓ · unit 31 ✓ · e2e 10 ✓
 
 ## Not
 
-Önceki handoff: `2bbe952` (PROMPT 13). CI/DB/branch-admin doğrulaması değişmedi.
+E2E `playwright.config.ts`: `DEMO_AUTH_ALLOW_IN_MEMORY=true` (migrate edilmemiş DB ile çakışmayı önler).

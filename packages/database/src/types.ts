@@ -41,6 +41,52 @@ export type ParentSummaryRecord = {
   assignments: AssignmentRecord[];
 };
 
+export type TopicExamType = "TYT" | "AYT" | "LGS" | "GENEL";
+
+export type TopicProgressRecord = {
+  completed: boolean;
+  completedAt: string | null;
+  updatedAt: string;
+};
+
+export type TopicRecord = {
+  id: string;
+  subjectId: string;
+  studentId: string;
+  name: string;
+  progress: TopicProgressRecord;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type SubjectRecord = {
+  id: string;
+  studentId: string;
+  examType: TopicExamType;
+  name: string;
+  topics: TopicRecord[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TopicTrackingSummary = {
+  totalTopics: number;
+  completedTopics: number;
+  completionRate: number;
+};
+
+export type CreateSubjectInput = {
+  studentId: string;
+  examType: TopicExamType;
+  name: string;
+};
+
+export type CreateTopicInput = {
+  subjectId: string;
+  studentId: string;
+  name: string;
+};
+
 export type AuthUserRecord = {
   id: string;
   email: string;

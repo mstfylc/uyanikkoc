@@ -78,6 +78,11 @@ export function calculateStreak(dates: string[], today: string): number {
 }
 
 export {
+  calculateTopicCompletionRate,
+  TOPIC_EXAM_TYPE_LABELS,
+} from "./topic-insights";
+
+export {
   buildCoachSuggestion,
   buildParentWeeklyComment,
   buildRulesBasedRiskBand,

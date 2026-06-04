@@ -131,7 +131,65 @@ async function main() {
     },
   });
 
-  console.log("Seed completed: demo org, branch, users, profiles, sample assignment");
+  const sampleSubject = await prisma.subject.upsert({
+    where: { id: "subject_seed_tyt_mat" },
+    update: {
+      studentId: "student_001",
+      examType: "TYT",
+      name: "Matematik (ornek — silinebilir)",
+    },
+    create: {
+      id: "subject_seed_tyt_mat",
+      studentId: "student_001",
+      examType: "TYT",
+      name: "Matematik (ornek — silinebilir)",
+    },
+  });
+
+  await prisma.topic.upsert({
+    where: { id: "topic_seed_tyt_1" },
+    update: {
+      subjectId: sampleSubject.id,
+      studentId: "student_001",
+      name: "Temel kavramlar (ornek)",
+    },
+    create: {
+      id: "topic_seed_tyt_1",
+      subjectId: sampleSubject.id,
+      studentId: "student_001",
+      name: "Temel kavramlar (ornek)",
+      progress: {
+        create: {
+          studentId: "student_001",
+          completed: true,
+          completedAt: new Date(),
+        },
+      },
+    },
+  });
+
+  await prisma.topic.upsert({
+    where: { id: "topic_seed_tyt_2" },
+    update: {
+      subjectId: sampleSubject.id,
+      studentId: "student_001",
+      name: "Problemler (ornek)",
+    },
+    create: {
+      id: "topic_seed_tyt_2",
+      subjectId: sampleSubject.id,
+      studentId: "student_001",
+      name: "Problemler (ornek)",
+      progress: {
+        create: {
+          studentId: "student_001",
+          completed: false,
+        },
+      },
+    },
+  });
+
+  console.log("Seed completed: demo org, branch, users, profiles, assignment, sample topics");
 }
 
 main()

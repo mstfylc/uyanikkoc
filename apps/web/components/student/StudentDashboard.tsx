@@ -12,8 +12,14 @@ import {
 import {
   buildStudentPriorityAssignment,
   calculateCompletionRate,
+  calculateTopicCompletionRate,
 } from "@uyanik/shared";
-import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
+import type {
+  AssignmentPriority,
+  AssignmentStatus,
+  AssignmentType,
+  TopicTrackingSummary,
+} from "@uyanik/database";
 
 type Assignment = {
   id: string;
@@ -62,16 +68,29 @@ function StatCard({ label, value, icon, tone = "primary" }: StatCardProps) {
 
 export function StudentDashboard() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [topicSummary, setTopicSummary] = useState<TopicTrackingSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTopicsLoading, setIsTopicsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const response = await fetch("/api/student/assignments", { credentials: "same-origin" });
-      if (response.ok) {
-        const data = (await response.json()) as { assignments: Assignment[] };
+      const [assignmentsResponse, topicsResponse] = await Promise.all([
+        fetch("/api/student/assignments", { credentials: "same-origin" }),
+        fetch("/api/student/topics", { credentials: "same-origin" }),
+      ]);
+
+      if (assignmentsResponse.ok) {
+        const data = (await assignmentsResponse.json()) as { assignments: Assignment[] };
         setAssignments(data.assignments);
       }
+
+      if (topicsResponse.ok) {
+        const data = (await topicsResponse.json()) as { summary: TopicTrackingSummary };
+        setTopicSummary(data.summary);
+      }
+
       setIsLoading(false);
+      setIsTopicsLoading(false);
     }
 
     void load();
@@ -81,6 +100,9 @@ export function StudentDashboard() {
   const completed = assignments.filter((item) => item.completed).length;
   const pending = total - completed;
   const completionRate = calculateCompletionRate(total, completed);
+  const topicCompletionRate = topicSummary
+    ? calculateTopicCompletionRate(topicSummary.totalTopics, topicSummary.completedTopics)
+    : 0;
   const priorityAssignment = buildStudentPriorityAssignment(assignments);
 
   return (
@@ -125,6 +147,29 @@ export function StudentDashboard() {
           ) : (
             <p className="text-sm text-muted-foreground">Acik odev yok — harika!</p>
           )}
+        </div>
+      </div>
+
+      <div className="kt-card" data-testid="student-topic-summary-card">
+        <div className="kt-card-body p-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-base font-medium">Konu Tamamlama Ozeti</h3>
+            {isTopicsLoading ? (
+              <p className="text-sm text-muted-foreground">Yukleniyor...</p>
+            ) : topicSummary && topicSummary.totalTopics > 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {topicSummary.completedTopics}/{topicSummary.totalTopics} konu tamamlandi (
+                {topicCompletionRate}%)
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Henuz konu yok — kendi konu listeni olusturabilirsin.
+              </p>
+            )}
+          </div>
+          <Link href="/student/topics" className="kt-btn kt-btn-sm kt-btn-light self-start sm:self-auto">
+            Konu Takibi
+          </Link>
         </div>
       </div>
 

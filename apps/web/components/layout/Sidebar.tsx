@@ -22,7 +22,7 @@ const MENU_BY_ROLE: Record<"coach" | "student" | "parent" | "branch" | "admin", 
   student: [
     { href: "/student/dashboard", label: "Dashboard", icon: "ki-element-11" },
     { href: "/student/dashboard", label: "Çalışma Programı", icon: "ki-calendar" },
-    { href: "/student/dashboard", label: "Konu Takibi", icon: "ki-book-open" },
+    { href: "/student/topics", label: "Konu Takibi", icon: "ki-book-open" },
     { href: "/student/dashboard", label: "Denemeler", icon: "ki-chart-simple" },
     { href: "/student/assignments", label: "Ödevlerim", icon: "ki-notepad-edit" },
     { href: "/student/ai-coach", label: "AI Koç · Yakında", icon: "ki-technology-2" },
