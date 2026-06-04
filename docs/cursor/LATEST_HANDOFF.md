@@ -1,7 +1,7 @@
 # Latest Handoff
 
 **Son tamamlanan faz:** BACKLOG PROMPT 17 — Kullanıcı tanımlı konu takibi  
-**Son commit:** _(commit sonrası)_ — `feat: add user defined topic tracking`  
+**Son commit:** `0856a50` — `feat: add user defined topic tracking`  
 **Branch:** main  
 
 ## PROMPT 17 özeti
