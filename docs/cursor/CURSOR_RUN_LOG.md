@@ -10,4 +10,5 @@
 | 2026-06-04 | PROMPT 05 | 3d2b009 | typecheck ✓ e2e 8 ✓ | coach assignment form alpha |
 | 2026-06-04 | PROMPT 06 | 663c634 | typecheck ✓ unit 15 ✓ e2e 8 ✓ | student/parent alpha display |
 | 2026-06-04 | PROMPT 07 | ad9c9de | typecheck ✓ e2e 8 ✓ | AI coach coming soon surface |
-| 2026-06-04 | PROMPT 08 | (pending) | shared 13 ✓ typecheck ✓ web 15 ✓ | rules-based risk suggestions |
+| 2026-06-04 | PROMPT 08 | c1147f6 | shared 13 ✓ typecheck ✓ web 15 ✓ | rules-based risk suggestions |
+| 2026-06-04 | PROMPT 09 | — | — | DURDU: DATABASE_URL yok (RISK_REPORT) |
