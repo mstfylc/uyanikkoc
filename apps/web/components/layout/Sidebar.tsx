@@ -10,7 +10,7 @@ type MenuItem = {
   icon: string;
 };
 
-const MENU_BY_ROLE: Record<"coach" | "student" | "parent", MenuItem[]> = {
+const MENU_BY_ROLE: Record<"coach" | "student" | "parent" | "branch" | "admin", MenuItem[]> = {
   coach: [
     { href: "/coach/dashboard", label: "Dashboard", icon: "ki-element-11" },
     { href: "/coach/dashboard", label: "Öğrencilerim", icon: "ki-people" },
@@ -34,14 +34,33 @@ const MENU_BY_ROLE: Record<"coach" | "student" | "parent", MenuItem[]> = {
     { href: "/parent/dashboard", label: "Koça Mesaj", icon: "ki-messages" },
     { href: "/parent/dashboard", label: "Bildirimler", icon: "ki-notification-on" },
   ],
+  branch: [
+    { href: "/branch/dashboard", label: "Dashboard", icon: "ki-element-11" },
+    { href: "/branch/dashboard", label: "Öğrenciler", icon: "ki-people" },
+    { href: "/branch/dashboard", label: "Koçlar", icon: "ki-profile-circle" },
+    { href: "/branch/dashboard", label: "Raporlar", icon: "ki-graph-up" },
+  ],
+  admin: [
+    { href: "/admin/dashboard", label: "Dashboard", icon: "ki-element-11" },
+    { href: "/admin/dashboard", label: "Kullanıcılar", icon: "ki-people" },
+    { href: "/admin/dashboard", label: "Sistem Sağlığı", icon: "ki-shield-tick" },
+  ],
 };
 
 type SidebarProps = {
   role: AppRole;
 };
 
+const ROLE_DASHBOARD_PATHS = new Set([
+  "/coach/dashboard",
+  "/student/dashboard",
+  "/parent/dashboard",
+  "/branch/dashboard",
+  "/admin/dashboard",
+]);
+
 function isActive(pathname: string, href: string): boolean {
-  if (href === "/coach/dashboard" || href === "/student/dashboard" || href === "/parent/dashboard") {
+  if (ROLE_DASHBOARD_PATHS.has(href)) {
     return pathname === href;
   }
 

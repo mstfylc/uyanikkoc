@@ -13,3 +13,4 @@
 | 2026-06-04 | PROMPT 08 | c1147f6 | shared 13 ✓ typecheck ✓ web 15 ✓ | rules-based risk suggestions |
 | 2026-06-04 | PROMPT 09 | — | — | DURDU: DATABASE_URL yok (RISK_REPORT) |
 | 2026-06-04 | PROMPT 09 | f2e8930 | generate ✓ migrate ✓ seed ✓ verify ✓ typecheck ✓ | DB-backed alpha flow |
+| 2026-06-04 | PROMPT 10 | (pending) | typecheck ✓ e2e 10 ✓ | branch/admin minimal shells |

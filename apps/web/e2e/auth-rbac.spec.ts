@@ -28,4 +28,18 @@ test.describe("Auth ve RBAC iskeleti", () => {
     await page.waitForURL("**/student/dashboard");
     expect(page.url()).toContain("/student/dashboard");
   });
+
+  test("şube yöneticisi dashboard'a ulaşır", async ({ page }) => {
+    await login(page, "branch@uyanik.local");
+    await expect(page).toHaveURL(/\/branch\/dashboard/);
+    await expect(page.getByTestId("branch-dashboard")).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Şube Dashboard");
+  });
+
+  test("admin dashboard'a ulaşır", async ({ page }) => {
+    await login(page, "admin@uyanik.local");
+    await expect(page).toHaveURL(/\/admin\/dashboard/);
+    await expect(page.getByTestId("admin-dashboard")).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Admin Dashboard");
+  });
 });

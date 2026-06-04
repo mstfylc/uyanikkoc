@@ -1,20 +1,20 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 09 — DB-backed alpha dogrulama  
-**Commits:** `fix: verify db backed alpha flow`  
+**Son tamamlanan faz:** PROMPT 10 — Branch/Admin minimal shell  
+**Commits:** `feat: add minimal branch admin shells`  
 **Branch:** main  
 
 ## Durum
 
-- Seed: demo kullanicilar + ornek assignment (parent FK sirasi duzeltildi)
-- `pnpm db:verify-alpha`: auth, create, complete, parent summary dogrulandi
-- Yerel DB: `docker compose -f docker-compose.dev.yml up -d`
-- Test: generate ✓ migrate ✓ seed ✓ verify ✓ typecheck ✓
+- Branch ve admin icin AppLayout + Sidebar menuleri
+- Dashboard sayfalari: single-branch alpha aciklamasi
+- E2E: 10/10 (branch + admin login testleri eklendi)
+- Test: typecheck ✓ e2e 10 ✓
 
 ## Sonraki faz
 
-**PROMPT 10** — Branch/Admin minimal shell (onay bekleniyor)
+**PROMPT 11** — CI kalite kapisi (onay bekleniyor)
 
 ## Not
 
-`.env.local` icinde `DATABASE_URL` + `DEMO_AUTH_ALLOW_IN_MEMORY=false` ile web DB modunda calisir.
+Demo: branch@uyanik.local, admin@uyanik.local / uyanik123
