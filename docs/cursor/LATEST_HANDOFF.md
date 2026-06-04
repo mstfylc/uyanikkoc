@@ -1,20 +1,19 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 12 — Deploy karari dokumantasyonu  
-**Commits:** `docs: document deployment decision`  
+**Son tamamlanan faz:** PROMPT 13 — Alpha durum raporu (Sprint 1 kapanisi)  
+**Commits:** `docs: add alpha status report`  
 **Branch:** main  
 
 ## Durum
 
-- `docs/deploy/DEPLOYMENT_DECISION.md`: self-host production, Vercel preview, CRM izolasyonu
-- Vercel 404 riski dokumante (Output Directory override yasak)
-- Config degisikligi yapilmadi (prompt uyumu)
-- Test: typecheck ✓
+- Sprint 1 (PROMPT 00–13) dokumante tamamlandi
+- `docs/reports/ALPHA_STATUS_REPORT.md` olusturuldu
+- Faz 2 baslangic: `CURSOR_NEXT_BACKLOG.md` → PROMPT 14
 
-## Sonraki faz
+## Sonraki adim
 
-**PROMPT 13** — Alpha durum raporu (sprint kapanisi)
+**BACKLOG PROMPT 14** — Koç öğrenci roster (onay ile)
 
 ## Not
 
-Production deploy icin Dashboard + self-host checklist belgede.
+Yeni feature PROMPT 13 sonrasi backlog sirasindan baslar.
