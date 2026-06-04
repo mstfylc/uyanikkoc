@@ -1,33 +1,25 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 13 — Alpha durum raporu (Sprint 1 kapanışı)  
-**Son commit:** `2bbe952` — docs: sync handoff with actual progress  
+**Son tamamlanan faz:** BACKLOG PROMPT 14 — Assignment service layer  
+**Son commit:** `refactor: introduce assignment service layer` (main, 1 ahead of origin)  
 **Branch:** main  
 
-## Faz 1 doğrulama (09–11) — 2026-06-04
+## PROMPT 14 özeti
 
-| Faz | Commit | Mesaj |
-|-----|--------|-------|
-| 09 | `f2e8930` | fix: verify db backed alpha flow |
-| 10 | `945e178` | feat: add minimal branch admin shells |
-| 11 | `4c42424` | ci: add basic quality gate |
+- `apps/web/server/services/assignment.service.ts` — mock/DB seçimi, coach create (demo student/parent), list/complete/summary
+- API route'lar: auth → parse → service → response (`coach/student/parent` assignments + summary)
+- `lib/data/assignments.ts` — geriye dönük ince re-export (davranış aynı)
 
 ## Durum
 
-- Sprint 1: PROMPT 00–13 tamamlandı (10–13 dahil)
-- `.github/workflows/ci.yml` mevcut
-- Branch/admin: `layout.tsx` → `AppLayout`; dashboard içerik dolu
-- DB (`DEMO_AUTH_ALLOW_IN_MEMORY=false`): generate ✓ migrate ✓ seed ✓ verify-alpha ✓
-- Faz 2: `CURSOR_NEXT_BACKLOG.md` (Yol-C) → **BACKLOG 14**
+- Sprint 1: PROMPT 00–13 tamamlandı
+- Faz 2: PROMPT 14 (service layer) tamamlandı; backlog dosyasındaki “roster” maddesi kullanıcı yönlendirmesiyle **service layer** olarak uygulandı
+- Sonraki: `CURSOR_NEXT_BACKLOG.md` sırasına göre **17** (veya roster ihtiyacı ayrı faz olarak planlanabilir)
 
-## Test özeti
+## Test özeti (P14)
 
-typecheck ✓ · lint ✓ · unit 28 ✓ · e2e 10 ✓ · db:verify-alpha ✓
-
-## Sonraki adım
-
-BACKLOG PROMPT 14 onayı.
+typecheck ✓ · unit 28 ✓ · e2e 10 ✓
 
 ## Not
 
-Eski `LATEST_HANDOFF` “PROMPT 00 not-started” şablonu `origin/main` doküman commit’lerindeydi; yerel dosya sprint gerçeğini yansıtır.
+Önceki handoff: `2bbe952` (PROMPT 13). CI/DB/branch-admin doğrulaması değişmedi.

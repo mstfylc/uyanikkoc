@@ -1,3 +1,11 @@
+# Risk Report — BACKLOG PROMPT 14
+
+**Tarih:** 2026-06-03  
+**Faz:** Assignment service layer (refactor only)  
+**Durum:** Risk yok — davranış değişmedi; yeni tablo/endpoint/dependency yok.
+
+---
+
 # Risk Report — PROMPT 09
 
 **Tarih:** 2026-06-04  

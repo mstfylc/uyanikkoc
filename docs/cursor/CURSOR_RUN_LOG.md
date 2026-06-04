@@ -17,6 +17,7 @@
 | 2026-06-04 | PROMPT 11 | 4c42424 | typecheck ✓ lint ✓ unit 28 ✓ | CI quality gate workflow |
 | 2026-06-04 | PROMPT 12 | e8c31e8 | typecheck ✓ | deployment decision doc |
 | 2026-06-04 | PROMPT 13 | e14f8a5 | typecheck ✓ | alpha status report (sprint close) |
+| 2026-06-04 | BACKLOG 14 | a7cf7c6 | typecheck ✓ unit 28 ✓ e2e 10 ✓ | assignment service layer refactor |
 
 ## Kural (remote şablon ile uyumlu)
 
