@@ -7,4 +7,4 @@
 | 2026-06-04 | PROMPT 02 | 6f87c3d | typecheck ✓ lint ✓ | memory guard, withApiAuth |
 | 2026-06-04 | PROMPT 03 | 3425bbd | unit 12 ✓ e2e 8 ✓ typecheck ✓ | env/rbac tests, playwright 3011 |
 | 2026-06-04 | PROMPT 04 | 26221d8 | generate ✓ typecheck ✓ unit 15 ✓ | assignment alpha model |
-| 2026-06-04 | PROMPT 05 | (pending) | typecheck ✓ e2e 8 ✓ | coach assignment form alpha |
+| 2026-06-04 | PROMPT 05 | 3d2b009 | typecheck ✓ e2e 8 ✓ | coach assignment form alpha |

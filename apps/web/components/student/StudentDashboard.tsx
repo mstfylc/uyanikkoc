@@ -3,9 +3,23 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import {
+  ASSIGNMENT_PRIORITY_LABELS,
+  ASSIGNMENT_STATUS_LABELS,
+  ASSIGNMENT_TYPE_LABELS,
+  formatAssignmentDueDate,
+} from "@/lib/assignment-labels";
+import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
+
 type Assignment = {
   id: string;
   title: string;
+  description: string | null;
+  type: AssignmentType;
+  priority: AssignmentPriority;
+  status: AssignmentStatus;
+  subject: string | null;
+  dueDate: string | null;
   completed: boolean;
   createdAt: string;
 };
@@ -109,16 +123,20 @@ export function StudentDashboard() {
             assignments.map((assignment) => (
               <div
                 key={assignment.id}
-                className="flex items-center justify-between rounded-lg border border-border px-4 py-3"
+                className="flex flex-col gap-1 rounded-lg border border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
                   <div className="font-medium text-sm">{assignment.title}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(assignment.createdAt).toLocaleDateString("tr-TR")}
+                  <div className="text-xs text-muted-foreground flex flex-wrap gap-x-2 gap-y-1 mt-1">
+                    <span>{ASSIGNMENT_STATUS_LABELS[assignment.status]}</span>
+                    <span>· {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}</span>
+                    <span>· {ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
+                    {assignment.subject ? <span>· {assignment.subject}</span> : null}
+                    <span>· {formatAssignmentDueDate(assignment.dueDate)}</span>
                   </div>
                 </div>
                 <span
-                  className={`kt-badge kt-badge-sm ${assignment.completed ? "kt-badge-success" : "kt-badge-warning"}`}
+                  className={`kt-badge kt-badge-sm self-start sm:self-auto ${assignment.completed ? "kt-badge-success" : "kt-badge-warning"}`}
                 >
                   {assignment.completed ? "Tamamlandı" : "Bekliyor"}
                 </span>

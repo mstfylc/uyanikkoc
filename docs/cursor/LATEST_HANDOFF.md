@@ -1,20 +1,20 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 05 — Koç ödev formu alpha  
-**Commits:** `feat: upgrade coach assignment form`  
+**Son tamamlanan faz:** PROMPT 06 — Ogrenci/veli alpha gorunumu  
+**Commits:** `feat: show assignment details in student and parent views`  
 **Branch:** main  
 
 ## Durum
 
-- CreateAssignmentPanel: title, description, type, priority, subject, dueDate
-- Client validation (baslik min 2, aciklama max 500, son tarih >= bugun)
-- Basarili kayitta ozet karti; mobil tek kolon duzen
-- E2E 8/8 gecer
+- StudentAssignmentList: durum, oncelik, tur, ders, son tarih; Tamamla sadece acik odevlerde
+- StudentDashboard ve ParentDashboard alpha alanlari gosteriyor
+- Veli dashboard: kural tabanli haftalik yorum karti (OpenAI yok)
+- Test: typecheck ✓ unit 15 ✓ e2e 8 ✓
 
 ## Sonraki faz
 
-**PROMPT 06** — Ogrenci/veli ekranlarinda alpha alanlari
+**PROMPT 07** — AI Koc Yakinda yuzeyi
 
 ## Not
 
-Title-only POST ve mevcut e2e akisi korunuyor.
+assignment-labels.ts ortak etiket/yardimci katmani eklendi.

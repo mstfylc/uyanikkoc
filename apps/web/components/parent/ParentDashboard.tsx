@@ -3,6 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import {
+  ASSIGNMENT_PRIORITY_LABELS,
+  ASSIGNMENT_STATUS_LABELS,
+  ASSIGNMENT_TYPE_LABELS,
+  buildSimpleWeeklyComment,
+  countOverdueAssignments,
+  formatAssignmentDueDate,
+} from "@/lib/assignment-labels";
+import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
+
 type ParentSummary = {
   totalAssignments: number;
   completedCount: number;
@@ -10,6 +20,11 @@ type ParentSummary = {
   assignments: Array<{
     id: string;
     title: string;
+    type: AssignmentType;
+    priority: AssignmentPriority;
+    status: AssignmentStatus;
+    subject: string | null;
+    dueDate: string | null;
     completed: boolean;
   }>;
 };
@@ -67,6 +82,8 @@ export function ParentDashboard() {
   const completed = summary?.completedCount ?? 0;
   const pending = summary?.pendingCount ?? 0;
   const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const overdueCount = summary ? countOverdueAssignments(summary.assignments) : 0;
+  const weeklyComment = buildSimpleWeeklyComment(completionRate, pending, overdueCount);
 
   return (
     <div className="flex flex-col gap-5" data-testid="parent-summary">
@@ -103,6 +120,13 @@ export function ParentDashboard() {
         />
       </div>
 
+      <div className="kt-card" data-testid="parent-weekly-comment">
+        <div className="kt-card-body p-5 flex flex-col gap-2">
+          <h3 className="text-base font-medium">Haftalik Yorum</h3>
+          <p className="text-sm text-muted-foreground">{isLoading ? "Yukleniyor..." : weeklyComment}</p>
+        </div>
+      </div>
+
       <div className="kt-card">
         <div className="kt-card-body p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
@@ -115,6 +139,22 @@ export function ParentDashboard() {
               style={{ width: `${completionRate}%` }}
             />
           </div>
+          {summary && summary.assignments.length > 0 ? (
+            <ul className="flex flex-col gap-2 pt-2 text-sm">
+              {summary.assignments.slice(0, 5).map((assignment) => (
+                <li key={assignment.id} className="flex flex-col gap-0.5 border-b border-border pb-2 last:border-0">
+                  <span className="font-medium">{assignment.title}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {ASSIGNMENT_STATUS_LABELS[assignment.status]} ·{" "}
+                    {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]} ·{" "}
+                    {ASSIGNMENT_TYPE_LABELS[assignment.type]}
+                    {assignment.subject ? ` · ${assignment.subject}` : ""} ·{" "}
+                    {formatAssignmentDueDate(assignment.dueDate)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
           <div className="flex gap-2 pt-2">
             <Link href="/parent/dashboard" className="kt-btn kt-btn-sm kt-btn-primary">
               Rapor
