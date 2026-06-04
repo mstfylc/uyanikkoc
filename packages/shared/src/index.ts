@@ -76,3 +76,15 @@ export function calculateStreak(dates: string[], today: string): number {
 
   return streak;
 }
+
+export {
+  buildCoachSuggestion,
+  buildParentWeeklyComment,
+  buildRulesBasedRiskBand,
+  buildStudentPriorityAssignment,
+  calculateCompletionRate,
+  countOverdueAssignments,
+  isAssignmentOpen,
+  RISK_BAND_LABELS,
+  type AssignmentInsightItem,
+} from "./assignment-insights";

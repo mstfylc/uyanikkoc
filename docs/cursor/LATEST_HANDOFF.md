@@ -1,21 +1,19 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 07 — AI Koc Yakinda yuzeyi  
-**Commits:** `feat: add ai coach coming soon surface`  
+**Son tamamlanan faz:** PROMPT 08 — Rules-v1 risk ve oneri  
+**Commits:** `feat: add rules based risk suggestions`  
 **Branch:** main  
 
 ## Durum
 
-- `/student/ai-coach` sayfasi: AI Koc Yakinda
-- Sidebar: AI Koc · Yakinda linki
-- Student dashboard: yakinda bandi
-- `/api/ai-coach`: AI_COACH_ENABLED=false iken 503, canli yanit yok
-- Test: typecheck ✓ e2e 8 ✓
+- `@uyanik/shared` assignment-insights: completion rate, overdue, risk band, oneriler
+- Koç dashboard: risk karti; veli: haftalik yorum (shared); ogrenci: bugunku oncelik
+- Shared test 13/13; web unit 15/15; typecheck ✓
 
 ## Sonraki faz
 
-**PROMPT 08** — Rules-v1 risk ve oneri
+**PROMPT 09** — DB-backed alpha dogrulama (**DATABASE_URL gerekli**)
 
 ## Not
 
-OpenAI SDK veya external API cagrisi eklenmedi.
+AI veya RiskScore DB tablosu eklenmedi; pure helper katmani.

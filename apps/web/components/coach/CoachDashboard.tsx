@@ -3,9 +3,22 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import {
+  buildCoachSuggestion,
+  buildRulesBasedRiskBand,
+  calculateCompletionRate,
+  countOverdueAssignments,
+  RISK_BAND_LABELS,
+} from "@uyanik/shared";
+import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
+
 type Assignment = {
   id: string;
   title: string;
+  type: AssignmentType;
+  priority: AssignmentPriority;
+  status: AssignmentStatus;
+  dueDate: string | null;
   completed: boolean;
   createdAt: string;
 };
@@ -42,6 +55,13 @@ function StatCard({ label, value, icon, tone = "primary" }: StatCardProps) {
   );
 }
 
+const RISK_BADGE_CLASS: Record<string, string> = {
+  excellent: "kt-badge-success",
+  normal: "kt-badge-primary",
+  attention: "kt-badge-warning",
+  critical: "kt-badge-danger",
+};
+
 export function CoachDashboard() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,12 +82,33 @@ export function CoachDashboard() {
   const total = assignments.length;
   const completed = assignments.filter((item) => item.completed).length;
   const pending = total - completed;
+  const completionRate = calculateCompletionRate(total, completed);
+  const overdueCount = countOverdueAssignments(assignments);
+  const riskBand = buildRulesBasedRiskBand(completionRate, overdueCount);
+  const suggestion = buildCoachSuggestion(completionRate, overdueCount, pending);
 
   return (
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-xl font-semibold text-mono">Koç Dashboard</h1>
         <p className="text-sm text-muted-foreground">Ödev ve öğrenci takibi</p>
+      </div>
+
+      <div className="kt-card" data-testid="coach-risk-card">
+        <div className="kt-card-body p-5 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-base font-medium">Risk Ozeti</h3>
+            <span className={`kt-badge kt-badge-sm ${RISK_BADGE_CLASS[riskBand] ?? "kt-badge-light"}`}>
+              {RISK_BAND_LABELS[riskBand]}
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {isLoading
+              ? "Yukleniyor..."
+              : `Tamamlama %${completionRate} · Gecikmis: ${overdueCount} · Bekleyen: ${pending}`}
+          </p>
+          <p className="text-sm">{isLoading ? "" : suggestion}</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">

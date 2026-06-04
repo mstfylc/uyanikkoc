@@ -7,10 +7,13 @@ import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_STATUS_LABELS,
   ASSIGNMENT_TYPE_LABELS,
-  buildSimpleWeeklyComment,
-  countOverdueAssignments,
   formatAssignmentDueDate,
 } from "@/lib/assignment-labels";
+import {
+  buildParentWeeklyComment,
+  calculateCompletionRate,
+  countOverdueAssignments,
+} from "@uyanik/shared";
 import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
 
 type ParentSummary = {
@@ -81,9 +84,9 @@ export function ParentDashboard() {
   const total = summary?.totalAssignments ?? 0;
   const completed = summary?.completedCount ?? 0;
   const pending = summary?.pendingCount ?? 0;
-  const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const completionRate = calculateCompletionRate(total, completed);
   const overdueCount = summary ? countOverdueAssignments(summary.assignments) : 0;
-  const weeklyComment = buildSimpleWeeklyComment(completionRate, pending, overdueCount);
+  const weeklyComment = buildParentWeeklyComment(completionRate, overdueCount, pending);
 
   return (
     <div className="flex flex-col gap-5" data-testid="parent-summary">

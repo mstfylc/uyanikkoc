@@ -9,6 +9,10 @@ import {
   ASSIGNMENT_TYPE_LABELS,
   formatAssignmentDueDate,
 } from "@/lib/assignment-labels";
+import {
+  buildStudentPriorityAssignment,
+  calculateCompletionRate,
+} from "@uyanik/shared";
 import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
 
 type Assignment = {
@@ -76,7 +80,8 @@ export function StudentDashboard() {
   const total = assignments.length;
   const completed = assignments.filter((item) => item.completed).length;
   const pending = total - completed;
-  const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const completionRate = calculateCompletionRate(total, completed);
+  const priorityAssignment = buildStudentPriorityAssignment(assignments);
 
   return (
     <div className="flex flex-col gap-5">
@@ -98,6 +103,29 @@ export function StudentDashboard() {
         <Link href="/student/ai-coach" className="kt-btn kt-btn-sm kt-btn-light self-start sm:self-auto">
           Detay
         </Link>
+      </div>
+
+      <div className="kt-card" data-testid="student-priority-card">
+        <div className="kt-card-body p-5 flex flex-col gap-2">
+          <h3 className="text-base font-medium">Bugunku Oncelik</h3>
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Yukleniyor...</p>
+          ) : priorityAssignment ? (
+            <>
+              <p className="text-sm font-medium">{priorityAssignment.title ?? "Odev"}</p>
+              <p className="text-xs text-muted-foreground">
+                {priorityAssignment.priority
+                  ? `Oncelik: ${ASSIGNMENT_PRIORITY_LABELS[priorityAssignment.priority as AssignmentPriority] ?? priorityAssignment.priority}`
+                  : null}
+                {priorityAssignment.dueDate
+                  ? ` · Son tarih: ${formatAssignmentDueDate(priorityAssignment.dueDate)}`
+                  : ""}
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">Acik odev yok — harika!</p>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
