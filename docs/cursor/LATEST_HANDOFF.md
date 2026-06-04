@@ -1,20 +1,20 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 10 — Branch/Admin minimal shell  
-**Commits:** `feat: add minimal branch admin shells`  
+**Son tamamlanan faz:** PROMPT 11 — CI kalite kapisi  
+**Commits:** `ci: add basic quality gate`  
 **Branch:** main  
 
 ## Durum
 
-- Branch ve admin icin AppLayout + Sidebar menuleri
-- Dashboard sayfalari: single-branch alpha aciklamasi
-- E2E: 10/10 (branch + admin login testleri eklendi)
-- Test: typecheck ✓ e2e 10 ✓
+- `.github/workflows/ci.yml`: install, db:generate, typecheck, lint, test:unit
+- External secret yok; dummy DATABASE_URL + DEMO_AUTH_ALLOW_IN_MEMORY=true
+- E2E CI disinda (manuel / ayri job icin hazir)
+- Test: typecheck ✓ lint ✓ unit 28 ✓
 
 ## Sonraki faz
 
-**PROMPT 11** — CI kalite kapisi (onay bekleniyor)
+**PROMPT 12** — Deploy karari dokumantasyonu (onay bekleniyor)
 
 ## Not
 
-Demo: branch@uyanik.local, admin@uyanik.local / uyanik123
+Push sonrasi GitHub Actions otomatik calisir.
