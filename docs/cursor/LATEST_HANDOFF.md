@@ -1,20 +1,21 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 06 — Ogrenci/veli alpha gorunumu  
-**Commits:** `feat: show assignment details in student and parent views`  
+**Son tamamlanan faz:** PROMPT 07 — AI Koc Yakinda yuzeyi  
+**Commits:** `feat: add ai coach coming soon surface`  
 **Branch:** main  
 
 ## Durum
 
-- StudentAssignmentList: durum, oncelik, tur, ders, son tarih; Tamamla sadece acik odevlerde
-- StudentDashboard ve ParentDashboard alpha alanlari gosteriyor
-- Veli dashboard: kural tabanli haftalik yorum karti (OpenAI yok)
-- Test: typecheck ✓ unit 15 ✓ e2e 8 ✓
+- `/student/ai-coach` sayfasi: AI Koc Yakinda
+- Sidebar: AI Koc · Yakinda linki
+- Student dashboard: yakinda bandi
+- `/api/ai-coach`: AI_COACH_ENABLED=false iken 503, canli yanit yok
+- Test: typecheck ✓ e2e 8 ✓
 
 ## Sonraki faz
 
-**PROMPT 07** — AI Koc Yakinda yuzeyi
+**PROMPT 08** — Rules-v1 risk ve oneri
 
 ## Not
 
-assignment-labels.ts ortak etiket/yardimci katmani eklendi.
+OpenAI SDK veya external API cagrisi eklenmedi.

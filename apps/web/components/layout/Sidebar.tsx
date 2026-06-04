@@ -25,6 +25,7 @@ const MENU_BY_ROLE: Record<"coach" | "student" | "parent", MenuItem[]> = {
     { href: "/student/dashboard", label: "Konu Takibi", icon: "ki-book-open" },
     { href: "/student/dashboard", label: "Denemeler", icon: "ki-chart-simple" },
     { href: "/student/assignments", label: "Ödevlerim", icon: "ki-notepad-edit" },
+    { href: "/student/ai-coach", label: "AI Koç · Yakında", icon: "ki-technology-2" },
     { href: "/student/dashboard", label: "Motivasyon", icon: "ki-star" },
   ],
   parent: [

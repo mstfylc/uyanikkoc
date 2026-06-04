@@ -85,6 +85,21 @@ export function StudentDashboard() {
         <p className="text-sm text-muted-foreground">Ödevlerin ve ilerlemen</p>
       </div>
 
+      <div
+        className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+        data-testid="ai-coach-band"
+      >
+        <div>
+          <p className="text-sm font-medium">AI Koç · Yakında</p>
+          <p className="text-xs text-muted-foreground">
+            Kişisel AI koç modülü hazırlanıyor — canlı yanıt şu an kapalı.
+          </p>
+        </div>
+        <Link href="/student/ai-coach" className="kt-btn kt-btn-sm kt-btn-light self-start sm:self-auto">
+          Detay
+        </Link>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
         <StatCard label="Toplam Ödev" value={isLoading ? "—" : total} icon="ki-notepad-edit" />
         <StatCard
