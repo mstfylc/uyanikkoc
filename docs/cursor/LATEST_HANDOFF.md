@@ -1,7 +1,7 @@
 # Latest Handoff
 
 **Son tamamlanan faz:** BACKLOG PROMPT 14 — Assignment service layer  
-**Son commit:** `refactor: introduce assignment service layer` (main, 1 ahead of origin)  
+**Son commit:** `2945c0f` — `refactor: introduce assignment service layer`  
 **Branch:** main  
 
 ## PROMPT 14 özeti
