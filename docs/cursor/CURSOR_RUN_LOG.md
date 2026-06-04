@@ -12,4 +12,4 @@
 | 2026-06-04 | PROMPT 07 | ad9c9de | typecheck ✓ e2e 8 ✓ | AI coach coming soon surface |
 | 2026-06-04 | PROMPT 08 | c1147f6 | shared 13 ✓ typecheck ✓ web 15 ✓ | rules-based risk suggestions |
 | 2026-06-04 | PROMPT 09 | — | — | DURDU: DATABASE_URL yok (RISK_REPORT) |
-| 2026-06-04 | PROMPT 09 | (pending) | generate ✓ migrate ✓ seed ✓ verify ✓ typecheck ✓ | DB-backed alpha flow |
+| 2026-06-04 | PROMPT 09 | f2e8930 | generate ✓ migrate ✓ seed ✓ verify ✓ typecheck ✓ | DB-backed alpha flow |
