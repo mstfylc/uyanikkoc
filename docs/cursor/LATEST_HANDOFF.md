@@ -1,20 +1,20 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** PROMPT 04 — Assignment alpha veri modeli  
-**Commits:** `26221d8` — feat: expand assignment alpha model  
+**Son tamamlanan faz:** PROMPT 05 — Koç ödev formu alpha  
+**Commits:** `feat: upgrade coach assignment form`  
 **Branch:** main  
 
 ## Durum
 
-- Assignment alpha alanları: description, type, priority, status, subject, dueDate, updatedAt
-- Additive migration `20260604040000_assignment_alpha_fields` (veri kaybı yok)
-- Mock + DB repository + API uyumlu; title-only POST çalışıyor
-- Unit test: 15/15 (3 yeni assignment testi)
+- CreateAssignmentPanel: title, description, type, priority, subject, dueDate
+- Client validation (baslik min 2, aciklama max 500, son tarih >= bugun)
+- Basarili kayitta ozet karti; mobil tek kolon duzen
+- E2E 8/8 gecer
 
 ## Sonraki faz
 
-**PROMPT 05** — Koç ödev formu alpha (**onay bekleniyor**)
+**PROMPT 06** — Ogrenci/veli ekranlarinda alpha alanlari
 
 ## Not
 
-Supabase/production'da `pnpm db:migrate` ile yeni migration uygulanmalı.
+Title-only POST ve mevcut e2e akisi korunuyor.
