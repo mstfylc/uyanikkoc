@@ -77,12 +77,6 @@ async function main() {
     });
   }
 
-  await prisma.studentProfile.upsert({
-    where: { id: "student_001" },
-    update: { userId: "user_student_001", parentId: "parent_001" },
-    create: { id: "student_001", userId: "user_student_001", parentId: "parent_001" },
-  });
-
   await prisma.coachProfile.upsert({
     where: { id: "coach_001" },
     update: { userId: "user_coach_001" },
@@ -95,7 +89,49 @@ async function main() {
     create: { id: "parent_001", userId: "user_parent_001" },
   });
 
-  console.log("Seed completed: demo org, branch, users, profiles");
+  await prisma.studentProfile.upsert({
+    where: { id: "student_001" },
+    update: { userId: "user_student_001", parentId: "parent_001" },
+    create: { id: "student_001", userId: "user_student_001", parentId: "parent_001" },
+  });
+
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 7);
+
+  await prisma.assignment.upsert({
+    where: { id: "assignment_seed_001" },
+    update: {
+      title: "Matematik tekrar odevi",
+      description: "Demo seed odevi — DB-backed alpha",
+      type: "homework",
+      priority: "medium",
+      status: "pending",
+      subject: "Matematik",
+      dueDate,
+      coachId: "coach_001",
+      studentId: "student_001",
+      parentId: "parent_001",
+      branchId: DEMO_BRANCH_ID,
+      completed: false,
+      completedAt: null,
+    },
+    create: {
+      id: "assignment_seed_001",
+      title: "Matematik tekrar odevi",
+      description: "Demo seed odevi — DB-backed alpha",
+      type: "homework",
+      priority: "medium",
+      status: "pending",
+      subject: "Matematik",
+      dueDate,
+      coachId: "coach_001",
+      studentId: "student_001",
+      parentId: "parent_001",
+      branchId: DEMO_BRANCH_ID,
+    },
+  });
+
+  console.log("Seed completed: demo org, branch, users, profiles, sample assignment");
 }
 
 main()

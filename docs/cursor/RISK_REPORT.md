@@ -2,18 +2,21 @@
 
 **Tarih:** 2026-06-04  
 **Faz:** PROMPT 09 — DB-backed alpha dogrulama  
-**Durum:** DURDURULDU — gercek DATABASE_URL yok
+**Durum:** COZULDU
 
-## Bulgu
+## Onceki blokaj
 
-- `apps/web/.env.local` icinde DATABASE_URL tanimli degil
-- Kok `.env`, `.env.local`, `packages/database/.env` dosyalari yok
-- `db:migrate`, `db:seed` ve DB-backed auth dogrulamasi calistirilamadi
+DATABASE_URL yoktu; yerel Postgres docker-compose ile saglandi.
 
-## Gerekli aksiyon
+## Cozum
 
-Supabase veya yerel PostgreSQL URL'ini `.env.local` veya `apps/web/.env.local` icine ekleyin; ardindan PROMPT 09 yeniden baslatilsin.
+- `docker-compose.dev.yml` + `.env.example` guncellendi
+- Seed FK sirasi duzeltildi (parent once, student sonra)
+- `db:verify-alpha` scripti auth/assignment/summary akisini dogruladi
 
-## Hazir kod (commit edilmedi)
+## Yerel calistirma
 
-Seed'e ornek Assignment, auth DB adapter ve migration zaten mevcut — yalnizca DATABASE_URL eksik.
+```bash
+docker compose -f docker-compose.dev.yml up -d
+pnpm db:migrate && pnpm db:seed && pnpm db:verify-alpha
+```

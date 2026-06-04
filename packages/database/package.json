@@ -14,6 +14,7 @@
     "migrate:dev": "prisma migrate dev",
     "studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
+    "verify:alpha": "tsx scripts/verify-alpha-flow.ts",
     "test": "node --test"
   },
   "dependencies": {

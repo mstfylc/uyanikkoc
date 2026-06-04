@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: uyanik-postgres-local
+    environment:
+      POSTGRES_USER: uyanik
+      POSTGRES_PASSWORD: uyanik123
+      POSTGRES_DB: uyanik
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U uyanik -d uyanik"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
