@@ -17,3 +17,8 @@
 | 2026-06-04 | PROMPT 11 | 4c42424 | typecheck ✓ lint ✓ unit 28 ✓ | CI quality gate workflow |
 | 2026-06-04 | PROMPT 12 | e8c31e8 | typecheck ✓ | deployment decision doc |
 | 2026-06-04 | PROMPT 13 | e14f8a5 | typecheck ✓ | alpha status report (sprint close) |
+
+## Kural (remote şablon ile uyumlu)
+
+- Her faz sonunda `LATEST_HANDOFF.md` güncelle.
+- Risk varsa `RISK_REPORT.md`; bu tabloya en fazla 1 satır ekle.
