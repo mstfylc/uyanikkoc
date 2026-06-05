@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { UkBadge } from "@/components/design/UkBadge";
@@ -51,7 +52,7 @@ function ApptRow({
         <UkAvatar name={appointment.studentName} size={38} />
       ) : (
         <span className="lr-icon" style={{ background: "var(--primary-soft)", color: "var(--primary-600)" }}>
-          <i className="ki-filled ki-calendar" />
+          <KiIcon name="ki-calendar" />
         </span>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -71,7 +72,7 @@ function ApptRow({
       {coachView && appointment.status === "pending" && onApprove && onReject ? (
         <div className="row" style={{ gap: 6 }}>
           <button type="button" className="btn btn-primary btn-sm" onClick={onApprove}>
-            <i className="ki-filled ki-check" />
+            <KiIcon name="ki-check" />
             Onayla
           </button>
           <button type="button" className="btn btn-light btn-sm" onClick={onReject}>
@@ -164,7 +165,7 @@ function StudentAppointmentsView() {
             onClick={() => setShowForm(true)}
             style={{ opacity: canRequest ? 1 : 0.5 }}
           >
-            <i className="ki-filled ki-plus" />
+            <KiIcon name="ki-plus" />
             Randevu Iste
           </button>
         }
@@ -174,7 +175,7 @@ function StudentAppointmentsView() {
         <div className="card">
           <div className="card-pad row" style={{ gap: 16, flexWrap: "wrap" }}>
             <span className="stat-icon tone-primary" style={{ width: 46, height: 46, borderRadius: 13 }}>
-              <i className="ki-filled ki-target text-xl" />
+              <KiIcon name="ki-target text-xl" />
             </span>
             <div style={{ flex: 1, minWidth: 200 }}>
               <div style={{ fontSize: 14, fontWeight: 700 }}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
@@ -129,7 +130,7 @@ export function StudentDashboard() {
     <div className="stack rise" data-testid="student-dashboard">
       <div className="ai-band">
         <span className="ai-orb">
-          <i className="ki-filled ki-technology-2 text-white text-xl" />
+          <KiIcon name="ki-technology-2 text-white text-xl" />
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div className="row" style={{ gap: 8 }}>
@@ -180,7 +181,7 @@ export function StudentDashboard() {
                 flexShrink: 0,
               }}
             >
-              <i className="ki-filled ki-flag text-white text-xl" />
+              <KiIcon name="ki-flag text-white text-xl" />
             </span>
             <div style={{ minWidth: 0, flex: 1 }}>
               <div
@@ -214,7 +215,7 @@ export function StudentDashboard() {
             </div>
             <Link href="/student/assignments" className="btn btn-sm btn-white">
               Basla
-              <i className="ki-filled ki-arrow-right" />
+              <KiIcon name="ki-arrow-right" />
             </Link>
           </div>
         </div>
@@ -225,12 +226,12 @@ export function StudentDashboard() {
               <div className="between">
                 <div className="row" style={{ gap: 8 }}>
                   <span className="stat-icon tone-warning" style={{ width: 38, height: 38 }}>
-                    <i className="ki-filled ki-flame text-xl" />
+                    <KiIcon name="ki-flame text-xl" />
                   </span>
                   <div style={{ fontSize: 13.5, fontWeight: 700 }}>Calisma Serisi</div>
                 </div>
                 <span className="badge badge-warning">
-                  <i className="ki-filled ki-flash" />
+                  <KiIcon name="ki-flash" />
                   Aktif
                 </span>
               </div>
@@ -305,7 +306,7 @@ export function StudentDashboard() {
               shownAssignments.slice(0, 5).map((assignment) => (
                 <div key={assignment.id} className={`lrow${assignment.completed ? " done" : ""}`}>
                   <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                    <i className="ki-filled ki-notepad-edit" />
+                    <KiIcon name="ki-notepad-edit" />
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="lr-title">{assignment.title}</div>
@@ -318,7 +319,7 @@ export function StudentDashboard() {
                       ) : null}
                       <span className="d">{ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
                       <span className="d row" style={{ gap: 4 }}>
-                        <i className="ki-filled ki-time" style={{ color: "var(--faint)" }} />
+                        <KiIcon name="ki-time" size={14} style={{ color: "var(--faint)" }} />
                         {formatAssignmentDueDate(assignment.dueDate)}
                       </span>
                     </div>
@@ -338,7 +339,7 @@ export function StudentDashboard() {
           action={
             <Link href="/student/topics" className="link-btn">
               Detay
-              <i className="ki-filled ki-arrow-right" />
+              <KiIcon name="ki-arrow-right" />
             </Link>
           }
         >

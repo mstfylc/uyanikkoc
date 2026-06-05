@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { useCallback, useEffect, useState } from "react";
 
 import { UkBadge } from "@/components/design/UkBadge";
@@ -66,7 +67,7 @@ export function ParentExamsPanel() {
             exams.map((exam) => (
               <div key={exam.id} className="lrow">
                 <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                  <i className="ki-filled ki-chart-simple" />
+                  <KiIcon name="ki-chart-simple" />
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="lr-title">{exam.label ?? RESULT_EXAM_TYPE_LABELS[exam.examType]}</div>

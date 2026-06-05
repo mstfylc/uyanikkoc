@@ -85,7 +85,7 @@ Production ortamına Vercel'de gerçek DB bağlamak proje kararına aykırıdır
 | Demo login çalışmıyor (login sayfasında kalıyor) | Env değişkenleri **Production** kapsamında mı? Özellikle `AUTH_SECRET` + `DEMO_AUTH_ALLOW_IN_MEMORY=true`. Ekleyip **Redeploy** edin |
 | 404 NOT_FOUND | Output Directory boş; Root Directory `apps/web`; Framework Next.js |
 | 401 Unauthorized | Deployment Protection kapatın veya Vercel SSO ile giriş yapın |
-| İkonlar eksik | `public/assets/metronic/vendors/keenicons/` lisanslı; repoda yok |
+| İkonlar eksik | Metronic fontları repoda yoktu; uygulama artık `KiIcon` SVG kullanır (`components/design/KiIcon.tsx`). Eski not: `public/assets/metronic/vendors/keenicons/` |
 | Build fail | Root Directory `apps/web` + monorepo include açık mı kontrol edin |
 
 ## 5. Sağlık kontrolü

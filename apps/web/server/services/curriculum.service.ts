@@ -8,7 +8,11 @@ export async function getCoachCurriculum(coachId: string): Promise<CurriculumRec
 
 export async function updateCoachCurriculum(
   coachId: string,
-  patch: Partial<Pick<CurriculumRecord, "examType" | "subjects">>,
+  patch: Partial<Pick<CurriculumRecord, "examType" | "subjects">> & { reset?: boolean },
 ): Promise<CurriculumRecord> {
-  return memoryCurriculum.updateCurriculum(coachId, patch);
+  if (patch.reset) {
+    return memoryCurriculum.resetCurriculum(coachId);
+  }
+  const { reset: _reset, ...rest } = patch;
+  return memoryCurriculum.updateCurriculum(coachId, rest);
 }

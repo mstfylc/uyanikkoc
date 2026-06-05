@@ -1,3 +1,5 @@
+import { KiIcon } from "./KiIcon";
+
 type UkStatCardProps = {
   icon: string;
   tone?: "primary" | "success" | "warning" | "danger" | "info";
@@ -20,11 +22,11 @@ export function UkStatCard({
       <div className="card-pad">
         <div className="stat-top">
           <span className={`stat-icon tone-${tone}`}>
-            <i className={`ki-filled ${icon}`} />
+            <KiIcon name={icon} size={22} />
           </span>
           {delta ? (
             <span className={`delta ${deltaDir}`}>
-              <i className={`ki-filled ${deltaDir === "down" ? "ki-arrow-down" : "ki-arrow-up"}`} />
+              <KiIcon name={deltaDir === "down" ? "ki-arrow-down" : "ki-arrow-up"} size={14} />
               {delta}
             </span>
           ) : null}

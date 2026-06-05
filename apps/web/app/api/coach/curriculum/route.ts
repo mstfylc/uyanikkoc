@@ -22,6 +22,7 @@ export const PATCH = withApiAuth(["coach"], async (req, { session }) => {
   const body = (await req.json()) as {
     examType?: import("@uyanik/database").TopicExamType;
     subjects?: import("@uyanik/database").CurriculumRecord["subjects"];
+    reset?: boolean;
   };
 
   const curriculum = await updateCoachCurriculum(coachId, body);

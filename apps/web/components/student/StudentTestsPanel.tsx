@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
 import { UkBadge } from "@/components/design/UkBadge";
@@ -129,7 +130,7 @@ export function StudentTestsPanel() {
                   return (
                     <div key={assignment.id} className="lrow">
                       <span className={`stat-icon tone-${test?.tone ?? "primary"}`} style={{ width: 38, height: 38 }}>
-                        <i className={`ki-filled ${test?.icon ?? "ki-star"}`} />
+                        <KiIcon name={test?.icon ?? "ki-star"} />
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="lr-title">{test?.name ?? assignment.testId}</div>
@@ -159,7 +160,7 @@ export function StudentTestsPanel() {
                   return (
                     <div key={assignment.id} className="lrow done">
                       <span className={`stat-icon tone-${test?.tone ?? "primary"}`} style={{ width: 38, height: 38 }}>
-                        <i className={`ki-filled ${test?.icon ?? "ki-star"}`} />
+                        <KiIcon name={test?.icon ?? "ki-star"} />
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="lr-title">{test?.name ?? assignment.testId}</div>

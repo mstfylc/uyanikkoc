@@ -43,3 +43,13 @@ export function updateCurriculum(
   byCoach[coachId] = { ...current, ...patch, coachId };
   return byCoach[coachId];
 }
+
+export function resetCurriculum(coachId: string): CurriculumRecord {
+  const current = getCurriculum(coachId);
+  byCoach[coachId] = {
+    ...current,
+    subjects: structuredClone(DEFAULT_SUBJECTS),
+    coachId,
+  };
+  return byCoach[coachId];
+}

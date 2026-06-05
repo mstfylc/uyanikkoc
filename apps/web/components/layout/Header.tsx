@@ -5,6 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { UkAvatar } from "@/components/design/UkAvatar";
 import {
   NotificationBell,
@@ -33,7 +34,7 @@ export function Header({ role }: HeaderProps) {
       </div>
 
       <div className="searchbox">
-        <i className="ki-filled ki-magnifier" />
+        <KiIcon name="ki-magnifier" size={18} />
         <input placeholder={role === "coach" ? "Ogrenci ara..." : "Odev veya konu ara..."} readOnly />
         <kbd>K</kbd>
       </div>
@@ -41,7 +42,7 @@ export function Header({ role }: HeaderProps) {
       <div className="topbar-actions">
         {shouldShowNotificationBell(role) ? <NotificationBell role={role} /> : (
           <button type="button" className="icon-btn" aria-label="Bildirimler">
-            <i className="ki-filled ki-notification-on" />
+            <KiIcon name="ki-notification-on" size={19} />
           </button>
         )}
 
@@ -92,7 +93,7 @@ export function Header({ role }: HeaderProps) {
                     void signOut({ callbackUrl: "/login" });
                   }}
                 >
-                  <i className="ki-filled ki-exit-right" />
+                  <KiIcon name="ki-exit-right" size={18} />
                   Cikis Yap
                 </button>
               </div>

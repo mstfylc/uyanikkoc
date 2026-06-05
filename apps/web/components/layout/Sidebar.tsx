@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { UkAvatar } from "@/components/design/UkAvatar";
 import {
   findUkNavItem,
@@ -54,7 +55,7 @@ export function Sidebar({ role }: SidebarProps) {
     <aside className="sidebar theme-fade">
       <div className="sidebar-logo">
         <span className="logo-mark">
-          <i className="ki-filled ki-flash text-white text-lg" />
+          <KiIcon name="ki-flash" size={18} className="text-white" />
         </span>
         <span className="logo-text">
           <b>Uyanik Koc</b>
@@ -71,7 +72,7 @@ export function Sidebar({ role }: SidebarProps) {
 
           return (
             <Link key={item.href} href={item.href} className={`nav-item${active ? " active" : ""}`}>
-              <i className={`ki-filled ${item.icon}`} />
+              <KiIcon name={item.icon} size={18} />
               <span>{item.label}</span>
               {item.tag ? <span className="nav-tag">{item.tag}</span> : null}
             </Link>
@@ -85,7 +86,7 @@ export function Sidebar({ role }: SidebarProps) {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <Link key={item.href} href={item.href} className={`nav-item${active ? " active" : ""}`}>
-                  <i className={`ki-filled ${item.icon}`} />
+                  <KiIcon name={item.icon} size={18} />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -101,7 +102,7 @@ export function Sidebar({ role }: SidebarProps) {
             <b>{activeItem?.label ?? "Dashboard"}</b>
             <span>{UK_ROLE_CRUMB[role]}</span>
           </div>
-          <i className="ki-filled ki-right" style={{ color: "var(--faint)" }} />
+          <KiIcon name="ki-right" size={16} style={{ color: "var(--faint)" }} />
         </Link>
       </div>
     </aside>

@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -57,7 +58,7 @@ export function LoginForm() {
         <div className="auth-art-inner">
           <div className="row" style={{ gap: 12 }}>
             <span className="logo-mark" style={{ width: 44, height: 44, borderRadius: 13 }}>
-              <i className="ki-filled ki-flash text-white text-xl" />
+              <KiIcon name="ki-flash text-white text-xl" />
             </span>
             <div className="logo-text">
               <b style={{ fontSize: 19, color: "#fff" }}>Uyanik Koc</b>
@@ -104,7 +105,7 @@ export function LoginForm() {
                 style={{ flex: 1, justifyContent: "center" }}
                 onClick={() => setDemoRole(role)}
               >
-                <i className={`ki-filled ${role === "student" ? "ki-book" : role === "coach" ? "ki-people" : "ki-heart"}`} />
+                <KiIcon name={role === "student" ? "ki-book" : role === "coach" ? "ki-people" : "ki-heart"} />
                 {role === "student" ? "Ogrenci" : role === "coach" ? "Koc" : "Veli"}
               </button>
             ))}
@@ -159,7 +160,7 @@ export function LoginForm() {
               onClick={() => setRemember(!remember)}
             >
               <span className={`chk sm${remember ? " done" : ""}`}>
-                <i className="ki-filled ki-check text-xs" />
+                <KiIcon name="ki-check text-xs" />
               </span>
               Beni hatirla
             </button>
@@ -172,12 +173,12 @@ export function LoginForm() {
           ) : null}
 
           <button type="submit" className="btn btn-primary" style={{ width: "100%", height: 46 }} disabled={isSubmitting}>
-            <i className="ki-filled ki-entrance-right" />
+            <KiIcon name="ki-entrance-right" />
             {isSubmitting ? "Giris yapiliyor..." : "Giris Yap"}
           </button>
 
           <button type="button" className="btn btn-light" style={{ width: "100%", marginTop: 10 }} onClick={fillDemo}>
-            <i className="ki-filled ki-flash" />
+            <KiIcon name="ki-flash" />
             Demo bilgileriyle doldur
           </button>
         </form>

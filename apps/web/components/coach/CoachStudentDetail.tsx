@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
@@ -171,7 +172,7 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
           {summary.assignments.slice(0, 5).map((assignment) => (
             <div key={assignment.id} className="lrow">
               <span className="lr-icon tone-primary">
-                <i className="ki-filled ki-notepad-edit" />
+                <KiIcon name="ki-notepad-edit" />
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="lr-title">{assignment.title}</div>

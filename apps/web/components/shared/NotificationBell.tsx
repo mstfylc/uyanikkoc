@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import type { AppRole } from "@uyanik/tokens";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -39,7 +40,7 @@ export function NotificationBell({ role }: NotificationBellProps) {
       data-testid="notification-bell"
       style={{ textDecoration: "none" }}
     >
-      <i className="ki-filled ki-notification-on" />
+      <KiIcon name="ki-notification-on" />
       {unreadCount > 0 ? <span className="dot" /> : null}
     </Link>
   );

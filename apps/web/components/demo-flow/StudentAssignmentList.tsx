@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { useCallback, useEffect, useState } from "react";
 
 import { UkPageHead } from "@/components/design/UkPageHead";
@@ -127,7 +128,7 @@ export function StudentAssignmentList() {
                           color,
                         }}
                       >
-                        <i className="ki-filled ki-notepad-edit" />
+                        <KiIcon name="ki-notepad-edit" />
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="lr-title">{assignment.title}</div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { useCallback, useEffect, useState } from "react";
 
 import { UkAvatar } from "@/components/design/UkAvatar";
@@ -238,7 +239,7 @@ export function MessagesPanel({
                   className="btn btn-primary"
                   style={{ width: 44, padding: 0, flexShrink: 0 }}
                 >
-                  <i className="ki-filled ki-send" />
+                  <KiIcon name="ki-send" />
                 </button>
               </form>
             </div>

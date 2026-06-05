@@ -1,3 +1,5 @@
+import { KiIcon } from "@/components/design/KiIcon";
+
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
@@ -50,7 +52,7 @@ export default function StudentAiCoachPage() {
             flexShrink: 0,
           }}
         >
-          <i className="ki-filled ki-technology-2" style={{ fontSize: 38 }} />
+          <KiIcon name="ki-technology-2" size={38} />
         </span>
         <div style={{ flex: 1, minWidth: 240 }}>
           <h2 style={{ fontSize: 24 }}>Senin icin dusunen bir koc</h2>
@@ -66,7 +68,7 @@ export default function StudentAiCoachPage() {
           <div key={feature.title} className="card">
             <div className="card-pad" style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
               <span className="stat-icon tone-primary" style={{ flexShrink: 0 }}>
-                <i className={`ki-filled ${feature.icon}`} />
+                <KiIcon name={feature.icon} />
               </span>
               <div>
                 <div style={{ fontSize: 14.5, fontWeight: 700 }}>{feature.title}</div>
@@ -107,7 +109,7 @@ export default function StudentAiCoachPage() {
           >
             <div className="row" style={{ gap: 7, marginBottom: 6 }}>
               <span className="ai-orb" style={{ width: 24, height: 24, borderRadius: 8 }}>
-                <i className="ki-filled ki-technology-2" style={{ fontSize: 13 }} />
+                <KiIcon name="ki-technology-2" size={13} />
               </span>
               <b style={{ fontSize: 12.5 }}>AI Koc</b>
             </div>
@@ -116,7 +118,7 @@ export default function StudentAiCoachPage() {
           <div className="row" style={{ gap: 10, opacity: 0.6, marginTop: 4 }}>
             <input className="input" style={{ flex: 1 }} placeholder="Mesaj yaz... (yakinda aktif)" disabled />
             <button type="button" className="btn btn-primary" disabled style={{ width: 44, padding: 0 }}>
-              <i className="ki-filled ki-send" />
+              <KiIcon name="ki-send" />
             </button>
           </div>
           <p className="muted" style={{ fontSize: 12 }}>

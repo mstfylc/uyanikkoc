@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -140,7 +141,7 @@ export function CoachDashboard() {
               actionItems.map((item) => (
                 <div key={item.id} className="lrow">
                   <span className="lr-icon" style={{ background: "var(--warning-soft)", color: "var(--warning)" }}>
-                    <i className="ki-filled ki-notepad-edit" />
+                    <KiIcon name="ki-notepad-edit" />
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="lr-title">{item.title}</div>
@@ -152,7 +153,7 @@ export function CoachDashboard() {
               ))
             )}
             <Link href="/coach/assignments/create" className="btn btn-primary" style={{ width: "100%", marginTop: 2 }}>
-              <i className="ki-filled ki-plus" />
+              <KiIcon name="ki-plus" />
               Yeni odev ata
             </Link>
           </div>
@@ -186,7 +187,7 @@ export function CoachDashboard() {
                     color: item.completed ? "var(--success)" : "var(--primary-600)",
                   }}
                 >
-                  <i className={`ki-filled ${item.completed ? "ki-check-circle" : "ki-notepad-edit"}`} />
+                  <KiIcon name={item.completed ? "ki-check-circle" : "ki-notepad-edit"} />
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, lineHeight: 1.4 }}>

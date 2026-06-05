@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 
@@ -46,7 +47,7 @@ export function ProfilePanel({ role }: ProfilePanelProps) {
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <Link href={`/${role}/settings`} className="lrow" style={{ textDecoration: "none", color: "inherit" }}>
             <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-              <i className="ki-filled ki-setting-2" />
+              <KiIcon name="ki-setting-2" />
             </span>
             <div style={{ flex: 1 }}>
               <div className="lr-title">Ayarlar</div>
@@ -54,7 +55,7 @@ export function ProfilePanel({ role }: ProfilePanelProps) {
                 <span className="d">Profil ve tercihler</span>
               </div>
             </div>
-            <i className="ki-filled ki-arrow-right muted" />
+            <KiIcon name="ki-arrow-right muted" />
           </Link>
 
           <button
@@ -64,7 +65,7 @@ export function ProfilePanel({ role }: ProfilePanelProps) {
             onClick={() => void signOut({ callbackUrl: "/login" })}
           >
             <span className="lr-icon" style={{ background: "var(--danger-soft)", color: "var(--danger)" }}>
-              <i className="ki-filled ki-exit-right" />
+              <KiIcon name="ki-exit-right" />
             </span>
             <div style={{ flex: 1 }}>
               <div className="lr-title">Cikis yap</div>

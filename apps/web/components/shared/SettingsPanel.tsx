@@ -2,6 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
+import { CurriculumEditor } from "@/components/coach/CurriculumEditor";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { TOPIC_EXAM_TYPE_LABELS } from "@uyanik/shared";
@@ -15,7 +16,6 @@ const EXAM_TYPES: TopicExamType[] = ["TYT", "AYT", "LGS", "GENEL"];
 
 export function SettingsPanel({ role }: SettingsPanelProps) {
   const [curriculum, setCurriculum] = useState<CurriculumRecord | null>(null);
-  const [jsonDraft, setJsonDraft] = useState("");
   const [isLoading, setIsLoading] = useState(role === "coach");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,6 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
     if (response.ok) {
       const data = (await response.json()) as { curriculum: CurriculumRecord };
       setCurriculum(data.curriculum);
-      setJsonDraft(JSON.stringify(data.curriculum.subjects, null, 2));
     }
     setIsLoading(false);
   }, [role]);
@@ -45,6 +44,8 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
     }
 
     setIsSaving(true);
+    setError(null);
+    setSuccess(null);
     const response = await fetch("/api/coach/curriculum", {
       method: "PATCH",
       credentials: "same-origin",
@@ -54,24 +55,17 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
     setIsSaving(false);
 
     if (response.ok) {
+      setSuccess("Sinav turu guncellendi.");
       await load();
+    } else {
+      setError("Sinav turu kaydedilemedi.");
     }
   }
 
-  async function handleJsonSave(event: FormEvent) {
-    event.preventDefault();
+  async function saveSubjects(subjects: CurriculumRecord["subjects"]): Promise<boolean> {
+    setIsSaving(true);
     setError(null);
     setSuccess(null);
-
-    let subjects: CurriculumRecord["subjects"];
-    try {
-      subjects = JSON.parse(jsonDraft) as CurriculumRecord["subjects"];
-    } catch {
-      setError("Gecersiz JSON formati.");
-      return;
-    }
-
-    setIsSaving(true);
     const response = await fetch("/api/coach/curriculum", {
       method: "PATCH",
       credentials: "same-origin",
@@ -82,11 +76,39 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
 
     if (!response.ok) {
       setError("Mufredat kaydedilemedi.");
-      return;
+      return false;
     }
 
+    const data = (await response.json()) as { curriculum: CurriculumRecord };
+    setCurriculum(data.curriculum);
     setSuccess("Mufredat guncellendi.");
+    return true;
+  }
+
+  async function resetSubjects(): Promise<boolean> {
+    if (!confirm("Mufredat varsayilan degerlere sifirlansin mi?")) {
+      return false;
+    }
+
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+    const response = await fetch("/api/coach/curriculum", {
+      method: "PATCH",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reset: true }),
+    });
+    setIsSaving(false);
+
+    if (!response.ok) {
+      setError("Mufredat sifirlanamadi.");
+      return false;
+    }
+
     await load();
+    setSuccess("Mufredat varsayilana sifirlandi.");
+    return true;
   }
 
   if (role === "coach") {
@@ -101,7 +123,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
                 Yukleniyor...
               </p>
             ) : (
-              <div className="filters">
+              <div className="seg" style={{ width: "fit-content" }}>
                 {EXAM_TYPES.map((type) => (
                   <button
                     key={type}
@@ -118,35 +140,31 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
           </div>
         </UkSection>
 
-        <UkSection title="Mufredat JSON" sub="Ders ve konu listesini duzenle">
-          <form onSubmit={handleJsonSave} className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div className="field">
-              <label className="label" htmlFor="curriculum-json">
-                subjects JSON
-              </label>
-              <textarea
-                id="curriculum-json"
-                className="input"
-                rows={14}
-                value={jsonDraft}
-                onChange={(e) => setJsonDraft(e.target.value)}
-                style={{ fontFamily: "monospace", fontSize: 12 }}
+        <UkSection title="Mufredat & Konu Gruplari" sub="Ders, grup ve konu yapisini duzenle">
+          {isLoading || !curriculum ? (
+            <div className="card-body muted" style={{ fontSize: 13 }}>
+              Yukleniyor...
+            </div>
+          ) : (
+            <div className="card-body">
+              <CurriculumEditor
+                curriculum={curriculum}
+                isSaving={isSaving}
+                onSave={saveSubjects}
+                onReset={resetSubjects}
               />
             </div>
-            <button type="submit" disabled={isSaving} className="btn btn-primary w-fit">
-              {isSaving ? "Kaydediliyor..." : "Kaydet"}
-            </button>
-            {error ? (
-              <p className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>
-                {error}
-              </p>
-            ) : null}
-            {success ? (
-              <p className="badge badge-success" style={{ height: "auto", padding: "10px 12px" }}>
-                {success}
-              </p>
-            ) : null}
-          </form>
+          )}
+          {error ? (
+            <p className="badge badge-danger" style={{ height: "auto", padding: "10px 12px", margin: "0 16px 16px" }}>
+              {error}
+            </p>
+          ) : null}
+          {success ? (
+            <p className="badge badge-success" style={{ height: "auto", padding: "10px 12px", margin: "0 16px 16px" }}>
+              {success}
+            </p>
+          ) : null}
         </UkSection>
       </div>
     );

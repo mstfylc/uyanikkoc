@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -91,7 +92,7 @@ export function ParentDashboard() {
             <p>Haftalik odev ve deneme ozeti</p>
           </div>
           <span className="badge" style={{ background: "rgba(255,255,255,.16)", color: "#fff", height: 26 }}>
-            <i className="ki-filled ki-heart" style={{ marginRight: 6 }} />
+            <KiIcon name="ki-heart" size={14} style={{ marginRight: 6 }} />
             Veli Paneli
           </span>
         </div>
@@ -145,7 +146,7 @@ export function ParentDashboard() {
                         color,
                       }}
                     >
-                      <i className="ki-filled ki-notepad-edit" />
+                      <KiIcon name="ki-notepad-edit" />
                     </span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div className="lr-title">{assignment.title}</div>

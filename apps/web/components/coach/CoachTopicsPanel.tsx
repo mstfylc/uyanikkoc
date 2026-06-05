@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
 import { UkBadge } from "@/components/design/UkBadge";
@@ -269,7 +270,7 @@ export function CoachTopicsPanel() {
               return (
                 <div key={note.id} className="lrow">
                   <span className={`stat-icon tone-${meta.tone}`} style={{ width: 38, height: 38 }}>
-                    <i className={`ki-filled ${meta.icon}`} />
+                    <KiIcon name={meta.icon} />
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="lr-title">{meta.label}</div>

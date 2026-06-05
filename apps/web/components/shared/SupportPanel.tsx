@@ -1,5 +1,6 @@
 "use client";
 
+import { KiIcon } from "@/components/design/KiIcon";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
 import { UkBadge } from "@/components/design/UkBadge";
@@ -110,7 +111,7 @@ export function SupportPanel() {
             tickets.map((ticket) => (
               <div key={ticket.id} className="lrow">
                 <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                  <i className="ki-filled ki-message-text" />
+                  <KiIcon name="ki-message-text" />
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="lr-title">{ticket.subject}</div>
