@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "dev:web": "turbo run dev --filter=@uyanik/web",
+    "dev:real": "powershell -ExecutionPolicy Bypass -File ./scripts/start-real-server.ps1",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "test:unit": "turbo run test",
