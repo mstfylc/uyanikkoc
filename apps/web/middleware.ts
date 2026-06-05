@@ -18,6 +18,8 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+    // Auth.js v5 HTTPS'te __Secure-authjs.session-token kullanır; bu bayrak olmadan oturum null kalır.
+    secureCookie: process.env.NODE_ENV === "production",
   });
 
   const session = token?.role

@@ -64,6 +64,7 @@ export const ROLE_HOME_PATH: Record<AppRole, string> = {
 
 const PUBLIC_PATHS = [
   "/login",
+  "/post-login",
   "/register",
   "/api/auth",
   "/api/health",

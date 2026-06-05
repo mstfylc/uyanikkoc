@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ROLE_HOME_PATH, canAccessPath, getUnauthorizedRedirect } from "@/lib/rbac";
+import { ROLE_HOME_PATH, canAccessPath, getUnauthorizedRedirect, isPublicPath } from "@/lib/rbac";
 
 describe("RBAC path erişim kontrolü", () => {
   it("doğru rol için erişime izin verir", () => {
@@ -20,6 +20,11 @@ describe("RBAC path erişim kontrolü", () => {
   it("session yoksa login'e yönlendirir", () => {
     const result = getUnauthorizedRedirect("/student/dashboard", null);
     expect(result).toBe("/login?next=%2Fstudent%2Fdashboard");
+  });
+
+  it("post-login oturum kontrolünü sayfa yapar (middleware public)", () => {
+    expect(isPublicPath("/post-login")).toBe(true);
+    expect(getUnauthorizedRedirect("/post-login", null)).toBeNull();
   });
 
   it("yanlış rol kendi home'una yönlendirir", () => {
