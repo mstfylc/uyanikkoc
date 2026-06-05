@@ -54,7 +54,9 @@ Build log'u başarılı görünse bile `inspect` çıktısında `Builds: . [0ms]
 
 ## 2. Ortam değişkenleri (Preview / Demo)
 
-Vercel → Project → Settings → Environment Variables → **Preview** (ve isteğe bağlı Development):
+> **KRİTİK — env kapsamı (en sık login hatası sebebi):** `main`'e push edince Vercel **Production** deployment üretir. Yalnızca **Preview** kapsamına eklenen değişkenler Production'a **uygulanmaz**; `AUTH_SECRET` eksik kalır ve demo login "E-posta veya şifre hatalı" verip login sayfasında kalır. Bu yüzden aşağıdaki değişkenleri **Production** (ve Preview) kapsamında — en kolayı **All Environments** — ekleyin.
+
+Vercel → Project → Settings → Environment Variables → **Production + Preview** (en kolayı: **All Environments**):
 
 | Değişken | Değer |
 |----------|--------|
@@ -79,6 +81,7 @@ Production ortamına Vercel'de gerçek DB bağlamak proje kararına aykırıdır
 
 | Konu | Çözüm |
 |------|--------|
+| Demo login çalışmıyor (login sayfasında kalıyor) | Env değişkenleri **Production** kapsamında mı? Özellikle `AUTH_SECRET` + `DEMO_AUTH_ALLOW_IN_MEMORY=true`. Ekleyip **Redeploy** edin |
 | 404 NOT_FOUND | Output Directory boş; Root Directory `apps/web`; Framework Next.js |
 | 401 Unauthorized | Deployment Protection kapatın veya Vercel SSO ile giriş yapın |
 | İkonlar eksik | `public/assets/metronic/vendors/keenicons/` lisanslı; repoda yok |
