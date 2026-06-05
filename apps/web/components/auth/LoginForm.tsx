@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 type DemoRole = "student" | "coach" | "parent";
@@ -13,7 +13,6 @@ const DEMO_BY_ROLE: Record<DemoRole, { email: string; password: string }> = {
 };
 
 export function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") ?? "/post-login";
 
@@ -37,13 +36,13 @@ export function LoginForm() {
 
     setIsSubmitting(false);
 
-    if (result?.error) {
+    if (!result || result.error || result.ok === false) {
       setError("E-posta veya sifre hatali.");
       return;
     }
 
-    router.push(nextPath);
-    router.refresh();
+    // Tam sayfa geçiş — App Router'da router.push oturum çerezini server'a taşımıyor.
+    window.location.assign(nextPath);
   }
 
   function fillDemo() {
