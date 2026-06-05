@@ -1,7 +1,7 @@
 # Latest Handoff
 
 **Son tamamlanan faz:** Faz 2 backlog tamamlandı (Yol-C: 16→15→19→20→21→29→22→26→27)  
-**Son commit:** `6b3dac2` — `feat: complete faz2 backlog (prompts 16-22,26-27,29)`  
+**Son commit:** `4916324` — `docs: handoff for faz2 backlog completion` (feat batch: `6b3dac2`)  
 **Branch:** main  
 
 ## Tamamlanan backlog (Faz 2)
