@@ -1,7 +1,7 @@
 # Latest Handoff
 
 **Son tamamlanan faz:** BACKLOG PROMPT 14 — Koç öğrenci roster (alpha)  
-**Son commit:** _(commit sonrası)_  
+**Son commit:** `8fd1f00` — `feat: add coach student roster alpha`  
 **Branch:** main  
 
 ## Bu faz (P14 roster)
