@@ -56,4 +56,11 @@ describe("assertProductionMemoryPolicy", () => {
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "false");
     expect(() => assertProductionMemoryPolicy()).not.toThrow();
   });
+
+  it("Vercel demo deploy'da production + memory açıkken hata fırlatmaz", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "true");
+    vi.stubEnv("VERCEL", "1");
+    expect(() => assertProductionMemoryPolicy()).not.toThrow();
+  });
 });
