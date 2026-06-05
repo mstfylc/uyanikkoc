@@ -190,8 +190,80 @@ async function main() {
   });
 
   await seedExamResults();
+  await seedFaz2Skeletons();
 
-  console.log("Seed completed: demo org, branch, users, profiles, assignment, sample topics, exam results");
+  console.log(
+    "Seed completed: demo org, branch, users, profiles, assignment, topics, exams, notifications, messages, templates",
+  );
+}
+
+async function seedFaz2Skeletons() {
+  await prisma.notification.upsert({
+    where: { sourceKey: "welcome:student_001" },
+    update: {
+      studentId: "student_001",
+      parentId: null,
+      title: "Hos geldin",
+      body: "Uyanik Koc alpha bildirim iskeleti.",
+      read: false,
+    },
+    create: {
+      id: "notification_seed_001",
+      studentId: "student_001",
+      title: "Hos geldin",
+      body: "Uyanik Koc alpha bildirim iskeleti.",
+      sourceKey: "welcome:student_001",
+    },
+  });
+
+  await prisma.messageThread.upsert({
+    where: { id: "thread_seed_coach_student" },
+    update: {
+      coachId: "coach_001",
+      studentId: "student_001",
+      parentId: null,
+      title: "Koç — Öğrenci",
+    },
+    create: {
+      id: "thread_seed_coach_student",
+      coachId: "coach_001",
+      studentId: "student_001",
+      title: "Koç — Öğrenci",
+      messages: {
+        create: [
+          {
+            senderRole: "COACH",
+            body: "Merhaba, bu haftaki odev planini birlikte gozden gecirelim.",
+          },
+          {
+            senderRole: "STUDENT",
+            body: "Tamam hocam, matematik odevine basladim.",
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.assignmentTemplate.upsert({
+    where: { id: "template_seed_001" },
+    update: {
+      coachId: "coach_001",
+      title: "Matematik tekrar (sablon)",
+      description: "Gunluk matematik tekrar seti",
+      type: "homework",
+      priority: "medium",
+      subject: "Matematik",
+    },
+    create: {
+      id: "template_seed_001",
+      coachId: "coach_001",
+      title: "Matematik tekrar (sablon)",
+      description: "Gunluk matematik tekrar seti",
+      type: "homework",
+      priority: "medium",
+      subject: "Matematik",
+    },
+  });
 }
 
 async function seedExamResults() {

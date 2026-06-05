@@ -3,6 +3,11 @@
 import type { AppRole } from "@uyanik/tokens";
 import { signOut, useSession } from "next-auth/react";
 
+import {
+  NotificationBell,
+  shouldShowNotificationBell,
+} from "@/components/shared/NotificationBell";
+
 const ROLE_LABELS: Record<AppRole, string> = {
   admin: "Admin",
   branch: "Şube",
@@ -45,6 +50,7 @@ export function Header({ role }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2 ms-auto">
+          {shouldShowNotificationBell(role) ? <NotificationBell role={role} /> : null}
           <span className="kt-badge kt-badge-sm kt-badge-outline kt-badge-primary hidden sm:inline-flex">
             {ROLE_LABELS[role]}
           </span>

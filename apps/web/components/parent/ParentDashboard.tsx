@@ -13,13 +13,25 @@ import {
   buildParentWeeklyComment,
   calculateCompletionRate,
   countOverdueAssignments,
+  formatExamNet,
 } from "@uyanik/shared";
-import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
+import type {
+  AssignmentPriority,
+  AssignmentStatus,
+  AssignmentType,
+  ResultExamType,
+} from "@uyanik/database";
 
 type ParentSummary = {
   totalAssignments: number;
   completedCount: number;
   pendingCount: number;
+  topicCompletionRate: number;
+  topicCompletedCount: number;
+  topicTotalCount: number;
+  latestExamNet: number | null;
+  latestExamType: ResultExamType | null;
+  examTrend: "up" | "down" | "flat";
   assignments: Array<{
     id: string;
     title: string;
@@ -86,7 +98,11 @@ export function ParentDashboard() {
   const pending = summary?.pendingCount ?? 0;
   const completionRate = calculateCompletionRate(total, completed);
   const overdueCount = summary ? countOverdueAssignments(summary.assignments) : 0;
-  const weeklyComment = buildParentWeeklyComment(completionRate, overdueCount, pending);
+  const weeklyComment = buildParentWeeklyComment(completionRate, overdueCount, pending, {
+    topicCompletionRate: summary?.topicCompletionRate,
+    latestExamNet: summary?.latestExamNet,
+    examTrend: summary?.examTrend,
+  });
 
   return (
     <div className="flex flex-col gap-5" data-testid="parent-summary">
@@ -120,6 +136,27 @@ export function ParentDashboard() {
           value={isLoading ? "—" : `${completionRate}%`}
           icon="ki-chart-pie-simple"
           tone="primary"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <StatCard
+          label="Konu Tamamlama %"
+          value={isLoading ? "—" : `%${summary?.topicCompletionRate ?? 0}`}
+          icon="ki-book-open"
+          tone="primary"
+        />
+        <StatCard
+          label="Son Deneme Net"
+          value={
+            isLoading
+              ? "—"
+              : summary?.latestExamNet != null
+                ? formatExamNet(summary.latestExamNet)
+                : "—"
+          }
+          icon="ki-chart-simple"
+          tone="success"
         />
       </div>
 
@@ -162,7 +199,7 @@ export function ParentDashboard() {
             <Link href="/parent/dashboard" className="kt-btn kt-btn-sm kt-btn-primary">
               Rapor
             </Link>
-            <Link href="/parent/dashboard" className="kt-btn kt-btn-sm kt-btn-light">
+            <Link href="/parent/messages" className="kt-btn kt-btn-sm kt-btn-light">
               Mesaj
             </Link>
           </div>

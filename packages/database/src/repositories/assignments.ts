@@ -118,5 +118,11 @@ export async function getParentSummary(parentId: string): Promise<ParentSummaryR
     completedCount,
     pendingCount: mapped.length - completedCount,
     assignments: mapped,
+    topicCompletionRate: 0,
+    topicCompletedCount: 0,
+    topicTotalCount: 0,
+    latestExamNet: null,
+    latestExamType: null,
+    examTrend: "flat",
   };
 }

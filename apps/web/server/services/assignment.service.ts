@@ -7,6 +7,7 @@ import {
   completeAssignment as completeMemoryAssignment,
   createAssignment as createMemoryAssignment,
   getParentSummary as getMemoryParentSummary,
+  listAssignmentsForParent as listMemoryAssignmentsForParent,
   listAssignmentsForStudent as listMemoryAssignmentsForStudent,
   listAssignmentsForCoach as listMemoryAssignmentsForCoach,
 } from "@/mocks/assignments";
@@ -58,7 +59,12 @@ async function completeAssignment(
   return completeMemoryAssignment(assignmentId, studentId);
 }
 
-async function getParentSummary(parentId: string): Promise<ParentSummaryRecord> {
+type ParentAssignmentBase = Pick<
+  ParentSummaryRecord,
+  "totalAssignments" | "completedCount" | "pendingCount" | "assignments"
+>;
+
+async function getParentSummary(parentId: string): Promise<ParentAssignmentBase> {
   if (shouldUseDatabase()) {
     const { assignmentRepository } = await import("@uyanik/database");
     return assignmentRepository.getParentSummary(parentId);
@@ -101,6 +107,48 @@ export async function completeStudentAssignment(
   return completeAssignment(assignmentId, studentId);
 }
 
+async function resolveStudentIdForParent(parentId: string): Promise<string | null> {
+  if (parentId === DEMO_PARENT_ID) {
+    return DEMO_STUDENT_ID;
+  }
+
+  if (shouldUseDatabase()) {
+    const { studentRepository } = await import("@uyanik/database");
+    return studentRepository.resolveStudentIdForParent(parentId);
+  }
+
+  const parentAssignments = listMemoryAssignmentsForParent(parentId);
+  return parentAssignments[0]?.studentId ?? null;
+}
+
 export async function getParentAssignmentSummary(parentId: string): Promise<ParentSummaryRecord> {
-  return getParentSummary(parentId);
+  const base = await getParentSummary(parentId);
+  const studentId = await resolveStudentIdForParent(parentId);
+
+  if (!studentId) {
+    return {
+      ...base,
+      topicCompletionRate: 0,
+      topicCompletedCount: 0,
+      topicTotalCount: 0,
+      latestExamNet: null,
+      latestExamType: null,
+      examTrend: "flat",
+    };
+  }
+
+  const { listStudentTopics } = await import("@/server/services/topic.service");
+  const { listStudentExams } = await import("@/server/services/exam.service");
+  const { summary: topicSummary } = await listStudentTopics(studentId);
+  const { summary: examSummary } = await listStudentExams(studentId);
+
+  return {
+    ...base,
+    topicCompletionRate: topicSummary.completionRate,
+    topicCompletedCount: topicSummary.completedTopics,
+    topicTotalCount: topicSummary.totalTopics,
+    latestExamNet: examSummary.latestNet,
+    latestExamType: examSummary.examType,
+    examTrend: examSummary.trend,
+  };
 }

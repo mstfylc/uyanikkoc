@@ -13,6 +13,12 @@ export type ParentSummary = {
   completedCount: number;
   pendingCount: number;
   assignments: Assignment[];
+  topicCompletionRate: number;
+  topicCompletedCount: number;
+  topicTotalCount: number;
+  latestExamNet: number | null;
+  latestExamType: import("@uyanik/database").ResultExamType | null;
+  examTrend: "up" | "down" | "flat";
 };
 
 export const DEMO_ORG_ID = "org_demo_001";
@@ -94,6 +100,12 @@ export function getParentSummary(parentId: string): ParentSummary {
     completedCount,
     pendingCount: parentAssignments.length - completedCount,
     assignments: parentAssignments,
+    topicCompletionRate: 0,
+    topicCompletedCount: 0,
+    topicTotalCount: 0,
+    latestExamNet: null,
+    latestExamType: null,
+    examTrend: "flat",
   };
 }
 

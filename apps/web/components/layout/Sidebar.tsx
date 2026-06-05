@@ -3,6 +3,7 @@
 import type { AppRole } from "@uyanik/tokens";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 type MenuItem = {
   href: string;
@@ -13,37 +14,38 @@ type MenuItem = {
 const MENU_BY_ROLE: Record<"coach" | "student" | "parent" | "branch" | "admin", MenuItem[]> = {
   coach: [
     { href: "/coach/dashboard", label: "Dashboard", icon: "ki-element-11" },
-    { href: "/coach/dashboard", label: "Öğrencilerim", icon: "ki-people" },
-    { href: "/coach/assignments/create", label: "Ödev & Görev", icon: "ki-notepad-edit" },
-    { href: "/coach/dashboard", label: "Denemeler", icon: "ki-chart-simple" },
-    { href: "/coach/dashboard", label: "Mesajlar", icon: "ki-messages" },
+    { href: "/coach/students/student_001", label: "Ogrencilerim", icon: "ki-people" },
+    { href: "/coach/assignments/create", label: "Odev & Gorev", icon: "ki-notepad-edit" },
+    { href: "/coach/exams", label: "Denemeler", icon: "ki-chart-simple" },
+    { href: "/coach/messages", label: "Mesajlar", icon: "ki-messages" },
     { href: "/coach/dashboard", label: "Raporlar", icon: "ki-graph-up" },
   ],
   student: [
     { href: "/student/dashboard", label: "Dashboard", icon: "ki-element-11" },
-    { href: "/student/dashboard", label: "Çalışma Programı", icon: "ki-calendar" },
+    { href: "/student/dashboard", label: "Calisma Programi", icon: "ki-calendar" },
     { href: "/student/topics", label: "Konu Takibi", icon: "ki-book-open" },
     { href: "/student/dashboard", label: "Denemeler", icon: "ki-chart-simple" },
-    { href: "/student/assignments", label: "Ödevlerim", icon: "ki-notepad-edit" },
-    { href: "/student/ai-coach", label: "AI Koç · Yakında", icon: "ki-technology-2" },
-    { href: "/student/dashboard", label: "Motivasyon", icon: "ki-star" },
+    { href: "/student/assignments", label: "Odevlerim", icon: "ki-notepad-edit" },
+    { href: "/student/messages", label: "Mesajlar", icon: "ki-messages" },
+    { href: "/student/motivation", label: "Motivasyon", icon: "ki-star" },
+    { href: "/student/ai-coach", label: "AI Koc · Yakinda", icon: "ki-technology-2" },
   ],
   parent: [
     { href: "/parent/dashboard", label: "Dashboard", icon: "ki-element-11" },
     { href: "/parent/dashboard", label: "Raporlar", icon: "ki-graph-up" },
-    { href: "/parent/dashboard", label: "Koça Mesaj", icon: "ki-messages" },
-    { href: "/parent/dashboard", label: "Bildirimler", icon: "ki-notification-on" },
+    { href: "/parent/messages", label: "Koca Mesaj", icon: "ki-messages" },
+    { href: "/parent/notifications", label: "Bildirimler", icon: "ki-notification-on" },
   ],
   branch: [
     { href: "/branch/dashboard", label: "Dashboard", icon: "ki-element-11" },
-    { href: "/branch/dashboard", label: "Öğrenciler", icon: "ki-people" },
-    { href: "/branch/dashboard", label: "Koçlar", icon: "ki-profile-circle" },
+    { href: "/branch/dashboard", label: "Ogrenciler", icon: "ki-people" },
+    { href: "/branch/dashboard", label: "Koclar", icon: "ki-profile-circle" },
     { href: "/branch/dashboard", label: "Raporlar", icon: "ki-graph-up" },
   ],
   admin: [
     { href: "/admin/dashboard", label: "Dashboard", icon: "ki-element-11" },
-    { href: "/admin/dashboard", label: "Kullanıcılar", icon: "ki-people" },
-    { href: "/admin/dashboard", label: "Sistem Sağlığı", icon: "ki-shield-tick" },
+    { href: "/admin/dashboard", label: "Kullanicilar", icon: "ki-people" },
+    { href: "/admin/dashboard", label: "Sistem Sagligi", icon: "ki-shield-tick" },
   ],
 };
 
@@ -69,7 +71,31 @@ function isActive(pathname: string, href: string): boolean {
 
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
-  const items = MENU_BY_ROLE[role as keyof typeof MENU_BY_ROLE] ?? [];
+  const [motivationEnabled, setMotivationEnabled] = useState(true);
+
+  useEffect(() => {
+    if (role !== "student") {
+      return;
+    }
+
+    async function loadMotivation() {
+      const response = await fetch("/api/student/motivation", { credentials: "same-origin" });
+      if (response.ok) {
+        const data = (await response.json()) as { motivation: { enabled: boolean } };
+        setMotivationEnabled(data.motivation.enabled);
+      }
+    }
+
+    void loadMotivation();
+  }, [role]);
+
+  const items = useMemo(() => {
+    const base = MENU_BY_ROLE[role as keyof typeof MENU_BY_ROLE] ?? [];
+    if (role !== "student" || motivationEnabled) {
+      return base;
+    }
+    return base.filter((item) => item.href !== "/student/motivation");
+  }, [role, motivationEnabled]);
 
   return (
     <div
@@ -84,14 +110,14 @@ export function Sidebar({ role }: SidebarProps) {
       >
         <div className="kt-sidebar-logo min-w-0">
           <Link href={items[0]?.href ?? "/"}>
-            <span className="text-lg font-semibold text-foreground">Uyanık Koç</span>
+            <span className="text-lg font-semibold text-foreground">Uyanik Koc</span>
           </Link>
         </div>
         <div data-kt-toggle="body" data-kt-toggle-class="kt-sidebar-collapse" id="sidebar_toggle">
           <button
             type="button"
             className="kt-btn kt-btn-outline kt-btn-icon size-[30px] rounded-lg absolute start-full top-2/4 z-40 -translate-x-2/4 -translate-y-2/4"
-            aria-label="Kenar çubuğunu daralt"
+            aria-label="Kenar cubugunu daralt"
           >
             <i className="ki-filled ki-black-left-line kt-toggle-active:rotate-180 transition-all duration-300" />
           </button>

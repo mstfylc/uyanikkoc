@@ -3,6 +3,10 @@ export function useMemoryStore(): boolean {
   return flag !== "false" && flag !== "0";
 }
 
+export function isDatabaseConfigured(): boolean {
+  return Boolean(process.env.DATABASE_URL?.trim());
+}
+
 /** Production ortamında demo-memory açıksa açık hata fırlatır. */
 export function assertProductionMemoryPolicy(): void {
   if (process.env.NODE_ENV !== "production") {

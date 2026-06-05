@@ -88,32 +88,36 @@ model User {
 }
 
 model StudentProfile {
-  id          String       @id
-  userId      String       @unique
-  parentId    String?
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parent      ParentProfile? @relation(fields: [parentId], references: [id], onDelete: SetNull)
-  assignments Assignment[] @relation("StudentAssignments")
-  subjects    Subject[]
-  examResults ExamResult[]
+  id                String       @id
+  userId            String       @unique
+  parentId          String?
+  motivationEnabled Boolean      @default(true)
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent            ParentProfile? @relation(fields: [parentId], references: [id], onDelete: SetNull)
+  assignments       Assignment[] @relation("StudentAssignments")
+  subjects          Subject[]
+  examResults       ExamResult[]
+  notifications     Notification[]
 
   @@map("student_profiles")
 }
 
 model CoachProfile {
-  id          String       @id
-  userId      String       @unique
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assignments Assignment[] @relation("CoachAssignments")
+  id          String               @id
+  userId      String               @unique
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignments Assignment[]         @relation("CoachAssignments")
+  templates   AssignmentTemplate[]
 
   @@map("coach_profiles")
 }
 
 model ParentProfile {
-  id       String           @id
-  userId   String           @unique
-  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  children StudentProfile[]
+  id            String           @id
+  userId        String           @unique
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  children      StudentProfile[]
+  notifications Notification[]
 
   @@map("parent_profiles")
 }
@@ -216,4 +220,65 @@ model ExamSubjectResult {
 
   @@index([examResultId])
   @@map("exam_subject_results")
+}
+
+model Notification {
+  id        String          @id @default(cuid())
+  studentId String?
+  parentId  String?
+  title     String
+  body      String
+  read      Boolean         @default(false)
+  sourceKey String?         @unique
+  createdAt DateTime        @default(now())
+  student   StudentProfile? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  parent    ParentProfile?  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([parentId])
+  @@map("notifications")
+}
+
+model MessageThread {
+  id        String    @id @default(cuid())
+  coachId   String
+  studentId String?
+  parentId  String?
+  title     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+
+  @@index([coachId])
+  @@index([studentId])
+  @@index([parentId])
+  @@map("message_threads")
+}
+
+model Message {
+  id         String        @id @default(cuid())
+  threadId   String
+  senderRole DbRole
+  body       String
+  createdAt  DateTime      @default(now())
+  thread     MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@map("messages")
+}
+
+model AssignmentTemplate {
+  id          String       @id @default(cuid())
+  coachId     String
+  title       String
+  description String?
+  type        AssignmentType @default(homework)
+  priority    AssignmentPriority @default(medium)
+  subject     String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  coach       CoachProfile @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@index([coachId])
+  @@map("assignment_templates")
 }

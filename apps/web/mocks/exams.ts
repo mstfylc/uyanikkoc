@@ -84,3 +84,39 @@ export function getExamTrendSummaryForStudent(studentId: string): ExamTrendSumma
 export function getExamTrendSummaryForStudents(studentIds: string[]): ExamTrendSummary {
   return buildExamTrendSummary(listExamResultsForStudents(studentIds));
 }
+
+function computeSubjectNet(correct: number, wrong: number): number {
+  return correct - wrong / 4;
+}
+
+function computeTotalNet(subjects: Array<{ correct: number; wrong: number }>): number {
+  return subjects.reduce((total, subject) => total + computeSubjectNet(subject.correct, subject.wrong), 0);
+}
+
+export function createExamResult(input: import("@uyanik/database").CreateExamResultInput): ExamResultRecord {
+  seedIfEmpty();
+  const timestamp = nowIso();
+  const subjects = input.subjects.map((subject, index) => ({
+    id: `exam_sub_${Date.now()}_${index}`,
+    subjectName: subject.subjectName.trim(),
+    correct: subject.correct,
+    wrong: subject.wrong,
+    net: computeSubjectNet(subject.correct, subject.wrong),
+  }));
+  const totalNet = computeTotalNet(input.subjects);
+
+  const exam: ExamResultRecord = {
+    id: `exam_${examResults.length + 1}`,
+    studentId: input.studentId,
+    examType: input.examType,
+    label: input.label ?? null,
+    takenAt: input.takenAt,
+    totalNet,
+    subjects,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+
+  examResults.push(exam);
+  return exam;
+}

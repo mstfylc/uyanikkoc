@@ -88,24 +88,37 @@ export function buildParentWeeklyComment(
   completionRate: number,
   overdueCount: number,
   pendingCount: number,
+  extras?: {
+    topicCompletionRate?: number;
+    latestExamNet?: number | null;
+    examTrend?: "up" | "down" | "flat";
+  },
 ): string {
+  const parts: string[] = [];
+
   if (pendingCount === 0) {
-    return "Tum odevler tamamlandi. Harika bir hafta!";
+    parts.push("Tum odevler tamamlandi. Harika bir hafta!");
+  } else if (overdueCount > 0) {
+    parts.push(`${overdueCount} gecikmis odev var. Bu hafta odak noktasi tamamlama olmali.`);
+  } else if (completionRate >= 80) {
+    parts.push("Ilerleme guclu. Kalan odevler icin duzenli calisma surdurulebilir.");
+  } else if (completionRate >= 50) {
+    parts.push("Orta duzey ilerleme. Hafta sonuna kadar bekleyen odevler tamamlanmali.");
+  } else {
+    parts.push("Ilerleme dusuk. Haftalik plan gozden gecirilmeli ve oncelikli odevler belirlenmeli.");
   }
 
-  if (overdueCount > 0) {
-    return `${overdueCount} gecikmis odev var. Bu hafta odak noktasi tamamlama olmali.`;
+  if (extras?.topicCompletionRate !== undefined) {
+    parts.push(`Konu tamamlama: %${extras.topicCompletionRate}.`);
   }
 
-  if (completionRate >= 80) {
-    return "Ilerleme guclu. Kalan odevler icin duzenli calisma surdurulebilir.";
+  if (extras?.latestExamNet != null) {
+    const trendLabel =
+      extras.examTrend === "up" ? "yukari" : extras.examTrend === "down" ? "asagi" : "sabit";
+    parts.push(`Son deneme net: ${extras.latestExamNet.toFixed(1)} (${trendLabel} trend).`);
   }
 
-  if (completionRate >= 50) {
-    return "Orta duzey ilerleme. Hafta sonuna kadar bekleyen odevler tamamlanmali.";
-  }
-
-  return "Ilerleme dusuk. Haftalik plan gozden gecirilmeli ve oncelikli odevler belirlenmeli.";
+  return parts.join(" ");
 }
 
 export function buildStudentPriorityAssignment(

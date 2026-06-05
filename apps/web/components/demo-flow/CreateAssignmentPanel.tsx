@@ -1,7 +1,7 @@
 "use client";
 
-import type { AssignmentPriority, AssignmentType } from "@uyanik/database";
-import { FormEvent, useState } from "react";
+import type { AssignmentPriority, AssignmentType, AssignmentTemplateRecord } from "@uyanik/database";
+import { FormEvent, useEffect, useState } from "react";
 
 type CreatedAssignment = {
   id: string;
@@ -83,9 +83,37 @@ export function CreateAssignmentPanel() {
   const [priority, setPriority] = useState<AssignmentPriority>("medium");
   const [subject, setSubject] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [templateId, setTemplateId] = useState("");
+  const [templates, setTemplates] = useState<AssignmentTemplateRecord[]>([]);
   const [created, setCreated] = useState<CreatedAssignment | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    async function loadTemplates() {
+      const response = await fetch("/api/coach/templates", { credentials: "same-origin" });
+      if (response.ok) {
+        const data = (await response.json()) as { templates: AssignmentTemplateRecord[] };
+        setTemplates(data.templates);
+      }
+    }
+
+    void loadTemplates();
+  }, []);
+
+  function applyTemplate(selectedId: string) {
+    setTemplateId(selectedId);
+    const template = templates.find((item) => item.id === selectedId);
+    if (!template) {
+      return;
+    }
+
+    setTitle(template.title);
+    setDescription(template.description ?? "");
+    setType(template.type);
+    setPriority(template.priority);
+    setSubject(template.subject ?? "");
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -129,11 +157,30 @@ export function CreateAssignmentPanel() {
     setPriority("medium");
     setSubject("");
     setDueDate("");
+    setTemplateId("");
   }
 
   return (
     <section className="flex flex-col gap-4">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <label htmlFor="template">Sablon</label>
+          <select
+            id="template"
+            name="template"
+            value={templateId}
+            onChange={(event) => applyTemplate(event.target.value)}
+            className="w-full rounded-md border border-border px-3 py-2"
+          >
+            <option value="">Sablon seciniz (opsiyonel)</option>
+            {templates.map((template) => (
+              <option key={template.id} value={template.id}>
+                {template.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex flex-col gap-1">
           <label htmlFor="title">Baslik *</label>
           <input

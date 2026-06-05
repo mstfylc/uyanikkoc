@@ -49,6 +49,18 @@ describe("buildParentWeeklyComment", () => {
   it("tamamlanmis hafta icin olumlu yorum dondurur", () => {
     expect(buildParentWeeklyComment(100, 0, 0)).toContain("Harika");
   });
+
+  it("konu ve deneme ozetini yoruma ekler", () => {
+    const comment = buildParentWeeklyComment(80, 0, 2, {
+      topicCompletionRate: 50,
+      latestExamNet: 77,
+      examTrend: "up",
+    });
+
+    expect(comment).toContain("Konu tamamlama: %50");
+    expect(comment).toContain("Son deneme net: 77.0");
+    expect(comment).toContain("yukari");
+  });
 });
 
 describe("buildStudentPriorityAssignment", () => {

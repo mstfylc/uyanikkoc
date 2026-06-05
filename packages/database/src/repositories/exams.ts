@@ -96,3 +96,29 @@ export async function listExamResultsForStudents(studentIds: string[]): Promise<
 
   return exams.map(mapExamResult);
 }
+
+export async function createExamResult(input: import("../types").CreateExamResultInput): Promise<ExamResultRecord> {
+  const subjectRows = input.subjects.map((subject) => ({
+    subjectName: subject.subjectName.trim(),
+    correct: subject.correct,
+    wrong: subject.wrong,
+    net: computeSubjectNet(subject.correct, subject.wrong),
+  }));
+  const totalNet = computeTotalNet(input.subjects);
+
+  const exam = await prisma.examResult.create({
+    data: {
+      studentId: input.studentId,
+      examType: input.examType,
+      label: input.label ?? null,
+      takenAt: new Date(input.takenAt),
+      totalNet,
+      subjects: {
+        create: subjectRows,
+      },
+    },
+    include: { subjects: true },
+  });
+
+  return mapExamResult(exam);
+}

@@ -1,3 +1,11 @@
+# Risk Report — Faz 2 kapanış
+
+**Tarih:** 2026-06-05  
+**Faz:** Backlog 16–22, 26–27, 29  
+**Durum:** Additive migration `20260604210000_faz2_skeletons` — yerel/CI için `pnpm db:migrate` gerekir.
+
+---
+
 # Risk Report — BACKLOG PROMPT 18
 
 **Tarih:** 2026-06-04  

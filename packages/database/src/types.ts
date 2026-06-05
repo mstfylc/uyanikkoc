@@ -39,6 +39,85 @@ export type ParentSummaryRecord = {
   completedCount: number;
   pendingCount: number;
   assignments: AssignmentRecord[];
+  topicCompletionRate: number;
+  topicCompletedCount: number;
+  topicTotalCount: number;
+  latestExamNet: number | null;
+  latestExamType: ResultExamType | null;
+  examTrend: "up" | "down" | "flat";
+};
+
+export type NotificationRecord = {
+  id: string;
+  studentId: string | null;
+  parentId: string | null;
+  title: string;
+  body: string;
+  read: boolean;
+  createdAt: string;
+};
+
+export type MessageRecord = {
+  id: string;
+  threadId: string;
+  senderRole: "STUDENT" | "COACH" | "PARENT" | "BRANCH_MANAGER" | "ORG_ADMIN";
+  body: string;
+  createdAt: string;
+};
+
+export type MessageThreadRecord = {
+  id: string;
+  coachId: string;
+  studentId: string | null;
+  parentId: string | null;
+  title: string;
+  messages: MessageRecord[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AssignmentTemplateRecord = {
+  id: string;
+  coachId: string;
+  title: string;
+  description: string | null;
+  type: AssignmentType;
+  priority: AssignmentPriority;
+  subject: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateAssignmentTemplateInput = {
+  coachId: string;
+  title: string;
+  description?: string | null;
+  type?: AssignmentType;
+  priority?: AssignmentPriority;
+  subject?: string | null;
+};
+
+export type CreateExamResultInput = {
+  studentId: string;
+  examType: ResultExamType;
+  label?: string | null;
+  takenAt: string;
+  subjects: Array<{
+    subjectName: string;
+    correct: number;
+    wrong: number;
+  }>;
+};
+
+export type MotivationSummary = {
+  enabled: boolean;
+  streakDays: number;
+  badges: string[];
+};
+
+export type StudentProfileRecord = {
+  id: string;
+  motivationEnabled: boolean;
 };
 
 export type TopicExamType = "TYT" | "AYT" | "LGS" | "GENEL";

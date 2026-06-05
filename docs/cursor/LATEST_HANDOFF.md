@@ -1,26 +1,37 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** BACKLOG PROMPT 18 — Deneme sonuçları (YKS alpha)  
-**Son commit:** `2575599` — `feat: add exam results yks alpha`  
+**Son tamamlanan faz:** Faz 2 backlog tamamlandı (Yol-C: 16→15→19→20→21→29→22→26→27)  
+**Son commit:** _(commit sonrası)_  
 **Branch:** main  
 
-## PROMPT 18 özeti
+## Tamamlanan backlog (Faz 2)
 
-- Prisma: `ExamResult`, `ExamSubjectResult`, `ResultExamType` (TYT/AYT/LGS)
-- Migration: `20260604190000_exam_results_yks`
-- API: `GET /api/student/exams`, `GET /api/coach/exams`
-- Dashboard: son net + trend kartları (öğrenci + koç)
-- Seed: 2 TYT denemesi (yukarı trend)
+| Prompt | Konu | Commit mesajı |
+|--------|------|---------------|
+| 14 | Assignment service layer | `refactor: introduce assignment service layer` |
+| 17 | Konu takibi | `feat: add user defined topic tracking` |
+| 18 | Deneme sonuçları | `feat: add exam results yks alpha` |
+| 16 | Bildirim iskeleti | `feat: add in app notification skeleton` |
+| 15 | Mesajlaşma iskeleti | `feat: add messaging skeleton` |
+| 19 | Veli rapor genişletme | `feat: expand parent report summary` |
+| 20 | Koç deneme girişi | `feat: add coach exam entry` |
+| 21 | Koç öğrenci detay | `feat: add coach student detail shell` |
+| 29 | Motivasyon/streak | `feat: add toggleable motivation streak` |
+| 22 | Ödev şablonları | `feat: add assignment templates` |
+| 26 | Worker iskeleti | `chore: add worker job skeleton` |
+| 27 | Health genişletme | `feat: expand health check status` |
 
-## Durum
+## Migration
 
-- Faz 2: 14 ✓ · 17 ✓ · **18 ✓** — sıradaki **16** (Yol-C: bildirim iskeleti)
-- Yerel DB: `pnpm db:migrate && pnpm db:seed`
+`20260604210000_faz2_skeletons` — notifications, messages, assignment_templates, motivationEnabled  
+Önceki: `20260604180000_user_defined_topics`, `20260604190000_exam_results_yks`
 
-## Test özeti (P18)
+Yerel: `pnpm db:migrate && pnpm db:seed`
 
-db:generate ✓ · typecheck ✓ · unit 34 ✓
+## Test özeti
 
-## Not
+typecheck ✓ · unit 38 ✓ · e2e 10 ✓
 
-Net hesabı: `doğru - yanlış/4` (repository + seed). Bellek modu demo seed ile çalışır.
+## Ertelenen (backlog dışı)
+
+23, 24, 25, 28 + sprint 1 opsiyonel (10, 12, 13 tekrar)

@@ -6,7 +6,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --max-warnings 0",
-    "dev": "node -e \"console.log('worker dev placeholder')\"",
+    "dev": "node -e \"console.log('[worker] assignment-reminder stub — no queue configured')\"",
     "test": "node --test"
   }
 }

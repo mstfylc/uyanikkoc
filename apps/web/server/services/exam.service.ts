@@ -37,6 +37,17 @@ export async function listCoachExams(studentIds: string[]): Promise<StudentExamL
   return { exams, summary: buildExamTrendSummary(exams) };
 }
 
+export async function createCoachExamResult(
+  input: import("@uyanik/database").CreateExamResultInput,
+): Promise<ExamResultRecord> {
+  if (shouldUseDatabase()) {
+    const { examRepository } = await import("@uyanik/database");
+    return examRepository.createExamResult(input);
+  }
+
+  return memoryExams.createExamResult(input);
+}
+
 export async function resolveCoachStudentIds(coachId: string): Promise<string[]> {
   if (shouldUseDatabase()) {
     const { assignmentRepository } = await import("@uyanik/database");

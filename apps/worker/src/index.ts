@@ -1,1 +1,1 @@
-export const workerPlaceholder = true;
+export { runAssignmentReminderJob, startWorker } from "./jobs/assignment-reminder.js";
