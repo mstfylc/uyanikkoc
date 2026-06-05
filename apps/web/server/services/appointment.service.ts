@@ -7,7 +7,7 @@ import type {
 import { calculateCompletionRate } from "@uyanik/shared";
 
 import * as memoryAppointments from "@/mocks/appointments";
-import { listCoachStudents } from "@/mocks/roster";
+import { listCoachStudents, resolveParentIdForStudent } from "@/mocks/roster";
 import { getParentSummary } from "@/mocks/assignments";
 import { listExamResultsForStudent } from "@/mocks/exams";
 import { listSubjectsForStudent } from "@/mocks/topics";
@@ -77,8 +77,8 @@ export async function buildCoachReportSummary(coachId: string): Promise<CoachRep
   const pendingAppointments = appointments.filter((item) => item.status === "pending").length;
 
   const students = roster.map((entry) => {
-    const parentId = entry.studentId === "student_001" ? "parent_001" : "parent_002";
-    const summary = getParentSummary(parentId);
+    const parentId = resolveParentIdForStudent(entry.studentId);
+    const summary = parentId ? getParentSummary(parentId) : null;
     const exams = listExamResultsForStudent(entry.studentId);
     const topics = listSubjectsForStudent(entry.studentId);
     const topicSummary = buildTopicSummary(topics);
@@ -87,7 +87,9 @@ export async function buildCoachReportSummary(coachId: string): Promise<CoachRep
       studentId: entry.studentId,
       displayName: entry.displayName,
       latestNet: exams[0]?.totalNet ?? null,
-      assignmentRate: calculateCompletionRate(summary.totalAssignments, summary.completedCount),
+      assignmentRate: summary
+        ? calculateCompletionRate(summary.totalAssignments, summary.completedCount)
+        : 0,
       topicRate: topicSummary.completionRate,
     };
   });
