@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getAuthEnvDiagnostics } from "@/lib/auth/runtime-env";
 import { isDatabaseConfigured, shouldUseDatabase, useMemoryStore } from "@/lib/data/env";
 
 async function resolveDatabaseStatus(): Promise<"ok" | "memory" | "down"> {
@@ -26,8 +27,18 @@ async function resolveDatabaseStatus(): Promise<"ok" | "memory" | "down"> {
 
 export async function GET() {
   const database = await resolveDatabaseStatus();
-  const authSecret = (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET)?.trim()
-    ? "ok"
-    : "missing";
-  return NextResponse.json({ status: "ok", database, authSecret });
+  const auth = getAuthEnvDiagnostics();
+
+  return NextResponse.json({
+    status: "ok",
+    database,
+    authSecret: auth.authSecret,
+    ...(auth.vercel
+      ? {
+          vercel: true,
+          authUrlSet: auth.authUrlSet,
+          nextAuthUrlSet: auth.nextAuthUrlSet,
+        }
+      : {}),
+  });
 }

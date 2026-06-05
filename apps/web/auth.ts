@@ -3,7 +3,10 @@ import { compare } from "bcryptjs";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
+import { sanitizeAuthEnvForVercel } from "./lib/auth/runtime-env";
 import { resolveUserByEmail } from "./lib/auth/resolve-user";
+
+sanitizeAuthEnvForVercel();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,

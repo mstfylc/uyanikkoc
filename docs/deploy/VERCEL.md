@@ -58,11 +58,16 @@ Vercel → Project → Settings → Environment Variables → **Production + Pre
 |----------|--------|
 | `AUTH_SECRET` | `openssl rand -base64 32` çıktısı |
 | `NEXTAUTH_SECRET` | aynı değer |
-| `AUTH_URL` | `https://uyanikkoc.vercel.app` (slash yok) |
-| `NEXTAUTH_URL` | aynı URL |
 | `DEMO_AUTH_ALLOW_IN_MEMORY` | `true` |
 | `SINGLE_BRANCH_MODE` | `true` |
 | `AI_COACH_ENABLED` | `false` |
+
+**`AUTH_URL` / `NEXTAUTH_URL` eklemeyin** (veya silin). Vercel'de yanlış alias (`uyanikkoc-uyanik.vercel.app` vs `uyanikkoc.vercel.app`) Auth.js **Configuration** hatasına yol açar. Kod `trustHost` + runtime sanitize ile istek host'unu kullanır.
+
+Eski satırlar (kullanmayın):
+
+| ~~`AUTH_URL`~~ | ~~Vercel adresin~~ |
+| ~~`NEXTAUTH_URL`~~ | ~~aynı URL~~ |
 
 Preview'da `DATABASE_URL` **gerekmez** — demo kullanıcılar bellek modunda çalışır (`coach@uyanik.local` / `uyanik123`).
 
