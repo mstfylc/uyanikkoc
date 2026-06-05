@@ -36,3 +36,12 @@ export function coachHasStudent(coachId: string, studentId: string): boolean {
 export function resolveParentIdForStudent(studentId: string): string | null {
   return PARENT_BY_STUDENT[studentId] ?? null;
 }
+
+export function resolveCoachIdForStudent(studentId: string): string | null {
+  for (const [coachId, entries] of Object.entries(ROSTER_BY_COACH)) {
+    if (entries.some((entry) => entry.studentId === studentId)) {
+      return coachId;
+    }
+  }
+  return null;
+}

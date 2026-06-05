@@ -7,7 +7,7 @@ import {
   getCoachAppointmentSettings,
   listStudentAppointments,
 } from "@/server/services/appointment.service";
-import { listCoachRoster } from "@/server/services/roster.service";
+import { listCoachRoster, resolveCoachIdForStudent } from "@/server/services/roster.service";
 
 export const GET = withApiAuth(["student"], async (_req, { session }) => {
   const studentId = session.user.studentId;
@@ -36,9 +36,13 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const roster = await listCoachRoster("coach_001");
+  const coachId = await resolveCoachIdForStudent(studentId);
+  if (!coachId) {
+    return NextResponse.json({ error: "Atanmis koc bulunamadi" }, { status: 404 });
+  }
+
+  const roster = await listCoachRoster(coachId);
   const entry = roster.find((item) => item.studentId === studentId);
-  const coachId = "coach_001";
 
   try {
     const settings = await getCoachAppointmentSettings(coachId);

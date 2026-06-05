@@ -45,3 +45,13 @@ export async function resolveParentIdForStudent(studentId: string): Promise<stri
 
   return student?.parentId ?? null;
 }
+
+export async function resolveCoachIdForStudent(studentId: string): Promise<string | null> {
+  const row = await prisma.coachStudent.findFirst({
+    where: { studentId },
+    select: { coachId: true },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return row?.coachId ?? null;
+}

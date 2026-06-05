@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   coachHasStudent,
   listCoachStudents,
+  resolveCoachIdForStudent,
   resolveParentIdForStudent,
 } from "@/mocks/roster";
 
@@ -21,5 +22,11 @@ describe("coach roster mock store", () => {
   it("resolveParentIdForStudent ogrenci velisini doner", () => {
     expect(resolveParentIdForStudent("student_001")).toBe("parent_001");
     expect(resolveParentIdForStudent("student_002")).toBe("parent_002");
+  });
+
+  it("resolveCoachIdForStudent ogrencinin kocunu doner", () => {
+    expect(resolveCoachIdForStudent("student_001")).toBe("coach_001");
+    expect(resolveCoachIdForStudent("student_002")).toBe("coach_001");
+    expect(resolveCoachIdForStudent("student_999")).toBeNull();
   });
 });

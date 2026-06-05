@@ -29,3 +29,12 @@ export async function resolveParentIdForStudent(studentId: string): Promise<stri
 
   return memoryRoster.resolveParentIdForStudent(studentId);
 }
+
+export async function resolveCoachIdForStudent(studentId: string): Promise<string | null> {
+  if (shouldUseDatabase()) {
+    const { rosterRepository } = await import("@uyanik/database");
+    return rosterRepository.resolveCoachIdForStudent(studentId);
+  }
+
+  return memoryRoster.resolveCoachIdForStudent(studentId);
+}
