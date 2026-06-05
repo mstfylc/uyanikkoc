@@ -26,5 +26,8 @@ async function resolveDatabaseStatus(): Promise<"ok" | "memory" | "down"> {
 
 export async function GET() {
   const database = await resolveDatabaseStatus();
-  return NextResponse.json({ status: "ok", database });
+  const authSecret = (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET)?.trim()
+    ? "ok"
+    : "missing";
+  return NextResponse.json({ status: "ok", database, authSecret });
 }
