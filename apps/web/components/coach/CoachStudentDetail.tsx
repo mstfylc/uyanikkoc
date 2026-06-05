@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { UkBadge } from "@/components/design/UkBadge";
+import { UkPageHead } from "@/components/design/UkPageHead";
+import { UkSection } from "@/components/design/UkSection";
+import { UkStatCard } from "@/components/design/UkStatCard";
+import { ASSIGNMENT_STATUS_LABELS } from "@/lib/assignment-labels";
 import {
   describeExamTrend,
   formatExamNet,
@@ -64,113 +69,120 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Yukleniyor...</p>;
+    return <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>;
   }
 
   if (!summary) {
-    return <p className="text-sm text-danger">Ogrenci bulunamadi.</p>;
+    return <p className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>Ogrenci bulunamadi.</p>;
   }
 
   return (
-    <div className="flex flex-col gap-5" data-testid="coach-student-detail">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-mono">Ogrenci Detay</h1>
-          <p className="text-sm text-muted-foreground">{studentId}</p>
-        </div>
-        <Link href="/coach/dashboard" className="kt-btn kt-btn-sm kt-btn-light">
-          Dashboard
-        </Link>
+    <div className="stack rise" data-testid="coach-student-detail">
+      <UkPageHead
+        title="Ogrenci Detay"
+        sub={studentId}
+        actions={
+          <Link href="/coach/dashboard" className="btn btn-light btn-sm">
+            Dashboard
+          </Link>
+        }
+      />
+
+      <div className="grid g-4">
+        <UkStatCard icon="ki-notepad-edit" tone="primary" value={summary.assignments.length} label="Toplam odev" />
+        <UkStatCard
+          icon="ki-book-open"
+          tone="info"
+          value={`%${summary.topicSummary.completionRate}`}
+          label="Konu tamamlama"
+        />
+        <UkStatCard
+          icon="ki-chart-simple"
+          tone="success"
+          value={summary.examSummary.latestNet != null ? formatExamNet(summary.examSummary.latestNet) : "—"}
+          label="Son deneme neti"
+        />
+        <UkStatCard
+          icon="ki-star"
+          tone="warning"
+          value={summary.motivationEnabled ? "Acik" : "Kapali"}
+          label="Motivasyon"
+        />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="kt-card">
-          <div className="kt-card-body p-4">
-            <p className="text-sm text-muted-foreground">Toplam odev</p>
-            <p className="text-2xl font-semibold">{summary.assignments.length}</p>
+      <div className="grid col-main">
+        <UkSection title="Deneme trendi">
+          <div className="card-body">
+            {summary.examSummary.latestNet != null ? (
+              <p className="muted" style={{ fontSize: 13 }}>
+                {describeExamTrend(summary.examSummary.trend)}
+                {summary.examSummary.examType
+                  ? ` · ${RESULT_EXAM_TYPE_LABELS[summary.examSummary.examType]}`
+                  : ""}
+              </p>
+            ) : (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Deneme kaydi yok.
+              </p>
+            )}
           </div>
-        </div>
-        <div className="kt-card">
-          <div className="kt-card-body p-4">
-            <p className="text-sm text-muted-foreground">Konu tamamlama</p>
-            <p className="text-2xl font-semibold">%{summary.topicSummary.completionRate}</p>
-          </div>
-        </div>
-        <div className="kt-card">
-          <div className="kt-card-body p-4">
-            <p className="text-sm text-muted-foreground">Son deneme net</p>
-            <p className="text-2xl font-semibold">
-              {summary.examSummary.latestNet != null
-                ? formatExamNet(summary.examSummary.latestNet)
-                : "—"}
-            </p>
-          </div>
-        </div>
-        <div className="kt-card">
-          <div className="kt-card-body p-4">
-            <p className="text-sm text-muted-foreground">Motivasyon</p>
-            <p className="text-2xl font-semibold">
-              {summary.motivationEnabled ? "Acik" : "Kapali"}
-            </p>
-          </div>
-        </div>
-      </div>
+        </UkSection>
 
-      <div className="kt-card">
-        <div className="kt-card-body p-4 flex flex-col gap-3">
-          <h2 className="text-base font-medium">Deneme trendi</h2>
-          {summary.examSummary.latestNet != null ? (
-            <p className="text-sm text-muted-foreground">
-              {describeExamTrend(summary.examSummary.trend)}
-              {summary.examSummary.examType
-                ? ` · ${RESULT_EXAM_TYPE_LABELS[summary.examSummary.examType]}`
-                : ""}
-            </p>
-          ) : (
-            <p className="text-sm text-muted-foreground">Deneme kaydi yok.</p>
-          )}
-        </div>
-      </div>
-
-      <div className="kt-card">
-        <div className="kt-card-body p-4 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-medium">Motivasyon ayari</h2>
+        <UkSection
+          title="Motivasyon ayari"
+          action={
             <button
               type="button"
               disabled={motivationSaving}
-              className="kt-btn kt-btn-sm kt-btn-light"
+              className="btn btn-light btn-sm"
               onClick={() => void toggleMotivation(!summary.motivationEnabled)}
             >
               {summary.motivationEnabled ? "Kapat" : "Ac"}
             </button>
+          }
+        >
+          <div className="card-body">
+            {summary.motivation.enabled ? (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Seri: {summary.motivation.streakDays} gun · Rozetler:{" "}
+                {summary.motivation.badges.length > 0 ? (
+                  <span className="row" style={{ display: "inline-flex", gap: 6, flexWrap: "wrap" }}>
+                    {summary.motivation.badges.map((badge) => (
+                      <UkBadge key={badge} tone="primary">
+                        {badge}
+                      </UkBadge>
+                    ))}
+                  </span>
+                ) : (
+                  "Yok"
+                )}
+              </p>
+            ) : (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Motivasyon kapali.
+              </p>
+            )}
           </div>
-          {summary.motivation.enabled ? (
-            <p className="text-sm text-muted-foreground">
-              Seri: {summary.motivation.streakDays} gun · Rozetler:{" "}
-              {summary.motivation.badges.join(", ") || "Yok"}
-            </p>
-          ) : (
-            <p className="text-sm text-muted-foreground">Motivasyon kapali.</p>
-          )}
-        </div>
+        </UkSection>
       </div>
 
-      <div className="kt-card">
-        <div className="kt-card-header px-4 py-3 border-b border-border">
-          <h2 className="text-base font-medium">Son odevler</h2>
+      <UkSection title="Son odevler">
+        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {summary.assignments.slice(0, 5).map((assignment) => (
+            <div key={assignment.id} className="lrow">
+              <span className="lr-icon tone-primary">
+                <i className="ki-filled ki-notepad-edit" />
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="lr-title">{assignment.title}</div>
+                <div className="lr-meta">
+                  <span className="d">{ASSIGNMENT_STATUS_LABELS[assignment.status]}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="kt-card-body p-0">
-          <ul className="divide-y divide-border">
-            {summary.assignments.slice(0, 5).map((assignment) => (
-              <li key={assignment.id} className="px-4 py-3 text-sm">
-                <span className="font-medium">{assignment.title}</span>
-                <span className="text-muted-foreground"> · {assignment.status}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      </UkSection>
     </div>
   );
 }

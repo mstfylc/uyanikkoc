@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { UkPageHead } from "@/components/design/UkPageHead";
+import { UkSection } from "@/components/design/UkSection";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_STATUS_LABELS,
@@ -9,6 +11,7 @@ import {
   formatAssignmentDueDate,
   isAssignmentOpen,
 } from "@/lib/assignment-labels";
+import { subjectColor } from "@/lib/design/subject-colors";
 import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
 
 type AssignmentItem = {
@@ -25,6 +28,7 @@ type AssignmentItem = {
 
 export function StudentAssignmentList() {
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
+  const [filter, setFilter] = useState<"pending" | "done" | "all">("pending");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -64,48 +68,94 @@ export function StudentAssignmentList() {
     await loadAssignments();
   }
 
-  if (isLoading) {
-    return <p>Yukleniyor...</p>;
-  }
+  const shown = assignments.filter((item) => {
+    if (filter === "all") return true;
+    if (filter === "done") return item.completed;
+    return !item.completed;
+  });
 
-  if (error) {
-    return <p role="alert">{error}</p>;
-  }
-
-  if (assignments.length === 0) {
-    return <p data-testid="empty-assignments">Henuz odev yok.</p>;
-  }
+  const pending = assignments.filter((item) => !item.completed).length;
 
   return (
-    <ul data-testid="assignment-list" className="flex flex-col gap-3">
-      {assignments.map((assignment) => {
-        const open = isAssignmentOpen(assignment);
+    <div className="stack rise">
+      <UkPageHead title="Odevlerim" sub={`${pending} bekleyen gorev`} />
 
-        return (
-          <li
-            key={assignment.id}
-            className="rounded-lg border border-border px-4 py-3 flex flex-col gap-2"
-          >
-            <div className="font-medium">{assignment.title}</div>
-            <div className="text-sm text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
-              <span>Durum: {ASSIGNMENT_STATUS_LABELS[assignment.status]}</span>
-              <span>Oncelik: {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}</span>
-              <span>Tur: {ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
-              {assignment.subject ? <span>Ders: {assignment.subject}</span> : null}
-              <span>Son tarih: {formatAssignmentDueDate(assignment.dueDate)}</span>
-            </div>
-            {open ? (
-              <button type="button" onClick={() => void handleComplete(assignment.id)}>
-                Tamamla
-              </button>
-            ) : (
-              <span data-testid={`completed-${assignment.id}`} className="text-success text-sm">
-                (Tamamlandi)
-              </span>
-            )}
-          </li>
-        );
-      })}
-    </ul>
+      {error ? (
+        <p role="alert" className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>
+          {error}
+        </p>
+      ) : null}
+
+      <UkSection
+        title="Odev listesi"
+        action={
+          <div className="filters">
+            <button type="button" className={filter === "pending" ? "on" : ""} onClick={() => setFilter("pending")}>
+              Bekleyen
+            </button>
+            <button type="button" className={filter === "done" ? "on" : ""} onClick={() => setFilter("done")}>
+              Bitti
+            </button>
+            <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>
+              Tumu
+            </button>
+          </div>
+        }
+      >
+        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {isLoading ? (
+            <p className="muted" style={{ fontSize: 13 }}>
+              Yukleniyor...
+            </p>
+          ) : shown.length === 0 ? (
+            <p data-testid="empty-assignments" style={{ padding: "20px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
+              Bu gorunumde odev yok.
+            </p>
+          ) : (
+            <ul data-testid="assignment-list" style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 10 }}>
+              {shown.map((assignment) => {
+                const open = isAssignmentOpen(assignment);
+                const color = subjectColor(assignment.subject ?? "Genel");
+
+                return (
+                  <li key={assignment.id}>
+                    <div className={`lrow${assignment.completed ? " done" : ""}`}>
+                      <span
+                        className="lr-icon"
+                        style={{
+                          background: `color-mix(in srgb, ${color} 13%, transparent)`,
+                          color,
+                        }}
+                      >
+                        <i className="ki-filled ki-notepad-edit" />
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className="lr-title">{assignment.title}</div>
+                        <div className="lr-meta">
+                          <span className="d">{ASSIGNMENT_STATUS_LABELS[assignment.status]}</span>
+                          <span className="d">{ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}</span>
+                          <span className="d">{ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
+                          {assignment.subject ? <span className="d">{assignment.subject}</span> : null}
+                          <span className="d">{formatAssignmentDueDate(assignment.dueDate)}</span>
+                        </div>
+                      </div>
+                      {open ? (
+                        <button type="button" className="btn btn-sm btn-primary" onClick={() => void handleComplete(assignment.id)}>
+                          Tamamla
+                        </button>
+                      ) : (
+                        <span data-testid={`completed-${assignment.id}`} className="muted" style={{ fontSize: 13 }}>
+                          (Tamamlandi)
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </UkSection>
+    </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { UkAvatar } from "@/components/design/UkAvatar";
+import { UkPageHead } from "@/components/design/UkPageHead";
 import type { MessageRecord, MessageThreadRecord } from "@uyanik/database";
 
 type MessagesPanelProps = {
@@ -81,76 +83,164 @@ export function MessagesPanel({
     }
   }
 
+  const activeThread = threads.find((item) => item.id === selectedId);
+
   return (
-    <div className="flex flex-col gap-5" data-testid={testId}>
-      <div>
-        <h1 className="text-xl font-semibold text-mono">{title}</h1>
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
-      </div>
+    <div className="stack rise" data-testid={testId}>
+      <UkPageHead title={title} sub={subtitle} />
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Yukleniyor...</p>
+        <p className="muted" style={{ fontSize: 13 }}>
+          Yukleniyor...
+        </p>
       ) : threads.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Henuz mesaj yok.</p>
+        <p className="muted" style={{ fontSize: 13 }}>
+          Henuz mesaj yok.
+        </p>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <ul className="flex flex-col gap-2 lg:col-span-1">
-            {threads.map((item) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  className={`kt-card w-full text-start ${selectedId === item.id ? "border-primary" : ""}`}
-                  onClick={() => setSelectedId(item.id)}
-                >
-                  <div className="kt-card-body p-3">
-                    <p className="text-sm font-medium">{item.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {threadMeta ? threadMeta(item) : item.messages[item.messages.length - 1]?.body ?? "Mesaj yok"}
-                    </p>
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
+        <div className="card" style={{ overflow: "hidden" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(260px, 340px) 1fr", minHeight: 520 }}>
+            <div
+              style={{
+                borderRight: "1px solid var(--border)",
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 0,
+              }}
+            >
+              <div style={{ overflowY: "auto", flex: 1, padding: 8 }}>
+                {threads.map((item) => {
+                  const active = item.id === selectedId;
+                  const last = item.messages[item.messages.length - 1];
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setSelectedId(item.id)}
+                      style={{
+                        display: "flex",
+                        gap: 12,
+                        padding: "11px 12px",
+                        borderRadius: 12,
+                        width: "100%",
+                        textAlign: "left",
+                        border: "none",
+                        background: active ? "var(--surface-3)" : "none",
+                        cursor: "pointer",
+                        alignItems: "center",
+                      }}
+                    >
+                      <UkAvatar name={item.title} size={42} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className="between" style={{ gap: 6 }}>
+                          <b
+                            style={{
+                              fontSize: 13.5,
+                              fontWeight: 700,
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {item.title}
+                          </b>
+                        </div>
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: "var(--muted)",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "block",
+                          }}
+                        >
+                          {threadMeta
+                            ? threadMeta(item)
+                            : last?.body ?? "Mesaj yok"}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-          <div className="lg:col-span-2 kt-card">
-            <div className="kt-card-body p-4 flex flex-col gap-4 min-h-[320px]">
-              {thread ? (
-                <>
-                  <h2 className="text-base font-medium">{thread.title}</h2>
-                  <div className="flex flex-col gap-2 flex-1 overflow-y-auto">
-                    {thread.messages.map((message) => (
+            <div style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+              <div
+                className="row"
+                style={{ gap: 12, padding: "14px 18px", borderBottom: "1px solid var(--border)" }}
+              >
+                <UkAvatar name={activeThread?.title ?? "Mesaj"} size={40} />
+                <div style={{ flex: 1 }}>
+                  <b style={{ fontSize: 14, fontWeight: 700 }}>{activeThread?.title ?? "Mesaj"}</b>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  flex: 1,
+                  overflowY: "auto",
+                  padding: "20px 18px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                  background: "var(--surface-2)",
+                }}
+              >
+                {thread ? (
+                  thread.messages.map((message) => {
+                    const mine = message.senderRole === selfRole;
+                    return (
                       <div
                         key={message.id}
-                        className={`rounded-lg px-3 py-2 text-sm max-w-[85%] ${
-                          message.senderRole === selfRole ? "ms-auto bg-primary/10" : "bg-muted"
-                        }`}
+                        style={{ alignSelf: mine ? "flex-end" : "flex-start", maxWidth: "72%" }}
                       >
-                        <p className="text-xs text-muted-foreground mb-1">{message.senderRole}</p>
-                        <p>{message.body}</p>
+                        <div
+                          style={{
+                            background: mine ? "var(--primary)" : "var(--surface)",
+                            color: mine ? "#fff" : "var(--text)",
+                            border: mine ? "none" : "1px solid var(--border)",
+                            padding: "10px 14px",
+                            borderRadius: mine ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
+                            fontSize: 13.5,
+                            lineHeight: 1.5,
+                            boxShadow: "var(--shadow-sm)",
+                          }}
+                        >
+                          {message.body}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                  <form onSubmit={handleSend} className="flex gap-2">
-                    <input
-                      type="text"
-                      value={messageBody}
-                      onChange={(event) => setMessageBody(event.target.value)}
-                      placeholder="Mesajinizi yazin..."
-                      className="flex-1 rounded-md border border-border px-3 py-2 text-sm"
-                    />
-                    <button
-                      type="submit"
-                      disabled={isSending}
-                      className="kt-btn kt-btn-primary kt-btn-sm"
-                    >
-                      Gonder
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">Thread secin.</p>
-              )}
+                    );
+                  })
+                ) : (
+                  <p className="muted" style={{ fontSize: 13 }}>
+                    Thread secin.
+                  </p>
+                )}
+              </div>
+
+              <form
+                onSubmit={handleSend}
+                className="row"
+                style={{ gap: 10, padding: 14, borderTop: "1px solid var(--border)" }}
+              >
+                <input
+                  className="input"
+                  style={{ flex: 1 }}
+                  value={messageBody}
+                  onChange={(event) => setMessageBody(event.target.value)}
+                  placeholder="Mesaj yaz..."
+                />
+                <button
+                  type="submit"
+                  disabled={isSending}
+                  className="btn btn-primary"
+                  style={{ width: 44, padding: 0, flexShrink: 0 }}
+                >
+                  <i className="ki-filled ki-send" />
+                </button>
+              </form>
             </div>
           </div>
         </div>

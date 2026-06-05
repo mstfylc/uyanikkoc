@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { UkPageHead } from "@/components/design/UkPageHead";
+import { UkSection } from "@/components/design/UkSection";
+import { UkStatCard } from "@/components/design/UkStatCard";
+import { subjectColor } from "@/lib/design/subject-colors";
 import { TOPIC_EXAM_TYPE_LABELS } from "@uyanik/shared";
 import type { SubjectRecord, TopicExamType, TopicTrackingSummary } from "@uyanik/database";
 
@@ -107,27 +111,30 @@ export function StudentTopicPanel() {
   }
 
   return (
-    <div className="flex flex-col gap-5" data-testid="student-topic-panel">
-      <div className="kt-card">
-        <div className="kt-card-body p-5 flex flex-col gap-2">
-          <h2 className="text-lg font-semibold text-mono">Konu Takibi</h2>
-          <p className="text-sm text-muted-foreground">
-            Konulari sen tanimlarsin — ornek seed kayitlari silinebilir.
-          </p>
-          {summary ? (
-            <p className="text-sm">
-              Tamamlanan: {summary.completedTopics}/{summary.totalTopics} ({summary.completionRate}%)
-            </p>
-          ) : null}
-        </div>
-      </div>
+    <div className="stack rise" data-testid="student-topic-panel">
+      <UkPageHead
+        title="Konu Takibi"
+        sub="Konulari sen tanimlarsin — ornek seed kayitlari silinebilir."
+      />
 
-      <form onSubmit={handleCreateSubject} className="kt-card">
-        <div className="kt-card-body p-5 flex flex-col gap-3">
-          <h3 className="text-base font-medium">Yeni ders alani</h3>
-          <div className="flex flex-col sm:flex-row gap-3">
+      {summary ? (
+        <div className="grid g-4">
+          <UkStatCard
+            icon="ki-book-open"
+            tone="primary"
+            value={`${summary.completedTopics}/${summary.totalTopics}`}
+            label="Tamamlanan konu"
+          />
+          <UkStatCard icon="ki-chart-pie-simple" tone="success" value={`%${summary.completionRate}`} label="Tamamlama orani" />
+        </div>
+      ) : null}
+
+      <UkSection title="Yeni ders alani">
+        <form onSubmit={handleCreateSubject} className="card-body">
+          <div className="row" style={{ flexWrap: "wrap", gap: 10 }}>
             <select
-              className="kt-input"
+              className="select"
+              style={{ minWidth: 140 }}
               value={subjectExamType}
               onChange={(event) => setSubjectExamType(event.target.value as TopicExamType)}
             >
@@ -138,85 +145,102 @@ export function StudentTopicPanel() {
               ))}
             </select>
             <input
-              className="kt-input grow"
+              className="input"
+              style={{ flex: 1, minWidth: 180 }}
               placeholder="Ornek: Matematik"
               value={subjectName}
               onChange={(event) => setSubjectName(event.target.value)}
             />
-            <button type="submit" className="kt-btn kt-btn-primary">
+            <button type="submit" className="btn btn-primary btn-sm">
               Ekle
             </button>
           </div>
-        </div>
-      </form>
+        </form>
+      </UkSection>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Yukleniyor...</p>
+        <p className="muted" style={{ fontSize: 13 }}>
+          Yukleniyor...
+        </p>
       ) : subjects.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Henuz konu alani yok.</p>
+        <p className="muted" style={{ fontSize: 13 }}>
+          Henuz konu alani yok.
+        </p>
       ) : (
-        subjects.map((subject) => (
-          <div key={subject.id} className="kt-card">
-            <div className="kt-card-header flex items-center justify-between px-5 py-4 border-b border-border">
-              <div>
-                <h3 className="text-base font-medium">{subject.name}</h3>
-                <p className="text-xs text-muted-foreground">
-                  {TOPIC_EXAM_TYPE_LABELS[subject.examType]}
-                </p>
-              </div>
-              <button
-                type="button"
-                className="kt-btn kt-btn-sm kt-btn-light text-danger"
-                onClick={() => void removeSubject(subject.id)}
-              >
-                Sil
-              </button>
-            </div>
-            <div className="kt-card-body flex flex-col gap-3 p-5">
-              {subject.topics.map((topic) => (
-                <div
-                  key={topic.id}
-                  className="flex flex-col gap-2 rounded-lg border border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <span className="text-sm font-medium">{topic.name}</span>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      className={`kt-btn kt-btn-sm ${topic.progress.completed ? "kt-btn-success" : "kt-btn-light"}`}
-                      onClick={() => void toggleTopic(topic.id, topic.progress.completed)}
-                    >
-                      {topic.progress.completed ? "Tamamlandi" : "Tamamla"}
-                    </button>
-                    <button
-                      type="button"
-                      className="kt-btn kt-btn-sm kt-btn-light text-danger"
-                      onClick={() => void removeTopic(topic.id)}
-                    >
-                      Sil
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  className="kt-input grow"
-                  placeholder="Yeni konu adi"
-                  value={topicNames[subject.id] ?? ""}
-                  onChange={(event) =>
-                    setTopicNames((current) => ({ ...current, [subject.id]: event.target.value }))
-                  }
-                />
+        subjects.map((subject) => {
+          const color = subjectColor(subject.name);
+          return (
+            <UkSection
+              key={subject.id}
+              title={subject.name}
+              sub={TOPIC_EXAM_TYPE_LABELS[subject.examType]}
+              action={
                 <button
                   type="button"
-                  className="kt-btn kt-btn-light"
-                  onClick={() => void handleCreateTopic(subject.id)}
+                  className="btn btn-light btn-sm"
+                  style={{ color: "var(--danger)" }}
+                  onClick={() => void removeSubject(subject.id)}
                 >
-                  Konu ekle
+                  Sil
                 </button>
+              }
+            >
+              <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {subject.topics.map((topic) => (
+                  <div key={topic.id} className={`lrow${topic.progress.completed ? " done" : ""}`}>
+                    <span
+                      className="lr-icon"
+                      style={{
+                        background: `color-mix(in srgb, ${color} 13%, transparent)`,
+                        color,
+                      }}
+                    >
+                      <i className="ki-filled ki-book-open" />
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="lr-title">{topic.name}</div>
+                    </div>
+                    <div className="row" style={{ gap: 8 }}>
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${topic.progress.completed ? "btn-light" : "btn-primary"}`}
+                        onClick={() => void toggleTopic(topic.id, topic.progress.completed)}
+                      >
+                        {topic.progress.completed ? "Tamamlandi" : "Tamamla"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-light btn-sm"
+                        style={{ color: "var(--danger)" }}
+                        onClick={() => void removeTopic(topic.id)}
+                      >
+                        Sil
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <div className="row" style={{ flexWrap: "wrap", gap: 10, marginTop: 4 }}>
+                  <input
+                    className="input"
+                    style={{ flex: 1, minWidth: 180 }}
+                    placeholder="Yeni konu adi"
+                    value={topicNames[subject.id] ?? ""}
+                    onChange={(event) =>
+                      setTopicNames((current) => ({ ...current, [subject.id]: event.target.value }))
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-light btn-sm"
+                    onClick={() => void handleCreateTopic(subject.id)}
+                  >
+                    Konu ekle
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
-        ))
+            </UkSection>
+          );
+        })
       )}
     </div>
   );

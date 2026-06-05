@@ -3,6 +3,10 @@
 import type { CoachRosterEntry, ResultExamType } from "@uyanik/database";
 import { FormEvent, useEffect, useState } from "react";
 
+import { UkPageHead } from "@/components/design/UkPageHead";
+import { UkSection } from "@/components/design/UkSection";
+import { ExamImportPanel } from "@/components/coach/ExamImportPanel";
+
 type SubjectRow = {
   subjectName: string;
   correct: string;
@@ -94,100 +98,133 @@ export function CoachExamEntryForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4" data-testid="coach-exam-entry-form">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="studentId">Ogrenci</label>
-        <select
-          id="studentId"
-          value={studentId}
-          onChange={(event) => setStudentId(event.target.value)}
-          className="w-full rounded-md border border-border px-3 py-2"
+    <div className="stack rise">
+      <UkPageHead title="Deneme Girisi" sub="Ogrenci adina TYT/AYT/LGS sonucu kaydet" />
+
+      <UkSection title="Manuel sonuc">
+        <form
+          onSubmit={handleSubmit}
+          data-testid="coach-exam-entry-form"
+          className="card-body"
+          style={{ display: "flex", flexDirection: "column", gap: 16 }}
         >
-          {students.map((student) => (
-            <option key={student.studentId} value={student.studentId}>
-              {student.displayName}
-            </option>
-          ))}
-        </select>
-      </div>
+          <div className="grid g-2">
+            <div className="field">
+              <label className="label" htmlFor="studentId">
+                Ogrenci
+              </label>
+              <select
+                id="studentId"
+                value={studentId}
+                onChange={(event) => setStudentId(event.target.value)}
+                className="select"
+              >
+                {students.map((student) => (
+                  <option key={student.studentId} value={student.studentId}>
+                    {student.displayName}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="examType">Sinav turu</label>
-        <select
-          id="examType"
-          value={examType}
-          onChange={(event) => setExamType(event.target.value as ResultExamType)}
-          className="w-full rounded-md border border-border px-3 py-2"
-        >
-          {EXAM_TYPES.map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label htmlFor="label">Etiket</label>
-        <input
-          id="label"
-          value={label}
-          onChange={(event) => setLabel(event.target.value)}
-          placeholder="TYT Deneme 3"
-          className="w-full rounded-md border border-border px-3 py-2"
-        />
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label htmlFor="takenAt">Tarih</label>
-        <input
-          id="takenAt"
-          type="date"
-          value={takenAt}
-          onChange={(event) => setTakenAt(event.target.value)}
-          className="w-full rounded-md border border-border px-3 py-2"
-        />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium">Ders satirlari</p>
-        {subjects.map((row, index) => (
-          <div key={row.subjectName} className="grid grid-cols-3 gap-2">
-            <input
-              value={row.subjectName}
-              onChange={(event) => updateSubject(index, "subjectName", event.target.value)}
-              className="rounded-md border border-border px-3 py-2 text-sm"
-            />
-            <input
-              type="number"
-              min={0}
-              placeholder="Dogru"
-              value={row.correct}
-              onChange={(event) => updateSubject(index, "correct", event.target.value)}
-              className="rounded-md border border-border px-3 py-2 text-sm"
-            />
-            <input
-              type="number"
-              min={0}
-              placeholder="Yanlis"
-              value={row.wrong}
-              onChange={(event) => updateSubject(index, "wrong", event.target.value)}
-              className="rounded-md border border-border px-3 py-2 text-sm"
-            />
+            <div className="field">
+              <label className="label" htmlFor="examType">
+                Sinav turu
+              </label>
+              <select
+                id="examType"
+                value={examType}
+                onChange={(event) => setExamType(event.target.value as ResultExamType)}
+                className="select"
+              >
+                {EXAM_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        ))}
-      </div>
 
-      <button type="submit" disabled={isSubmitting} className="kt-btn kt-btn-primary w-fit">
-        {isSubmitting ? "Kaydediliyor..." : "Sonucu kaydet"}
-      </button>
+          <div className="grid g-2">
+            <div className="field">
+              <label className="label" htmlFor="label">
+                Etiket
+              </label>
+              <input
+                id="label"
+                value={label}
+                onChange={(event) => setLabel(event.target.value)}
+                placeholder="TYT Deneme 3"
+                className="input"
+              />
+            </div>
 
-      {error ? (
-        <p role="alert" className="text-danger text-sm">
-          {error}
-        </p>
-      ) : null}
-      {success ? <p className="text-success text-sm">{success}</p> : null}
-    </form>
+            <div className="field">
+              <label className="label" htmlFor="takenAt">
+                Tarih
+              </label>
+              <input
+                id="takenAt"
+                type="date"
+                value={takenAt}
+                onChange={(event) => setTakenAt(event.target.value)}
+                className="input"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p className="label" style={{ marginBottom: 10 }}>
+              Ders satirlari
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {subjects.map((row, index) => (
+                <div key={row.subjectName} className="grid g-3" style={{ gap: 8 }}>
+                  <input
+                    value={row.subjectName}
+                    onChange={(event) => updateSubject(index, "subjectName", event.target.value)}
+                    className="input"
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="Dogru"
+                    value={row.correct}
+                    onChange={(event) => updateSubject(index, "correct", event.target.value)}
+                    className="input"
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="Yanlis"
+                    value={row.wrong}
+                    onChange={(event) => updateSubject(index, "wrong", event.target.value)}
+                    className="input"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button type="submit" disabled={isSubmitting} className="btn btn-primary w-fit">
+            {isSubmitting ? "Kaydediliyor..." : "Sonucu kaydet"}
+          </button>
+
+          {error ? (
+            <p role="alert" className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>
+              {error}
+            </p>
+          ) : null}
+          {success ? (
+            <p className="badge badge-success" style={{ height: "auto", padding: "10px 12px" }}>
+              {success}
+            </p>
+          ) : null}
+        </form>
+      </UkSection>
+
+      <ExamImportPanel />
+    </div>
   );
 }

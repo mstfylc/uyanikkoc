@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { UkBadge } from "@/components/design/UkBadge";
+import { UkSection } from "@/components/design/UkSection";
+import { UkStatCard } from "@/components/design/UkStatCard";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_STATUS_LABELS,
   ASSIGNMENT_TYPE_LABELS,
   formatAssignmentDueDate,
 } from "@/lib/assignment-labels";
+import { subjectColor } from "@/lib/design/subject-colors";
 import {
   buildParentWeeklyComment,
   calculateCompletionRate,
@@ -27,8 +31,6 @@ type ParentSummary = {
   completedCount: number;
   pendingCount: number;
   topicCompletionRate: number;
-  topicCompletedCount: number;
-  topicTotalCount: number;
   latestExamNet: number | null;
   latestExamType: ResultExamType | null;
   examTrend: "up" | "down" | "flat";
@@ -43,38 +45,6 @@ type ParentSummary = {
     completed: boolean;
   }>;
 };
-
-type StatCardProps = {
-  label: string;
-  value: number | string;
-  icon: string;
-  tone?: "primary" | "success" | "warning" | "danger";
-};
-
-function StatCard({ label, value, icon, tone = "primary" }: StatCardProps) {
-  const toneClass =
-    tone === "success"
-      ? "text-success"
-      : tone === "warning"
-        ? "text-warning"
-        : tone === "danger"
-          ? "text-danger"
-          : "text-primary";
-
-  return (
-    <div className="kt-card">
-      <div className="kt-card-body flex items-center gap-4 p-5">
-        <span className={`flex size-12 items-center justify-center rounded-lg bg-muted ${toneClass}`}>
-          <i className={`ki-filled ${icon} text-xl`} />
-        </span>
-        <div>
-          <div className="text-2xl font-semibold text-mono">{value}</div>
-          <div className="text-sm text-muted-foreground">{label}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function ParentDashboard() {
   const [summary, setSummary] = useState<ParentSummary | null>(null);
@@ -105,104 +75,138 @@ export function ParentDashboard() {
   });
 
   return (
-    <div className="flex flex-col gap-5" data-testid="parent-summary">
-      <div>
-        <h1 className="text-xl font-semibold text-mono">Veli Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Öğrencinizin ilerleme özeti</p>
-      </div>
-
+    <div className="stack rise" data-testid="parent-summary">
+      <h1 className="sr-only">Veli Dashboard</h1>
       {!isLoading && summary ? (
-        <p className="sr-only">
-          Tamamlanan: {completed}
-        </p>
+        <p className="sr-only">Tamamlanan: {completed}</p>
       ) : null}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <StatCard label="Toplam Ödev" value={isLoading ? "—" : total} icon="ki-notepad-edit" />
-        <StatCard
-          label="Tamamlanan"
-          value={isLoading ? "—" : completed}
-          icon="ki-check-circle"
-          tone="success"
-        />
-        <StatCard
-          label="Bekleyen"
-          value={isLoading ? "—" : pending}
-          icon="ki-time"
-          tone="warning"
-        />
-        <StatCard
-          label="Tamamlama %"
-          value={isLoading ? "—" : `${completionRate}%`}
-          icon="ki-chart-pie-simple"
-          tone="primary"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <StatCard
-          label="Konu Tamamlama %"
-          value={isLoading ? "—" : `%${summary?.topicCompletionRate ?? 0}`}
-          icon="ki-book-open"
-          tone="primary"
-        />
-        <StatCard
-          label="Son Deneme Net"
-          value={
-            isLoading
-              ? "—"
-              : summary?.latestExamNet != null
-                ? formatExamNet(summary.latestExamNet)
-                : "—"
-          }
-          icon="ki-chart-simple"
-          tone="success"
-        />
-      </div>
-
-      <div className="kt-card" data-testid="parent-weekly-comment">
-        <div className="kt-card-body p-5 flex flex-col gap-2">
-          <h3 className="text-base font-medium">Haftalik Yorum</h3>
-          <p className="text-sm text-muted-foreground">{isLoading ? "Yukleniyor..." : weeklyComment}</p>
+      <div className="hero">
+        <div className="between" style={{ alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", fontWeight: 600, marginBottom: 6 }}>
+              Merhaba
+            </div>
+            <h2 style={{ marginBottom: 7 }}>Cocugunuzun gelisimi</h2>
+            <p>Haftalik odev ve deneme ozeti</p>
+          </div>
+          <span className="badge" style={{ background: "rgba(255,255,255,.16)", color: "#fff", height: 26 }}>
+            <i className="ki-filled ki-heart" style={{ marginRight: 6 }} />
+            Veli Paneli
+          </span>
         </div>
       </div>
 
-      <div className="kt-card">
-        <div className="kt-card-body p-5 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-medium">Genel İlerleme</h3>
-            <span className="text-sm font-semibold text-primary">{completionRate}%</span>
+      <div className="grid g-4">
+        <UkStatCard icon="ki-chart-pie-simple" tone="success" value={`${completionRate}%`} label="Odev tamamlama" />
+        <UkStatCard icon="ki-notepad-edit" tone="warning" value={pending} label="Bekleyen odev" />
+        <UkStatCard
+          icon="ki-chart-simple"
+          tone="primary"
+          value={summary?.latestExamNet != null ? formatExamNet(summary.latestExamNet) : "—"}
+          label="Son deneme neti"
+        />
+        <UkStatCard
+          icon="ki-book-open"
+          tone="info"
+          value={`%${summary?.topicCompletionRate ?? 0}`}
+          label="Konu tamamlama"
+        />
+      </div>
+
+      <div className="grid col-main">
+        <UkSection
+          title="Haftalik odevler"
+          sub="Cocugunuzun guncel odevleri"
+          action={
+            <UkBadge tone={completionRate >= 70 ? "success" : "warning"}>
+              {completed}/{total} tamam
+            </UkBadge>
+          }
+        >
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {isLoading ? (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Yukleniyor...
+              </p>
+            ) : !summary || summary.assignments.length === 0 ? (
+              <div style={{ padding: "16px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
+                Henuz odev yok.
+              </div>
+            ) : (
+              summary.assignments.slice(0, 6).map((assignment) => {
+                const color = subjectColor(assignment.subject ?? "Genel");
+                return (
+                  <div key={assignment.id} className="lrow">
+                    <span
+                      className="lr-icon"
+                      style={{
+                        background: `color-mix(in srgb, ${color} 13%, transparent)`,
+                        color,
+                      }}
+                    >
+                      <i className="ki-filled ki-notepad-edit" />
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="lr-title">{assignment.title}</div>
+                      <div className="lr-meta">
+                        {assignment.subject ? (
+                          <span className="chip" style={{ height: 20, fontSize: 10.5 }}>
+                            <span className="swatch" style={{ background: color }} />
+                            {assignment.subject}
+                          </span>
+                        ) : null}
+                        <span className="d">{formatAssignmentDueDate(assignment.dueDate)}</span>
+                      </div>
+                    </div>
+                    {assignment.completed ? (
+                      <UkBadge tone="success">Bitti</UkBadge>
+                    ) : (
+                      <UkBadge tone="warning" dot>
+                        Bekliyor
+                      </UkBadge>
+                    )}
+                  </div>
+                );
+              })
+            )}
           </div>
-          <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full rounded-full bg-primary transition-all"
-              style={{ width: `${completionRate}%` }}
-            />
+        </UkSection>
+
+        <div className="stack">
+          <div className="stack" data-testid="parent-weekly-comment">
+            <UkSection title="Haftalik yorum">
+              <div className="card-body">
+                <p style={{ fontSize: 13, lineHeight: 1.6 }}>
+                  {isLoading ? "Yukleniyor..." : weeklyComment}
+                </p>
+                <div className="row" style={{ gap: 8, marginTop: 16 }}>
+                  <Link href="/parent/messages" className="btn btn-sm btn-primary">
+                    Mesaj
+                  </Link>
+                  <Link href="/parent/notifications" className="btn btn-sm btn-light">
+                    Bildirimler
+                  </Link>
+                </div>
+              </div>
+            </UkSection>
           </div>
-          {summary && summary.assignments.length > 0 ? (
-            <ul className="flex flex-col gap-2 pt-2 text-sm">
-              {summary.assignments.slice(0, 5).map((assignment) => (
-                <li key={assignment.id} className="flex flex-col gap-0.5 border-b border-border pb-2 last:border-0">
-                  <span className="font-medium">{assignment.title}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {ASSIGNMENT_STATUS_LABELS[assignment.status]} ·{" "}
-                    {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]} ·{" "}
-                    {ASSIGNMENT_TYPE_LABELS[assignment.type]}
-                    {assignment.subject ? ` · ${assignment.subject}` : ""} ·{" "}
-                    {formatAssignmentDueDate(assignment.dueDate)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          <div className="flex gap-2 pt-2">
-            <Link href="/parent/dashboard" className="kt-btn kt-btn-sm kt-btn-primary">
-              Rapor
-            </Link>
-            <Link href="/parent/messages" className="kt-btn kt-btn-sm kt-btn-light">
-              Mesaj
-            </Link>
-          </div>
+
+          <UkSection title="Odev detay ozeti">
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {summary?.assignments.slice(0, 3).map((assignment) => (
+                <p key={assignment.id} className="muted" style={{ fontSize: 12.5 }}>
+                  {assignment.title} · {ASSIGNMENT_STATUS_LABELS[assignment.status]} ·{" "}
+                  {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]} ·{" "}
+                  {ASSIGNMENT_TYPE_LABELS[assignment.type]}
+                </p>
+              )) ?? (
+                <p className="muted" style={{ fontSize: 13 }}>
+                  Ozet yok.
+                </p>
+              )}
+            </div>
+          </UkSection>
         </div>
       </div>
     </div>

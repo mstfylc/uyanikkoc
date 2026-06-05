@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { UkBadge } from "@/components/design/UkBadge";
+import { UkPageHead } from "@/components/design/UkPageHead";
+import { UkSection } from "@/components/design/UkSection";
+import { UkStatCard } from "@/components/design/UkStatCard";
 import type { MotivationSummary } from "@uyanik/database";
 
 export function MotivationPanel() {
@@ -39,74 +43,76 @@ export function MotivationPanel() {
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Yukleniyor...</p>;
+    return <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>;
   }
 
   if (!motivation?.enabled) {
     return (
-      <div className="flex flex-col gap-4" data-testid="motivation-disabled">
-        <div>
-          <h1 className="text-xl font-semibold text-mono">Motivasyon</h1>
-          <p className="text-sm text-muted-foreground">Motivasyon ozellikleri kapali.</p>
+      <div className="stack rise" data-testid="motivation-disabled">
+        <UkPageHead
+          title="Motivasyon"
+          sub="Motivasyon ozellikleri kapali."
+          actions={
+            <button
+              type="button"
+              disabled={isSaving}
+              className="btn btn-primary btn-sm"
+              onClick={() => void toggleEnabled(true)}
+            >
+              Motivasyonu ac
+            </button>
+          }
+        />
+        <div className="card">
+          <div className="card-pad muted" style={{ fontSize: 13 }}>
+            Seri ve rozetler kapali durumda.
+          </div>
         </div>
-        <button
-          type="button"
-          disabled={isSaving}
-          className="kt-btn kt-btn-primary w-fit"
-          onClick={() => void toggleEnabled(true)}
-        >
-          Motivasyonu ac
-        </button>
-        <Link href="/student/dashboard" className="kt-btn kt-btn-sm kt-btn-light w-fit">
-          Dashboard
-        </Link>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-5" data-testid="motivation-panel">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-mono">Motivasyon</h1>
-          <p className="text-sm text-muted-foreground">Seri ve rozetler</p>
-        </div>
-        <button
-          type="button"
-          disabled={isSaving}
-          className="kt-btn kt-btn-sm kt-btn-light"
-          onClick={() => void toggleEnabled(false)}
-        >
-          Kapat
-        </button>
+    <div className="stack rise" data-testid="motivation-panel">
+      <UkPageHead
+        title="Motivasyon"
+        sub="Seri ve rozetler"
+        actions={
+          <button
+            type="button"
+            disabled={isSaving}
+            className="btn btn-light btn-sm"
+            onClick={() => void toggleEnabled(false)}
+          >
+            Kapat
+          </button>
+        }
+      />
+
+      <div className="grid g-4">
+        <UkStatCard icon="ki-flame" tone="warning" value={motivation.streakDays} label="Gun seri" />
+        <UkStatCard icon="ki-star" tone="primary" value={motivation.badges.length} label="Rozet sayisi" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="kt-card">
-          <div className="kt-card-body p-5">
-            <p className="text-sm text-muted-foreground">Seri</p>
-            <p className="text-3xl font-semibold">{motivation.streakDays} gun</p>
-          </div>
+      <UkSection title="Rozetler">
+        <div className="card-body">
+          {motivation.badges.length > 0 ? (
+            <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
+              {motivation.badges.map((badge) => (
+                <UkBadge key={badge} tone="primary">
+                  {badge}
+                </UkBadge>
+              ))}
+            </div>
+          ) : (
+            <p className="muted" style={{ fontSize: 13 }}>
+              Henuz rozet yok. Konu tamamla ve deneme gir!
+            </p>
+          )}
         </div>
-        <div className="kt-card">
-          <div className="kt-card-body p-5">
-            <p className="text-sm text-muted-foreground">Rozetler</p>
-            {motivation.badges.length > 0 ? (
-              <ul className="flex flex-wrap gap-2 mt-2">
-                {motivation.badges.map((badge) => (
-                  <li key={badge} className="kt-badge kt-badge-sm kt-badge-primary">
-                    {badge}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-muted-foreground mt-2">Henuz rozet yok.</p>
-            )}
-          </div>
-        </div>
-      </div>
+      </UkSection>
 
-      <Link href="/student/dashboard" className="kt-btn kt-btn-sm kt-btn-light w-fit">
+      <Link href="/student/dashboard" className="btn btn-light btn-sm w-fit">
         Dashboard
       </Link>
     </div>

@@ -1,0 +1,39 @@
+import { NextResponse } from "next/server";
+
+import { withApiAuth } from "@/lib/auth/api-guard";
+import {
+  getCoachAppointmentSettings,
+  listCoachAppointments,
+  updateCoachAppointmentSettings,
+} from "@/server/services/appointment.service";
+
+export const GET = withApiAuth(["coach"], async (_req, { session }) => {
+  const coachId = session.user.coachId;
+  if (!coachId) {
+    return NextResponse.json({ error: "Coach profile missing" }, { status: 400 });
+  }
+
+  const [settings, appointments] = await Promise.all([
+    getCoachAppointmentSettings(coachId),
+    listCoachAppointments(coachId),
+  ]);
+
+  return NextResponse.json({ settings, appointments }, { status: 200 });
+});
+
+export const PATCH = withApiAuth(["coach"], async (req, { session }) => {
+  const coachId = session.user.coachId;
+  if (!coachId) {
+    return NextResponse.json({ error: "Coach profile missing" }, { status: 400 });
+  }
+
+  const body = (await req.json()) as Partial<{
+    weeklyLimit: number;
+    allowOnline: boolean;
+    allowInPerson: boolean;
+    availability: Record<string, string[]>;
+  }>;
+
+  const settings = await updateCoachAppointmentSettings(coachId, body);
+  return NextResponse.json({ settings }, { status: 200 });
+});

@@ -34,16 +34,13 @@ export function NotificationBell({ role }: NotificationBellProps) {
   return (
     <Link
       href={notificationsPath(role)}
-      className="kt-btn kt-btn-icon kt-btn-ghost relative"
+      className="icon-btn relative"
       aria-label="Bildirimler"
       data-testid="notification-bell"
+      style={{ textDecoration: "none" }}
     >
       <i className="ki-filled ki-notification-on" />
-      {unreadCount > 0 ? (
-        <span className="absolute -top-1 -end-1 flex size-4 items-center justify-center rounded-full bg-danger text-[10px] font-semibold text-white">
-          {unreadCount > 9 ? "9+" : unreadCount}
-        </span>
-      ) : null}
+      {unreadCount > 0 ? <span className="dot" /> : null}
     </Link>
   );
 }

@@ -2,80 +2,102 @@
 
 import type { AppRole } from "@uyanik/tokens";
 import { signOut, useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
+import { UkAvatar } from "@/components/design/UkAvatar";
 import {
   NotificationBell,
   shouldShowNotificationBell,
 } from "@/components/shared/NotificationBell";
-
-const ROLE_LABELS: Record<AppRole, string> = {
-  admin: "Admin",
-  branch: "Şube",
-  coach: "Koç",
-  student: "Öğrenci",
-  parent: "Veli",
-};
+import { findUkNavItem, UK_ROLE_CRUMB } from "@/lib/navigation/uk-nav";
 
 type HeaderProps = {
   role: AppRole;
 };
 
 export function Header({ role }: HeaderProps) {
+  const pathname = usePathname();
   const { data: session } = useSession();
-  const displayName = session?.user?.name ?? session?.user?.email ?? "Kullanıcı";
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const displayName = session?.user?.name ?? session?.user?.email ?? "Kullanici";
+  const activeItem = findUkNavItem(role, pathname);
+  const pageTitle = activeItem?.label ?? "Dashboard";
 
   return (
-    <header
-      className="kt-header fixed top-0 z-10 start-0 end-0 flex items-stretch shrink-0 bg-background border-b border-border lg:start-[280px]"
-      data-kt-sticky="true"
-      data-kt-sticky-class="border-b border-border"
-      data-kt-sticky-name="header"
-      id="header"
-    >
-      <div className="kt-container-fixed flex justify-between items-stretch lg:gap-4 w-full" id="headerContainer">
-        <div className="flex gap-2.5 lg:hidden items-center -ms-1">
-          <span className="text-sm font-semibold text-foreground">Uyanık Koç</span>
+    <header className="topbar theme-fade">
+      <div className="crumb">
+        <b>{pageTitle}</b>
+        <span>{UK_ROLE_CRUMB[role]}</span>
+      </div>
+
+      <div className="searchbox">
+        <i className="ki-filled ki-magnifier" />
+        <input placeholder={role === "coach" ? "Ogrenci ara..." : "Odev veya konu ara..."} readOnly />
+        <kbd>K</kbd>
+      </div>
+
+      <div className="topbar-actions">
+        {shouldShowNotificationBell(role) ? <NotificationBell role={role} /> : (
+          <button type="button" className="icon-btn" aria-label="Bildirimler">
+            <i className="ki-filled ki-notification-on" />
+          </button>
+        )}
+
+        <div style={{ position: "relative" }}>
           <button
             type="button"
-            className="kt-btn kt-btn-icon kt-btn-ghost"
-            data-kt-drawer-toggle="#sidebar"
-            aria-label="Menüyü aç"
+            className="user-menu-btn"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label="Hesap menusu"
           >
-            <i className="ki-filled ki-menu" />
+            <UkAvatar name={displayName} size={40} />
           </button>
-        </div>
-
-        <div className="hidden lg:flex items-center">
-          <span className="text-sm text-muted-foreground">Uyanık Koç Paneli</span>
-        </div>
-
-        <div className="flex items-center gap-2 ms-auto">
-          {shouldShowNotificationBell(role) ? <NotificationBell role={role} /> : null}
-          <span className="kt-badge kt-badge-sm kt-badge-outline kt-badge-primary hidden sm:inline-flex">
-            {ROLE_LABELS[role]}
-          </span>
-
-          <div className="relative" data-kt-menu="true" data-kt-menu-placement="bottom-end">
-            <button
-              type="button"
-              className="kt-btn kt-btn-light flex items-center gap-2"
-              data-kt-menu-trigger="click"
-            >
-              <span className="text-sm font-medium text-foreground">{displayName}</span>
-              <i className="ki-filled ki-down text-xs" />
-            </button>
-            <div className="kt-menu-dropdown kt-menu-default w-48 py-2 hidden" data-kt-menu-dismiss="true">
-              <div className="px-4 py-2 text-xs text-muted-foreground">{session?.user?.email}</div>
-              <div className="border-b border-border my-1" />
-              <button
-                type="button"
-                className="kt-menu-link w-full text-start px-4 py-2 text-sm text-danger hover:bg-muted"
-                onClick={() => signOut({ callbackUrl: "/login" })}
-              >
-                Çıkış Yap
-              </button>
-            </div>
-          </div>
+          {menuOpen ? (
+            <>
+              <div
+                style={{ position: "fixed", inset: 0, zIndex: 40 }}
+                onClick={() => setMenuOpen(false)}
+                aria-hidden
+              />
+              <div className="user-pop">
+                <div
+                  className="row"
+                  style={{ gap: 11, padding: "4px 8px 12px", borderBottom: "1px solid var(--border)" }}
+                >
+                  <UkAvatar name={displayName} size={40} />
+                  <div style={{ minWidth: 0 }}>
+                    <b
+                      style={{
+                        fontSize: 13.5,
+                        display: "block",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {displayName}
+                    </b>
+                    <span className="muted" style={{ fontSize: 11.5 }}>
+                      {session?.user?.email}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="pop-item danger"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    void signOut({ callbackUrl: "/login" });
+                  }}
+                >
+                  <i className="ki-filled ki-exit-right" />
+                  Cikis Yap
+                </button>
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
     </header>

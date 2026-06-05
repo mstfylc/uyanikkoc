@@ -214,3 +214,110 @@ export type AuthUserRecord = {
   coachId?: string | null;
   parentId?: string | null;
 };
+
+export type AppointmentMode = "online" | "in_person";
+export type AppointmentStatus = "pending" | "approved" | "rejected" | "cancelled";
+export type AppointmentDay = "Pzt" | "Sal" | "Car" | "Per" | "Cum" | "Cmt";
+
+export type AppointmentRecord = {
+  id: string;
+  coachId: string;
+  studentId: string;
+  studentName: string;
+  day: AppointmentDay;
+  slot: string;
+  mode: AppointmentMode;
+  topic: string;
+  status: AppointmentStatus;
+  createdAt: string;
+};
+
+export type AppointmentSettingsRecord = {
+  coachId: string;
+  weeklyLimit: number;
+  allowOnline: boolean;
+  allowInPerson: boolean;
+  availability: Record<AppointmentDay, string[]>;
+};
+
+export type PsychTestDefinition = {
+  id: string;
+  name: string;
+  icon: string;
+  tone: "primary" | "success" | "warning" | "danger" | "info";
+  description: string;
+  questions: string[];
+  bands: Array<[number, number, string, string]>;
+};
+
+export type TestAssignmentStatus = "sent" | "completed";
+
+export type TestAssignmentRecord = {
+  id: string;
+  coachId: string;
+  studentId: string;
+  studentName: string;
+  testId: string;
+  status: TestAssignmentStatus;
+  score: number | null;
+  band: string | null;
+  bandTone: string | null;
+  coachNote: string;
+  sentAt: string;
+  completedAt: string | null;
+};
+
+export type SchoolScheduleRecord = {
+  studentId: string;
+  attendsSchool: boolean;
+  grid: Record<string, string[]>;
+};
+
+export type CoachNoteKind = "meeting" | "warning" | "general";
+
+export type CoachStudentNoteRecord = {
+  id: string;
+  coachId: string;
+  studentId: string;
+  text: string;
+  kind: CoachNoteKind;
+  pinned: boolean;
+  createdAt: string;
+};
+
+export type CurriculumTopicGroup = {
+  name: string;
+  topics: string[];
+};
+
+export type CurriculumRecord = {
+  coachId: string;
+  examType: TopicExamType;
+  subjects: Record<string, CurriculumTopicGroup[]>;
+};
+
+export type SupportTicketRecord = {
+  id: string;
+  userId: string;
+  role: string;
+  subject: string;
+  message: string;
+  status: "open" | "closed";
+  createdAt: string;
+};
+
+export type CoachReportStudentRow = {
+  studentId: string;
+  displayName: string;
+  latestNet: number | null;
+  assignmentRate: number;
+  topicRate: number;
+};
+
+export type CoachReportSummary = {
+  rosterCount: number;
+  avgExamNet: number | null;
+  assignmentCompletionRate: number;
+  pendingAppointments: number;
+  students: CoachReportStudentRow[];
+};

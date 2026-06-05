@@ -48,6 +48,16 @@ export async function createCoachExamResult(
   return memoryExams.createExamResult(input);
 }
 
+export async function importCoachExamResults(
+  inputs: import("@uyanik/database").CreateExamResultInput[],
+): Promise<ExamResultRecord[]> {
+  const created: ExamResultRecord[] = [];
+  for (const input of inputs) {
+    created.push(await createCoachExamResult(input));
+  }
+  return created;
+}
+
 export async function resolveCoachStudentIds(coachId: string): Promise<string[]> {
   const { listCoachRoster } = await import("@/server/services/roster.service");
   const roster = await listCoachRoster(coachId);
