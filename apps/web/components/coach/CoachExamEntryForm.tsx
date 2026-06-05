@@ -1,9 +1,7 @@
 "use client";
 
-import type { ResultExamType } from "@uyanik/database";
+import type { CoachRosterEntry, ResultExamType } from "@uyanik/database";
 import { FormEvent, useEffect, useState } from "react";
-
-import { DEMO_STUDENT_ID } from "@/mocks/assignments";
 
 type SubjectRow = {
   subjectName: string;
@@ -21,25 +19,24 @@ const DEFAULT_SUBJECTS: SubjectRow[] = [
 ];
 
 export function CoachExamEntryForm() {
-  const [studentId, setStudentId] = useState(DEMO_STUDENT_ID);
+  const [studentId, setStudentId] = useState("");
   const [examType, setExamType] = useState<ResultExamType>("TYT");
   const [label, setLabel] = useState("");
   const [takenAt, setTakenAt] = useState(new Date().toISOString().slice(0, 10));
   const [subjects, setSubjects] = useState<SubjectRow[]>(DEFAULT_SUBJECTS);
-  const [studentIds, setStudentIds] = useState<string[]>([DEMO_STUDENT_ID]);
+  const [students, setStudents] = useState<CoachRosterEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     async function loadStudents() {
-      const response = await fetch("/api/coach/assignments", { credentials: "same-origin" });
+      const response = await fetch("/api/coach/students", { credentials: "same-origin" });
       if (response.ok) {
-        const data = (await response.json()) as { assignments: Array<{ studentId: string }> };
-        const ids = [...new Set(data.assignments.map((item) => item.studentId))];
-        if (ids.length > 0) {
-          setStudentIds(ids);
-          setStudentId(ids[0] ?? DEMO_STUDENT_ID);
+        const data = (await response.json()) as { students: CoachRosterEntry[] };
+        setStudents(data.students);
+        if (data.students[0]) {
+          setStudentId(data.students[0].studentId);
         }
       }
     }
@@ -106,9 +103,9 @@ export function CoachExamEntryForm() {
           onChange={(event) => setStudentId(event.target.value)}
           className="w-full rounded-md border border-border px-3 py-2"
         >
-          {studentIds.map((id) => (
-            <option key={id} value={id}>
-              {id}
+          {students.map((student) => (
+            <option key={student.studentId} value={student.studentId}>
+              {student.displayName}
             </option>
           ))}
         </select>

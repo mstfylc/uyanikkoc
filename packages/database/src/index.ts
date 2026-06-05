@@ -12,6 +12,7 @@ export * as notificationRepository from "./repositories/notifications";
 export * as messageRepository from "./repositories/messages";
 export * as templateRepository from "./repositories/templates";
 export * as studentRepository from "./repositories/students";
+export * as rosterRepository from "./repositories/roster";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
@@ -22,6 +23,7 @@ export type {
   AssignmentTemplateRecord,
   AssignmentType,
   AuthUserRecord,
+  CoachRosterEntry,
   CreateAssignmentTemplateInput,
   CreateExamResultInput,
   CreateSubjectInput,

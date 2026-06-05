@@ -49,13 +49,7 @@ export async function createCoachExamResult(
 }
 
 export async function resolveCoachStudentIds(coachId: string): Promise<string[]> {
-  if (shouldUseDatabase()) {
-    const { assignmentRepository } = await import("@uyanik/database");
-    const assignments = await assignmentRepository.listAssignmentsForCoach(coachId);
-    return [...new Set(assignments.map((assignment) => assignment.studentId))];
-  }
-
-  const { listAssignmentsForCoach } = await import("@/mocks/assignments");
-  const assignments = listAssignmentsForCoach(coachId);
-  return [...new Set(assignments.map((assignment) => assignment.studentId))];
+  const { listCoachRoster } = await import("@/server/services/roster.service");
+  const roster = await listCoachRoster(coachId);
+  return roster.map((entry) => entry.studentId);
 }

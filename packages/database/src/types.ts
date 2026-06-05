@@ -120,6 +120,12 @@ export type StudentProfileRecord = {
   motivationEnabled: boolean;
 };
 
+export type CoachRosterEntry = {
+  studentId: string;
+  displayName: string;
+  email: string;
+};
+
 export type TopicExamType = "TYT" | "AYT" | "LGS" | "GENEL";
 
 export type TopicProgressRecord = {

@@ -2,8 +2,6 @@ import type { AssignmentCreateInput, AssignmentRecord, ParentSummaryRecord } fro
 
 import { shouldUseDatabase } from "@/lib/data/env";
 import {
-  DEMO_PARENT_ID,
-  DEMO_STUDENT_ID,
   completeAssignment as completeMemoryAssignment,
   createAssignment as createMemoryAssignment,
   getParentSummary as getMemoryParentSummary,
@@ -11,11 +9,12 @@ import {
   listAssignmentsForStudent as listMemoryAssignmentsForStudent,
   listAssignmentsForCoach as listMemoryAssignmentsForCoach,
 } from "@/mocks/assignments";
+import { coachHasStudent, resolveParentIdForStudent } from "@/server/services/roster.service";
 
 export type { AssignmentCreateInput, AssignmentRecord, ParentSummaryRecord };
 
 export type CoachCreateAssignmentBody = Partial<
-  Pick<AssignmentCreateInput, "description" | "type" | "priority" | "subject" | "dueDate">
+  Pick<AssignmentCreateInput, "description" | "type" | "priority" | "subject" | "dueDate" | "studentId">
 > & {
   title: string;
 };
@@ -82,11 +81,26 @@ export async function createCoachAssignment(
   branchId: string,
   body: CoachCreateAssignmentBody,
 ): Promise<AssignmentRecord> {
+  const studentId = body.studentId?.trim();
+  if (!studentId) {
+    throw new Error("Student is required");
+  }
+
+  const hasStudent = await coachHasStudent(coachId, studentId);
+  if (!hasStudent) {
+    throw new Error("Student not in roster");
+  }
+
+  const parentId = await resolveParentIdForStudent(studentId);
+  if (!parentId) {
+    throw new Error("Parent not found for student");
+  }
+
   return createAssignment({
     title: body.title,
     coachId,
-    studentId: DEMO_STUDENT_ID,
-    parentId: DEMO_PARENT_ID,
+    studentId,
+    parentId,
     branchId,
     description: body.description ?? null,
     type: body.type,
@@ -108,10 +122,6 @@ export async function completeStudentAssignment(
 }
 
 async function resolveStudentIdForParent(parentId: string): Promise<string | null> {
-  if (parentId === DEMO_PARENT_ID) {
-    return DEMO_STUDENT_ID;
-  }
-
   if (shouldUseDatabase()) {
     const { studentRepository } = await import("@uyanik/database");
     return studentRepository.resolveStudentIdForParent(parentId);

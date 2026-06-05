@@ -33,6 +33,13 @@ async function main() {
       parentId: "parent_001",
     },
     {
+      id: "user_student_002",
+      email: "student2@uyanik.local",
+      role: "STUDENT" as const,
+      studentId: "student_002",
+      parentId: "parent_002",
+    },
+    {
       id: "user_coach_001",
       email: "coach@uyanik.local",
       role: "COACH" as const,
@@ -43,6 +50,12 @@ async function main() {
       email: "parent@uyanik.local",
       role: "PARENT" as const,
       parentId: "parent_001",
+    },
+    {
+      id: "user_parent_002",
+      email: "parent2@uyanik.local",
+      role: "PARENT" as const,
+      parentId: "parent_002",
     },
     {
       id: "user_branch_001",
@@ -89,11 +102,37 @@ async function main() {
     create: { id: "parent_001", userId: "user_parent_001" },
   });
 
+  await prisma.parentProfile.upsert({
+    where: { id: "parent_002" },
+    update: { userId: "user_parent_002" },
+    create: { id: "parent_002", userId: "user_parent_002" },
+  });
+
   await prisma.studentProfile.upsert({
     where: { id: "student_001" },
     update: { userId: "user_student_001", parentId: "parent_001" },
     create: { id: "student_001", userId: "user_student_001", parentId: "parent_001" },
   });
+
+  await prisma.studentProfile.upsert({
+    where: { id: "student_002" },
+    update: { userId: "user_student_002", parentId: "parent_002" },
+    create: { id: "student_002", userId: "user_student_002", parentId: "parent_002" },
+  });
+
+  for (const studentId of ["student_001", "student_002"] as const) {
+    await prisma.coachStudent.upsert({
+      where: {
+        coachId_studentId: { coachId: "coach_001", studentId },
+      },
+      update: {},
+      create: {
+        id: `coach_student_${studentId}`,
+        coachId: "coach_001",
+        studentId,
+      },
+    });
+  }
 
   const dueDate = new Date();
   dueDate.setDate(dueDate.getDate() + 7);

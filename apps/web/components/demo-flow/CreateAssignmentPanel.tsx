@@ -79,6 +79,8 @@ function validateForm(input: {
 export function CreateAssignmentPanel() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [students, setStudents] = useState<Array<{ studentId: string; displayName: string }>>([]);
   const [type, setType] = useState<AssignmentType>("homework");
   const [priority, setPriority] = useState<AssignmentPriority>("medium");
   const [subject, setSubject] = useState("");
@@ -98,7 +100,21 @@ export function CreateAssignmentPanel() {
       }
     }
 
+    async function loadStudents() {
+      const response = await fetch("/api/coach/students", { credentials: "same-origin" });
+      if (response.ok) {
+        const data = (await response.json()) as {
+          students: Array<{ studentId: string; displayName: string }>;
+        };
+        setStudents(data.students);
+        if (data.students[0]) {
+          setStudentId(data.students[0].studentId);
+        }
+      }
+    }
+
     void loadTemplates();
+    void loadStudents();
   }, []);
 
   function applyTemplate(selectedId: string) {
@@ -126,6 +142,11 @@ export function CreateAssignmentPanel() {
       return;
     }
 
+    if (!studentId) {
+      setError("Ogrenci seciniz.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     const response = await fetch("/api/coach/assignments", {
@@ -134,6 +155,7 @@ export function CreateAssignmentPanel() {
       credentials: "same-origin",
       body: JSON.stringify({
         title: title.trim(),
+        studentId,
         description: description.trim() || null,
         type,
         priority,
@@ -176,6 +198,25 @@ export function CreateAssignmentPanel() {
             {templates.map((template) => (
               <option key={template.id} value={template.id}>
                 {template.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor="student">Ogrenci *</label>
+          <select
+            id="student"
+            name="student"
+            required
+            value={studentId}
+            onChange={(event) => setStudentId(event.target.value)}
+            className="w-full rounded-md border border-border px-3 py-2"
+          >
+            <option value="">Ogrenci seciniz</option>
+            {students.map((student) => (
+              <option key={student.studentId} value={student.studentId}>
+                {student.displayName}
               </option>
             ))}
           </select>
@@ -274,7 +315,7 @@ export function CreateAssignmentPanel() {
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !studentId}
           className="kt-btn kt-btn-primary w-full sm:w-auto"
         >
           {isSubmitting ? "Kaydediliyor..." : "Odevi kaydet"}

@@ -31,14 +31,21 @@ export const POST = withApiAuth(["coach"], async (req, { session }) => {
     return NextResponse.json({ error: "Coach profile missing" }, { status: 400 });
   }
 
-  const assignment = await createCoachAssignment(coachId, branchId, {
-    title,
-    description: body.description,
-    type: body.type,
-    priority: body.priority,
-    subject: body.subject,
-    dueDate: body.dueDate,
-  });
+  try {
+    const assignment = await createCoachAssignment(coachId, branchId, {
+      title,
+      studentId: body.studentId,
+      description: body.description,
+      type: body.type,
+      priority: body.priority,
+      subject: body.subject,
+      dueDate: body.dueDate,
+    });
 
-  return NextResponse.json({ assignment }, { status: 200 });
+    return NextResponse.json({ assignment }, { status: 200 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Assignment create failed";
+    const status = message === "Student not in roster" ? 404 : 400;
+    return NextResponse.json({ error: message }, { status });
+  }
 });

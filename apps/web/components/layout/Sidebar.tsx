@@ -14,7 +14,7 @@ type MenuItem = {
 const MENU_BY_ROLE: Record<"coach" | "student" | "parent" | "branch" | "admin", MenuItem[]> = {
   coach: [
     { href: "/coach/dashboard", label: "Dashboard", icon: "ki-element-11" },
-    { href: "/coach/students/student_001", label: "Ogrencilerim", icon: "ki-people" },
+    { href: "/coach/students", label: "Ogrencilerim", icon: "ki-people" },
     { href: "/coach/assignments/create", label: "Odev & Gorev", icon: "ki-notepad-edit" },
     { href: "/coach/exams", label: "Denemeler", icon: "ki-chart-simple" },
     { href: "/coach/messages", label: "Mesajlar", icon: "ki-messages" },

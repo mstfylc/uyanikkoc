@@ -20,9 +20,9 @@ export const PATCH = withApiAuth(["coach"], async (req, { session }) => {
     return NextResponse.json({ error: "Student id is required" }, { status: 400 });
   }
 
-  const { listCoachAssignments } = await import("@/server/services/assignment.service");
-  const assignments = await listCoachAssignments(coachId);
-  if (!assignments.some((item) => item.studentId === studentId)) {
+  const { coachHasStudent } = await import("@/server/services/roster.service");
+  const hasStudent = await coachHasStudent(coachId, studentId);
+  if (!hasStudent) {
     return NextResponse.json({ error: "Student not found" }, { status: 404 });
   }
 

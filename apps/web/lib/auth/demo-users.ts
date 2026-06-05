@@ -30,6 +30,15 @@ export const demoUsers: DemoUser[] = [
     studentId: "student_001",
   },
   {
+    id: "user_student_002",
+    email: "student2@uyanik.local",
+    passwordHash: DEMO_PASSWORD_HASH,
+    role: "STUDENT",
+    organizationId: DEMO_ORG_ID,
+    branchId: DEMO_BRANCH_ID,
+    studentId: "student_002",
+  },
+  {
     id: "user_coach_001",
     email: "coach@uyanik.local",
     passwordHash: DEMO_PASSWORD_HASH,

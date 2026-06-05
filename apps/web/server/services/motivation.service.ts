@@ -7,6 +7,7 @@ import type {
 
 import { shouldUseDatabase } from "@/lib/data/env";
 import * as memoryMotivation from "@/mocks/motivation";
+import { coachHasStudent } from "@/server/services/roster.service";
 
 export type CoachStudentSummary = {
   studentId: string;
@@ -60,16 +61,16 @@ export async function getCoachStudentSummary(
   coachId: string,
   studentId: string,
 ): Promise<CoachStudentSummary | null> {
+  const hasStudent = await coachHasStudent(coachId, studentId);
+  if (!hasStudent) {
+    return null;
+  }
+
   const { listCoachAssignments } = await import("@/server/services/assignment.service");
   const { listStudentTopics } = await import("@/server/services/topic.service");
   const { listStudentExams } = await import("@/server/services/exam.service");
 
   const assignments = await listCoachAssignments(coachId);
-  const hasStudent = assignments.some((item) => item.studentId === studentId);
-  if (!hasStudent) {
-    return null;
-  }
-
   const studentAssignments = assignments.filter((item) => item.studentId === studentId);
   const { summary: topicSummary } = await listStudentTopics(studentId);
   const { summary: examSummary } = await listStudentExams(studentId);
