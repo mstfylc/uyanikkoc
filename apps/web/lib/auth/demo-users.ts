@@ -1,11 +1,12 @@
 import type { DbRole } from "@uyanik/tokens";
-import { hashSync } from "bcryptjs";
 
 export const DEMO_ORG_ID = "org_demo_001";
 export const DEMO_BRANCH_ID = "branch_demo_001";
 export const DEMO_PASSWORD = "uyanik123";
 
-export const DEMO_PASSWORD_HASH = hashSync(DEMO_PASSWORD, 10);
+/** bcryptjs.hashSync("uyanik123", 10) — statik; cold-start'ta yeniden hesaplanmaz. */
+export const DEMO_PASSWORD_HASH =
+  "$2b$10$IC1Jmqu4yzbuTg4gNWszNusmd/F1X3Z4pxWLLx1A6QJHNSFfQfgrC";
 
 export type DemoUser = {
   id: string;
