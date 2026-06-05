@@ -1,7 +1,7 @@
 # Latest Handoff
 
 **Son tamamlanan faz:** BACKLOG PROMPT 18 — Deneme sonuçları (YKS alpha)  
-**Son commit:** `feat: add exam results yks alpha`  
+**Son commit:** `2575599` — `feat: add exam results yks alpha`  
 **Branch:** main  
 
 ## PROMPT 18 özeti

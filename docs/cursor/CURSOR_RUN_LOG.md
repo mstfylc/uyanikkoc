@@ -19,7 +19,7 @@
 | 2026-06-04 | PROMPT 13 | e14f8a5 | typecheck ✓ | alpha status report (sprint close) |
 | 2026-06-04 | BACKLOG 14 | 2945c0f | typecheck ✓ unit 28 ✓ e2e 10 ✓ | assignment service layer refactor |
 | 2026-06-04 | BACKLOG 17 | 0856a50 | generate ✓ typecheck ✓ unit 31 ✓ e2e 10 ✓ | user-defined topic tracking |
-| 2026-06-04 | BACKLOG 18 | — | generate ✓ typecheck ✓ unit 34 ✓ | exam results yks alpha |
+| 2026-06-04 | BACKLOG 18 | 2575599 | generate ✓ typecheck ✓ unit 34 ✓ | exam results yks alpha |
 
 ## Kural (remote şablon ile uyumlu)
 
