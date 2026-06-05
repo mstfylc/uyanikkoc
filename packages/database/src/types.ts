@@ -87,6 +87,37 @@ export type CreateTopicInput = {
   name: string;
 };
 
+export type ResultExamType = "TYT" | "AYT" | "LGS";
+
+export type ExamSubjectResultRecord = {
+  id: string;
+  subjectName: string;
+  correct: number;
+  wrong: number;
+  net: number;
+};
+
+export type ExamResultRecord = {
+  id: string;
+  studentId: string;
+  examType: ResultExamType;
+  label: string | null;
+  takenAt: string;
+  totalNet: number;
+  subjects: ExamSubjectResultRecord[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ExamTrendSummary = {
+  latestNet: number | null;
+  previousNet: number | null;
+  trend: "up" | "down" | "flat";
+  examType: ResultExamType | null;
+  takenAt: string | null;
+  examCount: number;
+};
+
 export type AuthUserRecord = {
   id: string;
   email: string;

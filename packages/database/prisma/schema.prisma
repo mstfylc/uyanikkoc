@@ -43,6 +43,12 @@ enum TopicExamType {
   GENEL
 }
 
+enum ResultExamType {
+  TYT
+  AYT
+  LGS
+}
+
 model Organization {
   id       String   @id
   name     String
@@ -89,6 +95,7 @@ model StudentProfile {
   parent      ParentProfile? @relation(fields: [parentId], references: [id], onDelete: SetNull)
   assignments Assignment[] @relation("StudentAssignments")
   subjects    Subject[]
+  examResults ExamResult[]
 
   @@map("student_profiles")
 }
@@ -179,4 +186,34 @@ model TopicProgress {
 
   @@index([studentId])
   @@map("topic_progress")
+}
+
+model ExamResult {
+  id        String             @id @default(cuid())
+  studentId String
+  examType  ResultExamType
+  label     String?
+  takenAt   DateTime
+  totalNet  Float
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  student   StudentProfile     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjects  ExamSubjectResult[]
+
+  @@index([studentId])
+  @@index([takenAt])
+  @@map("exam_results")
+}
+
+model ExamSubjectResult {
+  id           String     @id @default(cuid())
+  examResultId String
+  subjectName  String
+  correct      Int
+  wrong        Int
+  net          Float
+  examResult   ExamResult @relation(fields: [examResultId], references: [id], onDelete: Cascade)
+
+  @@index([examResultId])
+  @@map("exam_subject_results")
 }

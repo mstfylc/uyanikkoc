@@ -7,7 +7,9 @@ export {
 export * as assignmentRepository from "./repositories/assignments";
 export * as authRepository from "./repositories/auth";
 export * as topicRepository from "./repositories/topics";
+export * as examRepository from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
+export { buildExamTrendSummary } from "./repositories/exams";
 export type {
   AssignmentCreateInput,
   AssignmentPriority,
@@ -17,7 +19,11 @@ export type {
   AuthUserRecord,
   CreateSubjectInput,
   CreateTopicInput,
+  ExamResultRecord,
+  ExamSubjectResultRecord,
+  ExamTrendSummary,
   ParentSummaryRecord,
+  ResultExamType,
   SubjectRecord,
   TopicExamType,
   TopicProgressRecord,

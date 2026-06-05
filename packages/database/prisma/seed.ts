@@ -189,7 +189,78 @@ async function main() {
     },
   });
 
-  console.log("Seed completed: demo org, branch, users, profiles, assignment, sample topics");
+  await seedExamResults();
+
+  console.log("Seed completed: demo org, branch, users, profiles, assignment, sample topics, exam results");
+}
+
+async function seedExamResults() {
+  const olderTakenAt = new Date("2026-05-10T10:00:00.000Z");
+  const newerTakenAt = new Date("2026-06-01T10:00:00.000Z");
+
+  const examOneSubjects = [
+    { subjectName: "Turkce", correct: 32, wrong: 6, net: 30.5 },
+    { subjectName: "Matematik", correct: 18, wrong: 8, net: 16 },
+    { subjectName: "Fen", correct: 12, wrong: 5, net: 10.75 },
+    { subjectName: "Sosyal", correct: 14, wrong: 4, net: 13 },
+  ];
+
+  await prisma.examResult.upsert({
+    where: { id: "exam_seed_tyt_1" },
+    update: {
+      studentId: "student_001",
+      examType: "TYT",
+      label: "TYT Deneme 1",
+      takenAt: olderTakenAt,
+      totalNet: 70.25,
+    },
+    create: {
+      id: "exam_seed_tyt_1",
+      studentId: "student_001",
+      examType: "TYT",
+      label: "TYT Deneme 1",
+      takenAt: olderTakenAt,
+      totalNet: 70.25,
+      subjects: {
+        create: examOneSubjects.map((subject, index) => ({
+          id: `exam_seed_sub_1_${index + 1}`,
+          ...subject,
+        })),
+      },
+    },
+  });
+
+  const examTwoSubjects = [
+    { subjectName: "Turkce", correct: 34, wrong: 5, net: 32.75 },
+    { subjectName: "Matematik", correct: 20, wrong: 7, net: 18.25 },
+    { subjectName: "Fen", correct: 13, wrong: 4, net: 12 },
+    { subjectName: "Sosyal", correct: 15, wrong: 4, net: 14 },
+  ];
+
+  await prisma.examResult.upsert({
+    where: { id: "exam_seed_tyt_2" },
+    update: {
+      studentId: "student_001",
+      examType: "TYT",
+      label: "TYT Deneme 2",
+      takenAt: newerTakenAt,
+      totalNet: 77,
+    },
+    create: {
+      id: "exam_seed_tyt_2",
+      studentId: "student_001",
+      examType: "TYT",
+      label: "TYT Deneme 2",
+      takenAt: newerTakenAt,
+      totalNet: 77,
+      subjects: {
+        create: examTwoSubjects.map((subject, index) => ({
+          id: `exam_seed_sub_2_${index + 1}`,
+          ...subject,
+        })),
+      },
+    },
+  });
 }
 
 main()

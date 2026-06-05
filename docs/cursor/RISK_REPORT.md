@@ -1,3 +1,11 @@
+# Risk Report — BACKLOG PROMPT 18
+
+**Tarih:** 2026-06-04  
+**Faz:** Deneme sonuçları (YKS alpha)  
+**Durum:** Additive migration — yerel/CI DB için `pnpm db:migrate` gerekir.
+
+---
+
 # Risk Report — BACKLOG PROMPT 17
 
 **Tarih:** 2026-06-04  

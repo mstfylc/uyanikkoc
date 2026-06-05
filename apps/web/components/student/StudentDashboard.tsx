@@ -13,11 +13,15 @@ import {
   buildStudentPriorityAssignment,
   calculateCompletionRate,
   calculateTopicCompletionRate,
+  describeExamTrend,
+  formatExamNet,
+  RESULT_EXAM_TYPE_LABELS,
 } from "@uyanik/shared";
 import type {
   AssignmentPriority,
   AssignmentStatus,
   AssignmentType,
+  ExamTrendSummary,
   TopicTrackingSummary,
 } from "@uyanik/database";
 
@@ -69,14 +73,17 @@ function StatCard({ label, value, icon, tone = "primary" }: StatCardProps) {
 export function StudentDashboard() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [topicSummary, setTopicSummary] = useState<TopicTrackingSummary | null>(null);
+  const [examSummary, setExamSummary] = useState<ExamTrendSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTopicsLoading, setIsTopicsLoading] = useState(true);
+  const [isExamsLoading, setIsExamsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [assignmentsResponse, topicsResponse] = await Promise.all([
+      const [assignmentsResponse, topicsResponse, examsResponse] = await Promise.all([
         fetch("/api/student/assignments", { credentials: "same-origin" }),
         fetch("/api/student/topics", { credentials: "same-origin" }),
+        fetch("/api/student/exams", { credentials: "same-origin" }),
       ]);
 
       if (assignmentsResponse.ok) {
@@ -89,8 +96,14 @@ export function StudentDashboard() {
         setTopicSummary(data.summary);
       }
 
+      if (examsResponse.ok) {
+        const data = (await examsResponse.json()) as { summary: ExamTrendSummary };
+        setExamSummary(data.summary);
+      }
+
       setIsLoading(false);
       setIsTopicsLoading(false);
+      setIsExamsLoading(false);
     }
 
     void load();
@@ -170,6 +183,32 @@ export function StudentDashboard() {
           <Link href="/student/topics" className="kt-btn kt-btn-sm kt-btn-light self-start sm:self-auto">
             Konu Takibi
           </Link>
+        </div>
+      </div>
+
+      <div className="kt-card" data-testid="student-exam-summary-card">
+        <div className="kt-card-body p-5 flex flex-col gap-2">
+          <h3 className="text-base font-medium">Deneme Net Ozeti</h3>
+          {isExamsLoading ? (
+            <p className="text-sm text-muted-foreground">Yukleniyor...</p>
+          ) : examSummary && examSummary.latestNet !== null ? (
+            <>
+              <p className="text-sm">
+                Son net:{" "}
+                <span className="font-semibold">{formatExamNet(examSummary.latestNet)}</span>
+                {examSummary.examType ? ` (${RESULT_EXAM_TYPE_LABELS[examSummary.examType]})` : null}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {describeExamTrend(examSummary.trend)}
+                {examSummary.previousNet !== null
+                  ? ` · Onceki: ${formatExamNet(examSummary.previousNet)}`
+                  : ""}
+                {examSummary.examCount > 0 ? ` · ${examSummary.examCount} deneme` : ""}
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">Henuz deneme sonucu yok.</p>
+          )}
         </div>
       </div>
 

@@ -1,26 +1,26 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** BACKLOG PROMPT 17 — Kullanıcı tanımlı konu takibi  
-**Son commit:** `0856a50` — `feat: add user defined topic tracking`  
+**Son tamamlanan faz:** BACKLOG PROMPT 18 — Deneme sonuçları (YKS alpha)  
+**Son commit:** `feat: add exam results yks alpha`  
 **Branch:** main  
 
-## PROMPT 17 özeti
+## PROMPT 18 özeti
 
-- Prisma: `Subject`, `Topic`, `TopicProgress` + `TopicExamType` (TYT/AYT/LGS/GENEL)
-- Migration: `20260604180000_user_defined_topics`
-- API: `/api/student/topics` (GET/POST), `/api/student/topics/[id]` (PATCH/DELETE)
-- UI: dashboard konu özeti kartı, `/student/topics` CRUD paneli
-- Bellek + DB adapter; seed örnek konular (silinebilir)
+- Prisma: `ExamResult`, `ExamSubjectResult`, `ResultExamType` (TYT/AYT/LGS)
+- Migration: `20260604190000_exam_results_yks`
+- API: `GET /api/student/exams`, `GET /api/coach/exams`
+- Dashboard: son net + trend kartları (öğrenci + koç)
+- Seed: 2 TYT denemesi (yukarı trend)
 
 ## Durum
 
-- Faz 2: 14 ✓, **17 ✓** — sıradaki **18** (deneme sonuçları YKS)
-- Yerel DB: `pnpm db:migrate` + `pnpm db:seed` (yeni tablolar için)
+- Faz 2: 14 ✓ · 17 ✓ · **18 ✓** — sıradaki **16** (Yol-C: bildirim iskeleti)
+- Yerel DB: `pnpm db:migrate && pnpm db:seed`
 
-## Test özeti (P17)
+## Test özeti (P18)
 
-db:generate ✓ · typecheck ✓ · unit 31 ✓ · e2e 10 ✓
+db:generate ✓ · typecheck ✓ · unit 34 ✓
 
 ## Not
 
-E2E `playwright.config.ts`: `DEMO_AUTH_ALLOW_IN_MEMORY=true` (migrate edilmemiş DB ile çakışmayı önler).
+Net hesabı: `doğru - yanlış/4` (repository + seed). Bellek modu demo seed ile çalışır.

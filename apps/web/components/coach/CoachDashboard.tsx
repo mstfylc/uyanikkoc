@@ -8,9 +8,12 @@ import {
   buildRulesBasedRiskBand,
   calculateCompletionRate,
   countOverdueAssignments,
+  describeExamTrend,
+  formatExamNet,
+  RESULT_EXAM_TYPE_LABELS,
   RISK_BAND_LABELS,
 } from "@uyanik/shared";
-import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
+import type { AssignmentPriority, AssignmentStatus, AssignmentType, ExamTrendSummary } from "@uyanik/database";
 
 type Assignment = {
   id: string;
@@ -64,16 +67,29 @@ const RISK_BADGE_CLASS: Record<string, string> = {
 
 export function CoachDashboard() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [examSummary, setExamSummary] = useState<ExamTrendSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isExamsLoading, setIsExamsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const response = await fetch("/api/coach/assignments", { credentials: "same-origin" });
-      if (response.ok) {
-        const data = (await response.json()) as { assignments: Assignment[] };
+      const [assignmentsResponse, examsResponse] = await Promise.all([
+        fetch("/api/coach/assignments", { credentials: "same-origin" }),
+        fetch("/api/coach/exams", { credentials: "same-origin" }),
+      ]);
+
+      if (assignmentsResponse.ok) {
+        const data = (await assignmentsResponse.json()) as { assignments: Assignment[] };
         setAssignments(data.assignments);
       }
+
+      if (examsResponse.ok) {
+        const data = (await examsResponse.json()) as { summary: ExamTrendSummary };
+        setExamSummary(data.summary);
+      }
+
       setIsLoading(false);
+      setIsExamsLoading(false);
     }
 
     void load();
@@ -108,6 +124,31 @@ export function CoachDashboard() {
               : `Tamamlama %${completionRate} · Gecikmis: ${overdueCount} · Bekleyen: ${pending}`}
           </p>
           <p className="text-sm">{isLoading ? "" : suggestion}</p>
+        </div>
+      </div>
+
+      <div className="kt-card" data-testid="coach-exam-summary-card">
+        <div className="kt-card-body p-5 flex flex-col gap-2">
+          <h3 className="text-base font-medium">Deneme Net Trendi</h3>
+          {isExamsLoading ? (
+            <p className="text-sm text-muted-foreground">Yukleniyor...</p>
+          ) : examSummary && examSummary.latestNet !== null ? (
+            <>
+              <p className="text-sm">
+                Son net:{" "}
+                <span className="font-semibold">{formatExamNet(examSummary.latestNet)}</span>
+                {examSummary.examType ? ` (${RESULT_EXAM_TYPE_LABELS[examSummary.examType]})` : null}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {describeExamTrend(examSummary.trend)}
+                {examSummary.previousNet !== null
+                  ? ` · Onceki: ${formatExamNet(examSummary.previousNet)}`
+                  : ""}
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">Ogrenci deneme sonucu henuz yok.</p>
+          )}
         </div>
       </div>
 

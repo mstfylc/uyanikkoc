@@ -83,6 +83,13 @@ export {
 } from "./topic-insights";
 
 export {
+  buildExamTrendSummaryFromRecords,
+  describeExamTrend,
+  formatExamNet,
+  RESULT_EXAM_TYPE_LABELS,
+} from "./exam-insights";
+
+export {
   buildCoachSuggestion,
   buildParentWeeklyComment,
   buildRulesBasedRiskBand,
