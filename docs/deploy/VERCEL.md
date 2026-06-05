@@ -2,28 +2,24 @@
 
 Production canlı trafik **self-host** (`DEPLOYMENT_DECISION.md`). Vercel yalnızca **preview, demo ve PR önizleme** içindir.
 
-## 0. Acil — 404 NOT_FOUND teşhisi (2026-06-05)
+## Güncel durum (2026-06-05)
 
-Vercel CLI ile doğrulanan **mevcut yanlış ayarlar**:
+| Kontrol | Durum |
+|---------|--------|
+| Production URL | `https://uyanikkoc.vercel.app` |
+| `main` @ GitHub | `1831e36` (login fix + review follow-up merge'lü) |
+| `/api/health` | `{ "status":"ok", "database":"memory", "authSecret":"ok" }` |
+| Demo login | `student@uyanik.local` / `uyanik123` |
 
-| Ayar | Şu an (yanlış) | Olması gereken |
-|------|----------------|----------------|
-| Root Directory | `.` (repo kökü) | `apps/web` |
-| Framework | **Other** | **Next.js** |
-| Output Directory | `apps/web/.next` | **boş** |
-| Build Command | `pnpm --filter @uyanik/web build` | **boş** (package.json `build` script kullanılır) |
+**PR merge gerekmez** — `2faf8e1` (auth fix) ve `91cd19b`…`1831e36` (review follow-up) zaten `main`'de; push sonrası Vercel Production otomatik deploy alır.
 
-`Output Directory = apps/web/.next` → Vercel `.next` klasörünü statik site sanır, Next.js server route'ları deploy edilmez → **tüm URL'ler 404 NOT_FOUND**.
+Env zaten **Production** kapsamında tanımlıysa (`authSecret: "ok"`) yeni `AUTH_SECRET` üretip değiştirmeyin; gereksiz oturum kırılması olur.
 
-Build log'u başarılı görünse bile `inspect` çıktısında `Builds: . [0ms]` satırı varsa serverless route yok demektir.
+---
 
-**Ek:** Deployment Protection (SSO) açık → `uyanikkoc-uyanik.vercel.app` **401** döner (giriş gerekir). Demo için kapatın veya Vercel hesabıyla giriş yapın.
+## 0. Sorun giderme (404 / login)
 
-**Doğru demo URL (ayarlar düzeldikten sonra):** `https://uyanikkoc-uyanik.vercel.app/login`
-
-`https://uyanikkoc.vercel.app` kısa alias bazen 404 verebilir; team URL'sini kullanın.
-
-### Dashboard düzeltme (2 dk)
+### Dashboard (404 alıyorsanız)
 
 1. [vercel.com](https://vercel.com) → **uyanikkoc** → **Settings** → **General**
 2. **Root Directory** → `apps/web` → Save
@@ -62,7 +58,7 @@ Vercel → Project → Settings → Environment Variables → **Production + Pre
 |----------|--------|
 | `AUTH_SECRET` | `openssl rand -base64 32` çıktısı |
 | `NEXTAUTH_SECRET` | aynı değer |
-| `AUTH_URL` | `https://uyanikkoc-uyanik.vercel.app` (slash yok) |
+| `AUTH_URL` | `https://uyanikkoc.vercel.app` (slash yok) |
 | `NEXTAUTH_URL` | aynı URL |
 | `DEMO_AUTH_ALLOW_IN_MEMORY` | `true` |
 | `SINGLE_BRANCH_MODE` | `true` |
@@ -89,12 +85,20 @@ Production ortamına Vercel'de gerçek DB bağlamak proje kararına aykırıdır
 
 ## 5. Sağlık kontrolü
 
-Deploy sonrası: `GET https://uyanikkoc-uyanik.vercel.app/api/health` → `{ "status": "ok", "database": "memory" }` (preview demo modu).
+Deploy sonrası: `GET https://uyanikkoc.vercel.app/api/health`
 
-Doğrulama komutu (PowerShell):
+Beklenen (demo modu):
 
-```powershell
-Invoke-WebRequest -Uri "https://uyanikkoc-uyanik.vercel.app/api/health" -UseBasicParsing
+```json
+{ "status": "ok", "database": "memory", "authSecret": "ok" }
 ```
 
-200 dönmeli; 404 ise Dashboard ayarları hâlâ yanlış demektir.
+`authSecret: "missing"` → `AUTH_SECRET` Production kapsamında yok; aşağıdaki env tablosunu **All Environments** ile ekleyip redeploy edin.
+
+Doğrulama (PowerShell):
+
+```powershell
+Invoke-WebRequest -Uri "https://uyanikkoc.vercel.app/api/health" -UseBasicParsing
+```
+
+200 dönmeli. 404 ise Dashboard ayarları (Root Directory / Output Directory) hâlâ yanlış demektir.
