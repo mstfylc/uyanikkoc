@@ -16,6 +16,15 @@ pnpm --filter @uyanik/mobile typecheck
 pnpm --filter @uyanik/mobile lint
 ```
 
+## Veri modu
+Varsayılan **mock açık** — uygulama backend olmadan tek başına çalışır (iç-süreç
+`src/mocks/mockApi`). Gerçek backend'e (apps/web) bağlanmak için:
+```bash
+# apps/web ayakta (pnpm --filter @uyanik/web dev, :3010)
+VITE_USE_MOCK=false VITE_API_BASE=http://localhost:3010 pnpm --filter @uyanik/mobile dev
+```
+OTP kodu bellek modunda gerçek SMS yerine **web sunucu loglarına** yazılır.
+
 ## Yapı
 ```
 src/
@@ -30,11 +39,20 @@ src/
 ```
 
 ## Durum
-**Dilim 0 (bu commit):** İskele + tasarım sistemi + 6 ekran mock veriyle statik
-çalışıyor. Giriş şimdilik simülasyon.
+- **Dilim 0 ✅** İskele + `uk-m` tasarım sistemi + 6 ekran (mock veri).
+- **Dilim 1 ✅** Veri katmanı: `apiClient` (Bearer + 401→refresh), `tokens`
+  (Capacitor Preferences), `session` context. Login gerçek OTP/e-posta akışına bağlı.
+- **Dilim 2 ✅** `/api/me` bootstrap → Ana Sayfa + Profil canlı `me` verisini kullanır.
+- **Backend ✅** apps/web'de M1–M5 token uçları (bellek modu) — uçtan uca doğrulandı.
+- **Push (M3) kısmi** `lib/push.ts` + `/api/devices` hazır; native plugin
+  (`@capacitor/push-notifications`) native build aşamasında eklenecek.
 
-**Sıradaki:** Login dilimi — `apiClient` (Bearer + 401→refresh) + Capacitor
-Preferences token saklama + gerçek `/api/auth/otp/*` uçları (handoff M1+M2).
+### Kalan işler (follow-up)
+- Domain ekranları (Ödevler/Denemeler/Program) hâlâ tipli mock veri kullanıyor;
+  `apiClient` üzerinden gerçek student uçlarına bağlanacak.
+- Backend DB kalıcılığı: `OtpChallenge`/`RefreshToken`/`DeviceToken` prisma
+  modelleri + repository (şu an `shouldUseDatabase()` iken 501).
+- Native build: `cap add ios/android`, APNs/FCM, deep-link.
 
 ## Native (sonra)
 ```bash
