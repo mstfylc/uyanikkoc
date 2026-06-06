@@ -30,11 +30,11 @@ export function CoachReportsPanel() {
   }, [load]);
 
   async function approveReport(id: string) {
-    const response = await fetch("/api/coach/reports", {
-      method: "PATCH",
+    const response = await fetch(`/api/coach/reports/${id}/approve`, {
+      method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reportId: id }),
+      body: JSON.stringify({}),
     });
     if (response.ok) {
       await load();

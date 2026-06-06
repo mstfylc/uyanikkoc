@@ -35,6 +35,7 @@ const COACH_NAV: UkNavItem[] = [
 const PARENT_NAV: UkNavItem[] = [
   { href: "/parent/dashboard", label: "Genel Bakis", icon: "ki-element-11" },
   { href: "/parent/exams", label: "Deneme Sonuclari", icon: "ki-chart-simple" },
+  { href: "/parent/reports", label: "Gelisim Raporlari", icon: "ki-notepad-edit" },
   { href: "/parent/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/parent/appointments", label: "Randevular", icon: "ki-calendar-tick" },
   { href: "/parent/notifications", label: "Bildirimler", icon: "ki-notification-on" },
