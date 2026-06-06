@@ -17,6 +17,8 @@ export * as billingRepository from "./repositories/billing";
 export * as supportRepository from "./repositories/support";
 export * as ratingRepository from "./repositories/ratings";
 export * as onlineExamRepository from "./repositories/online-exam";
+export * as motivationBroadcastRepository from "./repositories/motivation-broadcast";
+export * as groupRepository from "./repositories/groups";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
@@ -53,6 +55,7 @@ export type {
   AppointmentMode,
   AppointmentStatus,
   PsychTestDefinition,
+  PsychTestQuestion,
   TestAssignmentRecord,
   TestAssignmentStatus,
   SchoolScheduleRecord,
@@ -71,6 +74,7 @@ export type {
   OptikSubmissionRecord,
   CreateOnlineExamInput,
   SubmitOptikInput,
+  MotivationMessageRecord,
   CoachReportSummary,
   CoachReportStudentRow,
   ParentReportRecord,

@@ -1,4 +1,5 @@
-import type { PsychTestDefinition, TestAssignmentRecord } from "@uyanik/database";
+import type { PsychTestDefinition, PsychTestQuestion, TestAssignmentRecord } from "@uyanik/database";
+import { answerScore, averageScore } from "@uyanik/shared";
 
 import * as memoryTests from "@/mocks/tests";
 
@@ -41,13 +42,25 @@ export async function completeStudentTest(
     return null;
   }
 
-  const score =
-    answers.length > 0
-      ? Number((answers.reduce((sum, value) => sum + value, 0) / answers.length).toFixed(2))
-      : 0;
+  const score = averageScore(
+    test.questions.map((question, index) => answerScore(question.kind, answers[index] ?? null, question)),
+  );
   const band = memoryTests.scoreBand(test, score);
 
   return memoryTests.completeTestAssignment(assignmentId, score, band.label, band.tone);
+}
+
+export async function createCustomTest(
+  coachId: string,
+  input: {
+    name: string;
+    desc: string;
+    icon: string;
+    tone: PsychTestDefinition["tone"];
+    questions: PsychTestQuestion[];
+  },
+): Promise<PsychTestDefinition> {
+  return memoryTests.createCustomTest(coachId, input);
 }
 
 export async function setCoachTestNote(

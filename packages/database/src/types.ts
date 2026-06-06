@@ -70,7 +70,10 @@ export type MessageThreadRecord = {
   coachId: string;
   studentId: string | null;
   parentId: string | null;
+  kind: "dm" | "group";
+  name: string | null;
   title: string;
+  memberUserIds?: string[];
   messages: MessageRecord[];
   createdAt: string;
   updatedAt: string;
@@ -216,7 +219,7 @@ export type AuthUserRecord = {
   parentId?: string | null;
 };
 
-export type AppointmentMode = "online" | "in_person";
+export type AppointmentMode = "online" | "in_person" | "phone";
 export type AppointmentStatus = "pending" | "approved" | "rejected" | "cancelled";
 export type AppointmentDay = "Pzt" | "Sal" | "Car" | "Per" | "Cum" | "Cmt";
 
@@ -236,9 +239,19 @@ export type AppointmentRecord = {
 export type AppointmentSettingsRecord = {
   coachId: string;
   weeklyLimit: number;
+  weeklyLimitStudent: number;
+  weeklyLimitParent: number;
   allowOnline: boolean;
   allowInPerson: boolean;
+  allowPhone: boolean;
   availability: Record<AppointmentDay, string[]>;
+  slotModes: Record<AppointmentDay, Record<string, AppointmentMode[]>>;
+};
+
+export type PsychTestQuestion = {
+  text: string;
+  kind: "likert" | "yesno" | "scale" | "choice";
+  options?: string[];
 };
 
 export type PsychTestDefinition = {
@@ -247,8 +260,10 @@ export type PsychTestDefinition = {
   icon: string;
   tone: "primary" | "success" | "warning" | "danger" | "info";
   description: string;
-  questions: string[];
+  questions: PsychTestQuestion[];
   bands: Array<[number, number, string, string]>;
+  custom?: boolean;
+  coachId?: string | null;
 };
 
 export type TestAssignmentStatus = "sent" | "completed";
@@ -392,12 +407,22 @@ export type CoachReportStudentRow = {
 
 export type ParentReportRecord = {
   id: string;
+  parentId: string;
   studentName: string;
   parentName: string;
   week: string;
   completion: number;
   netDelta: string;
   status: "pending" | "approved";
+  sentAt: string | null;
+};
+
+export type MotivationMessageRecord = {
+  id: string;
+  studentId: string;
+  coachId: string;
+  body: string;
+  createdAt: string;
 };
 
 export type CoachReportSummary = {

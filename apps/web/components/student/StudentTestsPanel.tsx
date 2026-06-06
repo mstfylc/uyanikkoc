@@ -185,9 +185,9 @@ export function StudentTestsPanel() {
                   style={{ gap: 18, overflowY: "auto", flex: 1, display: "flex", flexDirection: "column" }}
                 >
                   {activeTest.questions.map((question, index) => (
-                    <div key={question} className="field">
+                    <div key={`${question.text}-${index}`} className="field">
                       <p className="label" style={{ marginBottom: 8 }}>
-                        {index + 1}. {question}
+                        {index + 1}. {question.text}
                       </p>
                       <div className="filters" style={{ flexWrap: "wrap" }}>
                         {LIKERT_OPTIONS.map((label, scoreIndex) => {

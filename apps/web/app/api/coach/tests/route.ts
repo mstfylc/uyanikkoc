@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
 import {
+  createCustomTest,
   listCoachTestAssignments,
   listPsychTests,
   sendCoachTest,
@@ -34,7 +35,36 @@ export const POST = withApiAuth(["coach"], async (req, { session }) => {
     testId?: string;
     assignmentId?: string;
     coachNote?: string;
+    name?: string;
+    desc?: string;
+    icon?: string;
+    tone?: string;
+    questions?: { text: string; kind: string; options?: string[] }[];
   };
+
+  if (body.name?.trim() && body.questions?.length) {
+    const kinds = ["likert", "yesno", "scale", "choice"];
+    for (const question of body.questions) {
+      if (!question.text?.trim() || !kinds.includes(question.kind)) {
+        return NextResponse.json({ error: "invalid question" }, { status: 400 });
+      }
+      if (question.kind === "choice" && (question.options?.filter(Boolean).length ?? 0) < 2) {
+        return NextResponse.json({ error: "choice needs >=2 options" }, { status: 400 });
+      }
+    }
+    const test = await createCustomTest(coachId, {
+      name: body.name.trim(),
+      desc: body.desc ?? "",
+      icon: body.icon ?? "ki-star",
+      tone: (body.tone as "primary") ?? "primary",
+      questions: body.questions.map((question) => ({
+        text: question.text.trim(),
+        kind: question.kind as "likert" | "yesno" | "scale" | "choice",
+        options: question.options,
+      })),
+    });
+    return NextResponse.json({ test }, { status: 201 });
+  }
 
   if (body.assignmentId && body.coachNote != null) {
     const assignment = await setCoachTestNote(coachId, body.assignmentId, body.coachNote);

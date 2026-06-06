@@ -114,3 +114,9 @@ export {
 export type { BillingCycle, InstallmentOption, PlanPricing } from "./billing";
 export { gradeOptik, optikNetCoef } from "./optik";
 export type { OptikExamType, OptikResult } from "./optik";
+export { buildReportDetail } from "./report-insights";
+export type { ReportDetail } from "./report-insights";
+export { allowedModes, slotSupportsMode, weeklyLimitFor } from "./appointments";
+export type { Availability, SharedAppointmentMode } from "./appointments";
+export { answerScore, averageScore } from "./test-scoring";
+export type { QuestionKind, TestQuestion } from "./test-scoring";

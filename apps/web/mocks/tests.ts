@@ -1,8 +1,12 @@
-import type { PsychTestDefinition, TestAssignmentRecord } from "@uyanik/database";
+import type { PsychTestDefinition, PsychTestQuestion, TestAssignmentRecord } from "@uyanik/database";
 
 import { DEMO_STUDENT_ID } from "@/mocks/assignments";
 
 export const LIKERT_OPTIONS = ["Hic", "Az", "Orta", "Cok", "Tamamen"] as const;
+
+function q(text: string): PsychTestQuestion {
+  return { text, kind: "likert" };
+}
 
 export const TEST_CATALOG: PsychTestDefinition[] = [
   {
@@ -12,11 +16,11 @@ export const TEST_CATALOG: PsychTestDefinition[] = [
     tone: "danger",
     description: "Sinav oncesi kaygi duzeyini olcer.",
     questions: [
-      "Sinavdan once kalbim hizlanir.",
-      "Bildigim sorulari bile sinavda unuturum.",
-      "Sinav gecesi uyumakta zorlanirim.",
-      "Sinav sirasinda ellerim terler.",
-      "Sonuclari dusununce gerilirim.",
+      q("Sinavdan once kalbim hizlanir."),
+      q("Bildigim sorulari bile sinavda unuturum."),
+      q("Sinav gecesi uyumakta zorlanirim."),
+      q("Sinav sirasinda ellerim terler."),
+      q("Sonuclari dusununce gerilirim."),
     ],
     bands: [
       [0, 2, "Dusuk kaygi", "success"],
@@ -31,11 +35,11 @@ export const TEST_CATALOG: PsychTestDefinition[] = [
     tone: "primary",
     description: "Calisma motivasyonu ve hedef bagliligi.",
     questions: [
-      "Hedeflerime ulasacagima inaniyorum.",
-      "Zorlandigimda pes etmem.",
-      "Calismaya baslamak benim icin kolaydir.",
-      "Basarisizlik beni daha cok calistirir.",
-      "Gelecegim icin heyecan duyuyorum.",
+      q("Hedeflerime ulasacagima inaniyorum."),
+      q("Zorlandigimda pes etmem."),
+      q("Calismaya baslamak benim icin kolaydir."),
+      q("Basarisizlik beni daha cok calistirir."),
+      q("Gelecegim icin heyecan duyuyorum."),
     ],
     bands: [
       [0, 2.5, "Dusuk", "danger"],
@@ -50,11 +54,11 @@ export const TEST_CATALOG: PsychTestDefinition[] = [
     tone: "warning",
     description: "Calisirken dikkat surdurme duzeyi.",
     questions: [
-      "Calisirken kolayca dikkatim dagilir.",
-      "Telefonum yanimdayken odaklanamam.",
-      "Uzun sure tek konuya calisabilirim.",
-      "Mola sonrasi toparlanmam uzun surer.",
-      "Gurultulu ortamda calisamam.",
+      q("Calisirken kolayca dikkatim dagilir."),
+      q("Telefonum yanimdayken odaklanamam."),
+      q("Uzun sure tek konuya calisabilirim."),
+      q("Mola sonrasi toparlanmam uzun surer."),
+      q("Gurultulu ortamda calisamam."),
     ],
     bands: [
       [0, 2.2, "Guclu odak", "success"],
@@ -114,6 +118,35 @@ function seedIfEmpty() {
 
 export function getTestById(testId: string): PsychTestDefinition | undefined {
   return TEST_CATALOG.find((item) => item.id === testId);
+}
+
+export function createCustomTest(
+  coachId: string,
+  input: {
+    name: string;
+    desc: string;
+    icon: string;
+    tone: PsychTestDefinition["tone"];
+    questions: PsychTestQuestion[];
+  },
+): PsychTestDefinition {
+  const test: PsychTestDefinition = {
+    id: `custom_${Date.now()}`,
+    name: input.name,
+    icon: input.icon,
+    tone: input.tone,
+    description: input.desc,
+    questions: input.questions,
+    bands: [
+      [0, 2.5, "Dusuk", "danger"],
+      [2.5, 3.7, "Orta", "warning"],
+      [3.7, 5, "Yuksek", "success"],
+    ],
+    custom: true,
+    coachId,
+  };
+  TEST_CATALOG.unshift(test);
+  return test;
 }
 
 export function scoreBand(test: PsychTestDefinition, score: number): { label: string; tone: string } {

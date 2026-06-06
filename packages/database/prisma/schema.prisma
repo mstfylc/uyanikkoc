@@ -107,6 +107,7 @@ model StudentProfile {
   subscriptions     Subscription[]
   rating            CoachRating?
   optikSubmissions  OptikSubmission[]
+  motivationMessages MotivationMessage[]
 
   @@map("student_profiles")
 }
@@ -251,14 +252,17 @@ model Notification {
 }
 
 model MessageThread {
-  id        String    @id @default(cuid())
+  id        String         @id @default(cuid())
   coachId   String
   studentId String?
   parentId  String?
+  kind      ThreadKind     @default(dm)
+  name      String?
   title     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   messages  Message[]
+  members   ThreadMember[]
 
   @@index([coachId])
   @@index([studentId])
@@ -488,4 +492,32 @@ model OptikSubmission {
   @@unique([examId, studentId])
   @@index([studentId])
   @@map("optik_submissions")
+}
+
+model MotivationMessage {
+  id        String         @id @default(cuid())
+  studentId String
+  coachId   String
+  body      String
+  createdAt DateTime       @default(now())
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("motivation_messages")
+}
+
+enum ThreadKind {
+  dm
+  group
+}
+
+model ThreadMember {
+  id       String        @id @default(cuid())
+  threadId String
+  userId   String
+  thread   MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, userId])
+  @@index([userId])
+  @@map("thread_members")
 }
