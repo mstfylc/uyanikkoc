@@ -119,6 +119,10 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
   "ki-office-bag": "building",
   "ki-arrows-circle": "refresh",
   "ki-dollar": "banknote",
+  "ki-teacher": "cap",
+  "ki-graduation": "cap",
+  "ki-crown-2": "award",
+  "ki-gift": "heart",
 };
 
 export function resolveKiIcon(name: string): UkIconName {

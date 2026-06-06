@@ -58,8 +58,8 @@ export const ROLE_HOME_PATH: Record<AppRole, string> = {
   student: "/student/dashboard",
   coach: "/coach/dashboard",
   parent: "/parent/dashboard",
-  branch: "/branch/dashboard",
-  admin: "/admin/dashboard",
+  branch: "/yonetim/dashboard",
+  admin: "/yonetim/dashboard",
 };
 
 const PUBLIC_PATHS = [
@@ -101,6 +101,10 @@ export function canAccessPath(role: AppRole, pathname: string): boolean {
 
   if (pathname.startsWith("/parent")) {
     return role === "parent";
+  }
+
+  if (pathname.startsWith("/yonetim")) {
+    return role === "admin" || role === "branch";
   }
 
   if (pathname.startsWith("/branch")) {
