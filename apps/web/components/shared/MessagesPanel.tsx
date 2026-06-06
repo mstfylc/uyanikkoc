@@ -7,6 +7,8 @@ import { UkAvatar } from "@/components/design/UkAvatar";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import type { MessageRecord, MessageThreadRecord } from "@uyanik/database";
 
+type ThreadFilter = "all" | "dm" | "group";
+
 type MessagesPanelProps = {
   apiBase: string;
   selfRole: MessageRecord["senderRole"];
@@ -14,6 +16,8 @@ type MessagesPanelProps = {
   subtitle: string;
   testId?: string;
   threadMeta?: (thread: MessageThreadRecord) => string;
+  enableGroupTabs?: boolean;
+  headerAction?: React.ReactNode;
 };
 
 export function MessagesPanel({
@@ -23,12 +27,15 @@ export function MessagesPanel({
   subtitle,
   testId = "messages-panel",
   threadMeta,
+  enableGroupTabs = false,
+  headerAction,
 }: MessagesPanelProps) {
   const [threads, setThreads] = useState<MessageThreadRecord[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [thread, setThread] = useState<MessageThreadRecord | null>(null);
   const [messageBody, setMessageBody] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [threadFilter, setThreadFilter] = useState<ThreadFilter>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
 
@@ -87,6 +94,10 @@ export function MessagesPanel({
 
   const activeThread = threads.find((item) => item.id === selectedId);
   const filteredThreads = threads.filter((item) => {
+    if (enableGroupTabs) {
+      if (threadFilter === "dm" && item.kind === "group") return false;
+      if (threadFilter === "group" && item.kind !== "group") return false;
+    }
     const query = searchQuery.trim().toLocaleLowerCase("tr-TR");
     if (!query) {
       return true;
@@ -96,7 +107,21 @@ export function MessagesPanel({
 
   return (
     <div className="stack rise" data-testid={testId}>
-      <UkPageHead title={title} sub={subtitle} />
+      <UkPageHead title={title} sub={subtitle} actions={headerAction} />
+
+      {enableGroupTabs ? (
+        <div className="seg" style={{ width: "fit-content" }}>
+          <button type="button" className={threadFilter === "all" ? "on" : ""} onClick={() => setThreadFilter("all")}>
+            Tumu
+          </button>
+          <button type="button" className={threadFilter === "dm" ? "on" : ""} onClick={() => setThreadFilter("dm")}>
+            Birebir
+          </button>
+          <button type="button" className={threadFilter === "group" ? "on" : ""} onClick={() => setThreadFilter("group")}>
+            Gruplar
+          </button>
+        </div>
+      ) : null}
 
       {isLoading ? (
         <p className="muted" style={{ fontSize: 13 }}>
@@ -179,7 +204,9 @@ export function MessagesPanel({
                         >
                           {threadMeta
                             ? threadMeta(item)
-                            : last?.body ?? "Mesaj yok"}
+                            : item.kind === "group"
+                              ? `Grup · ${last?.body ?? "Mesaj yok"}`
+                              : last?.body ?? "Mesaj yok"}
                         </span>
                       </div>
                     </button>

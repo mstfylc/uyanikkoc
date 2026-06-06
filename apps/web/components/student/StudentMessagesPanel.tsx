@@ -8,8 +8,9 @@ export function StudentMessagesPanel() {
       apiBase="/api/student/messages"
       selfRole="STUDENT"
       title="Mesajlar"
-      subtitle="Koc ile yazisma"
+      subtitle="Koc ve gruplar"
       testId="student-messages-panel"
+      enableGroupTabs
     />
   );
 }
