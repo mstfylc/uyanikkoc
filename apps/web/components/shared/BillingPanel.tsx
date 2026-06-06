@@ -22,7 +22,7 @@ import type {
 } from "@uyanik/database";
 
 type BillingPanelProps = {
-  role: "student" | "parent";
+  role: "student" | "parent" | "coach";
   embedded?: boolean;
 };
 
@@ -40,6 +40,17 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
   const [message, setMessage] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    if (role === "coach") {
+      const plansRes = await fetch("/api/billing/plans", { credentials: "same-origin" });
+      if (plansRes.ok) {
+        const data = (await plansRes.json()) as { plans: BillingPlanRecord[] };
+        setPlans(data.plans);
+        setSelectedPlanId((current) => current ?? data.plans.find((p) => p.popular)?.id ?? data.plans[0]?.id ?? null);
+      }
+      setIsLoading(false);
+      return;
+    }
+
     const [plansRes, subRes, methodsRes, invoicesRes] = await Promise.all([
       fetch("/api/billing/plans", { credentials: "same-origin" }),
       fetch("/api/billing/subscription", { credentials: "same-origin" }),
@@ -66,7 +77,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
       setInvoices(data.invoices);
     }
     setIsLoading(false);
-  }, []);
+  }, [role]);
 
   useEffect(() => {
     void load();
@@ -130,26 +141,41 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
     if (response.ok) await load();
   }
 
+  const isCoachView = role === "coach";
   const hasActiveSubscription = Boolean(subscription && plan);
   const canCheckout =
+    !isCoachView &&
     Boolean(selectedPlanId) &&
     methods.length > 0 &&
     (!subscription || selectedPlanId !== subscription.planId);
 
+  const pageSub =
+    role === "coach"
+      ? "Veli ve ogrencilere onerebileceginiz kocluk paketleri"
+      : role === "parent"
+        ? "Kocluk paketi ve faturalar"
+        : "Kocluk aboneligin";
+
   return (
     <div className="stack rise" data-testid="billing-panel">
       {!embedded ? (
-        <UkPageHead
-          title="Odeme & Abonelik"
-          sub={role === "parent" ? "Kocluk paketi ve faturalar" : "Kocluk aboneligin"}
-        />
+        <UkPageHead title="Odeme & Abonelik" sub={pageSub} />
       ) : null}
 
       {isLoading ? (
         <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>
       ) : (
         <>
-          {hasActiveSubscription && plan && subscription ? (
+          {isCoachView ? (
+            <UkSection title="Bilgi" sub="Abonelik veli veya ogrenci tarafindan yapilir">
+              <div className="card-body muted" style={{ fontSize: 13, lineHeight: 1.55 }}>
+                Ogrenci ve veli panellerindeki <b>Odeme & Planlar</b> ekranindan paket secip abone
+                olabilirler. Asagidaki paketleri ailelerinize onerebilirsiniz.
+              </div>
+            </UkSection>
+          ) : null}
+
+          {!isCoachView && hasActiveSubscription && plan && subscription ? (
             <UkSection title="Aktif abonelik" sub={plan.name}>
               <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 <div className="between">
@@ -175,7 +201,13 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
 
           <UkSection
             title="Kocluk Paketleri"
-            sub={hasActiveSubscription ? "Plan degistirmek icin yeni paket secin" : "Size uygun paketi secin"}
+            sub={
+              isCoachView
+                ? "Guncel paket listesi ve fiyatlar"
+                : hasActiveSubscription
+                  ? "Plan degistirmek icin yeni paket secin"
+                  : "Size uygun paketi secin"
+            }
           >
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div className="seg" style={{ width: "fit-content" }}>
@@ -196,12 +228,26 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                     const isCurrent = subscription?.planId === item.id;
                     const price = planPrice(item, cycle);
                     return (
-                      <button
+                      <div
                         key={item.id}
-                        type="button"
-                        className={`card card-pad${active ? " ring-primary" : ""}`}
-                        style={{ textAlign: "left", border: active ? "2px solid var(--primary-500)" : undefined }}
-                        onClick={() => setSelectedPlanId(item.id)}
+                        role={isCoachView ? undefined : "button"}
+                        tabIndex={isCoachView ? undefined : 0}
+                        className={`card card-pad${active && !isCoachView ? " ring-primary" : ""}${active && isCoachView ? " ring-primary" : ""}`}
+                        style={{
+                          textAlign: "left",
+                          border: active ? "2px solid var(--primary-500)" : undefined,
+                          cursor: isCoachView ? "default" : "pointer",
+                        }}
+                        onClick={isCoachView ? undefined : () => setSelectedPlanId(item.id)}
+                        onKeyDown={
+                          isCoachView
+                            ? undefined
+                            : (event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                  setSelectedPlanId(item.id);
+                                }
+                              }
+                        }
                       >
                         <div className="between" style={{ marginBottom: 8 }}>
                           <span style={{ fontWeight: 800 }}>{item.name}</span>
@@ -224,11 +270,11 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                           </div>
                         ) : null}
                         <ul style={{ marginTop: 12, paddingLeft: 18, fontSize: 12.5, lineHeight: 1.5 }}>
-                          {item.features.slice(0, 4).map((feature) => (
+                          {item.features.map((feature) => (
                             <li key={feature}>{feature}</li>
                           ))}
                         </ul>
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -236,7 +282,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
             </div>
           </UkSection>
 
-          {selectedPlan ? (
+          {!isCoachView && selectedPlan ? (
             <UkSection title="Odeme" sub="Taksit secenegi">
               <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
@@ -281,32 +327,34 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
             </UkSection>
           ) : null}
 
-          <UkSection title="Faturalar" sub={`${invoices.length} kayit`}>
-            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {invoices.length === 0 ? (
-                <p className="muted" style={{ fontSize: 13 }}>Henuz fatura yok.</p>
-              ) : (
-                invoices.map((invoice) => (
-                  <div key={invoice.id} className="lrow">
-                    <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                      <KiIcon name="ki-notepad-edit" />
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <div className="lr-title">{invoice.id}</div>
-                      <div className="lr-meta">
-                        <span className="d">{new Date(invoice.issuedAt).toLocaleDateString("tr-TR")}</span>
-                        <span className="d">{invoice.methodLabel}</span>
+          {!isCoachView ? (
+            <UkSection title="Faturalar" sub={`${invoices.length} kayit`}>
+              <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {invoices.length === 0 ? (
+                  <p className="muted" style={{ fontSize: 13 }}>Henuz fatura yok.</p>
+                ) : (
+                  invoices.map((invoice) => (
+                    <div key={invoice.id} className="lrow">
+                      <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
+                        <KiIcon name="ki-notepad-edit" />
+                      </span>
+                      <div style={{ flex: 1 }}>
+                        <div className="lr-title">{invoice.id}</div>
+                        <div className="lr-meta">
+                          <span className="d">{new Date(invoice.issuedAt).toLocaleDateString("tr-TR")}</span>
+                          <span className="d">{invoice.methodLabel}</span>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div className="tnum" style={{ fontWeight: 700 }}>{formatTRY(invoice.amount)}</div>
+                        <UkBadge tone={invoice.status === "paid" ? "success" : "warning"}>{invoice.status}</UkBadge>
                       </div>
                     </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div className="tnum" style={{ fontWeight: 700 }}>{formatTRY(invoice.amount)}</div>
-                      <UkBadge tone={invoice.status === "paid" ? "success" : "warning"}>{invoice.status}</UkBadge>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </UkSection>
+                  ))
+                )}
+              </div>
+            </UkSection>
+          ) : null}
         </>
       )}
     </div>

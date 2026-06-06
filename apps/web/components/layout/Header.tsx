@@ -98,7 +98,7 @@ export function Header({ role }: HeaderProps) {
                     </span>
                   </div>
                 </div>
-                {(role === "student" || role === "parent") ? (
+                {(role === "student" || role === "parent" || role === "coach") ? (
                   <Link
                     href={`/${role}/billing`}
                     className="pop-item"
