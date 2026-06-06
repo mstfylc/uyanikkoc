@@ -4,6 +4,7 @@ import type { IconName } from "./ui/icons";
 
 export type ThemeMode = "light" | "dark";
 export type TabId = "home" | "odevler" | "denemeler" | "program" | "profil";
+export type SubId = "konu" | "kaynaklar" | "randevu" | "mesaj" | "motivasyon";
 
 export type OdevTypeKey = "soru" | "video" | "konu" | "test";
 export type OdevStatus = "pending" | "done";
@@ -101,4 +102,45 @@ export interface Student {
   streak: number;
   weekHours: number;
   net: number;
+}
+
+export type TopicStatus = "done" | "progress" | "todo";
+
+export interface Topic {
+  n: string;
+  s: TopicStatus;
+  p?: number;
+}
+
+export interface SourceBook {
+  name: string;
+  subj: string;
+  tur: "soru" | "konu" | "deneme";
+}
+
+export interface Appointment {
+  id: string;
+  date: string;
+  time: string;
+  mode: string;
+  topic: string;
+  status: string;
+  coach: string;
+}
+
+export interface AppointmentSlot {
+  day: string;
+  times: string[];
+}
+
+export interface ChatMessage {
+  from: "me" | "coach";
+  text: string;
+  time: string;
+}
+
+export interface MotivationNote {
+  body: string;
+  coach: string;
+  date: string;
 }

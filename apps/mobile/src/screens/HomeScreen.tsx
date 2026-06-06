@@ -3,9 +3,9 @@ import { MIcon } from "../ui/MIcon";
 import { OdevCard } from "./OdevCard";
 import { useSession } from "../lib/session";
 import { ODEVLER, STUDENT, TODAY, UPCOMING } from "../mocks/student";
-import type { Odev, TabId } from "../types";
+import type { Odev, SubId, TabId } from "../types";
 
-export function HomeScreen({ go, openResult }: { go: (t: TabId) => void; openResult: (o: Odev) => void }) {
+export function HomeScreen({ go, openResult, openSub }: { go: (t: TabId) => void; openResult: (o: Odev) => void; openSub: (k: SubId) => void }) {
   const { me } = useSession();
   // Bootstrap (/api/me) verisi; yoksa mock'a düş.
   const initials = me?.user.avatarInitials ?? "EY";
@@ -137,6 +137,35 @@ export function HomeScreen({ go, openResult }: { go: (t: TabId) => void; openRes
         </button>
       </div>
 
+      {/* Hızlı erişim */}
+      <div className="uk-sec" style={{ marginTop: 22 }}>
+        <div className="uk-sec-head">
+          <h2>Hızlı erişim</h2>
+        </div>
+        <div className="uk-qa">
+          {(
+            [
+              ["konu", "book", "Konu Takibi", "var(--primary-soft)", "var(--primary-600)"],
+              ["kaynaklar", "notebook", "Kaynaklarım", "var(--info-soft)", "var(--info)"],
+              ["randevu", "calendar", "Randevular", "var(--success-soft)", "var(--success)"],
+              ["mesaj", "message", "Mesajlar", "var(--warning-soft)", "var(--warning)"],
+              ["motivasyon", "heart", "Motivasyon", "var(--danger-soft)", "var(--danger)"],
+              ["denemeler", "chart", "Denemeler", "var(--primary-soft)", "var(--primary-600)"],
+            ] as const
+          ).map(([key, ic, label, bg, col]) => (
+            <button
+              key={key}
+              onClick={() => (key === "denemeler" ? go("denemeler") : openSub(key as SubId))}
+            >
+              <span className="qic" style={{ background: bg, color: col }}>
+                <MIcon name={ic} size={21} fill={ic === "heart"} />
+              </span>
+              <span className="qn">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Koç bandı */}
       <div className="uk-sec" style={{ marginTop: 22 }}>
         <div className="uk-card uk-coach" style={{ display: "flex" }}>
@@ -147,7 +176,7 @@ export function HomeScreen({ go, openResult }: { go: (t: TabId) => void; openRes
             <div className="cn">{coachName}</div>
             <div className="cr">Koçun · YKS &amp; LGS</div>
           </div>
-          <button className="uk-iconbtn" style={{ background: "var(--primary)", color: "#fff", border: "none" }}>
+          <button className="uk-iconbtn" style={{ background: "var(--primary)", color: "#fff", border: "none" }} onClick={() => openSub("mesaj")}>
             <MIcon name="message" size={19} />
           </button>
         </div>

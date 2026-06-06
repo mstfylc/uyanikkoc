@@ -4,13 +4,19 @@
 
 import type {
   Achievement,
+  Appointment,
+  AppointmentSlot,
+  ChatMessage,
   Exam,
+  MotivationNote,
   Odev,
   OdevTypeKey,
   OdevTypeMeta,
   ScheduleBlock,
+  SourceBook,
   Student,
   SubjectProgress,
+  Topic,
   TrendPoint,
   Upcoming,
   Week,
@@ -142,3 +148,91 @@ export const ACHIEVEMENTS: Achievement[] = [
   { name: "Erken Kuş", icon: "star", earned: false },
   { name: "Tam Hafta", icon: "checkCircle", earned: false },
 ];
+
+export const TOPICS: Record<string, Topic[]> = {
+  Matematik: [
+    { n: "Temel Kavramlar", s: "done" }, { n: "Bölünebilme", s: "done" },
+    { n: "Rasyonel Sayılar", s: "done" }, { n: "Üslü Sayılar", s: "done" },
+    { n: "Köklü Sayılar", s: "progress", p: 70 }, { n: "Mutlak Değer", s: "progress", p: 40 },
+    { n: "Çarpanlara Ayırma", s: "todo" }, { n: "Oran – Orantı", s: "todo" },
+    { n: "Fonksiyonlar", s: "progress", p: 50 }, { n: "Türev", s: "progress", p: 35 }, { n: "İntegral", s: "todo" },
+  ],
+  Fizik: [
+    { n: "Fiziğe Giriş", s: "done" }, { n: "Madde ve Özellikleri", s: "done" },
+    { n: "Hareket (Kinematik)", s: "progress", p: 65 }, { n: "Newton Yasaları", s: "progress", p: 30 },
+    { n: "İş, Güç, Enerji", s: "todo" }, { n: "Elektrostatik", s: "todo" }, { n: "Dalgalar", s: "progress", p: 45 },
+  ],
+  Kimya: [
+    { n: "Kimya Bilimi", s: "done" }, { n: "Atom ve Periyodik Sistem", s: "done" },
+    { n: "Mol Kavramı", s: "progress", p: 60 }, { n: "Maddenin Halleri", s: "progress", p: 35 },
+    { n: "Kimyasal Tepkimeler", s: "todo" }, { n: "Asitler ve Bazlar", s: "todo" },
+  ],
+  Biyoloji: [
+    { n: "Canlıların Özellikleri", s: "done" }, { n: "Hücre", s: "progress", p: 70 },
+    { n: "Hücre Bölünmesi", s: "progress", p: 40 }, { n: "Kalıtım", s: "todo" }, { n: "Sistemler", s: "todo" },
+  ],
+  Türkçe: [
+    { n: "Sözcükte Anlam", s: "done" }, { n: "Cümlede Anlam", s: "done" },
+    { n: "Paragraf", s: "progress", p: 75 }, { n: "Yazım Kuralları", s: "progress", p: 60 },
+    { n: "Sözcük Türleri", s: "progress", p: 50 }, { n: "Anlatım Bozuklukları", s: "todo" },
+  ],
+  Geometri: [
+    { n: "Açılar", s: "done" }, { n: "Üçgenler", s: "progress", p: 55 },
+    { n: "Çokgenler", s: "todo" }, { n: "Çember", s: "todo" }, { n: "Analitik Geometri", s: "todo" },
+  ],
+};
+
+export const TOPIC_STATUS: Record<string, { label: string; tone: string }> = {
+  done: { label: "Tamamlandı", tone: "success" },
+  progress: { label: "Devam ediyor", tone: "warning" },
+  todo: { label: "Başlanmadı", tone: "muted" },
+};
+
+export const SOURCES: SourceBook[] = [
+  { name: "Uyanık YKS Soru Bankası", subj: "Genel", tur: "soru" },
+  { name: "345 Yayınları TYT Deneme", subj: "Genel", tur: "deneme" },
+  { name: "Apotemi Geometri", subj: "Geometri", tur: "soru" },
+  { name: "Bilgi Sarmal Paragraf", subj: "Türkçe", tur: "soru" },
+  { name: "Hocalara Geldik Fizik", subj: "Fizik", tur: "konu" },
+];
+
+export const CATALOG: SourceBook[] = [
+  { name: "Limit Yayınları Matematik SB", subj: "Matematik", tur: "soru" },
+  { name: "Tonguç Biyoloji Konu", subj: "Biyoloji", tur: "konu" },
+  { name: "Karekök Kimya SB", subj: "Kimya", tur: "soru" },
+  { name: "3D Yayınları TYT Türkçe", subj: "Türkçe", tur: "soru" },
+  { name: "Endemik AYT Deneme", subj: "Genel", tur: "deneme" },
+];
+
+export const KAYNAK_TUR: Record<string, { label: string; icon: string }> = {
+  soru: { label: "Soru Bankası", icon: "notebook" },
+  konu: { label: "Konu Anlatımı", icon: "book" },
+  deneme: { label: "Deneme", icon: "chart" },
+};
+
+export const APPTS: Appointment[] = [
+  { id: "ap1", date: "9 Haziran Pzt", time: "17:30", mode: "Yüz yüze", topic: "Haftalık değerlendirme", status: "onaylı", coach: "Dilek Emen" },
+  { id: "ap2", date: "13 Haziran Cum", time: "16:00", mode: "Online", topic: "Deneme analizi", status: "bekliyor", coach: "Dilek Emen" },
+];
+
+export const APPT_SLOTS: AppointmentSlot[] = [
+  { day: "Pzt", times: ["16:00", "17:30", "19:00"] },
+  { day: "Çar", times: ["16:30", "18:00"] },
+  { day: "Cum", times: ["16:00", "17:00", "18:30"] },
+];
+
+export const APPT_MODES = ["Yüz yüze", "Online", "Telefon"] as const;
+
+export const MESSAGES: ChatMessage[] = [
+  { from: "coach", text: "Elif merhaba! Bu haftaki türev testini gördüm, eline sağlık 👏", time: "09:12" },
+  { from: "me", text: "Teşekkürler hocam, birkaç soruda zorlandım", time: "09:15" },
+  { from: "coach", text: "Hangi konuda? İstersen pazar randevusunda birlikte bakalım.", time: "09:16" },
+  { from: "me", text: "Zincir kuralı kısmı. Olur, çok iyi olur 🙏", time: "09:18" },
+  { from: "coach", text: "Harika. Bu arada Cmt günü TYT deneme #7 var, unutma!", time: "09:20" },
+];
+
+export const MOTIVATION: MotivationNote = {
+  body: "Bugün sadece bir konuya tam odaklan — dağınık 5 saat yerine net 2 saat her zaman kazandırır. Sen yaparsın 💪",
+  coach: "Dilek Emen",
+  date: "Bugün 08:30",
+};

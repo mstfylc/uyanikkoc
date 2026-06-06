@@ -3,12 +3,12 @@ import { useState } from "react";
 import { MIcon } from "../ui/MIcon";
 import type { IconName } from "../ui/icons";
 import { useSession } from "../lib/session";
-import { ACHIEVEMENTS, STUDENT } from "../mocks/student";
-import type { ThemeMode } from "../types";
+import { ACHIEVEMENTS, SOURCES, STUDENT } from "../mocks/student";
+import type { SubId, ThemeMode } from "../types";
 
 type Stat = [IconName, number, string, string];
 
-export function ProfilScreen({ theme, setTheme }: { theme: ThemeMode; setTheme: (t: ThemeMode) => void }) {
+export function ProfilScreen({ theme, setTheme, openSub }: { theme: ThemeMode; setTheme: (t: ThemeMode) => void; openSub: (k: SubId) => void }) {
   const { me, logout } = useSession();
   const [notif, setNotif] = useState(true);
   const dark = theme === "dark";
@@ -108,12 +108,19 @@ export function ProfilScreen({ theme, setTheme }: { theme: ThemeMode; setTheme: 
               <span />
             </button>
           </div>
-          <div className="uk-li">
+          <div className="uk-li" onClick={() => openSub("kaynaklar")} style={{ cursor: "pointer" }}>
             <span className="lic" style={{ background: "var(--primary-soft)", color: "var(--primary-600)" }}>
               <MIcon name="book" size={17} />
             </span>
             <span className="lt">Kaynaklarım</span>
-            <span className="lr">7 kitap</span>
+            <span className="lr">{SOURCES.length} kitap</span>
+            <MIcon name="chevronRight" size={18} style={{ color: "var(--faint)" }} />
+          </div>
+          <div className="uk-li" onClick={() => openSub("randevu")} style={{ cursor: "pointer" }}>
+            <span className="lic" style={{ background: "var(--success-soft)", color: "var(--success)" }}>
+              <MIcon name="calendar" size={17} />
+            </span>
+            <span className="lt">Randevularım</span>
             <MIcon name="chevronRight" size={18} style={{ color: "var(--faint)" }} />
           </div>
           <div className="uk-li">
