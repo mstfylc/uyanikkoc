@@ -173,10 +173,10 @@ export function StudentDashboard() {
         style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit" }}
       >
         <span className="stat-icon tone-primary" style={{ width: 44, height: 44 }}>
-          <KiIcon name="ki-chart-line-up" />
+          <KiIcon name="ki-wallet" />
         </span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 14 }}>Odeme & Planlar</div>
+          <div style={{ fontWeight: 700, fontSize: 14 }}>Abonelik</div>
           <div className="muted" style={{ fontSize: 12.5 }}>Kocluk paketini sec, aboneligini yonet</div>
         </div>
         <KiIcon name="ki-right" size={16} style={{ color: "var(--faint)" }} />

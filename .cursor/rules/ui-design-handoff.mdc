@@ -1,0 +1,47 @@
+---
+description: Yeni UI ekrani yazmadan once tasarim handoff kontrolu ve kullanici onayi zorunlu
+alwaysApply: true
+---
+
+# UI tasarim handoff kurali
+
+Yeni ekran, panel, modal veya sayfa **eklemeden / yeniden yazmadan once** dur ve su adimlari uygula.
+
+## 1. Tasarim kaynagini bul
+
+Once repoda tasarim var mi kontrol et:
+
+- `.design-import/design_handoff_uyanik_koc/src/*.jsx`
+- `.import/**/handoff/` (zip handoff paketleri)
+- Ilgili `*.jsx`, `*.html`, README veya mockup referanslari
+
+`grep` / dosya aramasi yap; varsayimla ilerleme.
+
+## 2. Kullaniciya raporla
+
+Bulunan veya bulunamayan tasarimi acikca yaz:
+
+- Kaynak dosya yolu (or. `billing.jsx`)
+- Hangi rol/ekran (or. ogrenci odeme)
+- Repoda eksik mi?
+
+## 3. Onay al — kod yazma
+
+- Tasarim **yoksa**: dur, kullanicidan dosya/yol/referans iste. **Sifirdan ekran yazma.**
+- Tasarim **varsa**: hangi dosyadan ne tasiyacagini ozetle; **onay gelmeden** implementasyona baslama.
+- Sadece backend/API ise bu kural UI kapsaminda gecerli degil.
+
+## 4. Implementasyon
+
+Onaydan sonra:
+
+- Prototipi repo UI sistemine map et (`UkPageHead`, `UkSection`, `KiIcon`, mevcut CSS siniflari).
+- Is mantigini `packages/shared` / API katmanina koy; component'e gomme.
+- Tasarimda olmayan ekstra bolum veya layout **ekleme** (or. koç salt-okunur billing) — once kullaniciya sor.
+
+## Ornek
+
+```
+❌ Zip'te sadece billing backend var → BillingPanel.tsx sifirdan yazildi
+✅ billing.jsx bulundu → kullaniciya gosterildi → onay → TSX'e tasindi
+```

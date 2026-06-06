@@ -98,14 +98,23 @@ export function Header({ role }: HeaderProps) {
                     </span>
                   </div>
                 </div>
-                {(role === "student" || role === "parent" || role === "coach") ? (
+                {(role === "student" || role === "parent") ? (
                   <Link
                     href={`/${role}/billing`}
                     className="pop-item"
                     onClick={() => setMenuOpen(false)}
                   >
-                    <KiIcon name="ki-chart-line-up" size={18} />
-                    Odeme & Planlar
+                    <KiIcon name="ki-wallet" size={18} />
+                    Abonelik
+                  </Link>
+                ) : role === "coach" ? (
+                  <Link
+                    href="/coach/revenue"
+                    className="pop-item"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <KiIcon name="ki-dollar" size={18} />
+                    Gelir & Tahsilat
                   </Link>
                 ) : null}
                 <button

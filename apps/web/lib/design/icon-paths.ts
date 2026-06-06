@@ -51,6 +51,20 @@ export const UK_ICON_PATHS = {
   heart:
     '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
   flag: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',
+  card: '<rect width="20" height="14" x="2" y="5" rx="2.5"/><line x1="2" x2="22" y1="10" y2="10"/><line x1="6" x2="9" y1="15" y2="15"/>',
+  lock: '<rect width="16" height="11" x="4" y="11" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  download:
+    '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
+  receipt:
+    '<path d="M4 2v20l2-1.5L8 22l2-1.5L12 22l2-1.5L16 22l2-1.5L20 22V2l-2 1.5L16 2l-2 1.5L12 2l-2 1.5L8 2 6 3.5 4 2Z"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+  shield:
+    '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><polyline points="9 12 11 14 15 10"/>',
+  building:
+    '<rect width="16" height="20" x="4" y="2" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/>',
+  refresh:
+    '<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>',
+  banknote:
+    '<rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/>',
 } as const;
 
 export type UkIconName = keyof typeof UK_ICON_PATHS;
@@ -94,6 +108,14 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
   "ki-flag": "flag",
   "ki-information-2": "alert",
   "ki-menu": "menu",
+  "ki-wallet": "card",
+  "ki-lock": "lock",
+  "ki-cloud-download": "download",
+  "ki-receipt-square": "receipt",
+  "ki-shield-tick": "shield",
+  "ki-office-bag": "building",
+  "ki-arrows-circle": "refresh",
+  "ki-dollar": "banknote",
 };
 
 export function resolveKiIcon(name: string): UkIconName {

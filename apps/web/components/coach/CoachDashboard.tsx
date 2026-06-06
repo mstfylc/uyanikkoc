@@ -104,16 +104,16 @@ export function CoachDashboard() {
       </div>
 
       <Link
-        href="/coach/billing"
+        href="/coach/revenue"
         className="card card-pad"
         style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit" }}
       >
         <span className="stat-icon tone-primary" style={{ width: 44, height: 44 }}>
-          <KiIcon name="ki-chart-line-up" />
+          <KiIcon name="ki-dollar" />
         </span>
         <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 14 }}>Odeme & Planlar</div>
-          <div className="muted" style={{ fontSize: 12.5 }}>Kocluk paketlerini incele, ailelere oner</div>
+          <div style={{ fontWeight: 700, fontSize: 14 }}>Gelir & Tahsilat</div>
+          <div className="muted" style={{ fontSize: 12.5 }}>Abonelik geliri ve tahsilat durumu</div>
         </div>
         <KiIcon name="ki-right" size={16} style={{ color: "var(--faint)" }} />
       </Link>

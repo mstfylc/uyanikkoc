@@ -59,12 +59,11 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
       ? [
           { key: "mufredat", label: "Mufredat", icon: "ki-book-open" },
           { key: "profil", label: "Profil", icon: "ki-profile-circle" },
-          { key: "odeme", label: "Odeme & Planlar", icon: "ki-chart-line-up" },
           { key: "bildirimler", label: "Bildirimler", icon: "ki-notification-on" },
         ]
       : [
           { key: "profil", label: "Profil", icon: "ki-profile-circle" },
-          { key: "odeme", label: "Odeme & Planlar", icon: "ki-chart-line-up" },
+          { key: "odeme", label: "Abonelik", icon: "ki-wallet" },
           { key: "bildirimler", label: "Bildirimler", icon: "ki-notification-on" },
         ];
 
@@ -283,7 +282,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
         </UkSection>
       ) : null}
 
-      {tab === "odeme" ? (
+      {tab === "odeme" && (role === "student" || role === "parent") ? (
         <BillingPanel role={role} embedded />
       ) : null}
 

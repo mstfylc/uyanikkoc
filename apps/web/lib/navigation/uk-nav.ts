@@ -13,12 +13,12 @@ const STUDENT_NAV: UkNavItem[] = [
   { href: "/student/topics", label: "Konu Takibi", icon: "ki-book-open" },
   { href: "/student/exams", label: "Denemeler", icon: "ki-chart-simple" },
   { href: "/student/assignments", label: "Odevlerim", icon: "ki-notepad-edit" },
-  { href: "/student/appointments", label: "Randevular", icon: "ki-calendar-tick" },
-  { href: "/student/billing", label: "Odeme & Planlar", icon: "ki-chart-line-up" },
-  { href: "/student/tests", label: "Testlerim", icon: "ki-star" },
   { href: "/student/messages", label: "Mesajlar", icon: "ki-messages" },
-  { href: "/student/motivation", label: "Motivasyon", icon: "ki-flame" },
+  { href: "/student/appointments", label: "Randevular", icon: "ki-calendar-tick" },
+  { href: "/student/tests", label: "Testlerim", icon: "ki-star" },
   { href: "/student/ai-coach", label: "AI Koc", icon: "ki-technology-2", tag: "Yakinda" },
+  { href: "/student/motivation", label: "Motivasyon", icon: "ki-flame" },
+  { href: "/student/billing", label: "Abonelik", icon: "ki-wallet" },
 ];
 
 const COACH_NAV: UkNavItem[] = [
@@ -30,8 +30,8 @@ const COACH_NAV: UkNavItem[] = [
   { href: "/coach/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/coach/appointments", label: "Randevular", icon: "ki-calendar-tick" },
   { href: "/coach/tests", label: "Envanter & Testler", icon: "ki-star" },
-  { href: "/coach/billing", label: "Odeme & Planlar", icon: "ki-chart-pie-simple" },
   { href: "/coach/reports", label: "Raporlar", icon: "ki-chart-line-up" },
+  { href: "/coach/revenue", label: "Gelir & Tahsilat", icon: "ki-dollar" },
 ];
 
 const PARENT_NAV: UkNavItem[] = [
@@ -40,7 +40,7 @@ const PARENT_NAV: UkNavItem[] = [
   { href: "/parent/reports", label: "Gelisim Raporlari", icon: "ki-notepad-edit" },
   { href: "/parent/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/parent/appointments", label: "Randevular", icon: "ki-calendar-tick" },
-  { href: "/parent/billing", label: "Odeme & Planlar", icon: "ki-chart-line-up" },
+  { href: "/parent/billing", label: "Abonelik", icon: "ki-wallet" },
   { href: "/parent/notifications", label: "Bildirimler", icon: "ki-notification-on" },
 ];
 

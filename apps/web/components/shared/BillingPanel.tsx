@@ -1,15 +1,28 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
+import { BillingAddCardModal } from "@/components/shared/billing/BillingAddCardModal";
+import { BillingCheckoutModal } from "@/components/shared/billing/BillingCheckoutModal";
+import { CardBrandBadge } from "@/components/shared/billing/CardBrandBadge";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
+import { UkStatCard } from "@/components/design/UkStatCard";
+import {
+  billingDaysLeft,
+  downloadTextFile,
+  formatBillingDate,
+  formatCardExp,
+  invoiceReceiptText,
+  isCurrentPlan,
+  planColor,
+} from "@/lib/design/billing-ui";
 import {
   annualSavingAmount,
   formatTRY,
-  INSTALLMENT_OPTIONS,
   planMonthlyEquivalent,
   planPrice,
 } from "@uyanik/shared";
@@ -21,36 +34,36 @@ import type {
   SubscriptionRecord,
 } from "@uyanik/database";
 
+type BillingTab = "sub" | "plans" | "invoices" | "methods";
+
 type BillingPanelProps = {
-  role: "student" | "parent" | "coach";
+  role: "student" | "parent";
   embedded?: boolean;
 };
 
-export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
+type CheckoutState = { planId: string; cycle: BillingCycle } | null;
+
+const TABS: Array<{ key: BillingTab; label: string; icon: string }> = [
+  { key: "sub", label: "Aboneligim", icon: "ki-star" },
+  { key: "plans", label: "Paketler", icon: "ki-flash" },
+  { key: "invoices", label: "Faturalar", icon: "ki-receipt-square" },
+  { key: "methods", label: "Odeme Yontemleri", icon: "ki-wallet" },
+];
+
+export function BillingPanel({ embedded = false }: BillingPanelProps) {
+  const [tab, setTab] = useState<BillingTab>("sub");
+  const [checkout, setCheckout] = useState<CheckoutState>(null);
   const [plans, setPlans] = useState<BillingPlanRecord[]>([]);
   const [subscription, setSubscription] = useState<SubscriptionRecord | null>(null);
   const [plan, setPlan] = useState<BillingPlanRecord | null>(null);
   const [methods, setMethods] = useState<PaymentMethodRecord[]>([]);
   const [invoices, setInvoices] = useState<InvoiceRecord[]>([]);
-  const [cycle, setCycle] = useState<BillingCycle>("monthly");
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
-  const [installments, setInstallments] = useState(1);
+  const [pricingCycle, setPricingCycle] = useState<BillingCycle>("annual");
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [addCardOpen, setAddCardOpen] = useState(false);
 
   const load = useCallback(async () => {
-    if (role === "coach") {
-      const plansRes = await fetch("/api/billing/plans", { credentials: "same-origin" });
-      if (plansRes.ok) {
-        const data = (await plansRes.json()) as { plans: BillingPlanRecord[] };
-        setPlans(data.plans);
-        setSelectedPlanId((current) => current ?? data.plans.find((p) => p.popular)?.id ?? data.plans[0]?.id ?? null);
-      }
-      setIsLoading(false);
-      return;
-    }
-
     const [plansRes, subRes, methodsRes, invoicesRes] = await Promise.all([
       fetch("/api/billing/plans", { credentials: "same-origin" }),
       fetch("/api/billing/subscription", { credentials: "same-origin" }),
@@ -61,12 +74,17 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
     if (plansRes.ok) {
       const data = (await plansRes.json()) as { plans: BillingPlanRecord[] };
       setPlans(data.plans);
-      setSelectedPlanId((current) => current ?? data.plans.find((p) => p.popular)?.id ?? data.plans[0]?.id ?? null);
     }
     if (subRes.ok) {
-      const data = (await subRes.json()) as { subscription: SubscriptionRecord | null; plan: BillingPlanRecord | null };
+      const data = (await subRes.json()) as {
+        subscription: SubscriptionRecord | null;
+        plan: BillingPlanRecord | null;
+      };
       setSubscription(data.subscription);
       setPlan(data.plan);
+      if (data.subscription?.cycle) {
+        setPricingCycle(data.subscription.cycle);
+      }
     }
     if (methodsRes.ok) {
       const data = (await methodsRes.json()) as { methods: PaymentMethodRecord[] };
@@ -77,286 +95,517 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
       setInvoices(data.invoices);
     }
     setIsLoading(false);
-  }, [role]);
+  }, []);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  const selectedPlan = useMemo(
-    () => plans.find((item) => item.id === selectedPlanId) ?? null,
-    [plans, selectedPlanId],
+  const activePlan = plan ?? plans.find((item) => item.id === subscription?.planId) ?? null;
+  const card = methods.find((item) => item.id === subscription?.paymentMethodId) ?? methods.find((m) => m.isDefault);
+  const canceled = subscription?.status === "canceled";
+  const paidTotal = useMemo(
+    () => invoices.filter((item) => item.status === "paid").reduce((sum, item) => sum + item.amount, 0),
+    [invoices],
   );
 
-  async function subscribeNow() {
-    if (!selectedPlanId) return;
-    setIsSubmitting(true);
-    setMessage(null);
-    const defaultMethod = methods.find((m) => m.isDefault) ?? methods[0];
-    const response = await fetch("/api/billing/subscription", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        planId: selectedPlanId,
-        cycle,
-        installments,
-        paymentMethodId: defaultMethod?.id ?? null,
-      }),
-    });
-    setIsSubmitting(false);
-    if (response.ok) {
-      setMessage("Abonelik basariyla olusturuldu.");
-      await load();
-    } else {
-      setMessage("Abonelik olusturulamadi.");
-    }
+  function openCheckout(planId: string, cycle: BillingCycle) {
+    setCheckout({ planId, cycle });
   }
 
-  async function toggleAutoRenew() {
-    if (!subscription) return;
+  async function patchSubscription(action: "autoRenew" | "cancel" | "resume", value?: boolean) {
     await fetch("/api/billing/subscription", {
       method: "PATCH",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "autoRenew", value: !subscription.autoRenew }),
+      body: JSON.stringify({ action, value }),
     });
     await load();
   }
 
-  async function addDemoCard() {
-    const response = await fetch("/api/billing/payment-methods", {
-      method: "POST",
+  async function setDefaultCard(methodId: string) {
+    await fetch("/api/billing/payment-methods", {
+      method: "PATCH",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        brand: "visa",
-        last4: "4242",
-        holder: role === "parent" ? "Demo Veli" : "Demo Ogrenci",
-        expMonth: 12,
-        expYear: 2028,
-        makeDefault: true,
-      }),
+      body: JSON.stringify({ id: methodId }),
     });
-    if (response.ok) await load();
+    await load();
   }
 
-  const isCoachView = role === "coach";
-  const hasActiveSubscription = Boolean(subscription && plan);
-  const canCheckout =
-    !isCoachView &&
-    Boolean(selectedPlanId) &&
-    methods.length > 0 &&
-    (!subscription || selectedPlanId !== subscription.planId);
-
-  const pageSub =
-    role === "coach"
-      ? "Veli ve ogrencilere onerebileceginiz kocluk paketleri"
-      : role === "parent"
-        ? "Kocluk paketi ve faturalar"
-        : "Kocluk aboneligin";
+  async function removeCard(methodId: string) {
+    await fetch("/api/billing/payment-methods", {
+      method: "DELETE",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: methodId }),
+    });
+    await load();
+  }
 
   return (
     <div className="stack rise" data-testid="billing-panel">
       {!embedded ? (
-        <UkPageHead title="Odeme & Abonelik" sub={pageSub} />
+        <UkPageHead
+          title="Abonelik & Odeme"
+          sub="Kocluk paketini, faturalarini ve odeme yontemlerini yonet"
+        />
       ) : null}
+
+      <div className="seg-tabs">
+        {TABS.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            className={`seg-tab${tab === item.key ? " on" : ""}`}
+            onClick={() => setTab(item.key)}
+          >
+            <KiIcon name={item.icon} size={16} />
+            {item.label}
+          </button>
+        ))}
+      </div>
 
       {isLoading ? (
         <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>
       ) : (
         <>
-          {isCoachView ? (
-            <UkSection title="Bilgi" sub="Abonelik veli veya ogrenci tarafindan yapilir">
-              <div className="card-body muted" style={{ fontSize: 13, lineHeight: 1.55 }}>
-                Ogrenci ve veli panellerindeki <b>Odeme & Planlar</b> ekranindan paket secip abone
-                olabilirler. Asagidaki paketleri ailelerinize onerebilirsiniz.
+          {tab === "plans" ? (
+            <div className="stack" style={{ gap: 18 }}>
+              <div className="pricing-toggle-wrap">
+                <div className="seg pricing-toggle">
+                  <button type="button" className={pricingCycle === "monthly" ? "on" : ""} onClick={() => setPricingCycle("monthly")}>
+                    Aylik
+                  </button>
+                  <button type="button" className={pricingCycle === "annual" ? "on" : ""} onClick={() => setPricingCycle("annual")}>
+                    Yillik <span className="save-pill">2 ay bedava</span>
+                  </button>
+                </div>
               </div>
-            </UkSection>
+              <div className="pricing-grid">
+                {plans.map((item) => {
+                  const current = isCurrentPlan(item, pricingCycle, subscription);
+                  return (
+                    <div key={item.id} className={`plan-card${item.popular ? " popular" : ""}`}>
+                      {item.popular ? <span className="plan-flag">En cok tercih edilen</span> : null}
+                      <div className="plan-top">
+                        <span className="plan-dot" style={{ background: planColor(item.id) }} />
+                        <h3>{item.name}</h3>
+                        <p className="muted">{item.tagline}</p>
+                      </div>
+                      <div className="plan-price">
+                        <span className="tnum amount">{formatTRY(planMonthlyEquivalent(item, pricingCycle))}</span>
+                        <span className="per muted">
+                          /ay
+                          {pricingCycle === "annual" ? (
+                            <span className="tnum"> · yillik {formatTRY(item.annual)}</span>
+                          ) : null}
+                        </span>
+                      </div>
+                      {pricingCycle === "annual" ? (
+                        <div className="plan-saved">
+                          <KiIcon name="ki-check" size={13} />
+                          Ayliga gore {formatTRY(annualSavingAmount(item))} tasarruf
+                        </div>
+                      ) : (
+                        <div className="plan-saved muted" style={{ background: "transparent" }}>
+                          Istedigin zaman yilliga gec
+                        </div>
+                      )}
+                      <ul className="plan-feat">
+                        {item.features.map((feature) => (
+                          <li key={feature}>
+                            <KiIcon name="ki-check" size={15} style={{ color: planColor(item.id) }} />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      {current ? (
+                        <button type="button" className="btn btn-light" disabled style={{ width: "100%", opacity: 0.7 }}>
+                          <KiIcon name="ki-check" size={16} />
+                          Mevcut planin
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`btn ${item.popular ? "btn-primary" : "btn-outline"}`}
+                          style={{ width: "100%" }}
+                          onClick={() => openCheckout(item.id, pricingCycle)}
+                        >
+                          {item.name} Sec
+                          <KiIcon name="ki-right" size={16} />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="pricing-note">
+                <KiIcon name="ki-shield-tick" size={16} />
+                Tum paketler KVKK uyumlu, 3D Secure korumali. Ilk 7 gun icinde iptal edersen ucret iadesi yapilir.
+              </div>
+            </div>
           ) : null}
 
-          {!isCoachView && hasActiveSubscription && plan && subscription ? (
-            <UkSection title="Aktif abonelik" sub={plan.name}>
-              <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <div className="between">
-                  <div>
-                    <div style={{ fontWeight: 700 }}>{plan.name}</div>
-                    <div className="muted" style={{ fontSize: 12.5 }}>
-                      {subscription.cycle === "annual" ? "Yillik" : "Aylik"} ·{" "}
-                      {formatTRY(planPrice(plan, subscription.cycle))}
+          {tab === "sub" ? (
+            !subscription || !activePlan ? (
+              <UkSection title="Abonelik yok" sub="Kocluk paketi secmek icin Paketler sekmesine gec">
+                <div className="card-body">
+                  <button type="button" className="btn btn-primary" onClick={() => setTab("plans")}>
+                    Paketleri Gor
+                  </button>
+                </div>
+              </UkSection>
+            ) : (
+              <div className="stack" style={{ gap: 16 }}>
+                <div className={`sub-hero${canceled ? " canceled" : ""}`}>
+                  <div className="sub-hero-main">
+                    <div className="row" style={{ gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
+                      <span className="plan-dot" style={{ background: planColor(activePlan.id), width: 12, height: 12 }} />
+                      <h2 style={{ fontSize: 22, fontWeight: 800 }}>{activePlan.name}</h2>
+                      {canceled ? (
+                        <UkBadge tone="danger">Iptal edildi</UkBadge>
+                      ) : (
+                        <UkBadge tone="success">
+                          <span className="dot-live" />
+                          Aktif
+                        </UkBadge>
+                      )}
+                      <UkBadge tone="muted">{subscription.cycle === "annual" ? "Yillik" : "Aylik"}</UkBadge>
+                    </div>
+                    <p className="muted" style={{ fontSize: 13.5, maxWidth: 440 }}>{activePlan.tagline}</p>
+                    <div className="sub-meta">
+                      <div>
+                        <span className="muted">Baslangic</span>
+                        <b>{formatBillingDate(subscription.startedAt)}</b>
+                      </div>
+                      <div>
+                        <span className="muted">{canceled ? "Erisim sonu" : "Sonraki yenileme"}</span>
+                        <b>{formatBillingDate(subscription.renewsAt)}</b>
+                      </div>
+                      <div>
+                        <span className="muted">Odeme yontemi</span>
+                        <b className="row" style={{ gap: 6 }}>
+                          {card ? (
+                            <>
+                              <CardBrandBadge brand={card.brand} size="sm" /> •{card.last4}
+                            </>
+                          ) : (
+                            "—"
+                          )}
+                        </b>
+                      </div>
                     </div>
                   </div>
-                  <UkBadge tone={subscription.status === "active" ? "success" : "warning"}>
-                    {subscription.status}
-                  </UkBadge>
-                </div>
-                <div className="row" style={{ gap: 8 }}>
-                  <button type="button" className="btn btn-light btn-sm" onClick={() => void toggleAutoRenew()}>
-                    Otomatik yenileme: {subscription.autoRenew ? "Acik" : "Kapali"}
-                  </button>
-                </div>
-              </div>
-            </UkSection>
-          ) : null}
-
-          <UkSection
-            title="Kocluk Paketleri"
-            sub={
-              isCoachView
-                ? "Guncel paket listesi ve fiyatlar"
-                : hasActiveSubscription
-                  ? "Plan degistirmek icin yeni paket secin"
-                  : "Size uygun paketi secin"
-            }
-          >
-            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div className="seg" style={{ width: "fit-content" }}>
-                <button type="button" className={cycle === "monthly" ? "on" : ""} onClick={() => setCycle("monthly")}>
-                  Aylik
-                </button>
-                <button type="button" className={cycle === "annual" ? "on" : ""} onClick={() => setCycle("annual")}>
-                  Yillik
-                </button>
-              </div>
-
-              {plans.length === 0 ? (
-                <p className="muted" style={{ fontSize: 13 }}>Plan listesi yuklenemedi.</p>
-              ) : (
-                <div className="grid g-3">
-                  {plans.map((item) => {
-                    const active = item.id === selectedPlanId;
-                    const isCurrent = subscription?.planId === item.id;
-                    const price = planPrice(item, cycle);
-                    return (
-                      <div
-                        key={item.id}
-                        role={isCoachView ? undefined : "button"}
-                        tabIndex={isCoachView ? undefined : 0}
-                        className={`card card-pad${active && !isCoachView ? " ring-primary" : ""}${active && isCoachView ? " ring-primary" : ""}`}
-                        style={{
-                          textAlign: "left",
-                          border: active ? "2px solid var(--primary-500)" : undefined,
-                          cursor: isCoachView ? "default" : "pointer",
-                        }}
-                        onClick={isCoachView ? undefined : () => setSelectedPlanId(item.id)}
-                        onKeyDown={
-                          isCoachView
-                            ? undefined
-                            : (event) => {
-                                if (event.key === "Enter" || event.key === " ") {
-                                  setSelectedPlanId(item.id);
-                                }
-                              }
-                        }
-                      >
-                        <div className="between" style={{ marginBottom: 8 }}>
-                          <span style={{ fontWeight: 800 }}>{item.name}</span>
-                          <div className="row" style={{ gap: 6 }}>
-                            {isCurrent ? <UkBadge tone="success">Aktif</UkBadge> : null}
-                            {item.popular ? <UkBadge tone="primary">Populer</UkBadge> : null}
-                          </div>
-                        </div>
-                        <div className="muted" style={{ fontSize: 12.5, marginBottom: 10 }}>{item.tagline}</div>
-                        <div className="tnum" style={{ fontSize: 24, fontWeight: 800 }}>
-                          {formatTRY(price)}
-                          <span className="muted" style={{ fontSize: 12, fontWeight: 500 }}>
-                            /{cycle === "annual" ? "yil" : "ay"}
-                          </span>
-                        </div>
-                        {cycle === "annual" ? (
-                          <div className="muted" style={{ fontSize: 11.5, marginTop: 4 }}>
-                            {formatTRY(planMonthlyEquivalent(item, cycle))}/ay ·{" "}
-                            {formatTRY(annualSavingAmount(item))} tasarruf
-                          </div>
-                        ) : null}
-                        <ul style={{ marginTop: 12, paddingLeft: 18, fontSize: 12.5, lineHeight: 1.5 }}>
-                          {item.features.map((feature) => (
-                            <li key={feature}>{feature}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </UkSection>
-
-          {!isCoachView && selectedPlan ? (
-            <UkSection title="Odeme" sub="Taksit secenegi">
-              <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
-                  {INSTALLMENT_OPTIONS.map((option) => (
-                    <button
-                      key={option.count}
-                      type="button"
-                      className={`type-chip${installments === option.count ? " on" : ""}`}
-                      onClick={() => setInstallments(option.count)}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-                {methods.length === 0 ? (
-                  <button type="button" className="btn btn-light w-fit" onClick={() => void addDemoCard()}>
-                    Demo kart ekle
-                  </button>
-                ) : (
-                  <p className="muted" style={{ fontSize: 12.5 }}>
-                    Odeme: {methods.find((m) => m.isDefault)?.brand ?? methods[0]?.brand} ****{" "}
-                    {methods.find((m) => m.isDefault)?.last4 ?? methods[0]?.last4}
-                  </p>
-                )}
-                <button
-                  type="button"
-                  className="btn btn-primary w-fit"
-                  disabled={isSubmitting || !canCheckout}
-                  onClick={() => void subscribeNow()}
-                >
-                  {isSubmitting
-                    ? "Isleniyor..."
-                    : hasActiveSubscription
-                      ? "Plani guncelle"
-                      : "Abone ol"}
-                </button>
-                {hasActiveSubscription && selectedPlanId === subscription?.planId ? (
-                  <p className="muted" style={{ fontSize: 12.5 }}>Bu plan zaten aktif.</p>
-                ) : null}
-                {message ? <UkBadge tone="success">{message}</UkBadge> : null}
-              </div>
-            </UkSection>
-          ) : null}
-
-          {!isCoachView ? (
-            <UkSection title="Faturalar" sub={`${invoices.length} kayit`}>
-              <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {invoices.length === 0 ? (
-                  <p className="muted" style={{ fontSize: 13 }}>Henuz fatura yok.</p>
-                ) : (
-                  invoices.map((invoice) => (
-                    <div key={invoice.id} className="lrow">
-                      <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                        <KiIcon name="ki-notepad-edit" />
+                  <div className="sub-hero-side">
+                    <div className="sub-countdown">
+                      <span className="tnum">{billingDaysLeft(subscription.renewsAt)}</span>
+                      <span className="muted">gun {canceled ? "erisim" : "kaldi"}</span>
+                    </div>
+                    <div className="tnum" style={{ fontSize: 15, fontWeight: 800 }}>
+                      {formatTRY(planPrice(activePlan, subscription.cycle))}
+                      <span className="muted" style={{ fontSize: 11, fontWeight: 500 }}>
+                        /{subscription.cycle === "annual" ? "yil" : "ay"}
                       </span>
-                      <div style={{ flex: 1 }}>
-                        <div className="lr-title">{invoice.id}</div>
-                        <div className="lr-meta">
-                          <span className="d">{new Date(invoice.issuedAt).toLocaleDateString("tr-TR")}</span>
-                          <span className="d">{invoice.methodLabel}</span>
-                        </div>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <div className="tnum" style={{ fontWeight: 700 }}>{formatTRY(invoice.amount)}</div>
-                        <UkBadge tone={invoice.status === "paid" ? "success" : "warning"}>{invoice.status}</UkBadge>
+                    </div>
+                  </div>
+                </div>
+
+                {canceled ? (
+                  <div className="notice warn">
+                    <KiIcon name="ki-information-2" size={18} />
+                    <div style={{ flex: 1 }}>
+                      <b>Aboneligin iptal edildi.</b>
+                      <div className="muted" style={{ fontSize: 12.5 }}>
+                        {formatBillingDate(subscription.renewsAt)} tarihine kadar erisimin devam eder.
                       </div>
                     </div>
-                  ))
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => void patchSubscription("resume")}>
+                      <KiIcon name="ki-arrows-circle" size={15} />
+                      Aboneligi Surdur
+                    </button>
+                  </div>
+                ) : (
+                  <UkSection title="Plan & Yenileme" sub="Planini yukselt veya yenilemeyi yonet">
+                    <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                      <label className="renew-toggle">
+                        <div>
+                          <b style={{ fontSize: 13.5 }}>Otomatik yenileme</b>
+                          <div className="muted" style={{ fontSize: 12 }}>
+                            {subscription.cycle === "annual" ? "Yil" : "Ay"} sonunda{" "}
+                            {formatTRY(planPrice(activePlan, subscription.cycle))} otomatik tahsil edilir
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className={`switch${subscription.autoRenew ? " on" : ""}`}
+                          aria-label="Otomatik yenileme"
+                          onClick={() => void patchSubscription("autoRenew", !subscription.autoRenew)}
+                        >
+                          <span />
+                        </button>
+                      </label>
+                      <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
+                        <button type="button" className="btn btn-outline" onClick={() => setTab("plans")}>
+                          <KiIcon name="ki-arrow-up" size={16} />
+                          Plani Degistir / Yukselt
+                        </button>
+                        {subscription.cycle === "monthly" ? (
+                          <button
+                            type="button"
+                            className="btn btn-light"
+                            onClick={() => openCheckout(subscription.planId, "annual")}
+                          >
+                            <KiIcon name="ki-star" size={15} />
+                            Yilliga gec · 2 ay bedava
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          className="btn btn-ghost-danger"
+                          style={{ marginLeft: "auto" }}
+                          onClick={() => setConfirmCancel(true)}
+                        >
+                          Aboneligi iptal et
+                        </button>
+                      </div>
+                    </div>
+                  </UkSection>
                 )}
               </div>
-            </UkSection>
+            )
+          ) : null}
+
+          {tab === "invoices" ? (
+            <div className="stack" style={{ gap: 14 }}>
+              <div className="grid g-3">
+                <UkStatCard icon="ki-receipt-square" tone="primary" value={invoices.length} label="Toplam fatura" />
+                <UkStatCard icon="ki-dollar" tone="success" value={formatTRY(paidTotal)} label="Odenen tutar" />
+                <UkStatCard
+                  icon="ki-calendar"
+                  tone="info"
+                  value={
+                    invoices[0]
+                      ? formatBillingDate(invoices[0].issuedAt).split(" ").slice(1).join(" ")
+                      : "—"
+                  }
+                  label="Son odeme"
+                />
+              </div>
+              <UkSection title="Fatura & Odeme Gecmisi" sub="Gecmis odemelerini goruntule ve makbuzlari indir">
+                <div className="card-body" style={{ padding: 0, overflowX: "auto" }}>
+                  <table className="tbl" style={{ minWidth: 640 }}>
+                    <thead>
+                      <tr>
+                        <th>Fatura No</th>
+                        <th>Tarih</th>
+                        <th>Plan</th>
+                        <th>Yontem</th>
+                        <th style={{ textAlign: "right" }}>Tutar</th>
+                        <th style={{ textAlign: "center" }}>Durum</th>
+                        <th />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {invoices.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="muted" style={{ padding: 20, textAlign: "center" }}>
+                            Henuz fatura yok.
+                          </td>
+                        </tr>
+                      ) : (
+                        invoices.map((invoice) => {
+                          const invoicePlan = plans.find((item) => item.id === invoice.planId);
+                          const tone =
+                            invoice.status === "paid" ? "success" : invoice.status === "pending" ? "warning" : "danger";
+                          const label =
+                            invoice.status === "paid" ? "Odendi" : invoice.status === "pending" ? "Bekliyor" : "Basarisiz";
+                          return (
+                            <tr key={invoice.id}>
+                              <td>
+                                <span className="tnum" style={{ fontWeight: 700, fontSize: 12.5 }}>
+                                  {invoice.id}
+                                </span>
+                              </td>
+                              <td>
+                                <span className="muted" style={{ fontSize: 12.5 }}>
+                                  {formatBillingDate(invoice.issuedAt)}
+                                </span>
+                              </td>
+                              <td>
+                                <div className="row" style={{ gap: 7 }}>
+                                  <span className="plan-dot" style={{ background: planColor(invoice.planId) }} />
+                                  <span style={{ fontSize: 12.5, fontWeight: 600 }}>
+                                    {invoicePlan?.name ?? invoice.planId}
+                                  </span>
+                                  <span className="muted" style={{ fontSize: 11 }}>
+                                    {invoice.cycle === "annual" ? "Yillik" : "Aylik"}
+                                    {invoice.installments > 1 ? ` · ${invoice.installments}x` : ""}
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                <span className="muted tnum" style={{ fontSize: 12 }}>
+                                  {invoice.methodLabel}
+                                </span>
+                              </td>
+                              <td style={{ textAlign: "right" }}>
+                                <span className="tnum" style={{ fontWeight: 700 }}>
+                                  {formatTRY(invoice.amount)}
+                                </span>
+                              </td>
+                              <td style={{ textAlign: "center" }}>
+                                <UkBadge tone={tone}>{label}</UkBadge>
+                              </td>
+                              <td style={{ textAlign: "right" }}>
+                                <button
+                                  type="button"
+                                  className="icon-btn"
+                                  style={{ width: 32, height: 32 }}
+                                  title="Makbuzu indir"
+                                  aria-label="Indir"
+                                  onClick={() =>
+                                    downloadTextFile(
+                                      `makbuz-${invoice.id}.txt`,
+                                      invoiceReceiptText(
+                                        invoice,
+                                        invoicePlan?.name ?? invoice.planId,
+                                        formatTRY,
+                                      ),
+                                    )
+                                  }
+                                >
+                                  <KiIcon name="ki-cloud-download" size={16} />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </UkSection>
+            </div>
+          ) : null}
+
+          {tab === "methods" ? (
+            <div className="stack" style={{ gap: 14 }}>
+              <UkSection
+                title="Kayitli Kartlar"
+                sub="Yenilemeler ve yeni odemeler icin kullanilir"
+                action={
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => setAddCardOpen(true)}>
+                    <KiIcon name="ki-plus" size={15} />
+                    Kart Ekle
+                  </button>
+                }
+              >
+                <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {methods.length === 0 ? (
+                    <button type="button" onClick={() => setAddCardOpen(true)} className="dropzone" style={{ padding: "28px 24px" }}>
+                      <KiIcon name="ki-wallet" size={26} style={{ color: "var(--faint)" }} />
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-2)" }}>Kayitli kart yok</div>
+                      <div className="muted" style={{ fontSize: 12 }}>
+                        Hizli odeme icin bir <b style={{ color: "var(--primary-600)" }}>kart ekle</b>
+                      </div>
+                    </button>
+                  ) : (
+                    methods.map((method) => (
+                      <div key={method.id} className="pm-row">
+                        <CardBrandBadge brand={method.brand} />
+                        <div style={{ minWidth: 0 }}>
+                          <div className="row" style={{ gap: 8 }}>
+                            <b className="tnum" style={{ fontSize: 14 }}>
+                              •••• •••• •••• {method.last4}
+                            </b>
+                            {method.isDefault ? <UkBadge tone="primary">Varsayilan</UkBadge> : null}
+                          </div>
+                          <div className="muted" style={{ fontSize: 12 }}>
+                            {method.holder} · son kul. {formatCardExp(method)}
+                          </div>
+                        </div>
+                        <div className="row" style={{ gap: 6, marginLeft: "auto" }}>
+                          {!method.isDefault ? (
+                            <button type="button" className="btn btn-light btn-sm" onClick={() => void setDefaultCard(method.id)}>
+                              Varsayilan yap
+                            </button>
+                          ) : null}
+                          <button
+                            type="button"
+                            className="icon-btn"
+                            style={{ width: 34, height: 34, color: "var(--danger)" }}
+                            onClick={() => void removeCard(method.id)}
+                            title="Karti sil"
+                            aria-label="Sil"
+                          >
+                            <KiIcon name="ki-plus" size={16} style={{ transform: "rotate(45deg)" }} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  <div className="pm-secure">
+                    <KiIcon name="ki-lock" size={14} />
+                    Kart bilgilerin uygulamada saklanmaz; iyzico guvenli kasasinda tutulur.
+                  </div>
+                </div>
+              </UkSection>
+            </div>
           ) : null}
         </>
       )}
+
+      <BillingCheckoutModal
+        open={Boolean(checkout)}
+        planId={checkout?.planId ?? null}
+        cycle={checkout?.cycle ?? null}
+        plans={plans}
+        methods={methods}
+        onClose={() => setCheckout(null)}
+        onDone={async () => {
+          setCheckout(null);
+          setTab("sub");
+          await load();
+        }}
+      />
+
+      <BillingAddCardModal open={addCardOpen} onClose={() => setAddCardOpen(false)} onSaved={load} />
+
+      {confirmCancel && subscription && typeof document !== "undefined"
+        ? createPortal(
+            <div className="modal-overlay" onClick={() => setConfirmCancel(false)}>
+              <div className="modal-panel" style={{ maxWidth: 420 }} onClick={(e) => e.stopPropagation()}>
+                <div className="modal-body" style={{ padding: 24, textAlign: "center", gap: 12 }}>
+                  <span className="stat-icon tone-danger" style={{ width: 48, height: 48, margin: "0 auto" }}>
+                    <KiIcon name="ki-information-2" size={24} />
+                  </span>
+                  <h3 style={{ fontSize: 17, fontWeight: 800 }}>Aboneligi iptal et?</h3>
+                  <p className="muted" style={{ fontSize: 13 }}>
+                    {formatBillingDate(subscription.renewsAt)} tarihine kadar tum kocluk ozelliklerine erisimin surer.
+                  </p>
+                </div>
+                <div className="modal-foot">
+                  <button type="button" className="btn btn-light" onClick={() => setConfirmCancel(false)}>
+                    Vazgec
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    style={{ marginLeft: "auto" }}
+                    onClick={() => {
+                      void patchSubscription("cancel");
+                      setConfirmCancel(false);
+                    }}
+                  >
+                    Iptali Onayla
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }
