@@ -49,3 +49,8 @@ export async function addCoachStudent(
 
   return memoryRoster.addCoachStudent(coachId, input);
 }
+
+export async function listCoachStudentIds(coachId: string): Promise<string[]> {
+  const roster = await listCoachRoster(coachId);
+  return roster.map((entry) => entry.studentId);
+}

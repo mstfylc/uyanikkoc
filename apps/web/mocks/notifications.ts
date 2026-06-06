@@ -121,3 +121,29 @@ export function markRead(
 export function countUnread(items: NotificationRecord[]): number {
   return items.filter((item) => !item.read).length;
 }
+
+export function pushStudentNotification(studentId: string, title: string, body: string): void {
+  seedIfEmpty();
+  notifications.unshift({
+    id: `notification_${notifications.length + 1}`,
+    studentId,
+    parentId: null,
+    title,
+    body,
+    read: false,
+    createdAt: nowIso(),
+  });
+}
+
+export function pushParentNotification(parentId: string, title: string, body: string): void {
+  seedIfEmpty();
+  notifications.unshift({
+    id: `notification_${notifications.length + 1}`,
+    studentId: null,
+    parentId,
+    title,
+    body,
+    read: false,
+    createdAt: nowIso(),
+  });
+}

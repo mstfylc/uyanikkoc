@@ -38,6 +38,8 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
   const [summary, setSummary] = useState<CoachStudentSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [motivationSaving, setMotivationSaving] = useState(false);
+  const [motivationMessage, setMotivationMessage] = useState("");
+  const [motivationSending, setMotivationSending] = useState(false);
 
   const load = useCallback(async () => {
     const response = await fetch(`/api/coach/students/${studentId}/summary`, {
@@ -66,6 +68,23 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
 
     if (response.ok) {
       await load();
+    }
+  }
+
+  async function sendMotivation() {
+    if (motivationMessage.trim().length < 3) {
+      return;
+    }
+    setMotivationSending(true);
+    const response = await fetch("/api/coach/motivation", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentIds: [studentId], message: motivationMessage.trim() }),
+    });
+    setMotivationSending(false);
+    if (response.ok) {
+      setMotivationMessage("");
     }
   }
 
@@ -163,6 +182,26 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
                 Motivasyon kapali.
               </p>
             )}
+          </div>
+        </UkSection>
+
+        <UkSection title="Motivasyon gonder" sub="Ogrenciye gunluk not">
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <textarea
+              className="input"
+              rows={3}
+              value={motivationMessage}
+              onChange={(event) => setMotivationMessage(event.target.value)}
+              placeholder="Kisa bir motivasyon mesaji yaz..."
+            />
+            <button
+              type="button"
+              className="btn btn-primary w-fit"
+              disabled={motivationSending || motivationMessage.trim().length < 3}
+              onClick={() => void sendMotivation()}
+            >
+              {motivationSending ? "Gonderiliyor..." : "Gonder"}
+            </button>
           </div>
         </UkSection>
       </div>

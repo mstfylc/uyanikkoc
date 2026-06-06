@@ -31,14 +31,22 @@ function daysUntilYks(): number {
 
 export function MotivationPanel() {
   const [motivation, setMotivation] = useState<MotivationSummary | null>(null);
+  const [dailyNote, setDailyNote] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   const load = useCallback(async () => {
-    const response = await fetch("/api/student/motivation", { credentials: "same-origin" });
-    if (response.ok) {
-      const data = (await response.json()) as { motivation: MotivationSummary };
+    const [motivationResponse, latestResponse] = await Promise.all([
+      fetch("/api/student/motivation", { credentials: "same-origin" }),
+      fetch("/api/student/motivation/latest", { credentials: "same-origin" }),
+    ]);
+    if (motivationResponse.ok) {
+      const data = (await motivationResponse.json()) as { motivation: MotivationSummary };
       setMotivation(data.motivation);
+    }
+    if (latestResponse.ok) {
+      const data = (await latestResponse.json()) as { message: { body: string } | null };
+      setDailyNote(data.message?.body ?? null);
     }
     setIsLoading(false);
   }, []);
@@ -110,6 +118,14 @@ export function MotivationPanel() {
           <UkBadge tone="success">Aktif</UkBadge>
         </div>
       </div>
+
+      {dailyNote ? (
+        <UkSection title="Gunun Notu" sub="Kocundan">
+          <div className="card-body" style={{ fontSize: 14, lineHeight: 1.6 }}>
+            {dailyNote}
+          </div>
+        </UkSection>
+      ) : null}
 
       <div className="grid col-main">
         <UkSection title="Hedefe Kalan" sub="YKS 2026">
