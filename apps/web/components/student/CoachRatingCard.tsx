@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { StarRating } from "@/components/design/StarRating";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
@@ -10,10 +11,10 @@ import type { CoachRatingRecord } from "@uyanik/database";
 export function CoachRatingCard() {
   const [rating, setRating] = useState<CoachRatingRecord | null>(null);
   const [coachId, setCoachId] = useState<string | null>(null);
-  const [stars, setStars] = useState(5);
+  const [stars, setStars] = useState(0);
   const [comment, setComment] = useState("");
+  const [editing, setEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   const load = useCallback(async () => {
     const response = await fetch("/api/student/coach-rating", { credentials: "same-origin" });
@@ -21,10 +22,9 @@ export function CoachRatingCard() {
       const data = (await response.json()) as { rating: CoachRatingRecord | null; coachId?: string | null };
       setRating(data.rating);
       setCoachId(data.coachId ?? data.rating?.coachId ?? null);
-      if (data.rating) {
-        setStars(data.rating.stars);
-        setComment(data.rating.comment ?? "");
-      }
+      setStars(data.rating?.stars ?? 0);
+      setComment(data.rating?.comment ?? "");
+      setEditing(!data.rating);
     }
   }, []);
 
@@ -32,8 +32,8 @@ export function CoachRatingCard() {
     void load();
   }, [load]);
 
-  async function handleSubmit() {
-    if (!coachId) return;
+  async function handleSave() {
+    if (!coachId || !stars) return;
     setIsSaving(true);
     const response = await fetch("/api/student/coach-rating", {
       method: "POST",
@@ -43,49 +43,101 @@ export function CoachRatingCard() {
     });
     setIsSaving(false);
     if (response.ok) {
-      setSaved(true);
+      setEditing(false);
       await load();
-      setTimeout(() => setSaved(false), 2000);
     }
   }
 
   return (
-    <UkSection title="Kocunu Degerlendir" sub="Yildiz ve geri bildirim">
-      <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <UkSection
+      title="Kocunu Degerlendir"
+      sub="Goruslerin kocunun gelisimine yardimci olur"
+      action={
+        rating && !editing ? <UkBadge tone="success">Gonderildi</UkBadge> : null
+      }
+    >
+      <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 13 }}>
         {!coachId ? (
-          <p className="muted" style={{ fontSize: 13 }}>Atanmis koc bulunamadi.</p>
-        ) : (
+          <p className="muted" style={{ fontSize: 13 }}>
+            Atanmis koc bulunamadi.
+          </p>
+        ) : rating && !editing ? (
           <>
-            <div className="row" style={{ gap: 6 }}>
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`icon-btn${stars >= value ? " tone-warning" : ""}`}
-                  style={{ width: 36, height: 36 }}
-                  onClick={() => setStars(value)}
-                  aria-label={`${value} yildiz`}
-                >
-                  <KiIcon name="ki-star" size={18} />
-                </button>
-              ))}
+            <div className="row" style={{ gap: 12 }}>
+              <StarRating value={rating.stars} size={20} />
+              <span className="tnum" style={{ fontWeight: 800, fontSize: 15 }}>
+                {rating.stars}.0
+              </span>
             </div>
-            <textarea
-              className="input"
-              rows={2}
-              value={comment}
-              onChange={(event) => setComment(event.target.value)}
-              placeholder="Kocun hakkinda kisa bir yorum..."
-            />
+            {rating.comment ? (
+              <div
+                style={{
+                  fontSize: 13.5,
+                  color: "var(--text-2)",
+                  lineHeight: 1.5,
+                  background: "var(--surface-3)",
+                  padding: "11px 14px",
+                  borderRadius: 11,
+                }}
+              >
+                {rating.comment}
+              </div>
+            ) : null}
             <button
               type="button"
-              className="btn btn-primary w-fit"
-              disabled={isSaving}
-              onClick={() => void handleSubmit()}
+              className="btn btn-light btn-sm"
+              style={{ alignSelf: "flex-start" }}
+              onClick={() => setEditing(true)}
             >
-              {isSaving ? "Kaydediliyor..." : rating ? "Guncelle" : "Gonder"}
+              <KiIcon name="ki-setting-2" size={14} />
+              Degerlendirmeni duzenle
             </button>
-            {saved ? <UkBadge tone="success">Degerlendirme kaydedildi</UkBadge> : null}
+          </>
+        ) : (
+          <>
+            <div>
+              <div className="muted" style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>
+                PUANIN
+              </div>
+              <StarRating value={stars} size={22} onPick={setStars} />
+            </div>
+            <div className="field">
+              <label className="label">
+                Geri bildirimin <span className="muted" style={{ fontWeight: 500 }}>(opsiyonel)</span>
+              </label>
+              <textarea
+                className="textarea"
+                rows={3}
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+                placeholder="Kocunla ilgili gorus ve onerilerini yaz..."
+              />
+            </div>
+            <div className="row" style={{ gap: 8 }}>
+              <button
+                type="button"
+                className="btn btn-primary"
+                disabled={!stars || isSaving}
+                onClick={() => void handleSave()}
+                style={{ opacity: stars ? 1 : 0.5 }}
+              >
+                <KiIcon name="ki-send" size={16} />
+                {isSaving ? "Kaydediliyor..." : "Gonder"}
+              </button>
+              {rating ? (
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => {
+                    setEditing(false);
+                    setStars(rating.stars);
+                    setComment(rating.comment ?? "");
+                  }}
+                >
+                  Vazgec
+                </button>
+              ) : null}
+            </div>
           </>
         )}
       </div>

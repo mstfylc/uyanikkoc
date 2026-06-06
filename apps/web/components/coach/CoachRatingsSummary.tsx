@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { KiIcon } from "@/components/design/KiIcon";
-import { UkBadge } from "@/components/design/UkBadge";
+import { StarRating } from "@/components/design/StarRating";
+import { UkAvatar } from "@/components/design/UkAvatar";
 import { UkSection } from "@/components/design/UkSection";
 import type { CoachRatingSummary } from "@uyanik/database";
 
@@ -24,23 +24,41 @@ export function CoachRatingsSummary() {
   if (!summary) return null;
 
   return (
-    <UkSection title="Ogrenci Degerlendirmeleri" sub={`${summary.count} yorum · ortalama ${summary.average.toFixed(1)}`}>
+    <UkSection
+      title="Ogrenci Geri Bildirimleri"
+      sub={`${summary.count} ogrenci degerlendirmesi`}
+      action={
+        <div className="row" style={{ gap: 8 }}>
+          <StarRating value={summary.average} size={15} />
+          <span className="tnum" style={{ fontWeight: 800, fontSize: 14 }}>
+            {summary.average.toFixed(1)}
+          </span>
+        </div>
+      }
+    >
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {summary.count === 0 ? (
-          <p className="muted" style={{ fontSize: 13 }}>Henuz degerlendirme yok.</p>
+          <div style={{ padding: "20px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
+            Henuz degerlendirme yok.
+          </div>
         ) : (
-          summary.ratings.slice(0, 5).map((row) => (
-            <div key={row.id} className="lrow">
-              <span className="lr-icon tone-warning">
-                <KiIcon name="ki-star" />
-              </span>
-              <div style={{ flex: 1 }}>
-                <div className="lr-title">{row.stars}/5 yildiz</div>
-                <div className="lr-meta">
-                  <span className="d">{row.comment ?? "Yorum yok"}</span>
+          summary.ratings.map((row) => (
+            <div key={row.id} className="lrow" style={{ alignItems: "flex-start" }}>
+              <UkAvatar name={row.studentName ?? "Ogrenci"} size={36} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="between">
+                  <b style={{ fontSize: 13, fontWeight: 700 }}>{row.studentName ?? "Ogrenci"}</b>
+                  <StarRating value={row.stars} size={13} />
+                </div>
+                {row.comment ? (
+                  <div style={{ fontSize: 12.5, color: "var(--text-2)", marginTop: 4, lineHeight: 1.45 }}>
+                    {row.comment}
+                  </div>
+                ) : null}
+                <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>
+                  {new Date(row.createdAt).toLocaleDateString("tr-TR", { day: "numeric", month: "long" })}
                 </div>
               </div>
-              <UkBadge tone="primary">{new Date(row.createdAt).toLocaleDateString("tr-TR")}</UkBadge>
             </div>
           ))
         )}

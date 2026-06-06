@@ -27,6 +27,14 @@ export async function submitOptik(input: SubmitOptikInput): Promise<OptikSubmiss
   return memoryOnline.submitOptik(input);
 }
 
+export async function getOptikReview(
+  examId: string,
+  studentId: string,
+): Promise<{ submission: OptikSubmissionRecord; answerKey: string[] } | null> {
+  if (shouldUseDatabase()) return null;
+  return memoryOnline.getSubmissionReview(examId, studentId);
+}
+
 export async function createExam(input: CreateOnlineExamInput): Promise<OnlineExamRecord> {
   if (shouldUseDatabase()) return (await repo()).createExam(input);
   return memoryOnline.createExam(input);

@@ -37,6 +37,17 @@ const exams = globalStore.__uyanikOnlineExams ?? (globalStore.__uyanikOnlineExam
     createdAt: new Date().toISOString(),
     answerKey: Array.from({ length: 15 }, (_, i) => ["A", "B", "C", "D", "E"][(i + 2) % 5]!),
   },
+  {
+    id: "oe3",
+    title: "LGS Genel Deneme #4",
+    publisher: "Nartest",
+    examType: "LGS",
+    questionCount: 20,
+    cargoStatus: "kargoda",
+    branchId: "*",
+    createdAt: new Date().toISOString(),
+    answerKey: Array.from({ length: 20 }, (_, i) => ["A", "B", "C", "D"][(i + 1) % 4]!),
+  },
 ]);
 const subs = globalStore.__uyanikOptikSubs ?? (globalStore.__uyanikOptikSubs = new Map());
 let seq = globalStore.__uyanikOnlineSeq ?? (globalStore.__uyanikOnlineSeq = 1);
@@ -88,4 +99,14 @@ export async function submitOptik(input: SubmitOptikInput): Promise<OptikSubmiss
   };
   subs.set(k(input.examId, input.studentId), rec);
   return rec;
+}
+
+export async function getSubmissionReview(
+  examId: string,
+  studentId: string,
+): Promise<{ submission: OptikSubmissionRecord; answerKey: string[] } | null> {
+  const exam = exams.find((e) => e.id === examId);
+  const submission = subs.get(k(examId, studentId));
+  if (!exam || !submission) return null;
+  return { submission, answerKey: exam.answerKey };
 }

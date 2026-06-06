@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { UkBarChart } from "@/components/design/UkBarChart";
 import { CoachStudentsTable } from "@/components/coach/CoachStudentsTable";
+import { MotivationSendModal } from "@/components/coach/MotivationSendModal";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
@@ -39,6 +40,7 @@ export function CoachDashboard() {
   const [students, setStudents] = useState<CoachRosterEntry[]>([]);
   const [exams, setExams] = useState<ExamResultRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [motivationOpen, setMotivationOpen] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -90,6 +92,7 @@ export function CoachDashboard() {
     .slice(0, 5);
 
   return (
+    <>
     <div className="stack rise" data-testid="coach-dashboard">
       <div className="grid g-4">
         <UkStatCard icon="ki-people" tone="primary" value={students.length} label="Toplam ogrenci" />
@@ -117,6 +120,13 @@ export function CoachDashboard() {
         </div>
         <KiIcon name="ki-right" size={16} style={{ color: "var(--faint)" }} />
       </Link>
+
+      <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
+        <button type="button" className="btn btn-primary btn-sm" onClick={() => setMotivationOpen(true)}>
+          <KiIcon name="ki-heart" size={16} />
+          Motivasyon gonder
+        </button>
+      </div>
 
       <div className="grid col-main">
         <CoachStudentsTable rows={studentRows} isLoading={isLoading} />
@@ -216,5 +226,7 @@ export function CoachDashboard() {
       </UkSection>
       </div>
     </div>
+    <MotivationSendModal open={motivationOpen} onClose={() => setMotivationOpen(false)} />
+    </>
   );
 }

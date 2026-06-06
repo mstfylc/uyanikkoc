@@ -11,6 +11,7 @@ import { StudentExamAnalysis } from "@/components/student/StudentExamAnalysis";
 import { StudentManualExamModal } from "@/components/student/StudentManualExamModal";
 import { OptikFormModal, OptikResultBadge } from "@/components/student/OptikFormModal";
 import { UkBadge } from "@/components/design/UkBadge";
+import { cargoBadgeLabel, cargoBadgeTone } from "@/lib/design/motivation-ui";
 import { subjectColor } from "@/lib/design/subject-colors";
 import {
   describeExamTrend,
@@ -141,39 +142,74 @@ export function StudentExamsPanel() {
       {tab === "analysis" ? (
         <StudentExamAnalysis exams={exams} selected={selected} onSelect={setSelectedId} />
       ) : tab === "online" ? (
-        <UkSection title="Online denemeler" sub={`${onlineExams.length} sinav`}>
-          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {onlineLoading ? (
-              <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>
-            ) : onlineExams.length === 0 ? (
-              <p className="muted" style={{ fontSize: 13 }}>Online deneme bulunamadi.</p>
-            ) : (
-              onlineExams.map((exam) => (
-                <div key={exam.id} className="lrow">
-                  <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                    <KiIcon name="ki-chart-simple" />
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="lr-title">{exam.title}</div>
-                    <div className="lr-meta">
-                      <span className="d">{exam.publisher}</span>
-                      <UkBadge tone="primary">{exam.examType}</UkBadge>
-                      <span className="d">{exam.questionCount} soru</span>
-                    </div>
-                    {exam.submission ? <OptikResultBadge submission={exam.submission} /> : null}
-                  </div>
-                  {exam.submission ? (
-                    <UkBadge tone="success">Tamamlandi</UkBadge>
-                  ) : (
-                    <button type="button" className="btn btn-primary btn-sm" onClick={() => setOptikExam(exam)}>
-                      Optik doldur
-                    </button>
-                  )}
-                </div>
-              ))
-            )}
+        <>
+          <div
+            className="notice"
+            style={{
+              background: "var(--primary-soft)",
+              borderColor: "color-mix(in srgb, var(--primary) 25%, transparent)",
+            }}
+          >
+            <KiIcon name="ki-notepad" size={18} style={{ color: "var(--primary-600)", flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <b style={{ fontSize: 13.5 }}>Online deneme nasil calisir?</b>
+              <div className="muted" style={{ fontSize: 12.5 }}>
+                Deneme kitapcigin kargoyla gelir. Cozdukten sonra optik formu buradan online doldur, netin aninda
+                hesaplansin.
+              </div>
+            </div>
           </div>
-        </UkSection>
+          <UkSection title="Online Denemelerim" sub={`${onlineExams.length} deneme · optik formu online doldur`}>
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {onlineLoading ? (
+                <p className="muted" style={{ fontSize: 13 }}>
+                  Yukleniyor...
+                </p>
+              ) : onlineExams.length === 0 ? (
+                <p className="muted" style={{ fontSize: 13 }}>
+                  Online deneme bulunamadi.
+                </p>
+              ) : (
+                onlineExams.map((exam) => (
+                  <div key={exam.id} className="lrow" style={{ cursor: "default" }}>
+                    <span
+                      className="lr-icon"
+                      style={{
+                        background: "var(--primary-soft)",
+                        color: "var(--primary-600)",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <KiIcon name="ki-notepad" size={19} />
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="lr-title">{exam.title}</div>
+                      <div className="lr-meta">
+                        <UkBadge tone="muted">{exam.examType}</UkBadge>
+                        <span className="d">{exam.publisher}</span>
+                        <span className="d">{exam.questionCount} soru</span>
+                        <UkBadge tone={cargoBadgeTone(exam.cargoStatus)}>{cargoBadgeLabel(exam.cargoStatus)}</UkBadge>
+                      </div>
+                    </div>
+                    {exam.submission ? (
+                      <div className="row" style={{ gap: 8 }}>
+                        <OptikResultBadge submission={exam.submission} />
+                        <button type="button" className="btn btn-light btn-sm" onClick={() => setOptikExam(exam)}>
+                          Optigi Gor
+                        </button>
+                      </div>
+                    ) : (
+                      <button type="button" className="btn btn-primary btn-sm" onClick={() => setOptikExam(exam)}>
+                        <KiIcon name="ki-notepad" size={14} />
+                        Optik Doldur
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </UkSection>
+        </>
       ) : (
         <>
           {trendNets.length > 1 ? (
