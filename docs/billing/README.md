@@ -29,4 +29,4 @@ pnpm --filter @uyanik/database prisma db seed
 
 ## Sonraki adim
 
-UI ekranlari (`billing.jsx` TSX karsiligi) ayri commit ile baglanacak.
+UI ekranlari: `/student/billing`, `/parent/billing`, Ayarlar > Odeme & Planlar sekmesi.

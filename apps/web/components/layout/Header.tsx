@@ -1,12 +1,14 @@
 "use client";
 
 import type { AppRole } from "@uyanik/tokens";
+import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkAvatar } from "@/components/design/UkAvatar";
+import { MobileNavSheet } from "@/components/layout/MobileNavSheet";
 import {
   NotificationBell,
   shouldShowNotificationBell,
@@ -21,13 +23,24 @@ export function Header({ role }: HeaderProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
 
   const displayName = session?.user?.name ?? session?.user?.email ?? "Kullanici";
   const activeItem = findUkNavItem(role, pathname);
   const pageTitle = activeItem?.label ?? "Dashboard";
 
   return (
+    <>
     <header className="topbar theme-fade">
+      <button
+        type="button"
+        className="icon-btn mobile-nav-btn"
+        style={{ width: 40, height: 40, flexShrink: 0 }}
+        aria-label="Menu"
+        onClick={() => setNavOpen(true)}
+      >
+        <KiIcon name="ki-element-11" size={20} />
+      </button>
       <div className="crumb">
         <b>{pageTitle}</b>
         <span>{UK_ROLE_CRUMB[role]}</span>
@@ -85,6 +98,16 @@ export function Header({ role }: HeaderProps) {
                     </span>
                   </div>
                 </div>
+                {(role === "student" || role === "parent") ? (
+                  <Link
+                    href={`/${role}/billing`}
+                    className="pop-item"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <KiIcon name="ki-chart-line-up" size={18} />
+                    Odeme & Planlar
+                  </Link>
+                ) : null}
                 <button
                   type="button"
                   className="pop-item danger"
@@ -102,5 +125,7 @@ export function Header({ role }: HeaderProps) {
         </div>
       </div>
     </header>
+    <MobileNavSheet role={role} open={navOpen} onClose={() => setNavOpen(false)} />
+    </>
   );
 }

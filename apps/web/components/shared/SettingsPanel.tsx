@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
 import { CurriculumEditor } from "@/components/coach/CurriculumEditor";
+import { BillingPanel } from "@/components/shared/BillingPanel";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
@@ -14,7 +15,7 @@ type SettingsPanelProps = {
   role: "student" | "coach" | "parent";
 };
 
-type SettingsTab = "mufredat" | "profil" | "bildirimler";
+type SettingsTab = "mufredat" | "profil" | "bildirimler" | "odeme";
 
 const EXAM_TYPES: TopicExamType[] = ["TYT", "AYT", "LGS", "GENEL"];
 
@@ -62,6 +63,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
         ]
       : [
           { key: "profil", label: "Profil", icon: "ki-profile-circle" },
+          { key: "odeme", label: "Odeme & Planlar", icon: "ki-chart-line-up" },
           { key: "bildirimler", label: "Bildirimler", icon: "ki-notification-on" },
         ];
 
@@ -278,6 +280,10 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
             </div>
           </div>
         </UkSection>
+      ) : null}
+
+      {tab === "odeme" && (role === "student" || role === "parent") ? (
+        <BillingPanel role={role} embedded />
       ) : null}
 
       {tab === "bildirimler" ? (

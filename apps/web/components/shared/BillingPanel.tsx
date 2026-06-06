@@ -23,9 +23,10 @@ import type {
 
 type BillingPanelProps = {
   role: "student" | "parent";
+  embedded?: boolean;
 };
 
-export function BillingPanel({ role }: BillingPanelProps) {
+export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
   const [plans, setPlans] = useState<BillingPlanRecord[]>([]);
   const [subscription, setSubscription] = useState<SubscriptionRecord | null>(null);
   const [plan, setPlan] = useState<BillingPlanRecord | null>(null);
@@ -129,18 +130,26 @@ export function BillingPanel({ role }: BillingPanelProps) {
     if (response.ok) await load();
   }
 
+  const hasActiveSubscription = Boolean(subscription && plan);
+  const canCheckout =
+    Boolean(selectedPlanId) &&
+    methods.length > 0 &&
+    (!subscription || selectedPlanId !== subscription.planId);
+
   return (
     <div className="stack rise" data-testid="billing-panel">
-      <UkPageHead
-        title="Odeme & Abonelik"
-        sub={role === "parent" ? "Kocluk paketi ve faturalar" : "Kocluk aboneligin"}
-      />
+      {!embedded ? (
+        <UkPageHead
+          title="Odeme & Abonelik"
+          sub={role === "parent" ? "Kocluk paketi ve faturalar" : "Kocluk aboneligin"}
+        />
+      ) : null}
 
       {isLoading ? (
         <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>
       ) : (
         <>
-          {subscription && plan ? (
+          {hasActiveSubscription && plan && subscription ? (
             <UkSection title="Aktif abonelik" sub={plan.name}>
               <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 <div className="between">
@@ -162,8 +171,13 @@ export function BillingPanel({ role }: BillingPanelProps) {
                 </div>
               </div>
             </UkSection>
-          ) : (
-            <>
+          ) : null}
+
+          <UkSection
+            title="Kocluk Paketleri"
+            sub={hasActiveSubscription ? "Plan degistirmek icin yeni paket secin" : "Size uygun paketi secin"}
+          >
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div className="seg" style={{ width: "fit-content" }}>
                 <button type="button" className={cycle === "monthly" ? "on" : ""} onClick={() => setCycle("monthly")}>
                   Aylik
@@ -173,84 +187,99 @@ export function BillingPanel({ role }: BillingPanelProps) {
                 </button>
               </div>
 
-              <div className="grid g-3">
-                {plans.map((item) => {
-                  const active = item.id === selectedPlanId;
-                  const price = planPrice(item, cycle);
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      className={`card card-pad${active ? " ring-primary" : ""}`}
-                      style={{ textAlign: "left", border: active ? "2px solid var(--primary-500)" : undefined }}
-                      onClick={() => setSelectedPlanId(item.id)}
-                    >
-                      <div className="between" style={{ marginBottom: 8 }}>
-                        <span style={{ fontWeight: 800 }}>{item.name}</span>
-                        {item.popular ? <UkBadge tone="primary">Populer</UkBadge> : null}
-                      </div>
-                      <div className="muted" style={{ fontSize: 12.5, marginBottom: 10 }}>{item.tagline}</div>
-                      <div className="tnum" style={{ fontSize: 24, fontWeight: 800 }}>
-                        {formatTRY(price)}
-                        <span className="muted" style={{ fontSize: 12, fontWeight: 500 }}>
-                          /{cycle === "annual" ? "yil" : "ay"}
-                        </span>
-                      </div>
-                      {cycle === "annual" ? (
-                        <div className="muted" style={{ fontSize: 11.5, marginTop: 4 }}>
-                          {formatTRY(planMonthlyEquivalent(item, cycle))}/ay ·{" "}
-                          {formatTRY(annualSavingAmount(item))} tasarruf
+              {plans.length === 0 ? (
+                <p className="muted" style={{ fontSize: 13 }}>Plan listesi yuklenemedi.</p>
+              ) : (
+                <div className="grid g-3">
+                  {plans.map((item) => {
+                    const active = item.id === selectedPlanId;
+                    const isCurrent = subscription?.planId === item.id;
+                    const price = planPrice(item, cycle);
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className={`card card-pad${active ? " ring-primary" : ""}`}
+                        style={{ textAlign: "left", border: active ? "2px solid var(--primary-500)" : undefined }}
+                        onClick={() => setSelectedPlanId(item.id)}
+                      >
+                        <div className="between" style={{ marginBottom: 8 }}>
+                          <span style={{ fontWeight: 800 }}>{item.name}</span>
+                          <div className="row" style={{ gap: 6 }}>
+                            {isCurrent ? <UkBadge tone="success">Aktif</UkBadge> : null}
+                            {item.popular ? <UkBadge tone="primary">Populer</UkBadge> : null}
+                          </div>
                         </div>
-                      ) : null}
-                      <ul style={{ marginTop: 12, paddingLeft: 18, fontSize: 12.5, lineHeight: 1.5 }}>
-                        {item.features.slice(0, 4).map((feature) => (
-                          <li key={feature}>{feature}</li>
-                        ))}
-                      </ul>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {selectedPlan ? (
-                <UkSection title="Odeme" sub="Taksit secenegi">
-                  <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
-                      {INSTALLMENT_OPTIONS.map((option) => (
-                        <button
-                          key={option.count}
-                          type="button"
-                          className={`type-chip${installments === option.count ? " on" : ""}`}
-                          onClick={() => setInstallments(option.count)}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                    {methods.length === 0 ? (
-                      <button type="button" className="btn btn-light w-fit" onClick={() => void addDemoCard()}>
-                        Demo kart ekle
+                        <div className="muted" style={{ fontSize: 12.5, marginBottom: 10 }}>{item.tagline}</div>
+                        <div className="tnum" style={{ fontSize: 24, fontWeight: 800 }}>
+                          {formatTRY(price)}
+                          <span className="muted" style={{ fontSize: 12, fontWeight: 500 }}>
+                            /{cycle === "annual" ? "yil" : "ay"}
+                          </span>
+                        </div>
+                        {cycle === "annual" ? (
+                          <div className="muted" style={{ fontSize: 11.5, marginTop: 4 }}>
+                            {formatTRY(planMonthlyEquivalent(item, cycle))}/ay ·{" "}
+                            {formatTRY(annualSavingAmount(item))} tasarruf
+                          </div>
+                        ) : null}
+                        <ul style={{ marginTop: 12, paddingLeft: 18, fontSize: 12.5, lineHeight: 1.5 }}>
+                          {item.features.slice(0, 4).map((feature) => (
+                            <li key={feature}>{feature}</li>
+                          ))}
+                        </ul>
                       </button>
-                    ) : (
-                      <p className="muted" style={{ fontSize: 12.5 }}>
-                        Odeme: {methods.find((m) => m.isDefault)?.brand ?? methods[0]?.brand} ****{" "}
-                        {methods.find((m) => m.isDefault)?.last4 ?? methods[0]?.last4}
-                      </p>
-                    )}
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </UkSection>
+
+          {selectedPlan ? (
+            <UkSection title="Odeme" sub="Taksit secenegi">
+              <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+                  {INSTALLMENT_OPTIONS.map((option) => (
                     <button
+                      key={option.count}
                       type="button"
-                      className="btn btn-primary w-fit"
-                      disabled={isSubmitting || methods.length === 0}
-                      onClick={() => void subscribeNow()}
+                      className={`type-chip${installments === option.count ? " on" : ""}`}
+                      onClick={() => setInstallments(option.count)}
                     >
-                      {isSubmitting ? "Isleniyor..." : "Abone ol"}
+                      {option.label}
                     </button>
-                    {message ? <UkBadge tone="success">{message}</UkBadge> : null}
-                  </div>
-                </UkSection>
-              ) : null}
-            </>
-          )}
+                  ))}
+                </div>
+                {methods.length === 0 ? (
+                  <button type="button" className="btn btn-light w-fit" onClick={() => void addDemoCard()}>
+                    Demo kart ekle
+                  </button>
+                ) : (
+                  <p className="muted" style={{ fontSize: 12.5 }}>
+                    Odeme: {methods.find((m) => m.isDefault)?.brand ?? methods[0]?.brand} ****{" "}
+                    {methods.find((m) => m.isDefault)?.last4 ?? methods[0]?.last4}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  className="btn btn-primary w-fit"
+                  disabled={isSubmitting || !canCheckout}
+                  onClick={() => void subscribeNow()}
+                >
+                  {isSubmitting
+                    ? "Isleniyor..."
+                    : hasActiveSubscription
+                      ? "Plani guncelle"
+                      : "Abone ol"}
+                </button>
+                {hasActiveSubscription && selectedPlanId === subscription?.planId ? (
+                  <p className="muted" style={{ fontSize: 12.5 }}>Bu plan zaten aktif.</p>
+                ) : null}
+                {message ? <UkBadge tone="success">{message}</UkBadge> : null}
+              </div>
+            </UkSection>
+          ) : null}
 
           <UkSection title="Faturalar" sub={`${invoices.length} kayit`}>
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>

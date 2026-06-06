@@ -14,10 +14,10 @@ const STUDENT_NAV: UkNavItem[] = [
   { href: "/student/exams", label: "Denemeler", icon: "ki-chart-simple" },
   { href: "/student/assignments", label: "Odevlerim", icon: "ki-notepad-edit" },
   { href: "/student/appointments", label: "Randevular", icon: "ki-calendar-tick" },
+  { href: "/student/billing", label: "Odeme & Planlar", icon: "ki-chart-line-up" },
   { href: "/student/tests", label: "Testlerim", icon: "ki-star" },
   { href: "/student/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/student/motivation", label: "Motivasyon", icon: "ki-flame" },
-  { href: "/student/billing", label: "Odeme", icon: "ki-chart-line-up" },
   { href: "/student/ai-coach", label: "AI Koc", icon: "ki-technology-2", tag: "Yakinda" },
 ];
 
@@ -39,8 +39,8 @@ const PARENT_NAV: UkNavItem[] = [
   { href: "/parent/reports", label: "Gelisim Raporlari", icon: "ki-notepad-edit" },
   { href: "/parent/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/parent/appointments", label: "Randevular", icon: "ki-calendar-tick" },
+  { href: "/parent/billing", label: "Odeme & Planlar", icon: "ki-chart-line-up" },
   { href: "/parent/notifications", label: "Bildirimler", icon: "ki-notification-on" },
-  { href: "/parent/billing", label: "Odeme", icon: "ki-chart-line-up" },
 ];
 
 const BRANCH_NAV: UkNavItem[] = [

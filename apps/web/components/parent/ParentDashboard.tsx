@@ -1,6 +1,7 @@
 "use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { UkBadge } from "@/components/design/UkBadge";
@@ -90,6 +91,21 @@ export function ParentDashboard() {
           </span>
         </div>
       </div>
+
+      <Link
+        href="/parent/billing"
+        className="card card-pad"
+        style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit" }}
+      >
+        <span className="stat-icon tone-primary" style={{ width: 44, height: 44 }}>
+          <KiIcon name="ki-chart-line-up" />
+        </span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: 14 }}>Odeme & Planlar</div>
+          <div className="muted" style={{ fontSize: 12.5 }}>Kocluk paketini sec, faturalari goruntule</div>
+        </div>
+        <KiIcon name="ki-right" size={16} style={{ color: "var(--faint)" }} />
+      </Link>
 
       <div className="grid g-4">
         <UkStatCard icon="ki-chart-pie-simple" tone="success" value={`${completionRate}%`} label="Bu hafta odev tamamlama" />

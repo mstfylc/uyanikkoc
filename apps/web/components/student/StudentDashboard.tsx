@@ -1,7 +1,7 @@
 "use client";
 
-import { KiIcon } from "@/components/design/KiIcon";
 import Link from "next/link";
+import { KiIcon } from "@/components/design/KiIcon";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -166,6 +166,21 @@ export function StudentDashboard() {
           Detay
         </Link>
       </div>
+
+      <Link
+        href="/student/billing"
+        className="card card-pad"
+        style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit" }}
+      >
+        <span className="stat-icon tone-primary" style={{ width: 44, height: 44 }}>
+          <KiIcon name="ki-chart-line-up" />
+        </span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: 14 }}>Odeme & Planlar</div>
+          <div className="muted" style={{ fontSize: 12.5 }}>Kocluk paketini sec, aboneligini yonet</div>
+        </div>
+        <KiIcon name="ki-right" size={16} style={{ color: "var(--faint)" }} />
+      </Link>
 
       <div className="grid col-main">
         <div className="hero">

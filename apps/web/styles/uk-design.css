@@ -261,6 +261,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.mobile-nav-btn { display: none; }
 
 .icon-btn {
   width: 40px; height: 40px;
@@ -727,9 +728,10 @@ button { font-family: inherit; cursor: pointer; }
   :root { --sidebar-w: 0px; }
   .app { grid-template-columns: 1fr; }
   .sidebar { display: none; }
+  .mobile-nav-btn { display: grid; place-items: center; }
   .g-3, .g-2 { grid-template-columns: 1fr; }
   .content { padding: 20px 16px 40px; }
-  .topbar { padding: 0 16px; }
+  .topbar { padding: 0 16px; gap: 10px; }
 }
 
 /* ---- switch toggle ---- */
