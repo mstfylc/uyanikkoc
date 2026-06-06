@@ -341,3 +341,78 @@ export type CoachReportSummary = {
   parentReports: ParentReportRecord[];
   students: CoachReportStudentRow[];
 };
+
+export type BillingCycle = "monthly" | "annual";
+export type SubscriptionStatus = "active" | "trialing" | "past_due" | "canceled";
+export type InvoiceStatus = "paid" | "pending" | "failed";
+export type CardBrand = "visa" | "mastercard";
+
+export type BillingPlanRecord = {
+  id: string;
+  name: string;
+  tagline: string;
+  monthly: number;
+  annual: number;
+  popular: boolean;
+  features: string[];
+  sortOrder: number;
+};
+
+export type PaymentMethodRecord = {
+  id: string;
+  userId: string;
+  brand: CardBrand;
+  last4: string;
+  holder: string;
+  expMonth: number;
+  expYear: number;
+  isDefault: boolean;
+  createdAt: string;
+};
+
+export type SubscriptionRecord = {
+  id: string;
+  payerUserId: string;
+  studentId: string | null;
+  planId: string;
+  cycle: BillingCycle;
+  status: SubscriptionStatus;
+  autoRenew: boolean;
+  startedAt: string;
+  renewsAt: string;
+  canceledAt: string | null;
+  paymentMethodId: string | null;
+};
+
+export type InvoiceRecord = {
+  id: string;
+  subscriptionId: string;
+  payerUserId: string;
+  planId: string;
+  cycle: BillingCycle;
+  amount: number;
+  status: InvoiceStatus;
+  installments: number;
+  methodLabel: string;
+  paymentMethodId: string | null;
+  issuedAt: string;
+};
+
+export type CreatePaymentMethodInput = {
+  userId: string;
+  brand: CardBrand;
+  last4: string;
+  holder: string;
+  expMonth: number;
+  expYear: number;
+  makeDefault?: boolean;
+};
+
+export type CreateSubscriptionInput = {
+  payerUserId: string;
+  studentId?: string | null;
+  planId: string;
+  cycle: BillingCycle;
+  paymentMethodId?: string | null;
+  installments?: number;
+};

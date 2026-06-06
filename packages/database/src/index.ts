@@ -13,6 +13,7 @@ export * as messageRepository from "./repositories/messages";
 export * as templateRepository from "./repositories/templates";
 export * as studentRepository from "./repositories/students";
 export * as rosterRepository from "./repositories/roster";
+export * as billingRepository from "./repositories/billing";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
@@ -60,4 +61,14 @@ export type {
   CoachReportSummary,
   CoachReportStudentRow,
   ParentReportRecord,
+  BillingCycle,
+  SubscriptionStatus,
+  InvoiceStatus,
+  CardBrand,
+  BillingPlanRecord,
+  PaymentMethodRecord,
+  SubscriptionRecord,
+  InvoiceRecord,
+  CreatePaymentMethodInput,
+  CreateSubscriptionInput,
 } from "./types";

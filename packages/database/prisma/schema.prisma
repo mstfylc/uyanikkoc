@@ -82,6 +82,9 @@ model User {
   studentProfile StudentProfile?
   coachProfile   CoachProfile?
   parentProfile  ParentProfile?
+  paymentMethods PaymentMethod[]
+  subscriptions  Subscription[]  @relation("PayerSubscriptions")
+  invoices       Invoice[]
 
   @@index([organizationId, branchId])
   @@map("users")
@@ -99,6 +102,7 @@ model StudentProfile {
   examResults       ExamResult[]
   notifications     Notification[]
   coachLinks        CoachStudent[]
+  subscriptions     Subscription[]
 
   @@map("student_profiles")
 }
@@ -297,4 +301,106 @@ model CoachStudent {
   @@index([coachId])
   @@index([studentId])
   @@map("coach_students")
+}
+
+enum BillingCycle {
+  monthly
+  annual
+}
+
+enum SubscriptionStatus {
+  active
+  trialing
+  past_due
+  canceled
+}
+
+enum InvoiceStatus {
+  paid
+  pending
+  failed
+}
+
+enum CardBrand {
+  visa
+  mastercard
+}
+
+model BillingPlan {
+  id            String         @id
+  name          String
+  tagline       String
+  monthly       Int
+  annual        Int
+  popular       Boolean        @default(false)
+  features      String[]
+  sortOrder     Int            @default(0)
+  active        Boolean        @default(true)
+  subscriptions Subscription[]
+
+  @@map("billing_plans")
+}
+
+model PaymentMethod {
+  id            String         @id @default(cuid())
+  userId        String
+  brand         CardBrand
+  last4         String
+  holder        String
+  expMonth      Int
+  expYear       Int
+  isDefault     Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptions Subscription[]
+  invoices      Invoice[]
+
+  @@index([userId])
+  @@map("payment_methods")
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  payerUserId     String
+  studentId       String?
+  planId          String
+  cycle           BillingCycle
+  status          SubscriptionStatus @default(active)
+  autoRenew       Boolean            @default(true)
+  startedAt       DateTime           @default(now())
+  renewsAt        DateTime
+  canceledAt      DateTime?
+  paymentMethodId String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  payer           User               @relation("PayerSubscriptions", fields: [payerUserId], references: [id], onDelete: Cascade)
+  student         StudentProfile?    @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  plan            BillingPlan        @relation(fields: [planId], references: [id], onDelete: Restrict)
+  paymentMethod   PaymentMethod?     @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
+  invoices        Invoice[]
+
+  @@index([payerUserId])
+  @@index([studentId])
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id              String         @id
+  subscriptionId  String
+  payerUserId     String
+  planId          String
+  cycle           BillingCycle
+  amount          Int
+  status          InvoiceStatus  @default(paid)
+  installments    Int            @default(1)
+  methodLabel     String
+  paymentMethodId String?
+  issuedAt        DateTime       @default(now())
+  subscription    Subscription   @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  payer           User           @relation(fields: [payerUserId], references: [id], onDelete: Cascade)
+  paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
+
+  @@index([subscriptionId])
+  @@index([payerUserId])
+  @@map("invoices")
 }

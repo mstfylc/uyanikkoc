@@ -230,10 +230,68 @@ async function main() {
 
   await seedExamResults();
   await seedFaz2Skeletons();
+  await seedBillingPlans();
 
   console.log(
-    "Seed completed: demo org, branch, users, profiles, assignment, topics, exams, notifications, messages, templates",
+    "Seed completed: demo org, branch, users, profiles, assignment, topics, exams, notifications, messages, templates, billing plans",
   );
+}
+
+async function seedBillingPlans() {
+  const plans = [
+    {
+      id: "standart",
+      name: "Standart Kocluk",
+      tagline: "Duzenli takip ve birebir kocluk",
+      monthly: 1499,
+      annual: 14990,
+      popular: false,
+      sortOrder: 0,
+      features: [
+        "Haftalik birebir kocluk gorusmesi",
+        "Kisiye ozel haftalik calisma programi",
+        "Odev atama ve takibi",
+        "Deneme analizi ve net takibi",
+        "Konu takibi paneli",
+      ],
+    },
+    {
+      id: "plus",
+      name: "Plus Kocluk",
+      tagline: "Aileyle birlikte tam destek",
+      monthly: 2299,
+      annual: 22990,
+      popular: true,
+      sortOrder: 1,
+      features: [
+        "Standart paketteki her sey",
+        "Veliye haftalik gelisim raporu",
+        "Sinirsiz mesajlasma (koc + ogrenci)",
+        "Motivasyon ve hedef takibi",
+        "Onceliklendirilmis randevu",
+      ],
+    },
+    {
+      id: "vip",
+      name: "VIP Kocluk",
+      tagline: "Yogun tempo, ust duzey mentorluk",
+      monthly: 3499,
+      annual: 34990,
+      popular: false,
+      sortOrder: 2,
+      features: [
+        "Plus paketteki her sey",
+        "Haftada 2 birebir gorusme",
+        "Kidemli mentor eslestirmesi",
+        "Tercih ve kariyer danismanligi",
+        "7/24 oncelikli destek hatti",
+      ],
+    },
+  ];
+
+  for (const plan of plans) {
+    await prisma.billingPlan.upsert({ where: { id: plan.id }, update: plan, create: plan });
+  }
 }
 
 async function seedFaz2Skeletons() {
