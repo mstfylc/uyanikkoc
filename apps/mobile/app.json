@@ -7,6 +7,12 @@
     "scheme": "uyanik",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
+    "android": {
+      "package": "com.uyanik.mobile"
+    },
+    "ios": {
+      "bundleIdentifier": "com.uyanik.mobile"
+    },
     "plugins": ["expo-router", "expo-secure-store"],
     "experiments": {
       "typedRoutes": true
