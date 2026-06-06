@@ -23,6 +23,7 @@
 | 2026-06-05 | BACKLOG 16-22,26-27,29 | 6b3dac2 | typecheck ✓ unit 38 ✓ e2e 10 ✓ | faz2 backlog tamamlandi (Yol-C) |
 | 2026-06-05 | BACKLOG 14 roster | 8fd1f00 | typecheck ✓ unit 41 ✓ e2e 10 ✓ | coach student roster alpha |
 | 2026-06-05 | REVIEW follow-up | 26bf3c5 | typecheck ✓ lint ✓ unit 27+18 ✓ build ✓ | parent/coach resolve fix, exam import validation, health authSecret |
+| 2026-06-06 | DESIGN coach-productivity | — | typecheck ✓ lint ✓ unit 51 ✓ | mobil tasarim: Koç Görevleri + Toplu Duyuru backend; database→shared dep fix |
 
 ## Kural (remote şablon ile uyumlu)
 

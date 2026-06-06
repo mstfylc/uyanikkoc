@@ -134,6 +134,32 @@ async function main() {
     });
   }
 
+  const coachTaskSeed = [
+    { id: "coach_task_001", text: "Mert'in haftalik programini revize et", studentId: "student_002", due: "Bugun", priority: "high" as const, done: false },
+    { id: "coach_task_002", text: "Elif'in integral testini incele", studentId: "student_001", due: "Bugun", priority: "med" as const, done: false },
+    { id: "coach_task_003", text: "Haftalik raporlari hazirla", studentId: null, due: "7 Haz", priority: "med" as const, done: false },
+    { id: "coach_task_004", text: "Deneme #6 sonuclarini analiz et", studentId: null, due: "5 Haz", priority: "low" as const, done: true },
+  ];
+  for (const task of coachTaskSeed) {
+    await prisma.coachTask.upsert({
+      where: { id: task.id },
+      update: { text: task.text, studentId: task.studentId, due: task.due, priority: task.priority, done: task.done },
+      create: { ...task, coachId: "coach_001" },
+    });
+  }
+
+  const announcementSeed = [
+    { id: "coach_ann_001", title: "Pazar TYT Deneme #7", body: "8 Haziran Pazar 10:00'da TYT Genel Deneme #7 var. Erken uyuyun.", audience: "Tum ogrenciler", reach: 2 },
+    { id: "coach_ann_002", title: "Deneme analizi hatirlatmasi", body: "Deneme sonrasi mutlaka yanlis analizi yapin.", audience: "Tum veliler", reach: 2 },
+  ];
+  for (const announcement of announcementSeed) {
+    await prisma.coachAnnouncement.upsert({
+      where: { id: announcement.id },
+      update: { title: announcement.title, body: announcement.body, audience: announcement.audience, reach: announcement.reach },
+      create: { ...announcement, coachId: "coach_001" },
+    });
+  }
+
   const dueDate = new Date();
   dueDate.setDate(dueDate.getDate() + 7);
 

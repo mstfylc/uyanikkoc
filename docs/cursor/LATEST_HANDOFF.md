@@ -1,8 +1,34 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** Review follow-up — entegrasyon düzeltmeleri  
-**Son commit:** `1831e36` — `docs(cursor): handoff and run-log for review follow-up`  
-**Branch:** `main` (Vercel Production deploy kaynağı)
+**Son tamamlanan faz:** Mobil tasarım — Koç verimlilik backend'leri (Görevler + Toplu Duyuru)  
+**Branch:** `claude/elegant-mccarthy-9tfNd`
+
+## Bu faz (design coach-productivity)
+
+Kaynak: Claude mobil tasarımı (tek dosya, öğrenci/koç/veli). Tasarımdaki backend'siz iki
+koç ekranı için API yazıldı:
+
+- **Koç Görevleri** — `GET /api/coach/tasks`, `POST` (action: create | toggle | delete)
+  - Model `CoachTask` (text, studentId?, due?, done, priority high|med|low), koç-scope'lu
+  - Servis sıralaması: tamamlanmamış → öncelik → en yeni
+- **Koç Toplu Duyuru** — `GET /api/coach/announcements`, `POST { title, body, audience }`
+  - Model `CoachAnnouncement`; kitle çözümü (veli içeren → veliler, diğer → kadro)
+  - Oluşturma kadro/velilere `Notification` üretir; `reach` = gerçek alıcı sayısı
+- Her iki özellik DB + bellek (mock) modunda; migration `20260606180000_coach_tasks_announcements`
+- **Düzeltme:** `@uyanik/database` paketine eksik `@uyanik/shared` workspace bağımlılığı eklendi
+  (billing/online-exam repo'ları kullanıyordu; izole tsc çözemiyordu)
+
+## Test özeti
+
+typecheck ✓ · lint ✓ · unit 51 ✓ (yeni: `coach-productivity.test.ts` 6 test)
+
+> Not: `DATABASE_URL` yok → bellek modunda doğrulandı. DB için `pnpm db:migrate && pnpm db:seed`.
+
+---
+
+## Önceki faz (Review follow-up)
+
+**Son commit:** `1831e36` — `docs(cursor): handoff and run-log for review follow-up`
 
 ## Vercel demo (güncel)
 
