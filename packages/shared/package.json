@@ -4,7 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./phone": "./src/phone.ts",
+    "./otp": "./src/otp.ts",
+    "./token": "./src/token.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
