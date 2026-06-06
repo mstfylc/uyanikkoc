@@ -7,6 +7,7 @@ import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
+import { CoachRatingCard } from "@/components/student/CoachRatingCard";
 
 const BADGE_CATALOG = [
   { id: "streak-7", name: "7 Gun Seri", desc: "7 gun ust uste calisma", icon: "ki-flame" },
@@ -199,6 +200,8 @@ export function MotivationPanel() {
           })}
         </div>
       </UkSection>
+
+      <CoachRatingCard />
 
       <Link href="/student/dashboard" className="btn btn-light btn-sm w-fit">
         Dashboard

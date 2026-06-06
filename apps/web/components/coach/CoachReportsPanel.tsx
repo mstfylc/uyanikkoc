@@ -9,11 +9,14 @@ import { UkBarChart } from "@/components/design/UkBarChart";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkSparkline } from "@/components/design/UkSparkline";
+import { CoachRatingsSummary } from "@/components/coach/CoachRatingsSummary";
+import { ReportDetailModal } from "@/components/coach/ReportDetailModal";
 import { UkStatCard } from "@/components/design/UkStatCard";
-import type { CoachReportSummary } from "@uyanik/database";
+import type { CoachReportSummary, ParentReportRecord } from "@uyanik/database";
 
 export function CoachReportsPanel() {
   const [report, setReport] = useState<CoachReportSummary | null>(null);
+  const [detailReport, setDetailReport] = useState<ParentReportRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -29,12 +32,12 @@ export function CoachReportsPanel() {
     void load();
   }, [load]);
 
-  async function approveReport(id: string) {
+  async function approveReport(id: string, note = "") {
     const response = await fetch(`/api/coach/reports/${id}/approve`, {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ note }),
     });
     if (response.ok) {
       await load();
@@ -186,7 +189,7 @@ export function CoachReportsPanel() {
                             <button
                               type="button"
                               className="btn btn-light btn-sm"
-                              onClick={() => void approveReport(row.id)}
+                              onClick={() => setDetailReport(row)}
                             >
                               Onayla & Gonder
                             </button>
@@ -235,6 +238,19 @@ export function CoachReportsPanel() {
           </UkSection>
         </div>
       </div>
+
+      <CoachRatingsSummary />
+
+      <ReportDetailModal
+        open={Boolean(detailReport)}
+        report={detailReport}
+        onClose={() => setDetailReport(null)}
+        onApprove={async (note) => {
+          if (detailReport) {
+            await approveReport(detailReport.id, note);
+          }
+        }}
+      />
     </div>
   );
 }

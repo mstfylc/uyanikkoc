@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
+import { resolveCoachIdForStudent } from "@/server/services/roster.service";
 import { getStudentRating, submitRating } from "@/server/services/rating.service";
 
 export const GET = withApiAuth(["student"], async (_req, { session }) => {
   const studentId = session.user.studentId;
   if (!studentId) return NextResponse.json({ error: "Student profile missing" }, { status: 400 });
-  const rating = await getStudentRating(studentId);
-  return NextResponse.json({ rating }, { status: 200 });
+  const [rating, coachId] = await Promise.all([
+    getStudentRating(studentId),
+    resolveCoachIdForStudent(studentId),
+  ]);
+  return NextResponse.json({ rating, coachId }, { status: 200 });
 });
 
 export const POST = withApiAuth(["student"], async (req, { session }) => {
