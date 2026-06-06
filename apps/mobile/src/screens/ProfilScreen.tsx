@@ -2,19 +2,30 @@
 import { useState } from "react";
 import { MIcon } from "../ui/MIcon";
 import type { IconName } from "../ui/icons";
+import { useSession } from "../lib/session";
 import { ACHIEVEMENTS, STUDENT } from "../mocks/student";
 import type { ThemeMode } from "../types";
 
 type Stat = [IconName, number, string, string];
 
-export function ProfilScreen({ onLogout, theme, setTheme }: { onLogout: () => void; theme: ThemeMode; setTheme: (t: ThemeMode) => void }) {
+export function ProfilScreen({ theme, setTheme }: { theme: ThemeMode; setTheme: (t: ThemeMode) => void }) {
+  const { me, logout } = useSession();
   const [notif, setNotif] = useState(true);
   const dark = theme === "dark";
 
+  // Bootstrap (/api/me) verisi; yoksa mock'a düş.
+  const name = me?.user.name ?? STUDENT.name;
+  const initials = me?.user.avatarInitials ?? "EY";
+  const grade = me?.student?.grade ?? STUDENT.grade;
+  const goal = me?.student?.goal ?? STUDENT.goal;
+  const streak = me?.student?.streak ?? STUDENT.streak;
+  const totalNet = me?.student?.totalNet ?? STUDENT.net;
+  const weekHours = me?.student?.weekHours ?? STUDENT.weekHours;
+
   const stats: Stat[] = [
-    ["flame", STUDENT.streak, "gün seri", "var(--warning)"],
-    ["chart", STUDENT.net, "net", "var(--primary-600)"],
-    ["clock", STUDENT.weekHours, "saat/hf", "var(--info)"],
+    ["flame", streak, "gün seri", "var(--warning)"],
+    ["chart", totalNet, "net", "var(--primary-600)"],
+    ["clock", weekHours, "saat/hf", "var(--info)"],
   ];
 
   return (
@@ -28,12 +39,12 @@ export function ProfilScreen({ onLogout, theme, setTheme }: { onLogout: () => vo
       <div className="uk-sec">
         <div className="uk-card uk-card-pad" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 4, paddingTop: 22, paddingBottom: 22 }}>
           <span className="uk-avatar" style={{ width: 76, height: 76, fontSize: 26 }}>
-            EY
+            {initials}
           </span>
-          <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-.02em", marginTop: 12, width: "100%", lineHeight: 1.2 }}>{STUDENT.name}</div>
-          <div style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600, width: "100%" }}>{STUDENT.grade}</div>
+          <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-.02em", marginTop: 12, width: "100%", lineHeight: 1.2 }}>{name}</div>
+          <div style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600, width: "100%" }}>{grade}</div>
           <div className="uk-badge primary" style={{ marginTop: 10 }}>
-            <MIcon name="target" size={13} /> Hedef: {STUDENT.goal}
+            <MIcon name="target" size={13} /> Hedef: {goal}
           </div>
         </div>
       </div>
@@ -116,7 +127,7 @@ export function ProfilScreen({ onLogout, theme, setTheme }: { onLogout: () => vo
       </div>
 
       <div className="uk-sec" style={{ marginTop: 16 }}>
-        <button className="uk-btn uk-btn-light uk-btn-block" style={{ color: "var(--danger)", height: 50 }} onClick={onLogout}>
+        <button className="uk-btn uk-btn-light uk-btn-block" style={{ color: "var(--danger)", height: 50 }} onClick={() => void logout()}>
           <MIcon name="logout" size={18} /> Çıkış Yap
         </button>
       </div>

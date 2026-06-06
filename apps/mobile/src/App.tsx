@@ -1,5 +1,6 @@
-/* Uygulama kabuğu: auth kapısı + tab navigasyonu + sonuç sheet'i + tema. */
+/* Uygulama kabuğu: oturum kapısı + tab navigasyonu + sonuç sheet'i + tema. */
 import { useRef, useState } from "react";
+import { useSession } from "./lib/session";
 import { TabBar } from "./ui/TabBar";
 import { LoginScreen } from "./screens/LoginScreen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -8,11 +9,12 @@ import { DenemelerScreen } from "./screens/DenemelerScreen";
 import { ProgramScreen } from "./screens/ProgramScreen";
 import { ProfilScreen } from "./screens/ProfilScreen";
 import { ResultSheet } from "./screens/ResultSheet";
+import { Splash } from "./ui/Splash";
 import { ODEVLER } from "./mocks/student";
 import type { Odev, TabId, ThemeMode } from "./types";
 
 export function App() {
-  const [authed, setAuthed] = useState(false);
+  const { status } = useSession();
   const [tab, setTab] = useState<TabId>("home");
   const [result, setResult] = useState<Odev | null>(null);
   const [theme, setTheme] = useState<ThemeMode>("light");
@@ -25,15 +27,18 @@ export function App() {
 
   const pendingCount = ODEVLER.filter((o) => o.week === "w0" && o.status !== "done").length;
 
-  if (!authed) {
+  if (status === "loading") {
     return (
       <div className="uk-m" data-theme={theme}>
-        <LoginScreen
-          onDone={() => {
-            setAuthed(true);
-            setTab("home");
-          }}
-        />
+        <Splash />
+      </div>
+    );
+  }
+
+  if (status === "anon") {
+    return (
+      <div className="uk-m" data-theme={theme}>
+        <LoginScreen />
       </div>
     );
   }
@@ -46,7 +51,7 @@ export function App() {
           {tab === "odevler" && <OdevlerScreen openResult={setResult} />}
           {tab === "denemeler" && <DenemelerScreen />}
           {tab === "program" && <ProgramScreen />}
-          {tab === "profil" && <ProfilScreen onLogout={() => setAuthed(false)} theme={theme} setTheme={setTheme} />}
+          {tab === "profil" && <ProfilScreen theme={theme} setTheme={setTheme} />}
         </div>
         <TabBar active={tab} go={go} pendingCount={pendingCount} />
         {result && <ResultSheet odev={result} onClose={() => setResult(null)} />}

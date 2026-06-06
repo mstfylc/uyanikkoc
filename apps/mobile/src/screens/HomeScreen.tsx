@@ -1,10 +1,26 @@
 /* ANA SAYFA — selam, hero ilerleme, statlar, bugünün ödevleri, yaklaşan deneme, koç. */
 import { MIcon } from "../ui/MIcon";
 import { OdevCard } from "./OdevCard";
+import { useSession } from "../lib/session";
 import { ODEVLER, STUDENT, TODAY, UPCOMING } from "../mocks/student";
 import type { Odev, TabId } from "../types";
 
 export function HomeScreen({ go, openResult }: { go: (t: TabId) => void; openResult: (o: Odev) => void }) {
+  const { me } = useSession();
+  // Bootstrap (/api/me) verisi; yoksa mock'a düş.
+  const initials = me?.user.avatarInitials ?? "EY";
+  const first = (me?.user.name ?? STUDENT.name).split(" ")[0];
+  const streak = me?.student?.streak ?? STUDENT.streak;
+  const totalNet = me?.student?.totalNet ?? STUDENT.net;
+  const weekHours = me?.student?.weekHours ?? STUDENT.weekHours;
+  const coachName = me?.student?.coachName ?? STUDENT.coach;
+  const coachInitials = coachName
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
   const todays = ODEVLER.filter((o) => o.week === "w0");
   const pending = todays.filter((o) => o.status !== "done");
   const doneCount = todays.length - pending.length;
@@ -15,11 +31,11 @@ export function HomeScreen({ go, openResult }: { go: (t: TabId) => void; openRes
       <div className="uk-safe-top" />
       <div className="uk-head">
         <span className="uk-avatar" style={{ width: 46, height: 46, fontSize: 16 }}>
-          EY
+          {initials}
         </span>
         <div>
           <div className="hi">İyi çalışmalar,</div>
-          <div className="nm">{STUDENT.first} 👋</div>
+          <div className="nm">{first} 👋</div>
         </div>
         <div className="uk-head-actions">
           <button className="uk-iconbtn">
@@ -34,7 +50,7 @@ export function HomeScreen({ go, openResult }: { go: (t: TabId) => void; openRes
         <div className="uk-hero">
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div className="uk-badge" style={{ background: "rgba(255,255,255,.18)", color: "#fff" }}>
-              <MIcon name="flame" size={13} fill /> {STUDENT.streak} gün seri
+              <MIcon name="flame" size={13} fill /> {streak} gün seri
             </div>
             <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>{TODAY === "Cmt" ? "Cumartesi" : ""} · 6 Haz</div>
           </div>
@@ -61,7 +77,7 @@ export function HomeScreen({ go, openResult }: { go: (t: TabId) => void; openRes
               </span>{" "}
               Toplam Net
             </div>
-            <div className="val tnum">{STUDENT.net}</div>
+            <div className="val tnum">{totalNet}</div>
             <div className="sub" style={{ color: "var(--success)" }}>
               ▲ son denemede +15
             </div>
@@ -74,7 +90,7 @@ export function HomeScreen({ go, openResult }: { go: (t: TabId) => void; openRes
               Bu hafta
             </div>
             <div className="val tnum">
-              {STUDENT.weekHours}
+              {weekHours}
               <span style={{ fontSize: 15, fontWeight: 700, color: "var(--muted)" }}> sa</span>
             </div>
             <div className="sub" style={{ color: "var(--success)" }}>
@@ -125,10 +141,10 @@ export function HomeScreen({ go, openResult }: { go: (t: TabId) => void; openRes
       <div className="uk-sec" style={{ marginTop: 22 }}>
         <div className="uk-card uk-coach" style={{ display: "flex" }}>
           <span className="uk-avatar" style={{ width: 48, height: 48, fontSize: 16, background: "linear-gradient(140deg,#8E87D6,#463DA6)" }}>
-            DE
+            {coachInitials}
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="cn">{STUDENT.coach}</div>
+            <div className="cn">{coachName}</div>
             <div className="cr">Koçun · YKS &amp; LGS</div>
           </div>
           <button className="uk-iconbtn" style={{ background: "var(--primary)", color: "#fff", border: "none" }}>
