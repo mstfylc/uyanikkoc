@@ -154,6 +154,8 @@ async function resolveStudentIdForParent(parentId: string): Promise<string | nul
 export type ParentDashboardSummary = ParentSummaryRecord & {
   pinnedNotes: CoachStudentNoteRecord[];
   nextAppointment: AppointmentRecord | null;
+  childDisplayName: string;
+  studyStreakDays: number;
 };
 
 export async function getParentAssignmentSummary(parentId: string): Promise<ParentDashboardSummary> {
@@ -171,8 +173,13 @@ export async function getParentAssignmentSummary(parentId: string): Promise<Pare
       examTrend: "flat",
       pinnedNotes: [],
       nextAppointment: null,
+      childDisplayName: "Ogrenci",
+      studyStreakDays: 0,
     };
   }
+
+  const { listCoachStudents, resolveCoachIdForStudent } = await import("@/mocks/roster");
+  const { getStudentMotivationSummary } = await import("@/server/services/motivation.service");
 
   const { listStudentTopics } = await import("@/server/services/topic.service");
   const { listStudentExams } = await import("@/server/services/exam.service");
@@ -186,6 +193,11 @@ export async function getParentAssignmentSummary(parentId: string): Promise<Pare
     shouldUseDatabase()
       ? null
       : listAppointmentsForStudent(studentId).find((item) => item.status === "approved") ?? null;
+  const coachId = resolveCoachIdForStudent(studentId);
+  const childDisplayName =
+    listCoachStudents(coachId ?? "coach_001").find((entry) => entry.studentId === studentId)?.displayName ??
+    "Ogrenci";
+  const motivation = await getStudentMotivationSummary(studentId);
 
   return {
     ...base,
@@ -197,5 +209,7 @@ export async function getParentAssignmentSummary(parentId: string): Promise<Pare
     examTrend: examSummary.trend,
     pinnedNotes,
     nextAppointment,
+    childDisplayName,
+    studyStreakDays: motivation.streakDays,
   };
 }

@@ -312,6 +312,18 @@ export type CoachReportStudentRow = {
   latestNet: number | null;
   assignmentRate: number;
   topicRate: number;
+  examTrend: number[];
+  risk: "excellent" | "normal" | "attention" | "critical";
+};
+
+export type ParentReportRecord = {
+  id: string;
+  studentName: string;
+  parentName: string;
+  week: string;
+  completion: number;
+  netDelta: string;
+  status: "pending" | "approved";
 };
 
 export type CoachReportSummary = {
@@ -319,5 +331,12 @@ export type CoachReportSummary = {
   avgExamNet: number | null;
   assignmentCompletionRate: number;
   pendingAppointments: number;
+  pendingReports: number;
+  classNetTrend: number[];
+  classNetGain: number;
+  atRiskCount: number;
+  weekCompletion: Array<{ label: string; value: number }>;
+  riskDistribution: Array<{ band: string; label: string; count: number; tone: string }>;
+  parentReports: ParentReportRecord[];
   students: CoachReportStudentRow[];
 };

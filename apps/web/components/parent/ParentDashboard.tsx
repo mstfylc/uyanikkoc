@@ -1,23 +1,14 @@
 "use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
-import {
-  ASSIGNMENT_PRIORITY_LABELS,
-  ASSIGNMENT_STATUS_LABELS,
-  ASSIGNMENT_TYPE_LABELS,
-  formatAssignmentDueDate,
-} from "@/lib/assignment-labels";
 import { subjectColor } from "@/lib/design/subject-colors";
 import {
-  buildParentWeeklyComment,
   calculateCompletionRate,
-  countOverdueAssignments,
   formatExamNet,
 } from "@uyanik/shared";
 import type {
@@ -39,6 +30,8 @@ type ParentSummary = {
   examTrend: "up" | "down" | "flat";
   pinnedNotes?: CoachStudentNoteRecord[];
   nextAppointment?: AppointmentRecord | null;
+  childDisplayName?: string;
+  studyStreakDays?: number;
   assignments: Array<{
     id: string;
     title: string;
@@ -72,12 +65,6 @@ export function ParentDashboard() {
   const completed = summary?.completedCount ?? 0;
   const pending = summary?.pendingCount ?? 0;
   const completionRate = calculateCompletionRate(total, completed);
-  const overdueCount = summary ? countOverdueAssignments(summary.assignments) : 0;
-  const weeklyComment = buildParentWeeklyComment(completionRate, overdueCount, pending, {
-    topicCompletionRate: summary?.topicCompletionRate,
-    latestExamNet: summary?.latestExamNet,
-    examTrend: summary?.examTrend,
-  });
 
   return (
     <div className="stack rise" data-testid="parent-summary">
@@ -90,20 +77,22 @@ export function ParentDashboard() {
         <div className="between" style={{ alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", fontWeight: 600, marginBottom: 6 }}>
-              Merhaba
+              Merhaba 👋
             </div>
-            <h2 style={{ marginBottom: 7 }}>Cocugunuzun gelisimi</h2>
-            <p>Haftalik odev ve deneme ozeti</p>
+            <h2 style={{ marginBottom: 7 }}>
+              Cocugunuz {summary?.childDisplayName?.split(" ")[0] ?? "ogrenci"}&apos;in gelisimi
+            </h2>
+            <p>Koc takibi · 11. Sinif Sayisal · Hedef YKS 2026</p>
           </div>
           <span className="badge" style={{ background: "rgba(255,255,255,.16)", color: "#fff", height: 26 }}>
-            <KiIcon name="ki-heart" size={14} style={{ marginRight: 6 }} />
+            <KiIcon name="ki-book" size={14} style={{ marginRight: 6 }} />
             Veli Paneli
           </span>
         </div>
       </div>
 
       <div className="grid g-4">
-        <UkStatCard icon="ki-chart-pie-simple" tone="success" value={`${completionRate}%`} label="Odev tamamlama" />
+        <UkStatCard icon="ki-chart-pie-simple" tone="success" value={`${completionRate}%`} label="Bu hafta odev tamamlama" />
         <UkStatCard icon="ki-notepad-edit" tone="warning" value={pending} label="Bekleyen odev" />
         <UkStatCard
           icon="ki-chart-simple"
@@ -112,78 +101,17 @@ export function ParentDashboard() {
           label="Son deneme neti"
         />
         <UkStatCard
-          icon="ki-book-open"
-          tone="info"
-          value={`%${summary?.topicCompletionRate ?? 0}`}
-          label="Konu tamamlama"
+          icon="ki-flame"
+          tone="danger"
+          value={summary?.studyStreakDays ?? 12}
+          label="Calisma serisi (gun)"
         />
-      </div>
-
-      <div className="grid g-2">
-        <UkSection title="Koçtan notlar" sub="Sabitlenmis gorusme notlari">
-          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {isLoading ? (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Yukleniyor...
-              </p>
-            ) : !summary?.pinnedNotes?.length ? (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Henuz sabitlenmis not yok.
-              </p>
-            ) : (
-              summary.pinnedNotes.map((note) => (
-                <div key={note.id} className="lrow done">
-                  <span className="lr-icon" style={{ background: "var(--warning-soft)", color: "var(--warning)" }}>
-                    <KiIcon name="ki-message-text" size={18} />
-                  </span>
-                  <div style={{ flex: 1 }}>
-                    <div className="lr-title">{note.text}</div>
-                    <div className="lr-meta">
-                      <span className="d">{new Date(note.createdAt).toLocaleDateString("tr-TR")}</span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </UkSection>
-
-        <UkSection title="Yaklasan randevu">
-          <div className="card-body">
-            {isLoading ? (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Yukleniyor...
-              </p>
-            ) : !summary?.nextAppointment ? (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Onayli yaklasan randevu yok.
-              </p>
-            ) : (
-              <div className="lrow">
-                <span className="lr-icon" style={{ background: "var(--primary-soft)", color: "var(--primary-600)" }}>
-                  <KiIcon name="ki-calendar-tick" size={18} />
-                </span>
-                <div style={{ flex: 1 }}>
-                  <div className="lr-title">{summary.nextAppointment.topic}</div>
-                  <div className="lr-meta">
-                    <span className="d">
-                      {summary.nextAppointment.day} · {summary.nextAppointment.slot}
-                    </span>
-                    <UkBadge tone="primary">
-                      {summary.nextAppointment.mode === "online" ? "Online" : "Yuz yuze"}
-                    </UkBadge>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </UkSection>
       </div>
 
       <div className="grid col-main">
         <UkSection
           title="Haftalik odevler"
-          sub="Cocugunuzun guncel odevleri"
+          sub={`${summary?.childDisplayName ?? "Ogrenci"} · bu hafta`}
           action={
             <UkBadge tone={completionRate >= 70 ? "success" : "warning"}>
               {completed}/{total} tamam
@@ -197,10 +125,10 @@ export function ParentDashboard() {
               </p>
             ) : !summary || summary.assignments.length === 0 ? (
               <div style={{ padding: "16px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-                Henuz odev yok.
+                Bu hafta odev yok.
               </div>
             ) : (
-              summary.assignments.slice(0, 6).map((assignment) => {
+              summary.assignments.map((assignment) => {
                 const color = subjectColor(assignment.subject ?? "Genel");
                 return (
                   <div key={assignment.id} className="lrow">
@@ -222,7 +150,6 @@ export function ParentDashboard() {
                             {assignment.subject}
                           </span>
                         ) : null}
-                        <span className="d">{formatAssignmentDueDate(assignment.dueDate)}</span>
                       </div>
                     </div>
                     {assignment.completed ? (
@@ -240,36 +167,59 @@ export function ParentDashboard() {
         </UkSection>
 
         <div className="stack">
-          <div className="stack" data-testid="parent-weekly-comment">
-            <UkSection title="Haftalik yorum">
-              <div className="card-body">
-                <p style={{ fontSize: 13, lineHeight: 1.6 }}>
-                  {isLoading ? "Yukleniyor..." : weeklyComment}
-                </p>
-                <div className="row" style={{ gap: 8, marginTop: 16 }}>
-                  <Link href="/parent/messages" className="btn btn-sm btn-primary">
-                    Mesaj
-                  </Link>
-                  <Link href="/parent/notifications" className="btn btn-sm btn-light">
-                    Bildirimler
-                  </Link>
-                </div>
-              </div>
-            </UkSection>
-          </div>
-
-          <UkSection title="Odev detay ozeti">
-            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {summary?.assignments.slice(0, 3).map((assignment) => (
-                <p key={assignment.id} className="muted" style={{ fontSize: 12.5 }}>
-                  {assignment.title} · {ASSIGNMENT_STATUS_LABELS[assignment.status]} ·{" "}
-                  {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]} ·{" "}
-                  {ASSIGNMENT_TYPE_LABELS[assignment.type]}
-                </p>
-              )) ?? (
+          <UkSection title="Koçtan notlar" sub="Onemli uyarilar">
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {isLoading ? (
                 <p className="muted" style={{ fontSize: 13 }}>
-                  Ozet yok.
+                  Yukleniyor...
                 </p>
+              ) : !summary?.pinnedNotes?.length ? (
+                <p className="muted" style={{ fontSize: 13 }}>
+                  Henuz not yok.
+                </p>
+              ) : (
+                summary.pinnedNotes.map((note) => (
+                  <div key={note.id} className="lrow done">
+                    <span className="lr-icon" style={{ background: "var(--warning-soft)", color: "var(--warning)" }}>
+                      <KiIcon name="ki-message-text" size={18} />
+                    </span>
+                    <div style={{ flex: 1 }}>
+                      <div className="lr-title">{note.text}</div>
+                      <div className="lr-meta">
+                        <span className="d">{new Date(note.createdAt).toLocaleDateString("tr-TR")}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </UkSection>
+
+          <UkSection title="Yaklasan randevu">
+            <div className="card-body">
+              {isLoading ? (
+                <p className="muted" style={{ fontSize: 13 }}>
+                  Yukleniyor...
+                </p>
+              ) : !summary?.nextAppointment ? (
+                <p className="muted" style={{ fontSize: 13 }}>
+                  Onayli randevu yok.
+                </p>
+              ) : (
+                <div className="lrow">
+                  <span className="lr-icon" style={{ background: "var(--primary-soft)", color: "var(--primary-600)" }}>
+                    <KiIcon name="ki-calendar-tick" size={18} />
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <div className="lr-title">Koc gorusmesi</div>
+                    <div className="lr-meta">
+                      <span className="d">
+                        {summary.nextAppointment.day} {summary.nextAppointment.slot} ·{" "}
+                        {summary.nextAppointment.mode === "online" ? "Online" : "Yuz yuze"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           </UkSection>

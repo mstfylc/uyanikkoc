@@ -24,7 +24,7 @@ const COACH_NAV: UkNavItem[] = [
   { href: "/coach/dashboard", label: "Dashboard", icon: "ki-element-11" },
   { href: "/coach/students", label: "Ogrencilerim", icon: "ki-people" },
   { href: "/coach/topics", label: "Konu Takibi", icon: "ki-book-open" },
-  { href: "/coach/assignments/create", label: "Odev & Gorev", icon: "ki-notepad-edit" },
+  { href: "/coach/assignments", label: "Odev & Gorev", icon: "ki-notepad-edit" },
   { href: "/coach/exams", label: "Denemeler", icon: "ki-chart-simple" },
   { href: "/coach/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/coach/appointments", label: "Randevular", icon: "ki-calendar-tick" },

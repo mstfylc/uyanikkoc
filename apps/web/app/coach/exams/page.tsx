@@ -1,5 +1,5 @@
-import { CoachExamEntryForm } from "@/components/coach/CoachExamEntryForm";
+import { CoachExamsPanel } from "@/components/coach/CoachExamsPanel";
 
 export default function CoachExamsPage() {
-  return <CoachExamEntryForm />;
+  return <CoachExamsPanel />;
 }

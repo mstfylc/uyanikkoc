@@ -4,16 +4,14 @@ import { KiIcon } from "@/components/design/KiIcon";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { UkBarChart } from "@/components/design/UkBarChart";
 import { CoachStudentsTable } from "@/components/coach/CoachStudentsTable";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
 import { buildCoachStudentRows } from "@/lib/design/coach-student-rows";
 import {
-  buildCoachSuggestion,
-  buildRulesBasedRiskBand,
   calculateCompletionRate,
-  countOverdueAssignments,
   isAssignmentOpen,
 } from "@uyanik/shared";
 import type {
@@ -80,10 +78,7 @@ export function CoachDashboard() {
   const completed = assignments.filter((item) => item.completed).length;
   const pending = total - completed;
   const completionRate = calculateCompletionRate(total, completed);
-  const overdueCount = countOverdueAssignments(assignments);
-  const riskBand = buildRulesBasedRiskBand(completionRate, overdueCount);
   const atRisk = studentRows.filter((row) => row.risk === "attention" || row.risk === "critical").length;
-  const suggestion = buildCoachSuggestion(completionRate, overdueCount, pending);
 
   const actionItems = assignments
     .filter((item) => isAssignmentOpen(item))
@@ -108,28 +103,11 @@ export function CoachDashboard() {
         <UkStatCard icon="ki-notepad-edit" tone="warning" value={pending} label="Bekleyen odev" />
       </div>
 
-      <div className="card" data-testid="coach-risk-card">
-        <div className="card-pad flex flex-col gap-2">
-          <div className="between">
-            <h3 style={{ fontSize: 14.5, fontWeight: 700 }}>Risk ozeti</h3>
-            <UkBadge tone={riskBand === "critical" ? "danger" : riskBand === "attention" ? "warning" : "success"}>
-              {riskBand}
-            </UkBadge>
-          </div>
-          <p className="muted" style={{ fontSize: 13 }}>
-            {isLoading
-              ? "Yukleniyor..."
-              : `Tamamlama %${completionRate} · Gecikmis: ${overdueCount} · Bekleyen: ${pending}`}
-          </p>
-          {!isLoading ? <p style={{ fontSize: 13 }}>{suggestion}</p> : null}
-        </div>
-      </div>
-
       <div className="grid col-main">
         <CoachStudentsTable rows={studentRows} isLoading={isLoading} />
         <UkSection
           title="Aksiyon gerektirenler"
-          sub="Acik odevler"
+          sub="Onceliklendirilmis"
           action={<UkBadge tone="danger">{actionItems.length}</UkBadge>}
         >
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -152,7 +130,7 @@ export function CoachDashboard() {
                 </div>
               ))
             )}
-            <Link href="/coach/assignments/create" className="btn btn-primary" style={{ width: "100%", marginTop: 2 }}>
+            <Link href="/coach/assignments" className="btn btn-primary" style={{ width: "100%", marginTop: 2 }}>
               <KiIcon name="ki-plus" />
               Yeni odev ata
             </Link>
@@ -160,7 +138,26 @@ export function CoachDashboard() {
         </UkSection>
       </div>
 
-      <UkSection title="Son aktivite">
+      <div className="grid col-main">
+        <UkSection title="Haftalik sinif tamamlamasi" sub="Son 7 gun ortalamasi">
+          <div className="card-body">
+            <UkBarChart
+              data={[
+                { label: "Pzt", value: Math.max(completionRate - 8, 0) },
+                { label: "Sal", value: Math.max(completionRate - 4, 0) },
+                { label: "Car", value: Math.max(completionRate - 2, 0) },
+                { label: "Per", value: completionRate },
+                { label: "Cum", value: Math.min(completionRate + 3, 100) },
+                { label: "Cmt", value: Math.max(completionRate - 10, 0) },
+                { label: "Paz", value: Math.max(completionRate - 12, 0) },
+              ]}
+              max={100}
+              peakIdx={4}
+            />
+          </div>
+        </UkSection>
+
+        <UkSection title="Son aktivite" action={<Link href="/coach/assignments" className="link-btn">Tumu</Link>}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           {recentActivity.length === 0 ? (
             <p className="muted" style={{ fontSize: 13, padding: "12px 0" }}>
@@ -202,6 +199,7 @@ export function CoachDashboard() {
           )}
         </div>
       </UkSection>
+      </div>
     </div>
   );
 }

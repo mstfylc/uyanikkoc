@@ -1,60 +1,55 @@
 # Tasarım ↔ Kod Eşleştirme Raporu
 
-Kaynak: `uyanikkoc.zip` → `design_handoff_uyanik_koc/`
+Kaynak: `design_handoff_uyanik_koc/` (Claude design handoff)
 
-**Güncelleme:** Tasarımı olan tüm alpha ekranlar kodlandı (in-memory mock + API + uk-design UI).
+**Son güncelleme:** Tam ekran denetimi + kritik uyumsuzlukların giderilmesi.
 
-## Tamamlanan ekranlar
+## Bu turda hizalanan ekranlar
 
-| Tasarım | Route | Backend |
-|---------|-------|---------|
-| Login | `/login` | NextAuth |
-| App shell | `AppLayout` | — |
-| Öğrenci Dashboard | `/student/dashboard` | mevcut API |
-| Çalışma Programı | `/student/schedule` | `/api/student/schedule` |
-| Konu Takibi (öğrenci) | `/student/topics` | `/api/student/topics` |
-| Denemeler (öğrenci) | `/student/exams` | `/api/student/exams` |
-| Ödevlerim | `/student/assignments` | `/api/student/assignments` |
-| Randevular (öğrenci) | `/student/appointments` | `/api/student/appointments` |
-| Testlerim | `/student/tests` | `/api/student/tests` |
-| Mesajlar | `/student/messages` | `/api/student/messages` |
-| Motivasyon | `/student/motivation` | `/api/student/motivation` |
-| AI Koç (yakında) | `/student/ai-coach` | statik |
-| Koç Dashboard | `/coach/dashboard` | mevcut API |
-| Öğrencilerim | `/coach/students` | `/api/coach/students` |
-| Koç Konu Takibi | `/coach/topics` | `/api/coach/students/topics`, `/api/coach/notes` |
-| Ödev & Görev | `/coach/assignments/create` | `/api/coach/assignments` |
-| Denemeler (koç) | `/coach/exams` | `/api/coach/exams` + `/api/coach/exams/import` (CSV) |
-| Mesajlar (koç) | `/coach/messages` | `/api/coach/messages` |
-| Randevular (koç) | `/coach/appointments` | `/api/coach/appointments` |
-| Envanter & Testler | `/coach/tests` | `/api/coach/tests` |
-| Raporlar | `/coach/reports` | `/api/coach/reports` |
-| Veli Genel Bakış | `/parent/dashboard` | `/api/parent/summary` |
-| Veli Deneme Sonuçları | `/parent/exams` | `/api/parent/exams` |
-| Randevular (veli) | `/parent/appointments` | `/api/parent/appointments` |
-| Destek | `/{role}/support` | `/api/support` |
-| Ayarlar / Müfredat | `/{role}/settings` | `/api/coach/curriculum` (koç) |
-| Profil | `/{role}/profile` | session |
+| Ekran | Route | Yapılan |
+|-------|-------|---------|
+| Koç Denemeler | `/coach/exams` | Sınıf görünümü, stat kartlar, ders ort., sıralı tablo, modallar, trend grafiği |
+| Koç Raporlar | `/coach/reports` | Veli raporları tablosu, onay akışı, sparkline, haftalık bar, risk dağılımı |
+| Koç Ödev & Görev | `/coach/assignments` | Liste sayfası: hafta seg, stat kartlar, filtreler (create ayrı route) |
+| Koç Dashboard | `/coach/dashboard` | Net trend sparkline sütunu, haftalık tamamlama grafiği, layout |
+| Veli Denemeler | `/parent/exams` | Ders bazında net barları, puan/sıralama stat kartları |
+| Veli Dashboard | `/parent/dashboard` | Tasarım layout (ödevler sol, not/randevu sağ), doğru stat satırı |
+| Destek (tüm roller) | `/{role}/support` | SSS akordeon, iletişim kartları, kategori chip’leri |
+| Mesajlar | `/{role}/messages` | Sohbet arama, mesaj saat damgaları |
+| Motivasyon | `/student/motivation` | Hero seri, YKS geri sayım halkası, rozet grid’i |
 
-## Kod var — tasarım yok (dokunulmadı)
+## Ortak bileşenler (yeni)
 
-| Route | Açıklama |
-|-------|----------|
-| `/branch/dashboard` | Şube alpha shell |
-| `/admin/dashboard` | Admin alpha shell |
-| `/parent/notifications` | Bildirim listesi |
-| `/student/notifications` | Bildirim listesi |
+- `UkSparkline` — dashboard / rapor trend çizgileri
+- `UkBarChart` — sınıf ve haftalık grafikler
+- `lib/design/support-faq.ts` — rol bazlı SSS
+- `lib/design/coach-exam-sessions.ts` — deneme oturumu gruplama
 
-## Alpha sınırları (bilinçli)
+## Hâlâ kısmi / bilinçli alpha sınırı
 
-| Özellik | Durum |
-|---------|--------|
-| Excel (.xlsx) deneme import | CSV toplu import (tasarım akışının sadeleştirilmiş hali) |
-| Koç Konu Takibi (tam modal set) | Konu özeti + notlar + okul programı görüntüleme |
-| Öğrenci deneme analizi (projeksiyon) | Liste + ders tablosu + trend özeti |
-| Ayarlar (öğrenci/veli) | Profil tercihleri placeholder |
-| Prisma modelleri | Yeni alanlar in-memory mock; DB migration sonraki faz |
+| Alan | Durum |
+|------|--------|
+| Excel (.xlsx) deneme import | CSV + modal (xlsx dropzone yok) |
+| Koç Konu Takibi (tam) | Net gelişimi, haftalık soru hedefi, Ödev Ata modalı, topic rail tablosu — **henüz eksik** |
+| Koç Randevu müsait saat ızgarası | Müsait Saatlerim sekmesi — **henüz eksik** |
+| Koç Testler modal gönderim | Stat kart + inline form (tasarım modal picker değil) |
+| Öğrenci Ödevlerim Kaynaklarım | **henüz eksik** |
+| Öğrenci Dashboard sparkline / yaklaşan denemeler | **henüz eksik** |
+| Öğrenci Denemeler manuel giriş + sparkline | Analiz sekmesi var; sonuçlar sekmesi kısmi |
+| Ayarlar tab shell (Profil/Bildirim) | Koç müfredat editörü var; tab navigasyonu kısmi |
+| Login sol panel istatistikleri | **henüz eksik** |
+| Profil hero düzeni | Basit kart (tasarım rail layout değil) |
+| Veli / öğrenci bildirim sayfası | Tasarımda yok; Metronic stil |
 
-## Sidebar
+## Test durumu
 
-Menü `uk-nav.ts` ile tasarımdaki tüm alpha route'ları gösterir; Genel bölümünde Destek ve Ayarlar; footer'da Profil linki.
+- `pnpm test` — 33 test geçti
+- `pnpm build` — ESLint + typecheck geçti
+
+## Öncelikli kalan iş (sonraki tur)
+
+1. Koç Konu Takibi — `coach-konu.jsx` tam set
+2. Koç Randevular — Müsait Saatlerim + availability grid
+3. Öğrenci Ödevlerim — Kaynaklarım + hafta seçici + stat satırı
+4. Öğrenci Dashboard — exam sparkline + upcoming exams paneli
+5. Login / Profil — tasarım hero ve footer linkleri

@@ -28,6 +28,7 @@ export function MessagesPanel({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [thread, setThread] = useState<MessageThreadRecord | null>(null);
   const [messageBody, setMessageBody] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
 
@@ -85,6 +86,13 @@ export function MessagesPanel({
   }
 
   const activeThread = threads.find((item) => item.id === selectedId);
+  const filteredThreads = threads.filter((item) => {
+    const query = searchQuery.trim().toLocaleLowerCase("tr-TR");
+    if (!query) {
+      return true;
+    }
+    return item.title.toLocaleLowerCase("tr-TR").includes(query);
+  });
 
   return (
     <div className="stack rise" data-testid={testId}>
@@ -100,7 +108,7 @@ export function MessagesPanel({
         </p>
       ) : (
         <div className="card" style={{ overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(260px, 340px) 1fr", minHeight: 520 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", height: 600 }}>
             <div
               style={{
                 borderRight: "1px solid var(--border)",
@@ -109,8 +117,18 @@ export function MessagesPanel({
                 minHeight: 0,
               }}
             >
+              <div style={{ padding: 14, borderBottom: "1px solid var(--border)" }}>
+                <div className="searchbox" style={{ minWidth: 0, margin: 0, display: "flex" }}>
+                  <KiIcon name="ki-magnifier" size={16} />
+                  <input
+                    placeholder="Sohbet ara..."
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                  />
+                </div>
+              </div>
               <div style={{ overflowY: "auto", flex: 1, padding: 8 }}>
-                {threads.map((item) => {
+                {filteredThreads.map((item) => {
                   const active = item.id === selectedId;
                   const last = item.messages[item.messages.length - 1];
                   return (
@@ -145,6 +163,9 @@ export function MessagesPanel({
                           >
                             {item.title}
                           </b>
+                          <span style={{ fontSize: 11, color: "var(--faint)", flexShrink: 0 }}>
+                            {last ? new Date(last.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) : ""}
+                          </span>
                         </div>
                         <span
                           style={{
@@ -210,6 +231,19 @@ export function MessagesPanel({
                           }}
                         >
                           {message.body}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color: "var(--faint)",
+                            marginTop: 4,
+                            textAlign: mine ? "right" : "left",
+                          }}
+                        >
+                          {new Date(message.createdAt).toLocaleTimeString("tr-TR", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </div>
                       </div>
                     );

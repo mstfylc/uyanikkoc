@@ -59,4 +59,5 @@ export type {
   SupportTicketRecord,
   CoachReportSummary,
   CoachReportStudentRow,
+  ParentReportRecord,
 } from "./types";

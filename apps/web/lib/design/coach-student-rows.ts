@@ -12,6 +12,7 @@ export type CoachStudentRow = {
   email: string;
   completion: number;
   net: number | null;
+  examTrend: number[];
   risk: RiskBand;
   lastActivity: string;
 };
@@ -38,7 +39,7 @@ export function buildCoachStudentRows(
     const risk = buildRulesBasedRiskBand(completion, overdue);
     const studentExams = exams
       .filter((item) => item.studentId === student.studentId)
-      .sort((a, b) => new Date(b.takenAt).getTime() - new Date(a.takenAt).getTime());
+      .sort((a, b) => new Date(a.takenAt).getTime() - new Date(b.takenAt).getTime());
     const latestAssignment = studentAssignments
       .slice()
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0];
@@ -48,7 +49,8 @@ export function buildCoachStudentRows(
       displayName: student.displayName,
       email: student.email,
       completion,
-      net: studentExams[0]?.totalNet ?? null,
+      net: studentExams[studentExams.length - 1]?.totalNet ?? null,
+      examTrend: studentExams.map((exam) => exam.totalNet),
       risk,
       lastActivity: latestAssignment
         ? new Date(latestAssignment.updatedAt).toLocaleDateString("tr-TR")

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { UkAvatar } from "@/components/design/UkAvatar";
+import { UkSparkline } from "@/components/design/UkSparkline";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
 import type { CoachStudentRow } from "@/lib/design/coach-student-rows";
@@ -57,7 +58,7 @@ export function CoachStudentsTable({ rows, isLoading }: CoachStudentsTableProps)
               <tr>
                 <th>Ogrenci</th>
                 <th>Tamamlama</th>
-                <th>Son net</th>
+                <th>Net trendi</th>
                 <th>Durum</th>
                 <th style={{ textAlign: "right" }}>Son aktivite</th>
               </tr>
@@ -102,9 +103,18 @@ export function CoachStudentsTable({ rows, isLoading }: CoachStudentsTableProps)
                         </div>
                       </td>
                       <td>
-                        <span className="tnum" style={{ fontSize: 12.5, fontWeight: 700 }}>
-                          {row.net != null ? formatExamNet(row.net) : "—"}
-                        </span>
+                        <div style={{ width: 92 }}>
+                          {row.examTrend.length > 1 ? (
+                            <UkSparkline data={row.examTrend} width={92} height={28} fill={false} />
+                          ) : (
+                            <span className="muted" style={{ fontSize: 11 }}>
+                              —
+                            </span>
+                          )}
+                          <div className="tnum" style={{ fontSize: 12.5, fontWeight: 700, marginTop: 4 }}>
+                            {row.net != null ? formatExamNet(row.net) : "—"}
+                          </div>
+                        </div>
                       </td>
                       <td>
                         <UkBadge tone={RISK_TONE[row.risk]} dot>

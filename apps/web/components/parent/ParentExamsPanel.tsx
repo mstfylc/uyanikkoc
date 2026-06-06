@@ -1,18 +1,30 @@
 "use client";
 
-import { KiIcon } from "@/components/design/KiIcon";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
-import { formatExamNet, RESULT_EXAM_TYPE_LABELS } from "@uyanik/shared";
+import {
+  averageCategoryNets,
+  buildCoachExamSessions,
+} from "@/lib/design/coach-exam-sessions";
+import {
+  EXAM_CAT_COLOR,
+  EXAM_CAT_MAX,
+  EXAM_CAT_ORDER,
+} from "@/lib/design/exam-categories";
+import { formatExamNet } from "@uyanik/shared";
 import type { ExamResultRecord, ExamTrendSummary } from "@uyanik/database";
+
+function formatCategoryNet(value: number): string {
+  return value.toFixed(1).replace(/\.0$/, "");
+}
 
 export function ParentExamsPanel() {
   const [exams, setExams] = useState<ExamResultRecord[]>([]);
   const [summary, setSummary] = useState<ExamTrendSummary | null>(null);
+  const [childName, setChildName] = useState("Ogrenci");
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -21,9 +33,13 @@ export function ParentExamsPanel() {
       const data = (await response.json()) as {
         exams: ExamResultRecord[];
         summary: ExamTrendSummary | null;
+        childName?: string;
       };
       setExams(data.exams);
       setSummary(data.summary);
+      if (data.childName) {
+        setChildName(data.childName);
+      }
     }
     setIsLoading(false);
   }, []);
@@ -32,59 +48,118 @@ export function ParentExamsPanel() {
     void load();
   }, [load]);
 
+  const latestExam = exams[0] ?? null;
+  const sessions = useMemo(
+    () =>
+      buildCoachExamSessions(exams, [
+        { studentId: latestExam?.studentId ?? "child", displayName: childName, email: "" },
+      ]),
+    [childName, exams, latestExam?.studentId],
+  );
+  const latestSession = sessions[0] ?? null;
+  const studentRow = latestSession?.students[0] ?? null;
+  const categoryAverages = studentRow ? averageCategoryNets([studentRow]) : null;
+
+  if (!isLoading && exams.length === 0) {
+    return (
+      <div className="stack rise" data-testid="parent-exams-panel">
+        <UkPageHead title="Deneme Sonuclari" sub={childName} />
+        <div className="card">
+          <div className="card-pad" style={{ padding: 40, textAlign: "center", color: "var(--muted)", fontSize: 13.5 }}>
+            Henuz aciklanmis deneme sonucu yok.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="stack rise" data-testid="parent-exams-panel">
-      <UkPageHead title="Deneme Sonuclari" sub="Ogrencinin deneme performansi" />
+      <UkPageHead
+        title="Deneme Sonuclari"
+        sub={`${childName} · ${latestSession?.name ?? "Deneme"}`}
+      />
 
       <div className="grid g-4">
         <UkStatCard
           icon="ki-chart-simple"
           tone="primary"
-          value={summary?.latestNet != null ? formatExamNet(summary.latestNet) : "—"}
-          label="Son deneme neti"
+          value={studentRow ? formatExamNet(studentRow.totalNet) : "—"}
+          label="Toplam net"
         />
-        <UkStatCard icon="ki-chart-line-up" tone="info" value={summary?.examCount ?? 0} label="Toplam deneme" />
         <UkStatCard
-          icon="ki-flag"
+          icon="ki-star"
           tone="success"
-          value={summary?.examType ? RESULT_EXAM_TYPE_LABELS[summary.examType] : "—"}
-          label="Sinav turu"
+          value={studentRow?.score ?? "—"}
+          label="Puan"
         />
-        <UkStatCard icon="ki-arrow-up" tone="warning" value={exams.length} label="Kayit sayisi" />
+        <UkStatCard
+          icon="ki-chart-line-up"
+          tone="info"
+          value={studentRow?.rank ? studentRow.rank.toLocaleString("tr-TR") : "—"}
+          label="Siralama"
+        />
+        <UkStatCard
+          icon="ki-people"
+          tone="warning"
+          value={latestSession?.students.length ?? 1}
+          label="Katilan"
+        />
       </div>
 
-      <UkSection title="Deneme listesi" sub={`${exams.length} kayit`}>
-        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <UkSection title="Ders Bazinda Net" sub="Cocugunuzun bu denemedeki dagilimi">
+        <div className="card-body subj">
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
               Yukleniyor...
             </p>
-          ) : exams.length === 0 ? (
-            <p className="muted" style={{ fontSize: 13 }}>
-              Henuz deneme sonucu yok.
-            </p>
-          ) : (
-            exams.map((exam) => (
-              <div key={exam.id} className="lrow">
-                <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                  <KiIcon name="ki-chart-simple" />
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="lr-title">{exam.label ?? RESULT_EXAM_TYPE_LABELS[exam.examType]}</div>
-                  <div className="lr-meta">
-                    <span className="d">{new Date(exam.takenAt).toLocaleDateString("tr-TR")}</span>
-                    <UkBadge tone="primary">{RESULT_EXAM_TYPE_LABELS[exam.examType]}</UkBadge>
-                    <span className="d">{exam.subjects.length} ders</span>
+          ) : categoryAverages && studentRow ? (
+            EXAM_CAT_ORDER.map((category) => {
+              const net = studentRow.byCat[category].net;
+              return (
+                <div className="subj-row" key={category}>
+                  <div className="between" style={{ marginBottom: 7 }}>
+                    <span className="sname">
+                      <span className="swatch" style={{ background: EXAM_CAT_COLOR[category] }} />
+                      {category}
+                    </span>
+                    <span className="tnum" style={{ fontWeight: 800, fontSize: 13 }}>
+                      {formatCategoryNet(net)} / {EXAM_CAT_MAX[category]}
+                    </span>
+                  </div>
+                  <div className="bar">
+                    <span
+                      style={{
+                        width: `${(net / EXAM_CAT_MAX[category]) * 100}%`,
+                        background: EXAM_CAT_COLOR[category],
+                      }}
+                    />
                   </div>
                 </div>
-                <span className="tnum" style={{ fontWeight: 800, fontSize: 16 }}>
-                  {formatExamNet(exam.totalNet)} net
-                </span>
-              </div>
-            ))
+              );
+            })
+          ) : (
+            <p className="muted" style={{ fontSize: 13 }}>
+              Ders dagilimi hesaplanamadi.
+            </p>
           )}
         </div>
       </UkSection>
+
+      {exams.length > 1 ? (
+        <UkSection title="Onceki denemeler" sub={`${exams.length} kayit · son: ${summary?.examType ?? "TYT"}`}>
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {exams.slice(1, 5).map((exam) => (
+              <div key={exam.id} className="between">
+                <span style={{ fontSize: 13, fontWeight: 600 }}>{exam.label ?? new Date(exam.takenAt).toLocaleDateString("tr-TR")}</span>
+                <span className="tnum" style={{ fontWeight: 800 }}>
+                  {formatExamNet(exam.totalNet)} net
+                </span>
+              </div>
+            ))}
+          </div>
+        </UkSection>
+      ) : null}
     </div>
   );
 }

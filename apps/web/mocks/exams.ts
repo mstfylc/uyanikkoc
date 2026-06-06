@@ -2,6 +2,7 @@ import type { ExamResultRecord, ExamTrendSummary } from "@uyanik/database";
 import { buildExamTrendSummary } from "@uyanik/database";
 
 import { DEMO_STUDENT_ID } from "@/mocks/assignments";
+import { DEMO_STUDENT_002_ID } from "@/mocks/roster";
 
 const globalStore = globalThis as typeof globalThis & {
   __uyanikExamResults?: ExamResultRecord[];
@@ -51,6 +52,38 @@ function seedIfEmpty() {
         { id: "exam_sub_6", subjectName: "Matematik", correct: 20, wrong: 7, net: 18.25 },
         { id: "exam_sub_7", subjectName: "Fen", correct: 13, wrong: 4, net: 12 },
         { id: "exam_sub_8", subjectName: "Sosyal", correct: 15, wrong: 4, net: 14 },
+      ],
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    },
+    {
+      id: "exam_mem_tyt_1_s2",
+      studentId: DEMO_STUDENT_002_ID,
+      examType: "TYT",
+      label: "TYT Deneme 1",
+      takenAt: olderTakenAt,
+      totalNet: 65.5,
+      subjects: [
+        { id: "exam_sub_9", subjectName: "Turkce", correct: 28, wrong: 8, net: 26 },
+        { id: "exam_sub_10", subjectName: "Matematik", correct: 16, wrong: 9, net: 13.75 },
+        { id: "exam_sub_11", subjectName: "Fen", correct: 11, wrong: 6, net: 9.5 },
+        { id: "exam_sub_12", subjectName: "Sosyal", correct: 13, wrong: 5, net: 11.75 },
+      ],
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    },
+    {
+      id: "exam_mem_tyt_2_s2",
+      studentId: DEMO_STUDENT_002_ID,
+      examType: "TYT",
+      label: "TYT Deneme 2",
+      takenAt: newerTakenAt,
+      totalNet: 72.25,
+      subjects: [
+        { id: "exam_sub_13", subjectName: "Turkce", correct: 31, wrong: 7, net: 29.25 },
+        { id: "exam_sub_14", subjectName: "Matematik", correct: 18, wrong: 8, net: 16 },
+        { id: "exam_sub_15", subjectName: "Fen", correct: 12, wrong: 5, net: 10.75 },
+        { id: "exam_sub_16", subjectName: "Sosyal", correct: 14, wrong: 4, net: 13 },
       ],
       createdAt: timestamp,
       updatedAt: timestamp,
