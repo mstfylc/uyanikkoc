@@ -1,4 +1,4 @@
-import { resolveKiIcon } from "@/lib/design/icon-paths";
+import { parseKiIconRef } from "@/lib/design/icon-paths";
 
 import { UkIcon } from "./UkIcon";
 
@@ -11,5 +11,8 @@ type KiIconProps = {
 
 /** Metronic ki-* sınıf adlarını SVG ikona çevirir (Vercel'de font gerekmez). */
 export function KiIcon({ name, size = 20, className, style }: KiIconProps) {
-  return <UkIcon name={resolveKiIcon(name)} size={size} className={className} style={style} />;
+  const parsed = parseKiIconRef(name);
+  const mergedClassName = [parsed.className, className].filter(Boolean).join(" ") || undefined;
+
+  return <UkIcon name={parsed.icon} size={size} className={mergedClassName} style={style} />;
 }

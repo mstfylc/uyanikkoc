@@ -21,9 +21,11 @@ import {
   formatExamNet,
 } from "@uyanik/shared";
 import type {
+  AppointmentRecord,
   AssignmentPriority,
   AssignmentStatus,
   AssignmentType,
+  CoachStudentNoteRecord,
   ResultExamType,
 } from "@uyanik/database";
 
@@ -35,6 +37,8 @@ type ParentSummary = {
   latestExamNet: number | null;
   latestExamType: ResultExamType | null;
   examTrend: "up" | "down" | "flat";
+  pinnedNotes?: CoachStudentNoteRecord[];
+  nextAppointment?: AppointmentRecord | null;
   assignments: Array<{
     id: string;
     title: string;
@@ -113,6 +117,67 @@ export function ParentDashboard() {
           value={`%${summary?.topicCompletionRate ?? 0}`}
           label="Konu tamamlama"
         />
+      </div>
+
+      <div className="grid g-2">
+        <UkSection title="Koçtan notlar" sub="Sabitlenmis gorusme notlari">
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {isLoading ? (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Yukleniyor...
+              </p>
+            ) : !summary?.pinnedNotes?.length ? (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Henuz sabitlenmis not yok.
+              </p>
+            ) : (
+              summary.pinnedNotes.map((note) => (
+                <div key={note.id} className="lrow done">
+                  <span className="lr-icon" style={{ background: "var(--warning-soft)", color: "var(--warning)" }}>
+                    <KiIcon name="ki-message-text" size={18} />
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <div className="lr-title">{note.text}</div>
+                    <div className="lr-meta">
+                      <span className="d">{new Date(note.createdAt).toLocaleDateString("tr-TR")}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </UkSection>
+
+        <UkSection title="Yaklasan randevu">
+          <div className="card-body">
+            {isLoading ? (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Yukleniyor...
+              </p>
+            ) : !summary?.nextAppointment ? (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Onayli yaklasan randevu yok.
+              </p>
+            ) : (
+              <div className="lrow">
+                <span className="lr-icon" style={{ background: "var(--primary-soft)", color: "var(--primary-600)" }}>
+                  <KiIcon name="ki-calendar-tick" size={18} />
+                </span>
+                <div style={{ flex: 1 }}>
+                  <div className="lr-title">{summary.nextAppointment.topic}</div>
+                  <div className="lr-meta">
+                    <span className="d">
+                      {summary.nextAppointment.day} · {summary.nextAppointment.slot}
+                    </span>
+                    <UkBadge tone="primary">
+                      {summary.nextAppointment.mode === "online" ? "Online" : "Yuz yuze"}
+                    </UkBadge>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </UkSection>
       </div>
 
       <div className="grid col-main">

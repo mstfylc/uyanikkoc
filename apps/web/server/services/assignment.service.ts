@@ -1,4 +1,10 @@
-import type { AssignmentCreateInput, AssignmentRecord, ParentSummaryRecord } from "@uyanik/database";
+import type {
+  AppointmentRecord,
+  AssignmentCreateInput,
+  AssignmentRecord,
+  CoachStudentNoteRecord,
+  ParentSummaryRecord,
+} from "@uyanik/database";
 
 import { shouldUseDatabase } from "@/lib/data/env";
 import {
@@ -121,6 +127,20 @@ export async function completeStudentAssignment(
   return completeAssignment(assignmentId, studentId);
 }
 
+export async function submitStudentAssignmentResult(
+  assignmentId: string,
+  studentId: string,
+  input: { correct: number; wrong: number; blank: number },
+): Promise<{ assignment: AssignmentRecord; result: import("@/mocks/assignments").AssignmentResultRecord } | null> {
+  if (shouldUseDatabase()) {
+    const completed = await completeAssignment(assignmentId, studentId);
+    return completed ? { assignment: completed, result: { correct: input.correct, wrong: input.wrong, blank: input.blank, net: input.correct - input.wrong / 4 } } : null;
+  }
+
+  const { submitAssignmentResult } = await import("@/mocks/assignments");
+  return submitAssignmentResult(assignmentId, studentId, input);
+}
+
 async function resolveStudentIdForParent(parentId: string): Promise<string | null> {
   if (shouldUseDatabase()) {
     const { studentRepository } = await import("@uyanik/database");
@@ -131,7 +151,12 @@ async function resolveStudentIdForParent(parentId: string): Promise<string | nul
   return parentAssignments[0]?.studentId ?? null;
 }
 
-export async function getParentAssignmentSummary(parentId: string): Promise<ParentSummaryRecord> {
+export type ParentDashboardSummary = ParentSummaryRecord & {
+  pinnedNotes: CoachStudentNoteRecord[];
+  nextAppointment: AppointmentRecord | null;
+};
+
+export async function getParentAssignmentSummary(parentId: string): Promise<ParentDashboardSummary> {
   const base = await getParentSummary(parentId);
   const studentId = await resolveStudentIdForParent(parentId);
 
@@ -144,6 +169,8 @@ export async function getParentAssignmentSummary(parentId: string): Promise<Pare
       latestExamNet: null,
       latestExamType: null,
       examTrend: "flat",
+      pinnedNotes: [],
+      nextAppointment: null,
     };
   }
 
@@ -151,6 +178,14 @@ export async function getParentAssignmentSummary(parentId: string): Promise<Pare
   const { listStudentExams } = await import("@/server/services/exam.service");
   const { summary: topicSummary } = await listStudentTopics(studentId);
   const { summary: examSummary } = await listStudentExams(studentId);
+
+  const { listPinnedNotesForStudent } = await import("@/mocks/coach-notes");
+  const { listAppointmentsForStudent } = await import("@/mocks/appointments");
+  const pinnedNotes = shouldUseDatabase() ? [] : listPinnedNotesForStudent(studentId);
+  const nextAppointment =
+    shouldUseDatabase()
+      ? null
+      : listAppointmentsForStudent(studentId).find((item) => item.status === "approved") ?? null;
 
   return {
     ...base,
@@ -160,5 +195,7 @@ export async function getParentAssignmentSummary(parentId: string): Promise<Pare
     latestExamNet: examSummary.latestNet,
     latestExamType: examSummary.examType,
     examTrend: examSummary.trend,
+    pinnedNotes,
+    nextAppointment,
   };
 }

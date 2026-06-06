@@ -97,6 +97,14 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
 };
 
 export function resolveKiIcon(name: string): UkIconName {
-  const normalized = name.startsWith("ki-") ? name : `ki-${name}`;
-  return KI_ICON_MAP[normalized] ?? "dashboard";
+  const normalized = name.trim().split(/\s+/).find((part) => part.startsWith("ki-")) ?? name.trim();
+  const key = normalized.startsWith("ki-") ? normalized : `ki-${normalized}`;
+  return KI_ICON_MAP[key] ?? "dashboard";
+}
+
+export function parseKiIconRef(name: string): { icon: UkIconName; className?: string } {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const kiToken = parts.find((part) => part.startsWith("ki-")) ?? "ki-element-11";
+  const extra = parts.filter((part) => part !== kiToken).join(" ");
+  return { icon: resolveKiIcon(kiToken), className: extra || undefined };
 }

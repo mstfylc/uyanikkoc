@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { KI_ICON_MAP, resolveKiIcon } from "@/lib/design/icon-paths";
+import { KI_ICON_MAP, parseKiIconRef, resolveKiIcon } from "@/lib/design/icon-paths";
 
 describe("KiIcon mapping", () => {
   it("maps sidebar nav icons", () => {
@@ -11,6 +11,13 @@ describe("KiIcon mapping", () => {
 
   it("falls back to dashboard for unknown icons", () => {
     expect(resolveKiIcon("ki-unknown-icon")).toBe("dashboard");
+  });
+
+  it("parses ki name with utility classes", () => {
+    expect(parseKiIconRef("ki-flash text-white text-xl")).toEqual({
+      icon: "bolt",
+      className: "text-white text-xl",
+    });
   });
 
   it("covers all uk-nav icon names", () => {

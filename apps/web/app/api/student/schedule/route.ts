@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 import { withApiAuth } from "@/lib/auth/api-guard";
 import {
   getStudentSchedule,
+  getStudentStudyPlan,
   setStudentScheduleCell,
+  toggleStudentStudyBlock,
   updateStudentSchedule,
 } from "@/server/services/schedule.service";
 
@@ -13,8 +15,11 @@ export const GET = withApiAuth(["student"], async (_req, { session }) => {
     return NextResponse.json({ error: "Student profile missing" }, { status: 400 });
   }
 
-  const schedule = await getStudentSchedule(studentId);
-  return NextResponse.json({ schedule }, { status: 200 });
+  const [schedule, studyPlan] = await Promise.all([
+    getStudentSchedule(studentId),
+    getStudentStudyPlan(studentId),
+  ]);
+  return NextResponse.json({ schedule, studyPlan }, { status: 200 });
 });
 
 export const PATCH = withApiAuth(["student"], async (req, { session }) => {
@@ -27,7 +32,17 @@ export const PATCH = withApiAuth(["student"], async (req, { session }) => {
     attendsSchool?: boolean;
     grid?: Record<string, string[]>;
     cell?: { day: string; period: number; value: string };
+    studyBlockId?: string;
   };
+
+  if (body.studyBlockId) {
+    const block = await toggleStudentStudyBlock(studentId, body.studyBlockId);
+    if (!block) {
+      return NextResponse.json({ error: "Study block not found" }, { status: 404 });
+    }
+    const studyPlan = await getStudentStudyPlan(studentId);
+    return NextResponse.json({ block, studyPlan }, { status: 200 });
+  }
 
   if (body.cell) {
     const schedule = await setStudentScheduleCell(

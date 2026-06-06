@@ -89,6 +89,45 @@ export function completeAssignment(assignmentId: string, studentId: string): Ass
   return assignment;
 }
 
+export type AssignmentResultRecord = {
+  correct: number;
+  wrong: number;
+  blank: number;
+  net: number;
+};
+
+const resultStore = globalStore as typeof globalStore & {
+  __uyanikAssignmentResults?: Record<string, AssignmentResultRecord>;
+};
+
+const assignmentResults =
+  resultStore.__uyanikAssignmentResults ?? (resultStore.__uyanikAssignmentResults = {});
+
+export function getAssignmentResult(assignmentId: string): AssignmentResultRecord | null {
+  return assignmentResults[assignmentId] ?? null;
+}
+
+export function submitAssignmentResult(
+  assignmentId: string,
+  studentId: string,
+  input: { correct: number; wrong: number; blank: number },
+): { assignment: Assignment; result: AssignmentResultRecord } | null {
+  const assignment = completeAssignment(assignmentId, studentId);
+  if (!assignment) {
+    return null;
+  }
+
+  const net = input.correct - input.wrong / 4;
+  const result: AssignmentResultRecord = {
+    correct: input.correct,
+    wrong: input.wrong,
+    blank: input.blank,
+    net: +net.toFixed(2),
+  };
+  assignmentResults[assignmentId] = result;
+  return { assignment, result };
+}
+
 export function getParentSummary(parentId: string): ParentSummary {
   const parentAssignments = listAssignmentsForParent(parentId);
   const completedCount = parentAssignments.filter(

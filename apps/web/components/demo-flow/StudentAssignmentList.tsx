@@ -3,6 +3,7 @@
 import { KiIcon } from "@/components/design/KiIcon";
 import { useCallback, useEffect, useState } from "react";
 
+import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import {
@@ -27,11 +28,20 @@ type AssignmentItem = {
   completed: boolean;
 };
 
+type ResultDraft = {
+  correct: string;
+  wrong: string;
+  blank: string;
+};
+
 export function StudentAssignmentList() {
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
   const [filter, setFilter] = useState<"pending" | "done" | "all">("pending");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [resultTarget, setResultTarget] = useState<AssignmentItem | null>(null);
+  const [resultDraft, setResultDraft] = useState<ResultDraft>({ correct: "", wrong: "", blank: "" });
+  const [isSavingResult, setIsSavingResult] = useState(false);
 
   const loadAssignments = useCallback(async () => {
     setIsLoading(true);
@@ -53,19 +63,40 @@ export function StudentAssignmentList() {
     void loadAssignments();
   }, [loadAssignments]);
 
-  async function handleComplete(assignmentId: string) {
+  function openResultModal(assignment: AssignmentItem) {
+    setResultTarget(assignment);
+    setResultDraft({ correct: "", wrong: "", blank: "" });
+  }
+
+  async function submitResult(event: React.FormEvent) {
+    event.preventDefault();
+    if (!resultTarget) {
+      return;
+    }
+
+    setIsSavingResult(true);
+    setError(null);
     const response = await fetch("/api/student/assignments", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
-      body: JSON.stringify({ assignmentId, status: "completed" }),
+      body: JSON.stringify({
+        assignmentId: resultTarget.id,
+        result: {
+          correct: Number(resultDraft.correct) || 0,
+          wrong: Number(resultDraft.wrong) || 0,
+          blank: Number(resultDraft.blank) || 0,
+        },
+      }),
     });
+    setIsSavingResult(false);
 
     if (!response.ok) {
-      setError("Odev tamamlanamadi.");
+      setError("Sonuc kaydedilemedi.");
       return;
     }
 
+    setResultTarget(null);
     await loadAssignments();
   }
 
@@ -76,6 +107,8 @@ export function StudentAssignmentList() {
   });
 
   const pending = assignments.filter((item) => !item.completed).length;
+  const previewNet =
+    (Number(resultDraft.correct) || 0) - (Number(resultDraft.wrong) || 0) / 4;
 
   return (
     <div className="stack rise">
@@ -141,13 +174,15 @@ export function StudentAssignmentList() {
                         </div>
                       </div>
                       {open ? (
-                        <button type="button" className="btn btn-sm btn-primary" onClick={() => void handleComplete(assignment.id)}>
-                          Tamamla
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-primary"
+                          onClick={() => openResultModal(assignment)}
+                        >
+                          Sonuc Gir
                         </button>
                       ) : (
-                        <span data-testid={`completed-${assignment.id}`} className="muted" style={{ fontSize: 13 }}>
-                          (Tamamlandi)
-                        </span>
+                        <UkBadge tone="success">Tamamlandi</UkBadge>
                       )}
                     </div>
                   </li>
@@ -157,6 +192,77 @@ export function StudentAssignmentList() {
           )}
         </div>
       </UkSection>
+
+      {resultTarget ? (
+        <div className="modal-overlay" onClick={() => setResultTarget(null)}>
+          <div
+            className="modal-panel"
+            style={{ maxWidth: 420 }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="card-head">
+              <h3>Sonuc gir</h3>
+              <p className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>
+                {resultTarget.title}
+              </p>
+            </div>
+            <form onSubmit={submitResult} className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div className="grid g-3">
+                <div className="field">
+                  <label className="label" htmlFor="result-correct">
+                    Dogru
+                  </label>
+                  <input
+                    id="result-correct"
+                    className="input tnum"
+                    type="number"
+                    min={0}
+                    value={resultDraft.correct}
+                    onChange={(event) => setResultDraft((current) => ({ ...current, correct: event.target.value }))}
+                  />
+                </div>
+                <div className="field">
+                  <label className="label" htmlFor="result-wrong">
+                    Yanlis
+                  </label>
+                  <input
+                    id="result-wrong"
+                    className="input tnum"
+                    type="number"
+                    min={0}
+                    value={resultDraft.wrong}
+                    onChange={(event) => setResultDraft((current) => ({ ...current, wrong: event.target.value }))}
+                  />
+                </div>
+                <div className="field">
+                  <label className="label" htmlFor="result-blank">
+                    Bos
+                  </label>
+                  <input
+                    id="result-blank"
+                    className="input tnum"
+                    type="number"
+                    min={0}
+                    value={resultDraft.blank}
+                    onChange={(event) => setResultDraft((current) => ({ ...current, blank: event.target.value }))}
+                  />
+                </div>
+              </div>
+              <div className="badge badge-primary" style={{ height: "auto", padding: "10px 12px" }}>
+                Net: <span className="tnum">{previewNet.toFixed(2)}</span>
+              </div>
+              <div className="row" style={{ gap: 10, justifyContent: "flex-end" }}>
+                <button type="button" className="btn btn-light" onClick={() => setResultTarget(null)}>
+                  Iptal
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={isSavingResult}>
+                  {isSavingResult ? "Kaydediliyor..." : "Kaydet"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { CurriculumEditor } from "@/components/coach/CurriculumEditor";
 import { UkPageHead } from "@/components/design/UkPageHead";
