@@ -1,7 +1,7 @@
 import type { AppRole } from "@uyanik/tokens";
 
 import { orgCoaches } from "@/lib/admin/derive";
-import { resolveOrgCoachId, type AdminSnapshotContext } from "@/lib/admin/snapshot-context";
+import { resolveOrgCoachId, resolveSoloCoachId, type AdminSnapshotContext } from "@/lib/admin/snapshot-context";
 import type { AdminMutation } from "@/lib/admin/types";
 import * as memory from "@/mocks/admin";
 
@@ -20,6 +20,14 @@ export function mutationOrgId(m: AdminMutation): string | null {
     case "inviteOrgManager":
     case "removeOrgManager":
     case "setOrgManagerRole":
+    case "addBranch":
+    case "updateBranch":
+    case "updateOrgBilling":
+    case "updateOrgNotifications":
+    case "requestDataExport":
+    case "cancelOrgSubscription":
+    case "inviteOrgCoach":
+    case "inviteStudent":
       return m.orgId;
     default:
       return null;
@@ -36,23 +44,32 @@ export function assertMutationAllowed(
   }
 
   if (role === "coach") {
-    if (m.kind !== "completeTask") {
-      return "forbidden mutation for coach role";
+    if (m.kind === "completeTask") {
+      const task = memory.findTask(m.taskId);
+      if (!task) {
+        return "task not found";
+      }
+      const snapshot = memory.getMockSnapshot(ctx);
+      const org = snapshot.orgs.find((o) => o.id === snapshot.activeOrgId);
+      if (!org) {
+        return "organization not found";
+      }
+      const coachId = resolveOrgCoachId(org, ctx.coachId, snapshot.coaches);
+      if (task.coachId !== coachId) {
+        return "forbidden task for coach";
+      }
+      return null;
     }
-    const task = memory.findTask(m.taskId);
-    if (!task) {
-      return "task not found";
+    if (m.kind === "buyCoachPlan" || m.kind === "setCoachAutoRenew" || m.kind === "renewCoachPlan" || m.kind === "cancelCoach") {
+      const snapshot = memory.getMockSnapshot(ctx);
+      const soloId = resolveSoloCoachId(ctx.coachId, snapshot.coaches);
+      const targetId = m.coachId;
+      if (!soloId || targetId !== soloId) {
+        return "forbidden coach scope";
+      }
+      return null;
     }
-    const snapshot = memory.getMockSnapshot(ctx);
-    const org = snapshot.orgs.find((o) => o.id === snapshot.activeOrgId);
-    if (!org) {
-      return "organization not found";
-    }
-    const coachId = resolveOrgCoachId(org, ctx.coachId, snapshot.coaches);
-    if (task.coachId !== coachId) {
-      return "forbidden task for coach";
-    }
-    return null;
+    return "forbidden mutation for coach role";
   }
 
   if (role !== "branch") {
@@ -86,6 +103,21 @@ export function assertMutationAllowed(
     const coachId = m.kind === "assignTask" ? m.coachId : m.coachId;
     if (!coachIds.has(coachId)) {
       return "forbidden coach scope";
+    }
+  }
+
+  if (m.kind === "sendPaymentReminder") {
+    const sub = memory.findSubscription(m.subscriptionId);
+    if (!sub || sub.orgId !== orgId) {
+      return "forbidden subscription scope";
+    }
+  }
+
+  if (m.kind === "updateBranch") {
+    const snapshot = memory.getMockSnapshot(ctx);
+    const org = snapshot.orgs.find((o) => o.id === orgId);
+    if (!org?.branches.some((b) => b.id === m.branchId)) {
+      return "forbidden branch scope";
     }
   }
 

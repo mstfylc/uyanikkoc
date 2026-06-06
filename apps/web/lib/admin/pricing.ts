@@ -10,6 +10,8 @@ import type {
   ModuleKey,
   OrgPlan,
   OrgPlanId,
+  StudentPlanId,
+  StudentSubscription,
 } from "./types";
 
 /** Modül kataloğu (özellik bayrakları). */
@@ -123,6 +125,30 @@ export const COACH_PLANS: CoachPlan[] = [
 
 export function coachPlanById(id: CoachPlanId): CoachPlan {
   return COACH_PLANS.find((p) => p.id === id) ?? COACH_PLANS[0];
+}
+
+/** Öğrenci abonelik planları (şube tahsilat tablosu). */
+export type StudentPlan = {
+  id: StudentPlanId;
+  name: string;
+  color: string;
+  monthly: number;
+  annual: number;
+};
+
+export const STUDENT_PLANS: StudentPlan[] = [
+  { id: "standart", name: "Standart", color: "var(--info)", monthly: 1499, annual: 14990 },
+  { id: "plus", name: "Plus", color: "var(--primary)", monthly: 2299, annual: 22990 },
+  { id: "vip", name: "VIP", color: "var(--warning)", monthly: 3499, annual: 34990 },
+];
+
+export function studentPlanById(id: StudentPlanId): StudentPlan {
+  return STUDENT_PLANS.find((p) => p.id === id) ?? STUDENT_PLANS[0];
+}
+
+export function subscriptionMrr(sub: Pick<StudentSubscription, "planId" | "cycle">): number {
+  const p = studentPlanById(sub.planId);
+  return sub.cycle === "annual" ? Math.round(p.annual / 12) : p.monthly;
 }
 
 /** Modülleri plana göre kur. */

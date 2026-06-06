@@ -7,7 +7,7 @@ import { useState } from "react";
 
 import { ConfirmModal, EmptyState, Icon, StatCard, StatusBadge } from "@/components/admin/AdminKit";
 import { useAdminStore } from "@/components/admin/AdminStore";
-import { AssignTaskDialog } from "@/components/admin/dialogs";
+import { AssignTaskDialog, InviteCoachDialog } from "@/components/admin/dialogs";
 import { getActiveOrg, visibleOrgCoaches } from "@/components/admin/selectors";
 import { OrgSwitcher } from "./OrgSwitcher";
 import { UkAvatar } from "@/components/design/UkAvatar";
@@ -21,6 +21,7 @@ export function BranchCoaches() {
   const [branch, setBranch] = useState("all");
   const [assignFor, setAssignFor] = useState<{ id: string; name: string } | null>(null);
   const [removeFor, setRemoveFor] = useState<{ id: string; name: string } | null>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
   if (!snapshot) return <div className="card card-pad muted">Yükleniyor…</div>;
 
   const o = getActiveOrg(snapshot, activeOrgId);
@@ -39,7 +40,7 @@ export function BranchCoaches() {
             <button type="button" className="btn btn-light" onClick={() => { downloadCSV("koclar.csv", [["Koç", "Şube", "Öğrenci", "Puan", "Doluluk"], ...coaches.map((c) => [c.name, c.branch, c.students, c.rating, c.load + "%"])]); toast("Liste indirildi", { icon: "ki-cloud-download" }); }}>
               <Icon name="download" size={16} />Dışa aktar
             </button>
-            <button type="button" className="btn btn-primary" onClick={() => toast("Koç davet bağlantısı oluşturuldu", { icon: "ki-people" })}>
+            <button type="button" className="btn btn-primary" onClick={() => setInviteOpen(true)}>
               <Icon name="plus" size={16} />Koç davet et
             </button>
           </div>
@@ -157,6 +158,13 @@ export function BranchCoaches() {
         }}
         onClose={() => setRemoveFor(null)}
       />
+      {inviteOpen ? (
+        <InviteCoachDialog
+          orgId={o.id}
+          branches={o.branches.map((b) => ({ id: b.id, name: b.name }))}
+          onClose={() => setInviteOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }

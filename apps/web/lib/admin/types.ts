@@ -13,6 +13,25 @@ export type LicenseStatus =
 export type OrgType = "franchise" | "kurum";
 export type BillingCycle = "monthly" | "annual";
 
+/** Öğrenci abonelik planları (şube tahsilat). */
+export type StudentPlanId = "standart" | "plus" | "vip";
+export type StudentSubscriptionStatus = "paid" | "pending" | "failed";
+
+export type StudentSubscription = {
+  id: string;
+  orgId: string;
+  branchId: string;
+  studentName: string;
+  parentName: string;
+  planId: StudentPlanId;
+  cycle: BillingCycle;
+  status: StudentSubscriptionStatus;
+  /** Sonraki tahsilata kalan gün; negatif = gecikmiş. */
+  nextDueDays: number;
+  amount: number;
+  remindedAt?: number;
+};
+
 export type ModuleKey =
   | "denemeAnaliz"
   | "raporlar"
@@ -47,6 +66,33 @@ export type Branch = {
 
 export type OrgOwner = { name: string; email: string; phone: string };
 
+export type OrgBilling = {
+  taxId: string;
+  taxOffice: string;
+  billingAddress: string;
+  paymentMethod: string;
+};
+
+export type OrgNotificationPrefs = {
+  licenseReminders: boolean;
+  paymentAlerts: boolean;
+  weeklyReport: boolean;
+  productUpdates: boolean;
+};
+
+export type OrgInviteKind = "coach" | "student";
+
+export type OrgInvite = {
+  id: string;
+  orgId: string;
+  kind: OrgInviteKind;
+  name: string;
+  email: string;
+  branchId?: string;
+  createdAt: number;
+  status: "pending" | "accepted";
+};
+
 // Kuruma atanmış yönetici kullanıcı (tek kuruma birden fazla yönetici olabilir).
 export type OrgManagerRole = "owner" | "manager";
 export type OrgManager = {
@@ -76,6 +122,8 @@ export type Org = {
   managers: OrgManager[];
   tone: string;
   branches: Branch[];
+  billing: OrgBilling;
+  notifications: OrgNotificationPrefs;
   /** Süper admin tarafından tanımlanmış ücretsiz demo bitiş tarihi. */
   giftedDemoUntil?: number;
 };
@@ -266,6 +314,8 @@ export type SystemNote = {
 export type AdminSnapshot = {
   orgs: Org[];
   coaches: SoloCoach[];
+  /** Şube öğrenci abonelik tahsilatları (B2B2C). */
+  studentSubscriptions: StudentSubscription[];
   orgInvoices: OrgInvoice[];
   tasks: CoachTask[];
   feedback: CoachFeedback[];
@@ -276,6 +326,7 @@ export type AdminSnapshot = {
   licenseNotes: LicenseNote[];
   campaigns: Campaign[];
   campaignGrants: CampaignGrant[];
+  orgInvites: OrgInvite[];
   /** Demo: oturum açan süper admin kullanıcısının erişim seviyesi. */
   viewerAccess: AdminAccess;
   activeOrgId: string;
@@ -364,4 +415,48 @@ export type AdminMutation =
     }
   | { kind: "setCampaignStatus"; campaignId: string; status: CampaignStatus }
   | { kind: "deleteCampaign"; campaignId: string }
-  | { kind: "grantCampaign"; campaignId: string; subjectKind: LicenseSubjectKind; subjectId: string };
+  | { kind: "grantCampaign"; campaignId: string; subjectKind: LicenseSubjectKind; subjectId: string }
+  // şube yönetimi (zip-16 v2)
+  | { kind: "addBranch"; orgId: string; name: string; city: string }
+  | {
+      kind: "updateBranch";
+      orgId: string;
+      branchId: string;
+      name?: string;
+      city?: string;
+      status?: LicenseStatus;
+    }
+  | { kind: "sendPaymentReminder"; subscriptionId: string }
+  // bireysel koç lisans (zip-16 v2)
+  | { kind: "buyCoachPlan"; coachId: string; planId: CoachPlanId; cycle: BillingCycle }
+  | { kind: "setCoachAutoRenew"; coachId: string; enabled: boolean }
+  | { kind: "cancelCoach"; coachId: string }
+  | {
+      kind: "updateOrgBilling";
+      orgId: string;
+      taxId: string;
+      taxOffice: string;
+      billingAddress: string;
+      paymentMethod: string;
+    }
+  | { kind: "updateOrgNotifications"; orgId: string; prefs: OrgNotificationPrefs }
+  | { kind: "requestDataExport"; orgId: string; note?: string }
+  | { kind: "cancelOrgSubscription"; orgId: string }
+  | {
+      kind: "createOrg";
+      name: string;
+      city: string;
+      type: OrgType;
+      planId: OrgPlanId;
+      ownerName: string;
+      ownerEmail: string;
+      ownerPhone: string;
+    }
+  | { kind: "inviteOrgCoach"; orgId: string; name: string; email: string; branchId?: string }
+  | {
+      kind: "inviteStudent";
+      orgId: string;
+      name: string;
+      parentEmail: string;
+      branchId?: string;
+    };

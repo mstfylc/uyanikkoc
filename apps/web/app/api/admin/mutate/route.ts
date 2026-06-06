@@ -23,9 +23,24 @@ const BRANCH_ALLOWED: AdminMutation["kind"][] = [
   "removeOrgManager",
   "setOrgManagerRole",
   "setActiveOrg",
+  "addBranch",
+  "updateBranch",
+  "sendPaymentReminder",
+  "updateOrgBilling",
+  "updateOrgNotifications",
+  "requestDataExport",
+  "cancelOrgSubscription",
+  "inviteOrgCoach",
+  "inviteStudent",
 ];
 
-const COACH_ALLOWED: AdminMutation["kind"][] = ["completeTask"];
+const COACH_ALLOWED: AdminMutation["kind"][] = [
+  "completeTask",
+  "buyCoachPlan",
+  "setCoachAutoRenew",
+  "renewCoachPlan",
+  "cancelCoach",
+];
 
 export const POST = withApiAuth(["admin", "branch", "coach"], async (req, { session }) => {
   const body = (await req.json()) as AdminMutation;

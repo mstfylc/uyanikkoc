@@ -57,3 +57,18 @@ export function resolveOrgCoachId(
 
   return orgCoachList[0]?.id ?? sessionCoachId;
 }
+
+/** Bireysel koç lisansı — oturum koçu solo listesinde yoksa demo eşlemesi. */
+export function resolveSoloCoachId(
+  sessionCoachId: string | null | undefined,
+  soloCoaches: SoloCoach[],
+): string | null {
+  if (!sessionCoachId) return null;
+  if (soloCoaches.some((c) => c.id === sessionCoachId)) {
+    return sessionCoachId;
+  }
+  if (sessionCoachId === DEMO_COACH_ID) {
+    return soloCoaches.find((c) => c.id === "selin-yilmaz")?.id ?? null;
+  }
+  return null;
+}

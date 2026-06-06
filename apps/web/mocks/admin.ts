@@ -26,7 +26,11 @@ import type {
   OrgManager,
   OrgManagerRole,
   OrgPlanId,
+  OrgBilling,
+  OrgInvite,
+  OrgNotificationPrefs,
   SoloCoach,
+  StudentSubscription,
   SupportTicket,
   SystemNote,
   TaskPriority,
@@ -35,6 +39,24 @@ import type {
 
 const DAY = 86_400_000;
 const NOW = Date.now();
+
+function orgBilling(city: string): OrgBilling {
+  return {
+    taxId: "123 456 7890",
+    taxOffice: "Vergi Dairesi",
+    billingAddress: city,
+    paymentMethod: "Havale / EFT",
+  };
+}
+
+function orgNotifications(): OrgNotificationPrefs {
+  return {
+    licenseReminders: true,
+    paymentAlerts: true,
+    weeklyReport: false,
+    productUpdates: true,
+  };
+}
 
 function seedOrgs(): Omit<Org, "managers">[] {
   return [
@@ -65,6 +87,8 @@ function seedOrgs(): Omit<Org, "managers">[] {
           status: "active",
         },
       ],
+      billing: orgBilling("Istanbul"),
+      notifications: orgNotifications(),
     },
     {
       id: "akademi-yildiz", name: "Kampüs Koç", type: "franchise", city: "İstanbul",
@@ -80,6 +104,8 @@ function seedOrgs(): Omit<Org, "managers">[] {
         { id: "ay-atasehir", name: "Ataşehir Şubesi", city: "İstanbul", students: 76, coaches: 6, collect: 142000, status: "active" },
         { id: "ay-bakirkoy", name: "Bakırköy Şubesi", city: "İstanbul", students: 54, coaches: 5, collect: 101000, status: "active" },
       ],
+      billing: orgBilling("İstanbul"),
+      notifications: orgNotifications(),
     },
     {
       id: "zirve-egitim", name: "Zirve Eğitim Kurumları", type: "franchise", city: "İzmir",
@@ -94,6 +120,8 @@ function seedOrgs(): Omit<Org, "managers">[] {
         { id: "ze-karsiyaka", name: "Karşıyaka Şubesi", city: "İzmir", students: 64, coaches: 6, collect: 121000, status: "active" },
         { id: "ze-buca", name: "Buca Şubesi", city: "İzmir", students: 52, coaches: 4, collect: 98000, status: "active" },
       ],
+      billing: orgBilling("İzmir"),
+      notifications: orgNotifications(),
     },
     {
       id: "hedef-akademi", name: "Hedef Akademi", type: "franchise", city: "Antalya",
@@ -111,6 +139,8 @@ function seedOrgs(): Omit<Org, "managers">[] {
         { id: "ha-manavgat", name: "Manavgat Şubesi", city: "Antalya", students: 32, coaches: 3, collect: 61000, status: "active" },
         { id: "ha-adana", name: "Adana Seyhan Şubesi", city: "Adana", students: 26, coaches: 3, collect: 49000, status: "active" },
       ],
+      billing: orgBilling("Antalya"),
+      notifications: orgNotifications(),
     },
     {
       id: "doga-rehberlik", name: "Doğa Rehberlik Merkezi", type: "kurum", city: "Ankara",
@@ -123,6 +153,8 @@ function seedOrgs(): Omit<Org, "managers">[] {
       branches: [
         { id: "dr-merkez", name: "Çankaya Merkez", city: "Ankara", students: 118, coaches: 11, collect: 224000, status: "active" },
       ],
+      billing: orgBilling("Ankara"),
+      notifications: orgNotifications(),
     },
     {
       id: "pusula-kocluk", name: "Pusula Koçluk", type: "kurum", city: "Bursa",
@@ -135,6 +167,8 @@ function seedOrgs(): Omit<Org, "managers">[] {
       branches: [
         { id: "pk-merkez", name: "Nilüfer Merkez", city: "Bursa", students: 28, coaches: 4, collect: 52000, status: "active" },
       ],
+      billing: orgBilling("Bursa"),
+      notifications: orgNotifications(),
     },
     {
       id: "mavi-deniz", name: "Mavi Deniz Eğitim", type: "kurum", city: "Eskişehir",
@@ -147,6 +181,8 @@ function seedOrgs(): Omit<Org, "managers">[] {
       branches: [
         { id: "md-merkez", name: "Tepebaşı Merkez", city: "Eskişehir", students: 96, coaches: 9, collect: 181000, status: "active" },
       ],
+      billing: orgBilling("Eskişehir"),
+      notifications: orgNotifications(),
     },
   ];
 }
@@ -339,7 +375,12 @@ function withManagers(orgs: Omit<Org, "managers">[]): Org[] {
         status: "invited",
       });
     }
-    return { ...o, managers } as Org;
+    return {
+      ...o,
+      billing: orgBilling(o.city),
+      notifications: orgNotifications(),
+      managers,
+    } as Org;
   });
 }
 
@@ -412,10 +453,36 @@ function seedCampaigns(): Campaign[] {
   ];
 }
 
+const SUBSCRIPTION_TEMPLATES: Omit<StudentSubscription, "id" | "orgId" | "branchId">[] = [
+  { studentName: "Elif Yıldız", parentName: "Ayşe Yıldız", planId: "plus", cycle: "annual", status: "paid", nextDueDays: 279, amount: 22990 },
+  { studentName: "Mert Demir", parentName: "Hakan Demir", planId: "standart", cycle: "monthly", status: "paid", nextDueDays: 12, amount: 1499 },
+  { studentName: "Zeynep Kaya", parentName: "Sevgi Kaya", planId: "plus", cycle: "monthly", status: "pending", nextDueDays: 2, amount: 2299 },
+  { studentName: "Can Aydın", parentName: "Murat Aydın", planId: "vip", cycle: "annual", status: "paid", nextDueDays: 154, amount: 34990 },
+  { studentName: "Ece Şahin", parentName: "Deniz Şahin", planId: "standart", cycle: "monthly", status: "failed", nextDueDays: -3, amount: 1499 },
+  { studentName: "Burak Çelik", parentName: "Aslı Çelik", planId: "plus", cycle: "monthly", status: "paid", nextDueDays: 19, amount: 2299 },
+  { studentName: "Selin Arslan", parentName: "Tülay Arslan", planId: "standart", cycle: "annual", status: "paid", nextDueDays: 88, amount: 14990 },
+  { studentName: "Kaan Yılmaz", parentName: "Erol Yılmaz", planId: "vip", cycle: "monthly", status: "pending", nextDueDays: 1, amount: 3499 },
+];
+
+function seedStudentSubscriptions(orgs: Org[]): StudentSubscription[] {
+  const out: StudentSubscription[] = [];
+  for (const orgId of [DEMO_ORG_ID, ACTIVE_ORG_ID]) {
+    const org = orgs.find((o) => o.id === orgId);
+    const branchId = org?.branches[0]?.id;
+    if (!org || !branchId) continue;
+    SUBSCRIPTION_TEMPLATES.forEach((t, i) => {
+      out.push({ id: `sub-${orgId}-${i}`, orgId, branchId, ...t });
+    });
+  }
+  return out;
+}
+
 // --- modül seviyesinde global store (process ömrü boyunca kalıcı) ---
 type Store = {
   orgs: Org[];
   coaches: SoloCoach[];
+  studentSubscriptions: StudentSubscription[];
+  orgInvites: OrgInvite[];
   orgInvoices: OrgInvoice[];
   tasks: CoachTask[];
   feedback: CoachFeedback[];
@@ -435,6 +502,8 @@ function freshStore(): Store {
   return {
     orgs,
     coaches: seedCoaches(),
+    studentSubscriptions: seedStudentSubscriptions(orgs),
+    orgInvites: [],
     orgInvoices: seedOrgInvoices(orgs),
     tasks: seedTasks(orgs),
     feedback: seedFeedback(orgs),
@@ -463,6 +532,8 @@ export function getMockSnapshot(ctx: AdminSnapshotContext = {}): AdminSnapshot {
   return {
     orgs: s.orgs,
     coaches: s.coaches,
+    studentSubscriptions: s.studentSubscriptions,
+    orgInvites: s.orgInvites,
     orgInvoices: s.orgInvoices,
     tasks: s.tasks,
     feedback: s.feedback,
@@ -575,6 +646,10 @@ export function mockAssignTask(
 
 export function findTask(taskId: string): CoachTask | undefined {
   return store().tasks.find((x) => x.id === taskId);
+}
+
+export function findSubscription(id: string): StudentSubscription | undefined {
+  return store().studentSubscriptions.find((s) => s.id === id);
 }
 
 export function mockCompleteTask(taskId: string): void {
@@ -823,4 +898,244 @@ export function mockGrantCampaign(
     redeemed: false,
   });
   campaign.redemptions += 1;
+}
+
+// ---- şube yönetimi (zip-16 v2) ----
+export function mockAddBranch(orgId: string, name: string, city: string): void {
+  const o = findOrg(orgId);
+  if (!o) return;
+  const max = orgPlanById(o.planId).branches;
+  if (o.branches.length >= max) return;
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 24);
+  o.branches = [
+    ...o.branches,
+    {
+      id: `${orgId}-${slug || "sube"}-${Math.floor(100 + Math.random() * 899)}`,
+      name: name.trim(),
+      city: city.trim(),
+      students: 0,
+      coaches: 0,
+      collect: 0,
+      status: "active",
+    },
+  ];
+  if (o.type === "kurum" && o.branches.length > 1) {
+    o.type = "franchise";
+  }
+}
+
+export function mockUpdateBranch(
+  orgId: string,
+  branchId: string,
+  patch: { name?: string; city?: string; status?: Org["branches"][0]["status"] },
+): void {
+  const o = findOrg(orgId);
+  if (!o) return;
+  o.branches = o.branches.map((b) =>
+    b.id === branchId
+      ? {
+          ...b,
+          ...(patch.name != null ? { name: patch.name.trim() } : {}),
+          ...(patch.city != null ? { city: patch.city.trim() } : {}),
+          ...(patch.status != null ? { status: patch.status } : {}),
+        }
+      : b,
+  );
+}
+
+export function mockSendPaymentReminder(subscriptionId: string): void {
+  const sub = findSubscription(subscriptionId);
+  if (sub) sub.remindedAt = Date.now();
+}
+
+// ---- bireysel koç lisans (zip-16 v2) ----
+export function mockBuyCoachPlan(
+  coachId: string,
+  planId: SoloCoach["planId"],
+  cycle: SoloCoach["cycle"],
+): void {
+  const c = findCoach(coachId);
+  if (!c) return;
+  const p = coachPlanById(planId);
+  const amount = cycle === "annual" ? p.annual : p.monthly;
+  c.planId = planId;
+  c.cycle = cycle;
+  c.feeMonthly = cycle === "annual" ? Math.round(p.annual / 12) : p.monthly;
+  c.seats = { used: c.seats.used, total: p.seats };
+  c.modules = modulesFromPlan(p.modules);
+  const days = cycle === "annual" ? 365 : 30;
+  c.renewsAt = Math.max(Date.now(), c.renewsAt) + days * DAY;
+  c.status = "active";
+  c.autoRenew = true;
+  c.invoices.unshift({
+    id: "UK-K-" + Math.floor(1000 + Math.random() * 8999),
+    date: Date.now(),
+    amount,
+    planId,
+    status: "paid",
+    method: "Visa •4242",
+  });
+}
+
+export function mockSetCoachAutoRenew(coachId: string, enabled: boolean): void {
+  const c = findCoach(coachId);
+  if (c) c.autoRenew = enabled;
+}
+
+export function mockCancelCoach(coachId: string): void {
+  const c = findCoach(coachId);
+  if (!c) return;
+  c.status = "canceled";
+  c.autoRenew = false;
+}
+
+export function mockUpdateOrgBilling(
+  orgId: string,
+  patch: { taxId: string; taxOffice: string; billingAddress: string; paymentMethod: string },
+): void {
+  const o = findOrg(orgId);
+  if (!o) return;
+  o.billing = { ...patch };
+}
+
+export function mockUpdateOrgNotifications(orgId: string, prefs: OrgNotificationPrefs): void {
+  const o = findOrg(orgId);
+  if (o) o.notifications = { ...prefs };
+}
+
+export function mockRequestDataExport(orgId: string, note?: string): void {
+  const o = findOrg(orgId);
+  if (!o) return;
+  const s = store();
+  s.tickets.unshift({
+    id: "DST-" + Math.floor(2000 + Math.random() * 899),
+    org: o.name,
+    subj: "Veri dışa aktarma talebi",
+    priority: "Orta",
+    tone: "info",
+    time: "Az önce",
+    status: "open",
+    messages: [
+      {
+        id: "m-" + Math.floor(100 + Math.random() * 899),
+        author: o.owner.name,
+        role: "user",
+        text: note?.trim() || `${o.name} kurumu tüm verinin dışa aktarılmasını talep ediyor.`,
+        date: Date.now(),
+      },
+    ],
+  });
+}
+
+export function mockCancelOrgSubscription(orgId: string): void {
+  const o = findOrg(orgId);
+  if (!o) return;
+  o.status = "canceled";
+}
+
+export function mockCreateOrg(data: {
+  name: string;
+  city: string;
+  type: Org["type"];
+  planId: OrgPlanId;
+  ownerName: string;
+  ownerEmail: string;
+  ownerPhone: string;
+}): void {
+  const slug = data.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 20);
+  const id = `${slug || "kurum"}-${Math.floor(100 + Math.random() * 899)}`;
+  const plan = orgPlanById(data.planId);
+  const base = {
+    id,
+    name: data.name.trim(),
+    type: data.type,
+    city: data.city.trim(),
+    planId: data.planId,
+    status: "trial" as const,
+    cycle: "monthly" as const,
+    startedAt: NOW,
+    renewsAt: NOW + 14 * DAY,
+    feeMonthly: plan.monthly,
+    seats: { used: 0, total: plan.seats },
+    coaches: { used: 0, total: plan.coaches },
+    modules: modulesFromPlan(plan.modules),
+    owner: { name: data.ownerName.trim(), email: data.ownerEmail.trim(), phone: data.ownerPhone.trim() },
+    tone: "#5b6cff",
+    branches: [
+      {
+        id: `${id}-merkez`,
+        name: "Merkez",
+        city: data.city.trim(),
+        students: 0,
+        coaches: 0,
+        collect: 0,
+        status: "active" as const,
+      },
+    ],
+    billing: orgBilling(data.city),
+    notifications: orgNotifications(),
+  };
+  const org = withManagers([base])[0];
+  store().orgs.unshift(org);
+  store().orgInvoices.unshift({
+    id: "UK-F-NEW-" + Math.floor(1000 + Math.random() * 8999),
+    orgId: id,
+    orgName: org.name,
+    date: NOW,
+    amount: plan.monthly,
+    status: "pending",
+    plan: plan.name,
+    method: "Havale / EFT",
+  });
+}
+
+export function mockInviteOrgCoach(
+  orgId: string,
+  data: { name: string; email: string; branchId?: string },
+): void {
+  const o = findOrg(orgId);
+  if (!o) return;
+  store().orgInvites.unshift({
+    id: "inv-" + Math.floor(1000 + Math.random() * 8999),
+    orgId,
+    kind: "coach",
+    name: data.name.trim(),
+    email: data.email.trim(),
+    branchId: data.branchId,
+    createdAt: Date.now(),
+    status: "pending",
+  });
+}
+
+export function mockInviteStudent(
+  orgId: string,
+  data: { name: string; parentEmail: string; branchId?: string },
+): void {
+  const o = findOrg(orgId);
+  if (!o) return;
+  if (o.seats.used < o.seats.total) {
+    o.seats = { used: o.seats.used + 1, total: o.seats.total };
+    const branch = data.branchId
+      ? o.branches.find((b) => b.id === data.branchId)
+      : o.branches[0];
+    if (branch) branch.students += 1;
+  }
+  store().orgInvites.unshift({
+    id: "inv-" + Math.floor(1000 + Math.random() * 8999),
+    orgId,
+    kind: "student",
+    name: data.name.trim(),
+    email: data.parentEmail.trim(),
+    branchId: data.branchId,
+    createdAt: Date.now(),
+    status: "pending",
+  });
 }

@@ -27,6 +27,8 @@ const demoOrg: Org = {
     { id: "branch_demo_001", name: "Sube", city: "Istanbul", students: 2, coaches: 1, collect: 1, status: "active" },
   ],
   managers: [],
+  billing: { taxId: "123", taxOffice: "VD", billingAddress: "Istanbul", paymentMethod: "Havale" },
+  notifications: { licenseReminders: true, paymentAlerts: true, weeklyReport: false, productUpdates: true },
 };
 
 describe("admin mutation scope", () => {

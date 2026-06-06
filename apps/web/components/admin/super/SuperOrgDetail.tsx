@@ -22,7 +22,9 @@ import { canEdit } from "@/components/admin/selectors";
 import { SubscriberNotes } from "./SubscriberNotes";
 import { UkSection } from "@/components/design/UkSection";
 import { fmtShort, tl } from "@/lib/admin/format";
-import { moduleName, ORG_PLANS } from "@/lib/admin/pricing";
+import { moduleName, ORG_PLANS, orgPlanById } from "@/lib/admin/pricing";
+import { orgCoaches, orgStudents } from "@/lib/admin/derive";
+import { downloadCSV } from "@/lib/admin/csv";
 
 export function SuperOrgDetail({ orgId }: { orgId: string }) {
   const { snapshot, mutate, toast } = useAdminStore();
@@ -75,6 +77,43 @@ export function SuperOrgDetail({ orgId }: { orgId: string }) {
         </div>
         {editable ? (
           <div className="row" style={{ gap: 9 }}>
+            <button
+              type="button"
+              className="btn btn-light"
+              onClick={() => {
+                const subs = snapshot.studentSubscriptions.filter((s) => s.orgId === o.id);
+                downloadCSV(`kurum-${o.id}-tam-veri.csv`, [
+                  ["Kurum", o.name],
+                  ["Şehir", o.city],
+                  ["Plan", orgPlanById(o.planId).name],
+                  ["Durum", o.status],
+                  ["Öğrenci", `${o.seats.used}/${o.seats.total}`],
+                  ["Koç", `${o.coaches.used}/${o.coaches.total}`],
+                  ["Aylık platform", o.feeMonthly],
+                  ["Aylık tahsilat", totalCollect],
+                  [],
+                  ["Şube", "Şehir", "Öğrenci", "Koç", "Tahsilat", "Durum"],
+                  ...o.branches.map((b) => [b.name, b.city, b.students, b.coaches, b.collect, b.status]),
+                  [],
+                  ["Koç", "Şube", "Öğrenci", "Puan", "Doluluk"],
+                  ...orgCoaches(o).map((c) => [c.name, c.branch, c.students, c.rating, c.load]),
+                  [],
+                  ["Öğrenci", "Sınıf", "Şube", "Koç", "Net", "Devam", "Durum"],
+                  ...orgStudents(o).slice(0, 120).map((s) => [s.name, s.grade, s.branch, s.coach, s.net, s.attend, s.status]),
+                  ...(subs.length
+                    ? [
+                        [],
+                        ["Abonelik — Öğrenci", "Veli", "Plan", "Durum", "Sonraki gün"],
+                        ...subs.map((s) => [s.studentName, s.parentName, s.planId, s.status, s.nextDueDays]),
+                      ]
+                    : []),
+                ]);
+                toast("Tam veri dışa aktarıldı", { icon: "ki-cloud-download" });
+              }}
+            >
+              <Icon name="download" size={16} />
+              Tüm veriyi dışa aktar
+            </button>
             <button type="button" className="btn btn-light" onClick={() => toast(o.owner.email + " adresine yazıldı", { icon: "ki-messages" })}>
               <Icon name="message" size={16} />
               İletişim

@@ -11,8 +11,9 @@ import { getActiveOrg } from "@/components/admin/selectors";
 import { OrgSwitcher } from "./OrgSwitcher";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
+import { downloadText } from "@/lib/admin/csv";
 import { fmtShort, tl } from "@/lib/admin/format";
-import { orgPlanById } from "@/lib/admin/pricing";
+import { ORG_PLANS, orgPlanById } from "@/lib/admin/pricing";
 
 export function BranchLicense() {
   const { snapshot, activeOrgId, mutate, toast } = useAdminStore();
@@ -66,7 +67,26 @@ export function BranchLicense() {
               ) : null}
               <hr className="hr" style={{ margin: "4px 0" }} />
               <button type="button" className="btn btn-primary" onClick={() => setRenewOpen(true)}><Icon name="refresh" size={16} />Lisansı yenile / uzat</button>
+              <button type="button" className="btn btn-light" onClick={async () => { await mutate({ kind: "renewOrg", orgId: o.id }); toast("Lisans yenilendi", { icon: "ki-arrows-circle" }); }}><Icon name="refresh" size={16} />Şimdi yenile</button>
               <button type="button" className="btn btn-light" onClick={() => setConfirm("upgrade")}><Icon name="arrowUp" size={16} />Planı yükselt</button>
+              <button type="button" className="btn btn-light" onClick={() => { downloadText(`lisans-${o.id}.txt`, [o.name + " — LİSAN ÖZETİ", "", "Plan: " + p.name, "Öğrenci: " + o.seats.used + "/" + o.seats.total, "Koç: " + o.coaches.used + "/" + o.coaches.total, "Yenileme: " + fmtShort(o.renewsAt), "Ücret: " + tl(o.feeMonthly) + "/ay"].join("\n")); toast("Özet indirildi", { icon: "ki-cloud-download" }); }}><Icon name="download" size={16} />Özet indir</button>
+            </div>
+          </UkSection>
+          <UkSection title="Plan karşılaştırma" sub="Yükseltme anında kapasite güncellenir">
+            <div className="card-body">
+              <div className="grid g-3">
+                {ORG_PLANS.map((pl) => {
+                  const sel = pl.id === o.planId;
+                  return (
+                    <div key={pl.id} className={`lic-plan${sel ? " sel" : ""}`} onClick={() => { if (!sel) setConfirm("upgrade-" + pl.id); }} style={{ cursor: sel ? "default" : "pointer" }}>
+                      <h4><span className="plan-dot" style={{ background: pl.color }} />{pl.name}</h4>
+                      <div className="lp-price tnum">{tl(pl.monthly)}<span className="per"> /ay</span></div>
+                      <ul><li>{pl.seats} öğrenci</li><li>{pl.coaches} koç</li><li>{pl.branches} şube</li></ul>
+                      {sel ? <span className="badge badge-primary" style={{ alignSelf: "flex-start" }}>Mevcut</span> : null}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </UkSection>
           <UkSection title="Üst plan: Franchise">
@@ -89,12 +109,17 @@ export function BranchLicense() {
         />
       ) : null}
       <ConfirmModal
-        open={confirm === "upgrade"}
-        title="Franchise planına yükselt?"
+        open={confirm === "upgrade" || (typeof confirm === "string" && confirm.startsWith("upgrade-"))}
+        title="Plan değiştir?"
         tone="primary"
-        body={`${o.name} için kapasite Franchise seviyesine çıkacak (400 koltuk, 40 koç, 8 şube) ve tüm premium modüller açılacak. Yeni ücret ${tl(24900)}/ay.`}
-        confirmLabel="Yükselt"
-        onConfirm={async () => { await mutate({ kind: "changeOrgPlan", orgId: o.id, planId: "franchise" }); toast("Franchise planına yükseltildi", { icon: "ki-check-circle" }); }}
+        body={`${o.name} için seçilen plana geçilecek. Kapasite ve modüller güncellenir.`}
+        confirmLabel="Onayla"
+        onConfirm={async () => {
+          const target = confirm === "upgrade" ? "franchise" : (confirm?.replace("upgrade-", "") as typeof o.planId);
+          await mutate({ kind: "changeOrgPlan", orgId: o.id, planId: target });
+          toast(orgPlanById(target).name + " planına geçildi", { icon: "ki-check-circle" });
+          setConfirm(null);
+        }}
         onClose={() => setConfirm(null)}
       />
     </div>

@@ -6,14 +6,20 @@ import { createPortal } from "react-dom";
 
 import { Icon } from "./AdminKit";
 import { useAdminStore } from "./AdminStore";
+import { UkAvatar } from "@/components/design/UkAvatar";
 import { tl, fmtShort } from "@/lib/admin/format";
 import { COACH_PLANS, ORG_PLANS } from "@/lib/admin/pricing";
+import { orgCoaches, orgStudents } from "@/lib/admin/derive";
+import { downloadCSV } from "@/lib/admin/csv";
 import type {
   AdminAccess,
   CampaignAudience,
   CampaignType,
+  LicenseStatus,
   LicenseSubjectKind,
   OrgManagerRole,
+  OrgPlanId,
+  OrgType,
   TaskPriority,
 } from "@/lib/admin/types";
 
@@ -498,6 +504,369 @@ export function GrantCampaignDialog({
           ))}
         </select>
       </Field>
+    </Modal>
+  );
+}
+
+/* ---- yeni şube ekle (zip-16) ---- */
+export function AddBranchDialog({
+  orgId,
+  onClose,
+}: {
+  orgId: string;
+  onClose: () => void;
+}) {
+  const { mutate, toast } = useAdminStore();
+  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+
+  async function save() {
+    if (!name.trim() || !city.trim()) return;
+    await mutate({ kind: "addBranch", orgId, name: name.trim(), city: city.trim() });
+    toast(name.trim() + " şubesi eklendi", { icon: "ki-office-bag" });
+    onClose();
+  }
+
+  return (
+    <Modal
+      title="Yeni şube ekle"
+      sub="Franchise planı kapsamında yeni konum"
+      onClose={onClose}
+      foot={
+        <>
+          <button type="button" className="btn btn-light" onClick={onClose}>Vazgeç</button>
+          <button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={() => void save()} disabled={!name.trim() || !city.trim()}>
+            <Icon name="plus" size={16} />Ekle
+          </button>
+        </>
+      }
+    >
+      <Field label="Şube adı">
+        <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Örn. Kadıköy Şubesi" />
+      </Field>
+      <Field label="Şehir">
+        <input className="input" value={city} onChange={(e) => setCity(e.target.value)} placeholder="İstanbul" />
+      </Field>
+    </Modal>
+  );
+}
+
+/* ---- şube yönetim modalı (zip-16) ---- */
+export function BranchManageDialog({
+  orgId,
+  branchId,
+  onClose,
+}: {
+  orgId: string;
+  branchId: string;
+  onClose: () => void;
+}) {
+  const { snapshot, mutate, toast } = useAdminStore();
+  const o = snapshot?.orgs.find((x) => x.id === orgId);
+  const live = o?.branches.find((b) => b.id === branchId);
+  const [tab, setTab] = useState<"genel" | "koclar" | "ayarlar">("genel");
+  const [name, setName] = useState(live?.name ?? "");
+  const [city, setCity] = useState(live?.city ?? "");
+  const [status, setStatus] = useState<LicenseStatus>(live?.status ?? "active");
+
+  if (!o || !live || !snapshot) return null;
+
+  const branch = live;
+  const totalCollect = o.branches.reduce((s, b) => s + b.collect, 0) || 1;
+  const cap = Math.max(branch.students + 8, Math.round((branch.students || 1) / 0.82));
+  const occ = Math.min(100, Math.round((branch.students / cap) * 100));
+  const share = Math.round((branch.collect / totalCollect) * 100);
+  const coaches = orgCoaches(o).filter((c) => c.branchId === branch.id);
+  const students = orgStudents(o).filter((s) => s.branch === branch.name);
+  const risk = students.filter((s) => s.status === "risk");
+
+  async function saveInfo() {
+    await mutate({ kind: "updateBranch", orgId, branchId: branch.id, name, city, status });
+    toast("Şube bilgileri güncellendi", { icon: "ki-check-circle" });
+  }
+
+  function exportBranch() {
+    downloadCSV(`sube-${branch.id}.csv`, [
+      ["Şube", branch.name],
+      ["Şehir", branch.city],
+      ["Öğrenci", branch.students],
+      ["Koç", branch.coaches],
+      ["Aylık tahsilat", branch.collect],
+      ["Doluluk %", occ],
+      ["Gelir payı %", share],
+      [],
+      ["Koç", "Öğrenci", "Puan", "Doluluk %"],
+      ...coaches.map((c) => [c.name, c.students, c.rating, c.load]),
+    ]);
+    toast(branch.name + " raporu indirildi", { icon: "ki-cloud-download" });
+  }
+
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-panel" style={{ maxWidth: 640, height: "min(720px, calc(100vh - 36px))" }} onClick={(e) => e.stopPropagation()}>
+        <div className="modal-head">
+          <div className="row" style={{ gap: 12 }}>
+            <span className="org-logo" style={{ width: 44, height: 44, background: o.tone, borderRadius: 12 }}>
+              <Icon name="building" size={21} />
+            </span>
+            <div>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>{branch.name}</h3>
+              <div className="muted" style={{ fontSize: 12.5 }}>{branch.city} · {o.name}</div>
+            </div>
+          </div>
+          <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">
+            <Icon name="plus" size={18} style={{ transform: "rotate(45deg)" }} />
+          </button>
+        </div>
+
+        <div className="modal-sub" style={{ gap: 8 }}>
+          {(
+            [
+              ["genel", "Genel"],
+              ["koclar", `Koçlar (${coaches.length})`],
+              ["ayarlar", "Ayarlar"],
+            ] as const
+          ).map(([k, l]) => (
+            <button key={k} type="button" className={`seg-tab${tab === k ? " on" : ""}`} style={{ height: 32 }} onClick={() => setTab(k)}>
+              {l}
+            </button>
+          ))}
+        </div>
+
+        <div className="modal-body" style={{ padding: "16px 20px", gap: 16 }}>
+          {tab === "genel" ? (
+            <>
+              <div className="grid g-2" style={{ gap: 12 }}>
+                <div className="card stat"><div className="card-pad" style={{ gap: 8 }}><span className="stat-icon tone-primary"><Icon name="cap" size={20} /></span><div><div className="stat-value tnum" style={{ fontSize: 22 }}>{branch.students}</div><div className="stat-label">öğrenci · %{occ} doluluk</div></div></div></div>
+                <div className="card stat"><div className="card-pad" style={{ gap: 8 }}><span className="stat-icon tone-info"><Icon name="users" size={20} /></span><div><div className="stat-value tnum" style={{ fontSize: 22 }}>{branch.coaches}</div><div className="stat-label">koç</div></div></div></div>
+                <div className="card stat"><div className="card-pad" style={{ gap: 8 }}><span className="stat-icon tone-success"><Icon name="banknote" size={20} /></span><div><div className="stat-value tnum" style={{ fontSize: 22 }}>{tl(branch.collect)}</div><div className="stat-label">aylık tahsilat</div></div></div></div>
+                <div className="card stat"><div className="card-pad" style={{ gap: 8 }}><span className="stat-icon tone-warning"><Icon name="pie" size={20} /></span><div><div className="stat-value tnum" style={{ fontSize: 22 }}>%{share}</div><div className="stat-label">kurum gelir payı</div></div></div></div>
+              </div>
+              <div>
+                <div className="between" style={{ marginBottom: 7 }}>
+                  <span className="muted" style={{ fontSize: 12, fontWeight: 600 }}>Kapasite doluluğu</span>
+                  <span className="tnum" style={{ fontSize: 12, fontWeight: 700 }}>{branch.students}/{cap}</span>
+                </div>
+                <div className="meter-bar"><span style={{ width: `${occ}%`, background: occ >= 85 ? "var(--success)" : occ >= 60 ? "var(--primary)" : "var(--warning)" }} /></div>
+              </div>
+              <div className="grid g-2" style={{ gap: 12 }}>
+                <div className="kpi-row" style={{ padding: "12px 14px", border: "1px solid var(--border)", borderRadius: 12 }}>
+                  <span className="muted" style={{ fontSize: 12.5 }}>Öğrenci başına gelir</span>
+                  <b className="tnum">{tl(Math.round(branch.collect / Math.max(1, branch.students)))}</b>
+                </div>
+                <div className="kpi-row" style={{ padding: "12px 14px", border: "1px solid var(--border)", borderRadius: 12 }}>
+                  <span className="muted" style={{ fontSize: 12.5 }}>Risk altında</span>
+                  <b className="tnum" style={{ color: risk.length ? "var(--danger)" : "var(--text)" }}>{risk.length} öğrenci</b>
+                </div>
+              </div>
+              {risk.length ? (
+                <div className="alert-strip warn">
+                  <span className="as-ic"><Icon name="alert" size={16} /></span>
+                  <div style={{ flex: 1 }}>
+                    <b style={{ fontSize: 13 }}>{risk.length} öğrenci risk altında</b>
+                    <div className="muted" style={{ fontSize: 12 }}>{risk.slice(0, 3).map((s) => s.name).join(", ")}{risk.length > 3 ? ` +${risk.length - 3}` : ""}</div>
+                  </div>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+
+          {tab === "koclar" ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {coaches.length === 0 ? (
+                <p className="muted" style={{ fontSize: 12.5 }}>Bu şubeye atanmış koç yok.</p>
+              ) : (
+                coaches.map((c) => (
+                  <div key={c.id} className="lrow" style={{ padding: "11px 13px" }}>
+                    <UkAvatar name={c.name} size={34} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="lr-title" style={{ fontSize: 13 }}>{c.name}</div>
+                      <div className="muted" style={{ fontSize: 11.5 }}>{c.students} öğrenci · %{c.load} doluluk</div>
+                    </div>
+                    <span className="row" style={{ gap: 4, fontWeight: 700, fontSize: 12.5 }}>
+                      <Icon name="star" size={13} fill style={{ color: "var(--warning)" }} />
+                      {c.rating}
+                    </span>
+                    <button
+                      type="button"
+                      className="icon-btn"
+                      style={{ width: 32, height: 32 }}
+                      title="Mesaj"
+                      aria-label="Mesaj gönder"
+                      onClick={() => toast(c.name + " koçuna mesaj gönderildi", { icon: "ki-send" })}
+                    >
+                      <Icon name="message" size={15} />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : null}
+
+          {tab === "ayarlar" ? (
+            <>
+              <Field label="Şube adı">
+                <input className="input" value={name} onChange={(e) => setName(e.target.value)} />
+              </Field>
+              <Field label="Şehir">
+                <input className="input" value={city} onChange={(e) => setCity(e.target.value)} />
+              </Field>
+              <Field label="Durum">
+                <select className="input" value={status} onChange={(e) => setStatus(e.target.value as LicenseStatus)}>
+                  <option value="active">Aktif</option>
+                  <option value="expiring">Düşük doluluk</option>
+                  <option value="suspended">Donduruldu</option>
+                </select>
+              </Field>
+              <button type="button" className="btn btn-primary" style={{ alignSelf: "flex-start" }} onClick={() => void saveInfo()}>
+                <Icon name="check" size={16} />Kaydet
+              </button>
+            </>
+          ) : null}
+        </div>
+
+        <div className="modal-foot">
+          <button type="button" className="btn btn-light" onClick={() => toast(branch.name + " müdürüne mesaj gönderildi", { icon: "ki-messages" })}>
+            <Icon name="message" size={16} />Müdüre yaz
+          </button>
+          <button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={exportBranch}>
+            <Icon name="download" size={16} />Şube raporu
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+/* ---- yeni kurum ekle (süper admin) ---- */
+export function CreateOrgDialog({ onClose }: { onClose: () => void }) {
+  const { mutate, toast } = useAdminStore();
+  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [type, setType] = useState<OrgType>("kurum");
+  const [planId, setPlanId] = useState<OrgPlanId>("baslangic");
+  const [ownerName, setOwnerName] = useState("");
+  const [ownerEmail, setOwnerEmail] = useState("");
+  const [ownerPhone, setOwnerPhone] = useState("");
+
+  async function save() {
+    if (!name.trim() || !city.trim() || !ownerName.trim() || !ownerEmail.trim()) return;
+    await mutate({
+      kind: "createOrg",
+      name: name.trim(),
+      city: city.trim(),
+      type,
+      planId,
+      ownerName: ownerName.trim(),
+      ownerEmail: ownerEmail.trim(),
+      ownerPhone: ownerPhone.trim(),
+    });
+    toast(name.trim() + " kurumu oluşturuldu", { icon: "ki-office-bag" });
+    onClose();
+  }
+
+  return (
+    <Modal title="Yeni kurum ekle" sub="Deneme lisansı ile başlatılır" width={520} onClose={onClose}
+      foot={<><button type="button" className="btn btn-light" onClick={onClose}>Vazgeç</button><button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={() => void save()} disabled={!name.trim() || !ownerEmail.trim()}><Icon name="plus" size={16} />Oluştur</button></>}
+    >
+      <Field label="Kurum adı"><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+      <div className="grid g-2" style={{ gap: 12 }}>
+        <Field label="Şehir"><input className="input" value={city} onChange={(e) => setCity(e.target.value)} /></Field>
+        <Field label="Tür">
+          <select className="input" value={type} onChange={(e) => setType(e.target.value as OrgType)}>
+            <option value="kurum">Tek kurum</option>
+            <option value="franchise">Franchise</option>
+          </select>
+        </Field>
+      </div>
+      <Field label="Plan">
+        <select className="input" value={planId} onChange={(e) => setPlanId(e.target.value as OrgPlanId)}>
+          {ORG_PLANS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+      </Field>
+      <Field label="Yetkili adı"><input className="input" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} /></Field>
+      <div className="grid g-2" style={{ gap: 12 }}>
+        <Field label="E-posta"><input className="input" value={ownerEmail} onChange={(e) => setOwnerEmail(e.target.value)} /></Field>
+        <Field label="Telefon"><input className="input" value={ownerPhone} onChange={(e) => setOwnerPhone(e.target.value)} /></Field>
+      </div>
+    </Modal>
+  );
+}
+
+export function InviteCoachDialog({
+  orgId,
+  branches,
+  onClose,
+}: {
+  orgId: string;
+  branches: { id: string; name: string }[];
+  onClose: () => void;
+}) {
+  const { mutate, toast } = useAdminStore();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [branchId, setBranchId] = useState(branches[0]?.id ?? "");
+
+  async function save() {
+    if (!name.trim() || !email.trim()) return;
+    await mutate({ kind: "inviteOrgCoach", orgId, name: name.trim(), email: email.trim(), branchId: branchId || undefined });
+    toast(name.trim() + " için davet gönderildi", { icon: "ki-send" });
+    onClose();
+  }
+
+  return (
+    <Modal title="Koç davet et" sub="E-posta ile davet bağlantısı gönderilir" onClose={onClose}
+      foot={<><button type="button" className="btn btn-light" onClick={onClose}>Vazgeç</button><button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={() => void save()} disabled={!name.trim() || !email.trim()}><Icon name="send" size={16} />Davet gönder</button></>}
+    >
+      <Field label="Ad soyad"><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+      <Field label="E-posta"><input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
+      {branches.length > 1 ? (
+        <Field label="Şube">
+          <select className="input" value={branchId} onChange={(e) => setBranchId(e.target.value)}>
+            {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+          </select>
+        </Field>
+      ) : null}
+    </Modal>
+  );
+}
+
+export function InviteStudentDialog({
+  orgId,
+  branches,
+  onClose,
+}: {
+  orgId: string;
+  branches: { id: string; name: string }[];
+  onClose: () => void;
+}) {
+  const { mutate, toast } = useAdminStore();
+  const [name, setName] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
+  const [branchId, setBranchId] = useState(branches[0]?.id ?? "");
+
+  async function save() {
+    if (!name.trim() || !parentEmail.trim()) return;
+    await mutate({ kind: "inviteStudent", orgId, name: name.trim(), parentEmail: parentEmail.trim(), branchId: branchId || undefined });
+    toast(name.trim() + " kaydı oluşturuldu", { icon: "ki-plus" });
+    onClose();
+  }
+
+  return (
+    <Modal title="Öğrenci ekle" sub="Veli e-postasına kayıt daveti gönderilir" onClose={onClose}
+      foot={<><button type="button" className="btn btn-light" onClick={onClose}>Vazgeç</button><button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={() => void save()} disabled={!name.trim() || !parentEmail.trim()}><Icon name="plus" size={16} />Ekle</button></>}
+    >
+      <Field label="Öğrenci adı"><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+      <Field label="Veli e-postası"><input className="input" type="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} /></Field>
+      {branches.length > 1 ? (
+        <Field label="Şube">
+          <select className="input" value={branchId} onChange={(e) => setBranchId(e.target.value)}>
+            {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+          </select>
+        </Field>
+      ) : null}
     </Modal>
   );
 }

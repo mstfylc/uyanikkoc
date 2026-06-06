@@ -165,6 +165,66 @@ export async function applyAdminMutation(
     case "setActiveOrg":
       // Aktif kurum oturum bağlamıdır; memory store'da kalıcı tutulmaz (UI tarafında).
       break;
+    case "addBranch":
+      memory.mockAddBranch(m.orgId, m.name, m.city);
+      break;
+    case "updateBranch":
+      memory.mockUpdateBranch(m.orgId, m.branchId, {
+        name: m.name,
+        city: m.city,
+        status: m.status,
+      });
+      break;
+    case "sendPaymentReminder":
+      memory.mockSendPaymentReminder(m.subscriptionId);
+      break;
+    case "buyCoachPlan":
+      memory.mockBuyCoachPlan(m.coachId, m.planId, m.cycle);
+      break;
+    case "setCoachAutoRenew":
+      memory.mockSetCoachAutoRenew(m.coachId, m.enabled);
+      break;
+    case "cancelCoach":
+      memory.mockCancelCoach(m.coachId);
+      break;
+    case "updateOrgBilling":
+      memory.mockUpdateOrgBilling(m.orgId, {
+        taxId: m.taxId,
+        taxOffice: m.taxOffice,
+        billingAddress: m.billingAddress,
+        paymentMethod: m.paymentMethod,
+      });
+      break;
+    case "updateOrgNotifications":
+      memory.mockUpdateOrgNotifications(m.orgId, m.prefs);
+      break;
+    case "requestDataExport":
+      memory.mockRequestDataExport(m.orgId, m.note);
+      break;
+    case "cancelOrgSubscription":
+      memory.mockCancelOrgSubscription(m.orgId);
+      break;
+    case "createOrg":
+      memory.mockCreateOrg({
+        name: m.name,
+        city: m.city,
+        type: m.type,
+        planId: m.planId,
+        ownerName: m.ownerName,
+        ownerEmail: m.ownerEmail,
+        ownerPhone: m.ownerPhone,
+      });
+      break;
+    case "inviteOrgCoach":
+      memory.mockInviteOrgCoach(m.orgId, { name: m.name, email: m.email, branchId: m.branchId });
+      break;
+    case "inviteStudent":
+      memory.mockInviteStudent(m.orgId, {
+        name: m.name,
+        parentEmail: m.parentEmail,
+        branchId: m.branchId,
+      });
+      break;
     default: {
       const _exhaustive: never = m;
       void _exhaustive;
