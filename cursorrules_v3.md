@@ -14,7 +14,7 @@
 | CRM | Tamamen ayrı sunucu, ayrı DB — hiçbir dosyasına dokunma |
 | AI Koç | `AI_COACH_ENABLED=false` — OpenAI çağrısı yazma |
 | Şube/franchise | Şemada hazır, UI'da `SINGLE_BRANCH_MODE=true` — şube UI yazma |
-| Mobil | `apps/mobile` placeholder — içine kod yazma |
+| Mobil | `apps/mobile` aktif — Capacitor + React + TypeScript (bkz. "Mobil çalışma kuralları") |
 | Auth | NextAuth/Auth.js — başka yöntem ekleme |
 | DB | Prisma + PostgreSQL — sorgu doğrudan component'e yazılmaz |
 | Validation | Zod — her input/output için zorunlu |
@@ -52,7 +52,7 @@ Rol kontrolü sadece UI'da yapılmaz.
 
 ```
 apps/web          → Next.js 14 App Router (ana geliştirme)
-apps/mobile       → Placeholder — dokunma
+apps/mobile       → Capacitor + React + TS (öğrenci mobil uygulaması)
 apps/worker       → Sonraki faz
 packages/shared   → net, risk, streak hesaplamaları
 packages/contracts → Zod sözleşmeleri
@@ -60,6 +60,30 @@ packages/database  → Prisma client
 packages/tokens   → Renk/rol tokenları
 packages/ui-web   → Ortak web UI
 ```
+
+---
+
+## Mobil çalışma kuralları (`apps/mobile`)
+
+Öğrenci mobil uygulaması. Tasarım kaynağı: prototip "Uyanık Koç — Mobil Uygulama"
+(Giriş, Ana Sayfa, Ödevler, Denemeler, Program, Profil).
+
+- **Teknoloji:** Capacitor + React + Vite + **TypeScript**. Tek kod tabanı (iOS/Android),
+  `appId: com.uyanikkoc.app`.
+- **Tasarım:** Prototipin `uk-m` tasarım sistemi (`src/styles/uk-m.css`, light+dark,
+  Plus Jakarta Sans) birebir. Web Metronic'inden bağımsız; yeni tasarım dili icat etme.
+- **Ortak mantık:** `packages/shared`, `packages/contracts`, `packages/tokens` `workspace:*`
+  ile yeniden kullanılır — kopyalama yok.
+- **Mimari:** ekran → hook/data → `apiClient` (Bearer + 401→refresh). İş mantığı/sorgu
+  component'e gömülmez. Input/output **Zod** ile doğrulanır.
+- **Mock/fixture yeri:** yalnızca `apps/mobile/src/mocks/`. `lib/memory|fake|demo` yasak.
+- **Oturum:** native token oturumu (`withMobileAuth`) web NextAuth cookie oturumuna
+  paraleldir — NextAuth'a dokunma.
+- **Sınırlar web ile aynı:** AI Koç kapalı ("Koç önerisi" statik metin), CRM izolasyonu,
+  tek şube modu, marka "Uyanık Koç".
+- **Native klasörler:** `ios/`, `android/` `.gitignore`'da; `npx cap add` ile üretilir.
+- Yeni uygulama iskelesi tek mantıksal commit olabilir (8-dosya limiti muaf); sonrası
+  ekran-ekran (dikey dilim) ilerler.
 
 ---
 
@@ -134,10 +158,10 @@ SINGLE_BRANCH_MODE=true          → asla false yapma
 5. Supabase bağlantısı
 6. Vercel deploy (uyanikkoc.com)
 7. İç test
+8. Native mobil (apps/mobile) — Capacitor + React, dikey dilim: Login → Ana Sayfa → Ödevler → Denemeler → Program/Profil → Push
 ─────────────────────── (henüz sırada değil)
-8. AI Koç chat
-9. Ödeme sistemi
-10. Native mobil
+9. AI Koç chat
+10. Ödeme sistemi
 11. Admin paneli
 12. Franchise UI
 ```
@@ -170,7 +194,8 @@ Bilinen eksikler: [varsa]
 ✗ Prisma sorgusu doğrudan component'e
 ✗ Rol kontrolü sadece UI'da
 ✗ Server component içinde window/document
-✗ apps/mobile içine kod
+✗ Mobil mock'u src/mocks/ dışına koyma
+✗ Mobilde web tasarımından ayrı yeni tasarım dili icat etme
 ✗ Yeni dependency gerekçesiz ekleme
 ✗ Metronic için ayrıca tailwind.config kurma
 ```
