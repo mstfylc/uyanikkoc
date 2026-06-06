@@ -53,11 +53,7 @@ export function Header({ role }: HeaderProps) {
       </div>
 
       <div className="topbar-actions">
-        {shouldShowNotificationBell(role) ? <NotificationBell role={role} /> : (
-          <button type="button" className="icon-btn" aria-label="Bildirimler">
-            <KiIcon name="ki-notification-on" size={19} />
-          </button>
-        )}
+        {shouldShowNotificationBell(role) ? <NotificationBell role={role} /> : null}
 
         <div style={{ position: "relative" }}>
           <button

@@ -69,3 +69,33 @@ export async function markParentNotificationRead(
 
   return memoryNotifications.markRead(notificationId, { parentId });
 }
+
+export async function listCoachNotifications(coachId: string): Promise<NotificationListResult> {
+  const notifications = memoryNotifications.listForCoach(coachId);
+  return { notifications, unreadCount: countUnread(notifications) };
+}
+
+export async function markCoachNotificationRead(
+  coachId: string,
+  notificationId: string,
+): Promise<NotificationRecord | null> {
+  return memoryNotifications.markRead(notificationId, { coachId });
+}
+
+export async function markAllStudentNotificationsRead(studentId: string): Promise<number> {
+  if (shouldUseDatabase()) {
+    return 0;
+  }
+  return memoryNotifications.markAllRead({ studentId });
+}
+
+export async function markAllParentNotificationsRead(parentId: string): Promise<number> {
+  if (shouldUseDatabase()) {
+    return 0;
+  }
+  return memoryNotifications.markAllRead({ parentId });
+}
+
+export async function markAllCoachNotificationsRead(coachId: string): Promise<number> {
+  return memoryNotifications.markAllRead({ coachId });
+}

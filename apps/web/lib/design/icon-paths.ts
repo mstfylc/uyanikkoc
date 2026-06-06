@@ -22,6 +22,8 @@ export const UK_ICON_PATHS = {
     '<polygon points="12 2.5 14.85 8.26 21.2 9.18 16.6 13.66 17.69 19.99 12 17 6.31 19.99 7.4 13.66 2.8 9.18 9.15 8.26"/>',
   bell:
     '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  moon:
+    '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
   check: '<polyline points="20 6 9 17 4 12"/>',
   checkCircle:
     '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
@@ -89,6 +91,7 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
   "ki-people": "users",
   "ki-profile-circle": "users",
   "ki-setting-2": "settings",
+  "ki-moon": "moon",
   "ki-notification-on": "bell",
   "ki-magnifier": "search",
   "ki-exit-right": "logout",

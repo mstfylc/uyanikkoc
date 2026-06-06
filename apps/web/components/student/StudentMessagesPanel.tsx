@@ -11,6 +11,7 @@ export function StudentMessagesPanel() {
       subtitle="Koc ve gruplar"
       testId="student-messages-panel"
       enableGroupTabs
+      dmSectionLabel="Kocun"
     />
   );
 }

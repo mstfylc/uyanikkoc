@@ -1,7 +1,7 @@
 "use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { UkAvatar } from "@/components/design/UkAvatar";
 import { UkPageHead } from "@/components/design/UkPageHead";
@@ -18,6 +18,8 @@ type MessagesPanelProps = {
   threadMeta?: (thread: MessageThreadRecord) => string;
   enableGroupTabs?: boolean;
   headerAction?: React.ReactNode;
+  groupSectionLabel?: string;
+  dmSectionLabel?: string;
 };
 
 export function MessagesPanel({
@@ -29,6 +31,8 @@ export function MessagesPanel({
   threadMeta,
   enableGroupTabs = false,
   headerAction,
+  groupSectionLabel = "Gruplar",
+  dmSectionLabel = "Birebir",
 }: MessagesPanelProps) {
   const [threads, setThreads] = useState<MessageThreadRecord[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -105,6 +109,70 @@ export function MessagesPanel({
     return item.title.toLocaleLowerCase("tr-TR").includes(query);
   });
 
+  const { groupThreads, dmThreads } = useMemo(() => {
+    return {
+      groupThreads: filteredThreads.filter((item) => item.kind === "group"),
+      dmThreads: filteredThreads.filter((item) => item.kind !== "group"),
+    };
+  }, [filteredThreads]);
+
+  function renderThreadButton(item: MessageThreadRecord) {
+    const active = item.id === selectedId;
+    const last = item.messages[item.messages.length - 1];
+    const preview = threadMeta
+      ? threadMeta(item)
+      : item.kind === "group"
+        ? `Grup · ${last?.body ?? "Mesaj yok"}`
+        : last?.body ?? "Mesaj yok";
+
+    return (
+      <button
+        key={item.id}
+        type="button"
+        onClick={() => setSelectedId(item.id)}
+        className={`chan-row${active ? " on" : ""}`}
+      >
+        {item.kind === "group" ? (
+          <span className="chan-gico">
+            <KiIcon name="ki-people" size={18} />
+          </span>
+        ) : (
+          <UkAvatar name={item.title} size={42} />
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="between" style={{ gap: 6 }}>
+            <b
+              style={{
+                fontSize: 13.5,
+                fontWeight: 700,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {item.title}
+            </b>
+            <span style={{ fontSize: 11, color: "var(--faint)", flexShrink: 0 }}>
+              {last ? new Date(last.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) : ""}
+            </span>
+          </div>
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--muted)",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              marginTop: 2,
+            }}
+          >
+            {preview}
+          </div>
+        </div>
+      </button>
+    );
+  }
+
   return (
     <div className="stack rise" data-testid={testId}>
       <UkPageHead title={title} sub={subtitle} actions={headerAction} />
@@ -133,16 +201,9 @@ export function MessagesPanel({
         </p>
       ) : (
         <div className="card" style={{ overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "340px 1fr", height: 600 }}>
-            <div
-              style={{
-                borderRight: "1px solid var(--border)",
-                display: "flex",
-                flexDirection: "column",
-                minHeight: 0,
-              }}
-            >
-              <div style={{ padding: 14, borderBottom: "1px solid var(--border)" }}>
+          <div className="msg-shell">
+            <div className="msg-list">
+              <div style={{ padding: 12, borderBottom: "1px solid var(--border)" }}>
                 <div className="searchbox" style={{ minWidth: 0, margin: 0, display: "flex" }}>
                   <KiIcon name="ki-magnifier" size={16} />
                   <input
@@ -153,98 +214,79 @@ export function MessagesPanel({
                 </div>
               </div>
               <div style={{ overflowY: "auto", flex: 1, padding: 8 }}>
-                {filteredThreads.map((item) => {
-                  const active = item.id === selectedId;
-                  const last = item.messages[item.messages.length - 1];
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setSelectedId(item.id)}
-                      style={{
-                        display: "flex",
-                        gap: 12,
-                        padding: "11px 12px",
-                        borderRadius: 12,
-                        width: "100%",
-                        textAlign: "left",
-                        border: "none",
-                        background: active ? "var(--surface-3)" : "none",
-                        cursor: "pointer",
-                        alignItems: "center",
-                      }}
-                    >
-                      <UkAvatar name={item.title} size={42} />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="between" style={{ gap: 6 }}>
-                          <b
-                            style={{
-                              fontSize: 13.5,
-                              fontWeight: 700,
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                            }}
-                          >
-                            {item.title}
-                          </b>
-                          <span style={{ fontSize: 11, color: "var(--faint)", flexShrink: 0 }}>
-                            {last ? new Date(last.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }) : ""}
-                          </span>
-                        </div>
-                        <span
-                          style={{
-                            fontSize: 12,
-                            color: "var(--muted)",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "block",
-                          }}
-                        >
-                          {threadMeta
-                            ? threadMeta(item)
-                            : item.kind === "group"
-                              ? `Grup · ${last?.body ?? "Mesaj yok"}`
-                              : last?.body ?? "Mesaj yok"}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
+                {enableGroupTabs && groupThreads.length > 0 ? (
+                  <div className="msg-sec">{groupSectionLabel}</div>
+                ) : null}
+                {(enableGroupTabs ? groupThreads : filteredThreads.filter((item) => item.kind === "group")).map(
+                  renderThreadButton,
+                )}
+                {enableGroupTabs && dmThreads.length > 0 ? (
+                  <div className="msg-sec">{dmSectionLabel}</div>
+                ) : null}
+                {(enableGroupTabs ? dmThreads : filteredThreads.filter((item) => item.kind !== "group")).map(
+                  renderThreadButton,
+                )}
               </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+            <div className="msg-thread">
               <div
                 className="row"
-                style={{ gap: 12, padding: "14px 18px", borderBottom: "1px solid var(--border)" }}
+                style={{ gap: 12, padding: "13px 18px", borderBottom: "1px solid var(--border)" }}
               >
-                <UkAvatar name={activeThread?.title ?? "Mesaj"} size={40} />
-                <div style={{ flex: 1 }}>
+                {activeThread?.kind === "group" ? (
+                  <span className="chan-gico" style={{ width: 40, height: 40 }}>
+                    <KiIcon name="ki-people" size={18} />
+                  </span>
+                ) : (
+                  <UkAvatar name={activeThread?.title ?? "Mesaj"} size={40} />
+                )}
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <b style={{ fontSize: 14, fontWeight: 700 }}>{activeThread?.title ?? "Mesaj"}</b>
+                  {activeThread?.kind === "group" ? (
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: "var(--muted)",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      Grup sohbeti
+                    </div>
+                  ) : null}
                 </div>
               </div>
 
-              <div
-                style={{
-                  flex: 1,
-                  overflowY: "auto",
-                  padding: "20px 18px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 12,
-                  background: "var(--surface-2)",
-                }}
-              >
+              <div className="msg-body">
+                {activeThread?.kind === "group" ? (
+                  <div className="msg-day">Grup · {activeThread.title}</div>
+                ) : null}
                 {thread ? (
                   thread.messages.map((message) => {
                     const mine = message.senderRole === selfRole;
                     return (
                       <div
                         key={message.id}
-                        style={{ alignSelf: mine ? "flex-end" : "flex-start", maxWidth: "72%" }}
+                        style={{ alignSelf: mine ? "flex-end" : "flex-start", maxWidth: "74%" }}
                       >
+                        {!mine && activeThread?.kind === "group" ? (
+                          <div
+                            style={{
+                              fontSize: 10.5,
+                              fontWeight: 700,
+                              color: "var(--primary-600)",
+                              margin: "0 0 3px 4px",
+                            }}
+                          >
+                            {message.senderRole === "COACH"
+                              ? "Koc"
+                              : message.senderRole === "PARENT"
+                                ? "Veli"
+                                : "Ogrenci"}
+                          </div>
+                        ) : null}
                         <div
                           style={{
                             background: mine ? "var(--primary)" : "var(--surface)",
@@ -292,7 +334,11 @@ export function MessagesPanel({
                   style={{ flex: 1 }}
                   value={messageBody}
                   onChange={(event) => setMessageBody(event.target.value)}
-                  placeholder="Mesaj yaz..."
+                  placeholder={
+                    activeThread?.kind === "group"
+                      ? `${activeThread.title} grubuna yaz...`
+                      : `${activeThread?.title ?? "Kisi"}'a mesaj yaz...`
+                  }
                 />
                 <button
                   type="submit"

@@ -1,9 +1,12 @@
 import type { AssignmentRecord, NotificationRecord } from "@uyanik/database";
 
-import { DEMO_STUDENT_ID, listAssignmentsForParent, listAssignmentsForStudent } from "@/mocks/assignments";
+import { DEMO_PARENT_ID, DEMO_STUDENT_ID, listAssignmentsForParent, listAssignmentsForStudent } from "@/mocks/assignments";
+import { DEMO_COACH_ID } from "@/mocks/messages";
+
+type StoredNotification = NotificationRecord & { coachId?: string | null };
 
 const globalStore = globalThis as typeof globalThis & {
-  __uyanikNotifications?: NotificationRecord[];
+  __uyanikNotifications?: StoredNotification[];
   __uyanikNotificationSourceKeys?: Set<string>;
 };
 
@@ -11,8 +14,8 @@ const notifications = globalStore.__uyanikNotifications ?? (globalStore.__uyanik
 const sourceKeys =
   globalStore.__uyanikNotificationSourceKeys ?? (globalStore.__uyanikNotificationSourceKeys = new Set());
 
-function nowIso(): string {
-  return new Date().toISOString();
+function nowIso(offsetMinutes = 0): string {
+  return new Date(Date.now() - offsetMinutes * 60_000).toISOString();
 }
 
 function isOverdueAssignment(assignment: AssignmentRecord, now = new Date()): boolean {
@@ -30,16 +33,139 @@ function seedIfEmpty() {
     return;
   }
 
-  const timestamp = nowIso();
-  notifications.push({
-    id: "notification_sample_1",
-    studentId: DEMO_STUDENT_ID,
-    parentId: null,
-    title: "Hos geldin",
-    body: "Uyanik Koc bildirimlerine hos geldin. Gecikmis odevler burada gorunur.",
-    read: false,
-    createdAt: timestamp,
-  });
+  notifications.push(
+    {
+      id: "notif_s1",
+      studentId: DEMO_STUDENT_ID,
+      parentId: null,
+      title: "Yeni odev atandi",
+      body: "Matematik · Turev — 40 soru, son teslim 6 Haziran",
+      read: false,
+      createdAt: nowIso(12),
+    },
+    {
+      id: "notif_s2",
+      studentId: DEMO_STUDENT_ID,
+      parentId: null,
+      title: "Deneme sonucun hazir",
+      body: "Apotemi TYT-3 · 31 net — analizini incele",
+      read: false,
+      createdAt: nowIso(95),
+    },
+    {
+      id: "notif_s3",
+      studentId: DEMO_STUDENT_ID,
+      parentId: null,
+      title: "Randevu hatirlatmasi",
+      body: "Koc gorusmen yarin 17:00'de (yuz yuze)",
+      read: false,
+      createdAt: nowIso(240),
+    },
+    {
+      id: "notif_s4",
+      studentId: DEMO_STUDENT_ID,
+      parentId: null,
+      title: "Seri rekorun yolda",
+      body: "12 gundur kesintisizsin — bugunu de tamamla",
+      read: true,
+      createdAt: nowIso(600),
+    },
+    {
+      id: "notif_s5",
+      studentId: DEMO_STUDENT_ID,
+      parentId: null,
+      title: "Kocundan mesaj",
+      body: "Dilek Emen: Paragrafa biraz daha agirlik verelim.",
+      read: true,
+      createdAt: nowIso(1450),
+    },
+    {
+      id: "notif_c1",
+      studentId: null,
+      parentId: null,
+      coachId: DEMO_COACH_ID,
+      title: "Risk altinda ogrenci",
+      body: "Ece Sahin 4 gundur odev tamamlamadi",
+      read: false,
+      createdAt: nowIso(30),
+    },
+    {
+      id: "notif_c2",
+      studentId: null,
+      parentId: null,
+      coachId: DEMO_COACH_ID,
+      title: "Odev tamamlandi",
+      body: "Elif Yildiz · Turev odevini bitirdi (31/40 dogru)",
+      read: false,
+      createdAt: nowIso(75),
+    },
+    {
+      id: "notif_c3",
+      studentId: null,
+      parentId: null,
+      coachId: DEMO_COACH_ID,
+      title: "Yeni deneme sonuclari",
+      body: "OZDEBIR TYT-5 sonuclari ice aktarilmayi bekliyor",
+      read: false,
+      createdAt: nowIso(180),
+    },
+    {
+      id: "notif_c4",
+      studentId: null,
+      parentId: null,
+      coachId: DEMO_COACH_ID,
+      title: "Randevu talebi",
+      body: "Mert Demir online gorusme istedi · onayla",
+      read: false,
+      createdAt: nowIso(320),
+    },
+    {
+      id: "notif_c5",
+      studentId: null,
+      parentId: null,
+      coachId: DEMO_COACH_ID,
+      title: "Tahsilat alindi",
+      body: "Can Aydin · VIP yillik odemesi tamamlandi",
+      read: true,
+      createdAt: nowIso(900),
+    },
+    {
+      id: "notif_p1",
+      studentId: null,
+      parentId: DEMO_PARENT_ID,
+      title: "Cocugunuzun deneme sonucu",
+      body: "Elif · TYT-3 denemesinde 31 net (+2.5)",
+      read: false,
+      createdAt: nowIso(95),
+    },
+    {
+      id: "notif_p2",
+      studentId: null,
+      parentId: DEMO_PARENT_ID,
+      title: "Haftalik gelisim raporu",
+      body: "Bu hafta %86 odev tamamlama — raporu goruntule",
+      read: false,
+      createdAt: nowIso(300),
+    },
+    {
+      id: "notif_p3",
+      studentId: null,
+      parentId: DEMO_PARENT_ID,
+      title: "Veli gorusmesi",
+      body: "Koc Dilek Emen ile gorusme Cuma 18:00",
+      read: false,
+      createdAt: nowIso(720),
+    },
+    {
+      id: "notif_p4",
+      studentId: null,
+      parentId: DEMO_PARENT_ID,
+      title: "Abonelik yenileme",
+      body: "Plus Kocluk aboneliginiz 279 gun sonra yenilenecek",
+      read: true,
+      createdAt: nowIso(2880),
+    },
+  );
 }
 
 export function resetNotificationsForTests(): void {
@@ -99,15 +225,26 @@ export function listForParent(parentId: string): NotificationRecord[] {
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
 }
 
+export function listForCoach(coachId: string): NotificationRecord[] {
+  seedIfEmpty();
+  return notifications
+    .filter((item) => item.coachId === coachId)
+    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
+}
+
 export function markRead(
   notificationId: string,
-  filter: { studentId?: string; parentId?: string },
+  filter: { studentId?: string; parentId?: string; coachId?: string },
 ): NotificationRecord | null {
   seedIfEmpty();
   const notification = notifications.find(
     (item) =>
       item.id === notificationId &&
-      (filter.studentId ? item.studentId === filter.studentId : item.parentId === filter.parentId),
+      (filter.studentId
+        ? item.studentId === filter.studentId
+        : filter.parentId
+          ? item.parentId === filter.parentId
+          : item.coachId === filter.coachId),
   );
 
   if (!notification) {
@@ -116,6 +253,23 @@ export function markRead(
 
   notification.read = true;
   return notification;
+}
+
+export function markAllRead(filter: { studentId?: string; parentId?: string; coachId?: string }): number {
+  seedIfEmpty();
+  let count = 0;
+  for (const notification of notifications) {
+    const matches = filter.studentId
+      ? notification.studentId === filter.studentId
+      : filter.parentId
+        ? notification.parentId === filter.parentId
+        : notification.coachId === filter.coachId;
+    if (matches && !notification.read) {
+      notification.read = true;
+      count += 1;
+    }
+  }
+  return count;
 }
 
 export function countUnread(items: NotificationRecord[]): number {
@@ -141,6 +295,20 @@ export function pushParentNotification(parentId: string, title: string, body: st
     id: `notification_${notifications.length + 1}`,
     studentId: null,
     parentId,
+    title,
+    body,
+    read: false,
+    createdAt: nowIso(),
+  });
+}
+
+export function pushCoachNotification(coachId: string, title: string, body: string): void {
+  seedIfEmpty();
+  notifications.unshift({
+    id: `notification_${notifications.length + 1}`,
+    studentId: null,
+    parentId: null,
+    coachId,
     title,
     body,
     read: false,

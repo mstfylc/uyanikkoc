@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 import { CurriculumEditor } from "@/components/coach/CurriculumEditor";
 import { BillingPanel } from "@/components/shared/BillingPanel";
+import { NotificationSettingsPanel } from "@/components/shared/NotificationSettingsPanel";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
@@ -41,6 +43,7 @@ function SettingsToast({ message }: { message: string | null }) {
 
 export function SettingsPanel({ role }: SettingsPanelProps) {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<SettingsTab>(role === "coach" ? "mufredat" : "profil");
   const [curriculum, setCurriculum] = useState<CurriculumRecord | null>(null);
   const [isLoading, setIsLoading] = useState(role === "coach");
@@ -48,8 +51,6 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [emailReminders, setEmailReminders] = useState(true);
-  const [pushReminders, setPushReminders] = useState(true);
 
   const email = session?.user?.email ?? "—";
   const name = session?.user?.name ?? email.split("@")[0] ?? "Kullanici";
@@ -83,6 +84,13 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    const requested = searchParams.get("tab");
+    if (requested === "bildirimler" || requested === "profil" || requested === "odeme" || requested === "mufredat") {
+      setTab(requested);
+    }
+  }, [searchParams]);
 
   function showToast(message: string) {
     setToast(message);
@@ -164,10 +172,6 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
 
   function handleProfileSave() {
     showToast("Profil tercihleri kaydedildi");
-  }
-
-  function handleNotificationSave() {
-    showToast("Bildirim tercihleri kaydedildi");
   }
 
   return (
@@ -287,62 +291,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
       ) : null}
 
       {tab === "bildirimler" ? (
-        <UkSection
-          title="Bildirim tercihleri"
-          sub="E-posta ve push hatirlatmalari"
-          action={
-            <button type="button" className="btn btn-primary btn-sm" onClick={handleNotificationSave}>
-              <KiIcon name="ki-check" size={15} />
-              Kaydet
-            </button>
-          }
-        >
-          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div className="between" style={{ padding: "10px 0" }}>
-              <div className="row" style={{ gap: 12 }}>
-                <span className="lr-icon" style={{ width: 38, height: 38, background: "var(--surface-3)" }}>
-                  <KiIcon name="ki-message-text" size={18} />
-                </span>
-                <div>
-                  <div style={{ fontSize: 13.5, fontWeight: 700 }}>E-posta hatirlatmalari</div>
-                  <div className="muted" style={{ fontSize: 12 }}>
-                    Odev ve deneme bildirimleri
-                  </div>
-                </div>
-              </div>
-              <button
-                type="button"
-                className={`switch${emailReminders ? " on" : ""}`}
-                aria-label="E-posta hatirlatmalari"
-                onClick={() => setEmailReminders((value) => !value)}
-              >
-                <span />
-              </button>
-            </div>
-            <hr className="hr" />
-            <div className="between" style={{ padding: "10px 0" }}>
-              <div className="row" style={{ gap: 12 }}>
-                <span className="lr-icon" style={{ width: 38, height: 38, background: "var(--surface-3)" }}>
-                  <KiIcon name="ki-notification-on" size={18} />
-                </span>
-                <div>
-                  <div style={{ fontSize: 13.5, fontWeight: 700 }}>Push hatirlatmalari</div>
-                  <div className="muted" style={{ fontSize: 12 }}>
-                    Anlik bildirimler
-                  </div>
-                </div>
-              </div>
-              <button
-                type="button"
-                className={`switch${pushReminders ? " on" : ""}`}
-                aria-label="Push hatirlatmalari"
-                onClick={() => setPushReminders((value) => !value)}
-              >
-                <span />
-              </button>
-            </div>
-          </div>
-        </UkSection>
+        <NotificationSettingsPanel role={role} onSaved={showToast} />
       ) : null}
 
       <SettingsToast message={toast} />

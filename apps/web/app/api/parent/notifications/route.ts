@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { withApiAuth } from "@/lib/auth/api-guard";
 import {
   listParentNotifications,
+  markAllParentNotificationsRead,
   markParentNotificationRead,
 } from "@/server/services/notification.service";
 
@@ -22,7 +23,12 @@ export const PATCH = withApiAuth(["parent"], async (req, { session }) => {
     return NextResponse.json({ error: "Parent profile missing" }, { status: 400 });
   }
 
-  const body = (await req.json()) as { id?: string };
+  const body = (await req.json()) as { id?: string; markAll?: boolean };
+  if (body.markAll) {
+    const marked = await markAllParentNotificationsRead(parentId);
+    return NextResponse.json({ marked }, { status: 200 });
+  }
+
   const notificationId = body.id?.trim();
   if (!notificationId) {
     return NextResponse.json({ error: "id is required" }, { status: 400 });

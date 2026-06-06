@@ -11,6 +11,7 @@ export default function ParentMessagesPage() {
       subtitle="Koc ve gruplar"
       testId="parent-messages-panel"
       enableGroupTabs
+      dmSectionLabel="Kocun"
     />
   );
 }
