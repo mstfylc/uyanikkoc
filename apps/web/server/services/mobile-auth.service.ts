@@ -49,10 +49,23 @@ interface RefreshEntry {
   expiresAt: Date;
 }
 
-// Process-memory stores (bellek modu). Çok-örnekli prod için DB kalıcılığı gerekir.
-const otpStore = new Map<string, OtpEntry>(); // key: E.164 phone
-const refreshStore = new Map<string, RefreshEntry>(); // key: sha256(refreshToken)
-const deviceStore = new Map<string, Set<string>>(); // userId -> token set
+// Process-memory stores (bellek modu). globalThis'e bağlanır çünkü Next.js route'ları
+// ayrı modül graflarında derler — modül-seviyesi Map route'lar arası paylaşılmaz.
+// (Çok-örnekli prod için DB kalıcılığı gerekir; bkz. assertMemoryMode.)
+interface MobileStores {
+  otp: Map<string, OtpEntry>; // key: E.164 phone
+  refresh: Map<string, RefreshEntry>; // key: sha256(refreshToken)
+  device: Map<string, Set<string>>; // userId -> token set
+}
+const globalRef = globalThis as typeof globalThis & { __ukMobileStores?: MobileStores };
+const stores: MobileStores = (globalRef.__ukMobileStores ??= {
+  otp: new Map(),
+  refresh: new Map(),
+  device: new Map(),
+});
+const otpStore = stores.otp;
+const refreshStore = stores.refresh;
+const deviceStore = stores.device;
 
 function assertMemoryMode(): void {
   if (shouldUseDatabase()) {
