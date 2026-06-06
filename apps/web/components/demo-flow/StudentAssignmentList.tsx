@@ -1,11 +1,12 @@
 "use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
+import { UkStatCard } from "@/components/design/UkStatCard";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_STATUS_LABELS,
@@ -13,7 +14,16 @@ import {
   formatAssignmentDueDate,
   isAssignmentOpen,
 } from "@/lib/assignment-labels";
+import {
+  ASSIGNMENT_WEEKS,
+  defaultQuestionTarget,
+  weekIdForAssignment,
+} from "@/lib/design/assignment-weeks";
 import { subjectColor } from "@/lib/design/subject-colors";
+import {
+  getStudentResources,
+  STUDENT_RESOURCE_SUBJECTS,
+} from "@/lib/design/student-resources";
 import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
 
 type AssignmentItem = {
@@ -26,6 +36,8 @@ type AssignmentItem = {
   subject: string | null;
   dueDate: string | null;
   completed: boolean;
+  createdAt?: string;
+  result?: { correct: number; wrong: number; blank: number; net: number } | null;
 };
 
 type ResultDraft = {
@@ -36,7 +48,9 @@ type ResultDraft = {
 
 export function StudentAssignmentList() {
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
+  const [week, setWeek] = useState("w0");
   const [filter, setFilter] = useState<"pending" | "done" | "all">("pending");
+  const [resourceSubject, setResourceSubject] = useState(STUDENT_RESOURCE_SUBJECTS[0] ?? "Matematik");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [resultTarget, setResultTarget] = useState<AssignmentItem | null>(null);
@@ -62,6 +76,31 @@ export function StudentAssignmentList() {
   useEffect(() => {
     void loadAssignments();
   }, [loadAssignments]);
+
+  const weekAssignments = useMemo(
+    () => assignments.filter((item) => weekIdForAssignment(item) === week),
+    [assignments, week],
+  );
+
+  const weekPending = weekAssignments.filter((item) => !item.completed).length;
+  const weekDone = weekAssignments.filter((item) => item.completed).length;
+  const weekQuestionTotal = weekAssignments.reduce((sum, item) => {
+    if (item.result) {
+      return sum + item.result.correct + item.result.wrong + item.result.blank;
+    }
+    return sum + defaultQuestionTarget(item.type);
+  }, 0);
+  const weekCompletionPct =
+    weekAssignments.length === 0 ? 0 : Math.round((weekDone / weekAssignments.length) * 100);
+
+  const shown = weekAssignments.filter((item) => {
+    if (filter === "all") return true;
+    if (filter === "done") return item.completed;
+    return !item.completed;
+  });
+
+  const weekHasData = (weekId: string) => assignments.some((item) => weekIdForAssignment(item) === weekId);
+  const resources = getStudentResources(resourceSubject);
 
   function openResultModal(assignment: AssignmentItem) {
     setResultTarget(assignment);
@@ -100,25 +139,39 @@ export function StudentAssignmentList() {
     await loadAssignments();
   }
 
-  const shown = assignments.filter((item) => {
-    if (filter === "all") return true;
-    if (filter === "done") return item.completed;
-    return !item.completed;
-  });
-
-  const pending = assignments.filter((item) => !item.completed).length;
-  const previewNet =
-    (Number(resultDraft.correct) || 0) - (Number(resultDraft.wrong) || 0) / 4;
+  const previewNet = (Number(resultDraft.correct) || 0) - (Number(resultDraft.wrong) || 0) / 4;
 
   return (
     <div className="stack rise">
-      <UkPageHead title="Odevlerim" sub={`${pending} bekleyen gorev`} />
+      <UkPageHead title="Odevlerim" sub={`${weekPending} bekleyen gorev · ${ASSIGNMENT_WEEKS.find((w) => w.id === week)?.label}`} />
 
       {error ? (
         <p role="alert" className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>
           {error}
         </p>
       ) : null}
+
+      <div className="seg" style={{ width: "fit-content", flexWrap: "wrap" }}>
+        {ASSIGNMENT_WEEKS.map((w) => (
+          <button
+            key={w.id}
+            type="button"
+            className={week === w.id ? "on" : ""}
+            onClick={() => setWeek(w.id)}
+            disabled={!weekHasData(w.id)}
+            style={{ opacity: weekHasData(w.id) ? 1 : 0.45 }}
+          >
+            {w.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid g-4">
+        <UkStatCard icon="ki-time" tone="warning" value={weekPending} label="Bekleyen odev" />
+        <UkStatCard icon="ki-check-circle" tone="success" value={weekDone} label="Tamamlanan" />
+        <UkStatCard icon="ki-notepad-edit" tone="info" value={weekQuestionTotal} label="Hafta toplam soru" />
+        <UkStatCard icon="ki-chart-pie-simple" tone="primary" value={`%${weekCompletionPct}`} label="Tamamlama" />
+      </div>
 
       <UkSection
         title="Odev listesi"
@@ -174,11 +227,7 @@ export function StudentAssignmentList() {
                         </div>
                       </div>
                       {open ? (
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-primary"
-                          onClick={() => openResultModal(assignment)}
-                        >
+                        <button type="button" className="btn btn-sm btn-primary" onClick={() => openResultModal(assignment)}>
                           Sonuc Gir
                         </button>
                       ) : (
@@ -193,13 +242,43 @@ export function StudentAssignmentList() {
         </div>
       </UkSection>
 
+      <UkSection
+        title="Kaynaklarim"
+        sub="Ders bazinda elindeki kitap ve kaynaklar"
+        action={
+          <span className="badge badge-muted">
+            <KiIcon name="ki-book-open" />
+            {resources.length}
+          </span>
+        }
+      >
+        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="filters" style={{ flexWrap: "wrap" }}>
+            {STUDENT_RESOURCE_SUBJECTS.map((subject) => (
+              <button
+                key={subject}
+                type="button"
+                className={resourceSubject === subject ? "on" : ""}
+                onClick={() => setResourceSubject(subject)}
+              >
+                {subject}
+              </button>
+            ))}
+          </div>
+          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+            {resources.map((name) => (
+              <span key={name} className="chip" style={{ height: 30 }}>
+                <KiIcon name="ki-book-open" size={13} />
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </UkSection>
+
       {resultTarget ? (
         <div className="modal-overlay" onClick={() => setResultTarget(null)}>
-          <div
-            className="modal-panel"
-            style={{ maxWidth: 420 }}
-            onClick={(event) => event.stopPropagation()}
-          >
+          <div className="modal-panel" style={{ maxWidth: 420 }} onClick={(event) => event.stopPropagation()}>
             <div className="card-head">
               <h3>Sonuc gir</h3>
               <p className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>

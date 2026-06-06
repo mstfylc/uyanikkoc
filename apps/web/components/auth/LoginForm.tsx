@@ -83,6 +83,20 @@ export function LoginForm() {
               Koc, ogrenci ve veliyi tek ekranda bulusturan; deneme analizleri, konu takibi ve odev
               takibi ile calisan kocluk sistemi.
             </p>
+            <div className="row" style={{ gap: 22, marginTop: 30 }}>
+              {[
+                ["18", "Aktif ogrenci"],
+                ["%74", "Ort. tamamlama"],
+                ["+53", "Net gelisimi"],
+              ].map(([value, label]) => (
+                <div key={label}>
+                  <div className="tnum" style={{ fontSize: 24, fontWeight: 800 }}>
+                    {value}
+                  </div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>{label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -90,7 +104,7 @@ export function LoginForm() {
       <div className="auth-form-side">
         <form className="auth-card" onSubmit={handleSubmit}>
           <div style={{ marginBottom: 22 }}>
-            <h1 style={{ fontSize: 23, fontWeight: 800, letterSpacing: "-.02em" }}>Tekrar hos geldin</h1>
+            <h1 style={{ fontSize: 23, fontWeight: 800, letterSpacing: "-.02em" }}>Tekrar hos geldin 👋</h1>
             <p className="muted" style={{ fontSize: 13.5, marginTop: 4 }}>
               Devam etmek icin giris yap
             </p>
@@ -164,6 +178,13 @@ export function LoginForm() {
               </span>
               Beni hatirla
             </button>
+            <a
+              href="#"
+              className="link-btn"
+              onClick={(event) => event.preventDefault()}
+            >
+              Sifremi unuttum
+            </a>
           </div>
 
           {error ? (
@@ -181,6 +202,18 @@ export function LoginForm() {
             <KiIcon name="ki-flash" />
             Demo bilgileriyle doldur
           </button>
+
+          <div className="muted" style={{ fontSize: 12, textAlign: "center", marginTop: 20 }}>
+            Hesabin yok mu?{" "}
+            <a
+              href="#"
+              className="link-btn"
+              style={{ display: "inline" }}
+              onClick={(event) => event.preventDefault()}
+            >
+              Kurumundan davet iste
+            </a>
+          </div>
         </form>
       </div>
     </div>

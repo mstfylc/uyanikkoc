@@ -53,6 +53,35 @@ export function toggleStudyBlock(studentId: string, blockId: string): StudyBlock
   return plans[studentId][index];
 }
 
+export function addStudyBlock(
+  studentId: string,
+  input: { day: string; time: string; subject: string; topic: string; type: string },
+): StudyBlockRecord {
+  seedIfEmpty(studentId);
+  const block: StudyBlockRecord = {
+    id: `sb_${Date.now()}`,
+    day: input.day,
+    time: input.time,
+    subject: input.subject.trim(),
+    topic: input.topic.trim(),
+    type: input.type.trim() || "Soru",
+    done: false,
+  };
+  plans[studentId].push(block);
+  return block;
+}
+
+export function weeklyCompletionByDay(blocks: StudyBlockRecord[]): Array<{ label: string; value: number }> {
+  return STUDY_DAYS.map((day) => {
+    const dayBlocks = blocks.filter((block) => block.day === day);
+    if (dayBlocks.length === 0) {
+      return { label: day, value: 0 };
+    }
+    const done = dayBlocks.filter((block) => block.done).length;
+    return { label: day, value: Math.round((done / dayBlocks.length) * 100) };
+  });
+}
+
 export const STUDY_DAYS = [...SCHOOL_DAYS, "Cmt", "Paz"];
 
 export function countWeeklyBlocks(blocks: StudyBlockRecord[]): number {

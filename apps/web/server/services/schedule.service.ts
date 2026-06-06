@@ -18,6 +18,13 @@ export async function toggleStudentStudyBlock(studentId: string, blockId: string
   return memoryStudyPlan.toggleStudyBlock(studentId, blockId);
 }
 
+export async function addStudentStudyBlock(
+  studentId: string,
+  input: { day: string; time: string; subject: string; topic: string; type: string },
+) {
+  return memoryStudyPlan.addStudyBlock(studentId, input);
+}
+
 export async function updateStudentSchedule(
   studentId: string,
   patch: Partial<Pick<SchoolScheduleRecord, "attendsSchool" | "grid">>,

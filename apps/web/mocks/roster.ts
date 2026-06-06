@@ -45,3 +45,26 @@ export function resolveCoachIdForStudent(studentId: string): string | null {
   }
   return null;
 }
+
+export function addCoachStudent(
+  coachId: string,
+  input: { displayName: string; email: string },
+): CoachRosterEntry {
+  const displayName = input.displayName.trim();
+  const email = input.email.trim().toLowerCase();
+  const roster = ROSTER_BY_COACH[coachId] ?? (ROSTER_BY_COACH[coachId] = []);
+
+  const duplicate = roster.find((entry) => entry.email.toLowerCase() === email);
+  if (duplicate) {
+    throw new Error("Bu e-posta zaten kadroda.");
+  }
+
+  const entry: CoachRosterEntry = {
+    studentId: `student_${Date.now()}`,
+    displayName,
+    email,
+  };
+
+  roster.push(entry);
+  return entry;
+}

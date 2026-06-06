@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
+import { UkSparkline } from "@/components/design/UkSparkline";
 import { UkStatCard } from "@/components/design/UkStatCard";
 import { StudentExamAnalysis } from "@/components/student/StudentExamAnalysis";
+import { StudentManualExamModal } from "@/components/student/StudentManualExamModal";
 import { UkBadge } from "@/components/design/UkBadge";
 import { subjectColor } from "@/lib/design/subject-colors";
 import {
@@ -18,11 +20,26 @@ import type { ExamResultRecord, ExamTrendSummary } from "@uyanik/database";
 
 type ExamTab = "results" | "analysis";
 
+const SUBJECT_NET_MAX: Record<string, number> = {
+  Turkce: 40,
+  Matematik: 40,
+  Fen: 20,
+  Sosyal: 20,
+  Fizik: 14,
+  Kimya: 13,
+  Biyoloji: 13,
+};
+
+function subjectNetMax(name: string): number {
+  return SUBJECT_NET_MAX[name] ?? 40;
+}
+
 export function StudentExamsPanel() {
   const [exams, setExams] = useState<ExamResultRecord[]>([]);
   const [summary, setSummary] = useState<ExamTrendSummary | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [tab, setTab] = useState<ExamTab>("results");
+  const [manualOpen, setManualOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -44,10 +61,26 @@ export function StudentExamsPanel() {
   }, [load]);
 
   const selected = exams.find((e) => e.id === selectedId) ?? null;
+  const trendNets = useMemo(
+    () =>
+      [...exams]
+        .sort((a, b) => new Date(a.takenAt).getTime() - new Date(b.takenAt).getTime())
+        .map((exam) => exam.totalNet),
+    [exams],
+  );
 
   return (
     <div className="stack rise" data-testid="student-exams-panel">
-      <UkPageHead title="Denemeler" sub="Deneme sonuclarin ve performans trendi" />
+      <UkPageHead
+        title="Denemeler"
+        sub="Deneme sonuclarin ve performans trendi"
+        actions={
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => setManualOpen(true)}>
+            <KiIcon name="ki-plus" />
+            Manuel Gir
+          </button>
+        }
+      />
 
       <div className="seg" style={{ width: "fit-content" }}>
         <button type="button" className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>
@@ -85,87 +118,128 @@ export function StudentExamsPanel() {
       {tab === "analysis" ? (
         <StudentExamAnalysis exams={exams} selected={selected} onSelect={setSelectedId} />
       ) : (
-        <div className="grid col-main">
-          <UkSection title="Deneme listesi" sub={`${exams.length} kayit`}>
-            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {isLoading ? (
-                <p className="muted" style={{ fontSize: 13 }}>
-                  Yukleniyor...
-                </p>
-              ) : exams.length === 0 ? (
-                <p className="muted" style={{ fontSize: 13 }}>
-                  Henuz deneme sonucu yok.
-                </p>
-              ) : (
-                exams.map((exam) => {
-                  const active = exam.id === selectedId;
-                  return (
-                    <button
-                      key={exam.id}
-                      type="button"
-                      onClick={() => setSelectedId(exam.id)}
-                      className={`lrow${active ? " done" : ""}`}
-                      style={{ cursor: "pointer", border: "none", width: "100%", textAlign: "left" }}
-                    >
-                      <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                        <KiIcon name="ki-chart-simple" />
-                      </span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="lr-title">{exam.label ?? RESULT_EXAM_TYPE_LABELS[exam.examType]}</div>
-                        <div className="lr-meta">
-                          <span className="d">{new Date(exam.takenAt).toLocaleDateString("tr-TR")}</span>
-                          <UkBadge tone="primary">{RESULT_EXAM_TYPE_LABELS[exam.examType]}</UkBadge>
-                        </div>
-                      </div>
-                      <span className="tnum" style={{ fontWeight: 800, fontSize: 16 }}>
-                        {formatExamNet(exam.totalNet)}
-                      </span>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-          </UkSection>
+        <>
+          {trendNets.length > 1 ? (
+            <UkSection title="Net trendi" sub="Kronolojik deneme performansi">
+              <div className="card-body">
+                <UkSparkline data={trendNets} height={72} />
+              </div>
+            </UkSection>
+          ) : null}
 
-          <UkSection title="Ders detayi" sub={selected ? selected.label ?? "Secili deneme" : "Deneme secin"}>
-            <div className="card-body">
-              {!selected ? (
-                <p className="muted" style={{ fontSize: 13 }}>
-                  Detay icin bir deneme secin.
-                </p>
-              ) : (
-                <table className="tbl">
-                  <thead>
-                    <tr>
-                      <th>Ders</th>
-                      <th>Dogru</th>
-                      <th>Yanlis</th>
-                      <th>Net</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selected.subjects.map((row) => (
-                      <tr key={row.id}>
-                        <td>
-                          <span className="chip" style={{ height: 22, fontSize: 11, padding: "0 8px" }}>
-                            <span className="swatch" style={{ background: subjectColor(row.subjectName) }} />
-                            {row.subjectName}
-                          </span>
-                        </td>
-                        <td className="tnum">{row.correct}</td>
-                        <td className="tnum">{row.wrong}</td>
-                        <td className="tnum" style={{ fontWeight: 700 }}>
-                          {formatExamNet(row.net)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </UkSection>
-        </div>
+          <div className="grid col-main">
+            <UkSection title="Deneme listesi" sub={`${exams.length} kayit`}>
+              <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {isLoading ? (
+                  <p className="muted" style={{ fontSize: 13 }}>
+                    Yukleniyor...
+                  </p>
+                ) : exams.length === 0 ? (
+                  <p className="muted" style={{ fontSize: 13 }}>
+                    Henuz deneme sonucu yok.
+                  </p>
+                ) : (
+                  exams.map((exam) => {
+                    const active = exam.id === selectedId;
+                    return (
+                      <button
+                        key={exam.id}
+                        type="button"
+                        onClick={() => setSelectedId(exam.id)}
+                        className={`lrow${active ? " done" : ""}`}
+                        style={{ cursor: "pointer", border: "none", width: "100%", textAlign: "left" }}
+                      >
+                        <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
+                          <KiIcon name="ki-chart-simple" />
+                        </span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="lr-title">{exam.label ?? RESULT_EXAM_TYPE_LABELS[exam.examType]}</div>
+                          <div className="lr-meta">
+                            <span className="d">{new Date(exam.takenAt).toLocaleDateString("tr-TR")}</span>
+                            <UkBadge tone="primary">{RESULT_EXAM_TYPE_LABELS[exam.examType]}</UkBadge>
+                          </div>
+                        </div>
+                        <span className="tnum" style={{ fontWeight: 800, fontSize: 16 }}>
+                          {formatExamNet(exam.totalNet)}
+                        </span>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </UkSection>
+
+            <UkSection title="Ders detayi" sub={selected ? selected.label ?? "Secili deneme" : "Deneme secin"}>
+              <div className="card-body">
+                {!selected ? (
+                  <p className="muted" style={{ fontSize: 13 }}>
+                    Detay icin bir deneme secin.
+                  </p>
+                ) : (
+                  <>
+                    <div className="subj" style={{ marginBottom: 16 }}>
+                      {selected.subjects.map((row) => {
+                        const color = subjectColor(row.subjectName);
+                        const max = subjectNetMax(row.subjectName);
+                        const pct = max > 0 ? Math.round((row.net / max) * 100) : 0;
+                        return (
+                          <div className="subj-row" key={row.id}>
+                            <div className="between">
+                              <span className="sname">
+                                <span className="swatch" style={{ background: color }} />
+                                {row.subjectName}
+                              </span>
+                              <span className="spct tnum">
+                                {formatExamNet(row.net)} / {max}
+                              </span>
+                            </div>
+                            <div className="bar">
+                              <span style={{ width: `${Math.min(pct, 100)}%`, background: color }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <table className="tbl">
+                      <thead>
+                        <tr>
+                          <th>Ders</th>
+                          <th>Dogru</th>
+                          <th>Yanlis</th>
+                          <th>Net</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selected.subjects.map((row) => (
+                          <tr key={row.id}>
+                            <td>
+                              <span className="chip" style={{ height: 22, fontSize: 11, padding: "0 8px" }}>
+                                <span className="swatch" style={{ background: subjectColor(row.subjectName) }} />
+                                {row.subjectName}
+                              </span>
+                            </td>
+                            <td className="tnum">{row.correct}</td>
+                            <td className="tnum">{row.wrong}</td>
+                            <td className="tnum" style={{ fontWeight: 700 }}>
+                              {formatExamNet(row.net)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </>
+                )}
+              </div>
+            </UkSection>
+          </div>
+        </>
       )}
+
+      <StudentManualExamModal
+        open={manualOpen}
+        onClose={() => setManualOpen(false)}
+        onSaved={() => void load()}
+      />
     </div>
   );
 }

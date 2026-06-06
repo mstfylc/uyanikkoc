@@ -6,7 +6,9 @@ import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 
 import { UkSection } from "@/components/design/UkSection";
+import { UkSparkline } from "@/components/design/UkSparkline";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { UkBadge } from "@/components/design/UkBadge";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_TYPE_LABELS,
@@ -23,11 +25,18 @@ import type {
   AssignmentPriority,
   AssignmentStatus,
   AssignmentType,
+  ExamResultRecord,
   ExamTrendSummary,
   MotivationSummary,
   SubjectRecord,
   TopicTrackingSummary,
 } from "@uyanik/database";
+
+const UPCOMING_EXAMS = [
+  { id: "up1", label: "TYT Genel Deneme", examType: "TYT", date: "2026-06-14", venue: "Okul" },
+  { id: "up2", label: "AYT Sayisal Deneme", examType: "AYT", date: "2026-06-21", venue: "Merkez" },
+  { id: "up3", label: "Brans Matematik", examType: "TYT", date: "2026-06-28", venue: "Online" },
+];
 
 type Assignment = {
   id: string;
@@ -68,6 +77,7 @@ export function StudentDashboard() {
   const [subjects, setSubjects] = useState<SubjectRecord[]>([]);
   const [topicSummary, setTopicSummary] = useState<TopicTrackingSummary | null>(null);
   const [examSummary, setExamSummary] = useState<ExamTrendSummary | null>(null);
+  const [exams, setExams] = useState<ExamResultRecord[]>([]);
   const [motivation, setMotivation] = useState<MotivationSummary | null>(null);
   const [filter, setFilter] = useState<"pending" | "done" | "all">("pending");
   const [isLoading, setIsLoading] = useState(true);
@@ -96,7 +106,11 @@ export function StudentDashboard() {
       }
 
       if (examsResponse.ok) {
-        const data = (await examsResponse.json()) as { summary: ExamTrendSummary };
+        const data = (await examsResponse.json()) as {
+          exams: ExamResultRecord[];
+          summary: ExamTrendSummary;
+        };
+        setExams(data.exams);
         setExamSummary(data.summary);
       }
 
@@ -119,6 +133,13 @@ export function StudentDashboard() {
   const completionRate = calculateCompletionRate(total, completed);
   const priorityAssignment = buildStudentPriorityAssignment(assignments);
   const subjectRows = useMemo(() => subjectProgress(subjects), [subjects]);
+  const examTrendData = useMemo(
+    () =>
+      [...exams]
+        .sort((a, b) => new Date(a.takenAt).getTime() - new Date(b.takenAt).getTime())
+        .map((exam) => exam.totalNet),
+    [exams],
+  );
 
   const shownAssignments = assignments.filter((item) => {
     if (filter === "all") return true;
@@ -372,42 +393,73 @@ export function StudentDashboard() {
         </UkSection>
       </div>
 
-      <UkSection title="Deneme Performansi" sub="Son deneme ozeti">
-        <div className="card-body">
-          {isLoading ? (
-            <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
-            </p>
-          ) : examSummary && examSummary.latestNet !== null ? (
-            <>
-              <div className="between" style={{ marginBottom: 6 }}>
-                <div>
-                  <div className="row" style={{ gap: 8, alignItems: "baseline" }}>
-                    <span className="tnum" style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-.02em" }}>
-                      {formatExamNet(examSummary.latestNet)}
-                    </span>
-                    <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>net</span>
+      <div className="grid col-main">
+        <UkSection title="Deneme Performansi" sub="Son deneme ozeti">
+          <div className="card-body">
+            {isLoading ? (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Yukleniyor...
+              </p>
+            ) : examSummary && examSummary.latestNet !== null ? (
+              <>
+                <div className="between" style={{ marginBottom: 12, gap: 16, flexWrap: "wrap" }}>
+                  <div>
+                    <div className="row" style={{ gap: 8, alignItems: "baseline" }}>
+                      <span className="tnum" style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-.02em" }}>
+                        {formatExamNet(examSummary.latestNet)}
+                      </span>
+                      <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>net</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--muted)" }}>
+                      {examSummary.examType ? RESULT_EXAM_TYPE_LABELS[examSummary.examType] : "Deneme"}
+                      {examSummary.examCount > 0 ? ` · ${examSummary.examCount} deneme` : ""}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 12, color: "var(--muted)" }}>
-                    {examSummary.examType ? RESULT_EXAM_TYPE_LABELS[examSummary.examType] : "Deneme"}
-                    {examSummary.examCount > 0 ? ` · ${examSummary.examCount} deneme` : ""}
+                  {examTrendData.length > 1 ? (
+                    <div style={{ flex: 1, minWidth: 180, maxWidth: 320 }}>
+                      <UkSparkline data={examTrendData} height={56} />
+                    </div>
+                  ) : null}
+                </div>
+                <p className="muted" style={{ fontSize: 12.5 }}>
+                  {describeExamTrend(examSummary.trend)}
+                  {examSummary.previousNet !== null ? ` · Onceki: ${formatExamNet(examSummary.previousNet)}` : ""}
+                </p>
+              </>
+            ) : (
+              <p className="muted" style={{ fontSize: 13 }}>
+                Henuz deneme sonucu yok.
+              </p>
+            )}
+          </div>
+        </UkSection>
+
+        <UkSection title="Yaklasan Denemeler" sub="Planlanan sinav ve denemeler">
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {UPCOMING_EXAMS.map((item) => (
+              <div key={item.id} className="lrow">
+                <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
+                  <KiIcon name="ki-calendar" />
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="lr-title">{item.label}</div>
+                  <div className="lr-meta">
+                    <span className="d">
+                      {new Date(item.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })}
+                    </span>
+                    <span className="d">{item.venue}</span>
                   </div>
                 </div>
+                <UkBadge tone="primary">{item.examType}</UkBadge>
               </div>
-              <p className="muted" style={{ fontSize: 12.5 }}>
-                {describeExamTrend(examSummary.trend)}
-                {examSummary.previousNet !== null
-                  ? ` · Onceki: ${formatExamNet(examSummary.previousNet)}`
-                  : ""}
-              </p>
-            </>
-          ) : (
-            <p className="muted" style={{ fontSize: 13 }}>
-              Henuz deneme sonucu yok.
-            </p>
-          )}
-        </div>
-      </UkSection>
+            ))}
+            <Link href="/student/exams" className="link-btn" style={{ alignSelf: "flex-start", marginTop: 4 }}>
+              Tum denemeler
+              <KiIcon name="ki-arrow-right" />
+            </Link>
+          </div>
+        </UkSection>
+      </div>
     </div>
   );
 }

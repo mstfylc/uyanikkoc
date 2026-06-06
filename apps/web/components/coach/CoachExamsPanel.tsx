@@ -334,6 +334,7 @@ export function CoachExamsPanel() {
       <CoachExamImportModal
         open={importOpen}
         onClose={() => setImportOpen(false)}
+        roster={roster}
         onImported={() => {
           setSelectedSessionId(null);
           void loadData();

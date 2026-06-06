@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
 import {
+  addStudentStudyBlock,
   getStudentSchedule,
   getStudentStudyPlan,
   setStudentScheduleCell,
@@ -59,4 +60,38 @@ export const PATCH = withApiAuth(["student"], async (req, { session }) => {
     grid: body.grid,
   });
   return NextResponse.json({ schedule }, { status: 200 });
+});
+
+export const POST = withApiAuth(["student"], async (req, { session }) => {
+  const studentId = session.user.studentId;
+  if (!studentId) {
+    return NextResponse.json({ error: "Student profile missing" }, { status: 400 });
+  }
+
+  const body = (await req.json()) as {
+    day?: string;
+    time?: string;
+    subject?: string;
+    topic?: string;
+    type?: string;
+  };
+
+  const day = body.day?.trim();
+  const time = body.time?.trim();
+  const subject = body.subject?.trim();
+  const topic = body.topic?.trim();
+
+  if (!day || !time || !subject || !topic) {
+    return NextResponse.json({ error: "day, time, subject and topic are required" }, { status: 400 });
+  }
+
+  const block = await addStudentStudyBlock(studentId, {
+    day,
+    time,
+    subject,
+    topic,
+    type: body.type?.trim() || "Soru",
+  });
+  const studyPlan = await getStudentStudyPlan(studentId);
+  return NextResponse.json({ block, studyPlan }, { status: 200 });
 });

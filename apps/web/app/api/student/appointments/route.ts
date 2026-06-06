@@ -15,8 +15,13 @@ export const GET = withApiAuth(["student"], async (_req, { session }) => {
     return NextResponse.json({ error: "Student profile missing" }, { status: 400 });
   }
 
-  const appointments = await listStudentAppointments(studentId);
-  return NextResponse.json({ appointments }, { status: 200 });
+  const coachId = await resolveCoachIdForStudent(studentId);
+  const [appointments, settings] = await Promise.all([
+    listStudentAppointments(studentId),
+    coachId ? getCoachAppointmentSettings(coachId) : Promise.resolve(null),
+  ]);
+
+  return NextResponse.json({ appointments, settings }, { status: 200 });
 });
 
 export const POST = withApiAuth(["student"], async (req, { session }) => {

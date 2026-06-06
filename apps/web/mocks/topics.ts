@@ -147,7 +147,7 @@ export function updateSubject(
 export function updateTopic(
   topicId: string,
   studentId: string,
-  data: { name?: string; completed?: boolean },
+  data: { name?: string; completed?: boolean; status?: "todo" | "progress" | "done" },
 ): TopicRecord | null {
   for (const subject of subjects) {
     const topic = subject.topics.find((item) => item.id === topicId && item.studentId === studentId);
@@ -159,8 +159,24 @@ export function updateTopic(
     if (data.name) {
       topic.name = data.name.trim();
     }
-    if (data.completed !== undefined) {
+    if (data.status) {
+      if (data.status === "done") {
+        topic.progress.completed = true;
+        topic.progress.inProgress = false;
+        topic.progress.completedAt = timestamp;
+      } else if (data.status === "progress") {
+        topic.progress.completed = false;
+        topic.progress.inProgress = true;
+        topic.progress.completedAt = null;
+      } else {
+        topic.progress.completed = false;
+        topic.progress.inProgress = false;
+        topic.progress.completedAt = null;
+      }
+      topic.progress.updatedAt = timestamp;
+    } else if (data.completed !== undefined) {
       topic.progress.completed = data.completed;
+      topic.progress.inProgress = false;
       topic.progress.completedAt = data.completed ? timestamp : null;
       topic.progress.updatedAt = timestamp;
     }

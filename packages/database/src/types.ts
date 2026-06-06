@@ -130,6 +130,7 @@ export type TopicExamType = "TYT" | "AYT" | "LGS" | "GENEL";
 
 export type TopicProgressRecord = {
   completed: boolean;
+  inProgress?: boolean;
   completedAt: string | null;
   updatedAt: string;
 };

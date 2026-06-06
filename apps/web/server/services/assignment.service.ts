@@ -116,8 +116,23 @@ export async function createCoachAssignment(
   });
 }
 
-export async function listStudentAssignments(studentId: string): Promise<AssignmentRecord[]> {
-  return listAssignmentsForStudent(studentId);
+export async function listStudentAssignments(studentId: string): Promise<
+  Array<
+    AssignmentRecord & {
+      result?: { correct: number; wrong: number; blank: number; net: number } | null;
+    }
+  >
+> {
+  const items = await listAssignmentsForStudent(studentId);
+  if (shouldUseDatabase()) {
+    return items;
+  }
+
+  const { getAssignmentResult } = await import("@/mocks/assignments");
+  return items.map((item) => ({
+    ...item,
+    result: getAssignmentResult(item.id),
+  }));
 }
 
 export async function completeStudentAssignment(

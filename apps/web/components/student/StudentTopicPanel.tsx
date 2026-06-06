@@ -9,9 +9,56 @@ import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
 import { subjectColor } from "@/lib/design/subject-colors";
 import { TOPIC_EXAM_TYPE_LABELS } from "@uyanik/shared";
-import type { SubjectRecord, TopicExamType, TopicTrackingSummary } from "@uyanik/database";
+import type { SubjectRecord, TopicExamType, TopicRecord, TopicTrackingSummary } from "@uyanik/database";
 
 const EXAM_TYPES: TopicExamType[] = ["TYT", "AYT", "LGS", "GENEL"];
+
+type TopicStatus = "todo" | "progress" | "done";
+
+function getTopicStatus(topic: TopicRecord): TopicStatus {
+  if (topic.progress.completed) {
+    return "done";
+  }
+  if (topic.progress.inProgress) {
+    return "progress";
+  }
+  return "todo";
+}
+
+function nextTopicStatus(current: TopicStatus): TopicStatus {
+  if (current === "todo") return "progress";
+  if (current === "progress") return "done";
+  return "todo";
+}
+
+function statusLabel(status: TopicStatus): string {
+  if (status === "done") return "Tamamlandi";
+  if (status === "progress") return "Devam ediyor";
+  return "Baslanmadi";
+}
+
+function statusIcon(status: TopicStatus): string {
+  if (status === "done") return "ki-check-circle";
+  if (status === "progress") return "ki-time";
+  return "ki-book-open";
+}
+
+function downloadTopicReport(subjects: SubjectRecord[]) {
+  const rows = ["Ders,Konu,Durum"];
+  for (const subject of subjects) {
+    for (const topic of subject.topics) {
+      const status = getTopicStatus(topic);
+      rows.push(`${subject.name},${topic.name},${statusLabel(status)}`);
+    }
+  }
+  const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "konu-takip-raporu.csv";
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
 
 export function StudentTopicPanel() {
   const [subjects, setSubjects] = useState<SubjectRecord[]>([]);
@@ -88,12 +135,13 @@ export function StudentTopicPanel() {
     }
   }
 
-  async function toggleTopic(topicId: string, completed: boolean) {
-    const response = await fetch(`/api/student/topics/${topicId}?kind=topic`, {
+  async function cycleTopicStatus(topic: TopicRecord) {
+    const next = nextTopicStatus(getTopicStatus(topic));
+    const response = await fetch(`/api/student/topics/${topic.id}?kind=topic`, {
       method: "PATCH",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ completed: !completed }),
+      body: JSON.stringify({ status: next }),
     });
 
     if (response.ok) {
@@ -125,7 +173,18 @@ export function StudentTopicPanel() {
 
   return (
     <div className="stack rise" data-testid="student-topic-panel">
-      <UkPageHead title="Konu Takibi" sub="Ders bazinda ilerlemeni takip et" />
+      <UkPageHead
+        title="Konu Takibi"
+        sub="Ders bazinda ilerlemeni takip et"
+        actions={
+          subjects.length > 0 ? (
+            <button type="button" className="btn btn-light btn-sm" onClick={() => downloadTopicReport(subjects)}>
+              <KiIcon name="ki-cloud-download" />
+              Rapor indir
+            </button>
+          ) : null
+        }
+      />
 
       {summary ? (
         <div className="grid g-4">
@@ -206,36 +265,35 @@ export function StudentTopicPanel() {
               ) : (
                 activeSubject.topics.map((topic) => {
                   const color = subjectColor(activeSubject.name);
-                  const done = topic.progress.completed;
+                  const status = getTopicStatus(topic);
+                  const progressWidth = status === "done" ? "100%" : status === "progress" ? "50%" : "0%";
                   return (
-                    <div key={topic.id} className={`lrow${done ? " done" : ""}`}>
-                      <span
+                    <div key={topic.id} className={`lrow${status === "done" ? " done" : ""}`}>
+                      <button
+                        type="button"
                         className="lr-icon"
                         style={{
                           background: `color-mix(in srgb, ${color} 13%, transparent)`,
                           color,
+                          border: "none",
+                          cursor: "pointer",
                         }}
+                        onClick={() => void cycleTopicStatus(topic)}
+                        aria-label={`${topic.name} durumunu degistir`}
                       >
-                        <KiIcon name={done ? "ki-check-circle" : "ki-book-open"} size={18} />
-                      </span>
+                        <KiIcon name={statusIcon(status)} size={18} />
+                      </button>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="lr-title">{topic.name}</div>
-                        {!done ? (
-                          <div className="bar thin" style={{ marginTop: 8, maxWidth: 220 }}>
-                            <span style={{ width: "35%", background: color }} />
-                          </div>
-                        ) : null}
+                        <div className="bar thin" style={{ marginTop: 8, maxWidth: 220 }}>
+                          <span style={{ width: progressWidth, background: color }} />
+                        </div>
                       </div>
-                      <UkBadge tone={done ? "success" : "muted"}>{done ? "Tamamlandi" : "Baslanmadi"}</UkBadge>
+                      <UkBadge tone={status === "done" ? "success" : status === "progress" ? "warning" : "muted"}>
+                        {statusLabel(status)}
+                      </UkBadge>
                       {showEditor ? (
                         <div className="row" style={{ gap: 8 }}>
-                          <button
-                            type="button"
-                            className={`btn btn-sm ${done ? "btn-light" : "btn-primary"}`}
-                            onClick={() => void toggleTopic(topic.id, done)}
-                          >
-                            {done ? "Geri al" : "Tamamla"}
-                          </button>
                           <button
                             type="button"
                             className="btn btn-light btn-sm"
@@ -248,10 +306,10 @@ export function StudentTopicPanel() {
                       ) : (
                         <button
                           type="button"
-                          className={`btn btn-sm ${done ? "btn-light" : "btn-primary"}`}
-                          onClick={() => void toggleTopic(topic.id, done)}
+                          className="btn btn-sm btn-light"
+                          onClick={() => void cycleTopicStatus(topic)}
                         >
-                          {done ? "Tamamlandi" : "Tamamla"}
+                          Durumu degistir
                         </button>
                       )}
                     </div>

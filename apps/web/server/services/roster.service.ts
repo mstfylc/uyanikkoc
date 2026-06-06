@@ -38,3 +38,14 @@ export async function resolveCoachIdForStudent(studentId: string): Promise<strin
 
   return memoryRoster.resolveCoachIdForStudent(studentId);
 }
+
+export async function addCoachStudent(
+  coachId: string,
+  input: { displayName: string; email: string },
+): Promise<CoachRosterEntry> {
+  if (shouldUseDatabase()) {
+    throw new Error("Add student is not supported in database mode yet");
+  }
+
+  return memoryRoster.addCoachStudent(coachId, input);
+}

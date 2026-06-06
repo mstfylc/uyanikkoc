@@ -1,15 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { UkBarChart } from "@/components/design/UkBarChart";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
 import { subjectColor } from "@/lib/design/subject-colors";
 import type { StudyBlockRecord } from "@/mocks/study-plan";
 import { SCHOOL_DAYS, SCHOOL_PERIODS } from "@/mocks/schedule";
-import { countWeeklyBlocks, countWeeklyDone, STUDY_DAYS } from "@/mocks/study-plan";
+import { countWeeklyBlocks, countWeeklyDone, STUDY_DAYS, weeklyCompletionByDay } from "@/mocks/study-plan";
 import type { SchoolScheduleRecord } from "@uyanik/database";
 
 const DAY_INDEX = new Date().getDay();
@@ -19,8 +21,19 @@ export function StudentSchedulePanel() {
   const [schedule, setSchedule] = useState<SchoolScheduleRecord | null>(null);
   const [studyPlan, setStudyPlan] = useState<StudyBlockRecord[]>([]);
   const [activeDay, setActiveDay] = useState(TODAY_LABEL);
+  const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [savingCell, setSavingCell] = useState<string | null>(null);
+  const [blockDraft, setBlockDraft] = useState({
+    day: TODAY_LABEL,
+    time: "17:00",
+    subject: "Matematik",
+    topic: "",
+    type: "Soru",
+  });
+  const [blockError, setBlockError] = useState<string | null>(null);
+  const [isSavingBlock, setIsSavingBlock] = useState(false);
 
   const load = useCallback(async () => {
     const response = await fetch("/api/student/schedule", { credentials: "same-origin" });
@@ -36,6 +49,7 @@ export function StudentSchedulePanel() {
   }, []);
 
   useEffect(() => {
+    setMounted(true);
     void load();
   }, [load]);
 
@@ -43,6 +57,8 @@ export function StudentSchedulePanel() {
     () => studyPlan.filter((block) => block.day === activeDay).sort((a, b) => a.time.localeCompare(b.time)),
     [studyPlan, activeDay],
   );
+
+  const weeklyChart = useMemo(() => weeklyCompletionByDay(studyPlan), [studyPlan]);
 
   async function toggleStudyBlock(blockId: string) {
     const response = await fetch("/api/student/schedule", {
@@ -89,14 +105,58 @@ export function StudentSchedulePanel() {
     }
   }
 
+  async function handleAddBlock(event: FormEvent) {
+    event.preventDefault();
+    setBlockError(null);
+
+    if (!blockDraft.topic.trim()) {
+      setBlockError("Konu adi gerekli.");
+      return;
+    }
+
+    setIsSavingBlock(true);
+    const response = await fetch("/api/student/schedule", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(blockDraft),
+    });
+    setIsSavingBlock(false);
+
+    if (!response.ok) {
+      setBlockError("Blok eklenemedi.");
+      return;
+    }
+
+    const data = (await response.json()) as { studyPlan: StudyBlockRecord[] };
+    setStudyPlan(data.studyPlan);
+    setBlockDraft((current) => ({ ...current, topic: "" }));
+    setBlockModalOpen(false);
+  }
+
   return (
     <div className="stack rise" data-testid="student-schedule-panel">
-      <UkPageHead title="Calisma Programi" sub="Gunluk plan ve okul programi" />
+      <UkPageHead
+        title="Calisma Programi"
+        sub="Gunluk plan ve okul programi"
+        actions={
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => setBlockModalOpen(true)}>
+            <KiIcon name="ki-plus" />
+            Blok ekle
+          </button>
+        }
+      />
 
       <div className="grid g-4">
         <UkStatCard icon="ki-calendar" tone="primary" value={countWeeklyBlocks(studyPlan)} label="Bu hafta plan" />
         <UkStatCard icon="ki-check-circle" tone="success" value={countWeeklyDone(studyPlan)} label="Tamamlanan blok" />
       </div>
+
+      <UkSection title="Haftalik tamamlama" sub="Gun bazinda plan ilerlemesi">
+        <div className="card-body">
+          <UkBarChart data={weeklyChart} max={100} />
+        </div>
+      </UkSection>
 
       <UkSection title="Gunluk calisma plani" sub="Bugun icin onerilen bloklar">
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -243,6 +303,120 @@ export function StudentSchedulePanel() {
           </div>
         </UkSection>
       )}
+
+      {blockModalOpen && mounted
+        ? createPortal(
+            <div className="modal-overlay" onClick={() => setBlockModalOpen(false)}>
+              <div className="modal-panel" style={{ maxWidth: 480 }} onClick={(event) => event.stopPropagation()}>
+                <div className="modal-head">
+                  <div>
+                    <h3 style={{ fontSize: 16, fontWeight: 800 }}>Calisma blogu ekle</h3>
+                    <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
+                      Haftalik planina yeni blok ekle
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    style={{ width: 36, height: 36 }}
+                    onClick={() => setBlockModalOpen(false)}
+                    aria-label="Kapat"
+                  >
+                    <KiIcon name="ki-plus" size={18} style={{ transform: "rotate(45deg)" }} />
+                  </button>
+                </div>
+                <form onSubmit={handleAddBlock} className="modal-body" style={{ gap: 14 }}>
+                  <div className="grid g-2">
+                    <div className="field">
+                      <label className="label" htmlFor="block-day">
+                        Gun
+                      </label>
+                      <select
+                        id="block-day"
+                        className="select"
+                        value={blockDraft.day}
+                        onChange={(event) => setBlockDraft((current) => ({ ...current, day: event.target.value }))}
+                      >
+                        {STUDY_DAYS.map((day) => (
+                          <option key={day} value={day}>
+                            {day}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="field">
+                      <label className="label" htmlFor="block-time">
+                        Saat
+                      </label>
+                      <input
+                        id="block-time"
+                        className="input"
+                        type="time"
+                        value={blockDraft.time}
+                        onChange={(event) => setBlockDraft((current) => ({ ...current, time: event.target.value }))}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid g-2">
+                    <div className="field">
+                      <label className="label" htmlFor="block-subject">
+                        Ders
+                      </label>
+                      <input
+                        id="block-subject"
+                        className="input"
+                        value={blockDraft.subject}
+                        onChange={(event) => setBlockDraft((current) => ({ ...current, subject: event.target.value }))}
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="label" htmlFor="block-type">
+                        Tur
+                      </label>
+                      <select
+                        id="block-type"
+                        className="select"
+                        value={blockDraft.type}
+                        onChange={(event) => setBlockDraft((current) => ({ ...current, type: event.target.value }))}
+                      >
+                        <option value="Soru">Soru</option>
+                        <option value="Video">Video</option>
+                        <option value="Konu">Konu</option>
+                        <option value="Deneme">Deneme</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="field">
+                    <label className="label" htmlFor="block-topic">
+                      Konu
+                    </label>
+                    <input
+                      id="block-topic"
+                      className="input"
+                      placeholder="Ornek: Turev uygulamalari"
+                      value={blockDraft.topic}
+                      onChange={(event) => setBlockDraft((current) => ({ ...current, topic: event.target.value }))}
+                    />
+                  </div>
+                  {blockError ? (
+                    <p role="alert" className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>
+                      {blockError}
+                    </p>
+                  ) : null}
+                  <div className="row" style={{ gap: 10, justifyContent: "flex-end" }}>
+                    <button type="button" className="btn btn-light" onClick={() => setBlockModalOpen(false)}>
+                      Iptal
+                    </button>
+                    <button type="submit" className="btn btn-primary" disabled={isSavingBlock}>
+                      {isSavingBlock ? "Ekleniyor..." : "Ekle"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

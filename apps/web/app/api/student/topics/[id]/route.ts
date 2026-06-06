@@ -29,6 +29,7 @@ export const PATCH = withApiAuth(["student"], async (req, { session }) => {
     name?: string;
     examType?: TopicExamType;
     completed?: boolean;
+    status?: "todo" | "progress" | "done";
   };
 
   if (kind === "subject") {
@@ -51,6 +52,7 @@ export const PATCH = withApiAuth(["student"], async (req, { session }) => {
     const topic = await updateStudentTopic(id, studentId, {
       name: body.name,
       completed: body.completed,
+      status: body.status,
     });
     if (!topic) {
       return NextResponse.json({ error: "Topic not found" }, { status: 404 });
