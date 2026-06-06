@@ -9,6 +9,7 @@ import { UkSparkline } from "@/components/design/UkSparkline";
 import { UkStatCard } from "@/components/design/UkStatCard";
 import { StudentExamAnalysis } from "@/components/student/StudentExamAnalysis";
 import { StudentManualExamModal } from "@/components/student/StudentManualExamModal";
+import { OptikFormModal, OptikResultBadge } from "@/components/student/OptikFormModal";
 import { UkBadge } from "@/components/design/UkBadge";
 import { subjectColor } from "@/lib/design/subject-colors";
 import {
@@ -16,9 +17,9 @@ import {
   formatExamNet,
   RESULT_EXAM_TYPE_LABELS,
 } from "@uyanik/shared";
-import type { ExamResultRecord, ExamTrendSummary } from "@uyanik/database";
+import type { ExamResultRecord, ExamTrendSummary, OnlineExamRecord } from "@uyanik/database";
 
-type ExamTab = "results" | "analysis";
+type ExamTab = "results" | "online" | "analysis";
 
 const SUBJECT_NET_MAX: Record<string, number> = {
   Turkce: 40,
@@ -40,7 +41,10 @@ export function StudentExamsPanel() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [tab, setTab] = useState<ExamTab>("results");
   const [manualOpen, setManualOpen] = useState(false);
+  const [onlineExams, setOnlineExams] = useState<OnlineExamRecord[]>([]);
+  const [optikExam, setOptikExam] = useState<OnlineExamRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [onlineLoading, setOnlineLoading] = useState(false);
 
   const load = useCallback(async () => {
     const response = await fetch("/api/student/exams", { credentials: "same-origin" });
@@ -56,9 +60,25 @@ export function StudentExamsPanel() {
     setIsLoading(false);
   }, []);
 
+  const loadOnline = useCallback(async () => {
+    setOnlineLoading(true);
+    const response = await fetch("/api/student/online-exams", { credentials: "same-origin" });
+    if (response.ok) {
+      const data = (await response.json()) as { exams: OnlineExamRecord[] };
+      setOnlineExams(data.exams);
+    }
+    setOnlineLoading(false);
+  }, []);
+
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (tab === "online") {
+      void loadOnline();
+    }
+  }, [tab, loadOnline]);
 
   const selected = exams.find((e) => e.id === selectedId) ?? null;
   const trendNets = useMemo(
@@ -85,6 +105,9 @@ export function StudentExamsPanel() {
       <div className="seg" style={{ width: "fit-content" }}>
         <button type="button" className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>
           Sonuclar
+        </button>
+        <button type="button" className={tab === "online" ? "on" : ""} onClick={() => setTab("online")}>
+          Online Deneme
         </button>
         <button type="button" className={tab === "analysis" ? "on" : ""} onClick={() => setTab("analysis")}>
           Analiz
@@ -117,6 +140,40 @@ export function StudentExamsPanel() {
 
       {tab === "analysis" ? (
         <StudentExamAnalysis exams={exams} selected={selected} onSelect={setSelectedId} />
+      ) : tab === "online" ? (
+        <UkSection title="Online denemeler" sub={`${onlineExams.length} sinav`}>
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {onlineLoading ? (
+              <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>
+            ) : onlineExams.length === 0 ? (
+              <p className="muted" style={{ fontSize: 13 }}>Online deneme bulunamadi.</p>
+            ) : (
+              onlineExams.map((exam) => (
+                <div key={exam.id} className="lrow">
+                  <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
+                    <KiIcon name="ki-chart-simple" />
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="lr-title">{exam.title}</div>
+                    <div className="lr-meta">
+                      <span className="d">{exam.publisher}</span>
+                      <UkBadge tone="primary">{exam.examType}</UkBadge>
+                      <span className="d">{exam.questionCount} soru</span>
+                    </div>
+                    {exam.submission ? <OptikResultBadge submission={exam.submission} /> : null}
+                  </div>
+                  {exam.submission ? (
+                    <UkBadge tone="success">Tamamlandi</UkBadge>
+                  ) : (
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => setOptikExam(exam)}>
+                      Optik doldur
+                    </button>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </UkSection>
       ) : (
         <>
           {trendNets.length > 1 ? (
@@ -239,6 +296,13 @@ export function StudentExamsPanel() {
         open={manualOpen}
         onClose={() => setManualOpen(false)}
         onSaved={() => void load()}
+      />
+
+      <OptikFormModal
+        open={Boolean(optikExam)}
+        exam={optikExam}
+        onClose={() => setOptikExam(null)}
+        onSubmitted={() => void loadOnline()}
       />
     </div>
   );
