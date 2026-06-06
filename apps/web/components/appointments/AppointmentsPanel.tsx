@@ -230,15 +230,85 @@ function CoachAvailability({
   settings: AppointmentSettingsRecord;
   onChange: (patch: Partial<Omit<AppointmentSettingsRecord, "coachId">>) => void;
 }) {
+  const [selectedCell, setSelectedCell] = useState<{ day: AppointmentDay; slot: string } | null>(null);
+
+  function allowedModes(): AppointmentMode[] {
+    const modes: AppointmentMode[] = [];
+    if (settings.allowOnline) modes.push("online");
+    if (settings.allowInPerson) modes.push("in_person");
+    if (settings.allowPhone) modes.push("phone");
+    return modes;
+  }
+
   function toggleSlot(day: AppointmentDay, slot: string) {
     const current = settings.availability[day] ?? [];
-    const next = current.includes(slot)
-      ? current.filter((item) => item !== slot)
-      : [...current, slot].sort();
+    const isOn = current.includes(slot);
+
+    if (!isOn) {
+      onChange({
+        availability: {
+          ...settings.availability,
+          [day]: [...current, slot].sort(),
+        },
+        slotModes: {
+          ...settings.slotModes,
+          [day]: {
+            ...(settings.slotModes[day] ?? {}),
+            [slot]: allowedModes(),
+          },
+        },
+      });
+      setSelectedCell({ day, slot });
+      return;
+    }
+
+    if (selectedCell?.day === day && selectedCell.slot === slot) {
+      const nextDayModes = { ...(settings.slotModes[day] ?? {}) };
+      delete nextDayModes[slot];
+      onChange({
+        availability: {
+          ...settings.availability,
+          [day]: current.filter((item) => item !== slot),
+        },
+        slotModes: {
+          ...settings.slotModes,
+          [day]: nextDayModes,
+        },
+      });
+      setSelectedCell(null);
+      return;
+    }
+
+    setSelectedCell({ day, slot });
+  }
+
+  function toggleSlotMode(day: AppointmentDay, slot: string, mode: AppointmentMode) {
+    const current = settings.slotModes[day]?.[slot] ?? [];
+    const next = current.includes(mode) ? current.filter((item) => item !== mode) : [...current, mode];
+    if (next.length === 0) {
+      const avail = settings.availability[day] ?? [];
+      const nextDayModes = { ...(settings.slotModes[day] ?? {}) };
+      delete nextDayModes[slot];
+      onChange({
+        availability: {
+          ...settings.availability,
+          [day]: avail.filter((item) => item !== slot),
+        },
+        slotModes: {
+          ...settings.slotModes,
+          [day]: nextDayModes,
+        },
+      });
+      setSelectedCell(null);
+      return;
+    }
     onChange({
-      availability: {
-        ...settings.availability,
-        [day]: next,
+      slotModes: {
+        ...settings.slotModes,
+        [day]: {
+          ...(settings.slotModes[day] ?? {}),
+          [slot]: next,
+        },
       },
     });
   }
@@ -316,6 +386,50 @@ function CoachAvailability({
           <div className="between" style={{ padding: "12px 0" }}>
             <div className="row" style={{ gap: 12 }}>
               <span className="lr-icon" style={{ width: 38, height: 38, background: "var(--surface-3)" }}>
+                <KiIcon name="ki-profile-circle" size={18} />
+              </span>
+              <div>
+                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Ogrenci haftalik limiti</div>
+                <div className="muted" style={{ fontSize: 12 }}>
+                  Ogrenci basina haftalik randevu limiti
+                </div>
+              </div>
+            </div>
+            <UkNumStepper
+              value={settings.weeklyLimitStudent}
+              onChange={(value) => onChange({ weeklyLimitStudent: value })}
+              step={1}
+              min={0}
+              max={14}
+              size="sm"
+            />
+          </div>
+          <hr className="hr" />
+          <div className="between" style={{ padding: "12px 0" }}>
+            <div className="row" style={{ gap: 12 }}>
+              <span className="lr-icon" style={{ width: 38, height: 38, background: "var(--surface-3)" }}>
+                <KiIcon name="ki-people" size={18} />
+              </span>
+              <div>
+                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Veli haftalik limiti</div>
+                <div className="muted" style={{ fontSize: 12 }}>
+                  Veli basina haftalik randevu limiti
+                </div>
+              </div>
+            </div>
+            <UkNumStepper
+              value={settings.weeklyLimitParent}
+              onChange={(value) => onChange({ weeklyLimitParent: value })}
+              step={1}
+              min={0}
+              max={14}
+              size="sm"
+            />
+          </div>
+          <hr className="hr" />
+          <div className="between" style={{ padding: "12px 0" }}>
+            <div className="row" style={{ gap: 12 }}>
+              <span className="lr-icon" style={{ width: 38, height: 38, background: "var(--surface-3)" }}>
                 <KiIcon name="ki-target" size={18} />
               </span>
               <div>
@@ -351,11 +465,12 @@ function CoachAvailability({
                 <div className="avail-slot">{slot}</div>
                 {APPOINTMENT_DAYS.map((day) => {
                   const on = (settings.availability[day] ?? []).includes(slot);
+                  const selected = selectedCell?.day === day && selectedCell.slot === slot;
                   return (
                     <button
                       key={`${day}-${slot}`}
                       type="button"
-                      className={`avail-cell${on ? " on" : ""}`}
+                      className={`avail-cell${on ? " on" : ""}${selected ? " ring-primary" : ""}`}
                       onClick={() => toggleSlot(day, slot)}
                       aria-label={`${day} ${slot}`}
                     >
@@ -368,8 +483,31 @@ function CoachAvailability({
           </div>
           <div className="muted" style={{ fontSize: 11.5, marginTop: 12, display: "flex", alignItems: "center", gap: 6 }}>
             <KiIcon name="ki-flash-circle" size={13} />
-            Hucrelere tiklayarak musait saatlerini ac/kapat.
+            Hucreye tiklayarak musait saat ac/kapat; acik hucreye tekrar tiklayarak mod sec.
           </div>
+
+          {selectedCell && (settings.availability[selectedCell.day] ?? []).includes(selectedCell.slot) ? (
+            <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
+              <div className="label" style={{ marginBottom: 8 }}>
+                {selectedCell.day} {selectedCell.slot} · randevu modlari
+              </div>
+              <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+                {allowedModes().map((mode) => {
+                  const active = (settings.slotModes[selectedCell.day]?.[selectedCell.slot] ?? []).includes(mode);
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      className={`type-chip${active ? " on" : ""}`}
+                      onClick={() => toggleSlotMode(selectedCell.day, selectedCell.slot, mode)}
+                    >
+                      {MODE_LABELS[mode]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
         </div>
       </UkSection>
     </>
