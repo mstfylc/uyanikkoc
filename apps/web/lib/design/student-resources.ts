@@ -1,21 +1,10 @@
-/** Ders bazinda onerilen kaynaklar (design KAYNAKLAR havuzu). */
-const STUDENT_RESOURCES: Record<string, string[]> = {
-  Turkce: ["Hiz ve Renk Paragraf", "Bilgi Sarmali", "Ari Paragraf"],
-  Matematik: ["Mikro Mat", "Bilgi Sarmali (BS)"],
-  Geometri: ["Antrenmanlarla Geo 1"],
-  Fizik: ["Bilgi Sarmali", "Paraf", "ENS"],
-  Kimya: ["Hiz ve Renk", "Bilgi Sarmali", "Orbital"],
-  Biyoloji: ["Bilgi Sarmali", "Biyotik", "Aydin"],
-  "Fen Bilimleri": ["Hiz ve Renk", "Tonguc", "3D"],
-  "T.C. Inklap Tarihi": ["Tonguc", "Bilgi Sarmali"],
-  "Din Kulturu": ["Tonguc", "Aydin"],
-  Ingilizce: ["Tonguc", "Rehber"],
-};
+import { KAYNAK_HAVUZU, KAYNAK_DEFAULTS as CATALOG_DEFAULTS, sourcesForSubject } from "@/lib/design/kaynak-catalog";
 
-const DEFAULT_RESOURCES = ["Bilgi Sarmali", "Tonguc", "3D"];
-
-export const STUDENT_RESOURCE_SUBJECTS = Object.keys(STUDENT_RESOURCES);
+/** Ders bazinda onerilen kaynaklar (zip-10 KAYNAK_HAVUZU). */
+export const STUDENT_RESOURCE_SUBJECTS = Object.keys(KAYNAK_HAVUZU);
 
 export function getStudentResources(subject: string): string[] {
-  return STUDENT_RESOURCES[subject] ?? DEFAULT_RESOURCES;
+  return sourcesForSubject(subject).slice(0, 6);
 }
+
+export { KAYNAK_HAVUZU, CATALOG_DEFAULTS as KAYNAK_DEFAULTS };

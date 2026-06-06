@@ -20,10 +20,7 @@ import {
   weekIdForAssignment,
 } from "@/lib/design/assignment-weeks";
 import { subjectColor } from "@/lib/design/subject-colors";
-import {
-  getStudentResources,
-  STUDENT_RESOURCE_SUBJECTS,
-} from "@/lib/design/student-resources";
+import { StudentResourcesCard } from "@/components/student/StudentResourcesCard";
 import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
 
 type AssignmentItem = {
@@ -50,7 +47,6 @@ export function StudentAssignmentList() {
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
   const [week, setWeek] = useState("w0");
   const [filter, setFilter] = useState<"pending" | "done" | "all">("pending");
-  const [resourceSubject, setResourceSubject] = useState(STUDENT_RESOURCE_SUBJECTS[0] ?? "Matematik");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [resultTarget, setResultTarget] = useState<AssignmentItem | null>(null);
@@ -100,7 +96,6 @@ export function StudentAssignmentList() {
   });
 
   const weekHasData = (weekId: string) => assignments.some((item) => weekIdForAssignment(item) === weekId);
-  const resources = getStudentResources(resourceSubject);
 
   function openResultModal(assignment: AssignmentItem) {
     setResultTarget(assignment);
@@ -242,39 +237,7 @@ export function StudentAssignmentList() {
         </div>
       </UkSection>
 
-      <UkSection
-        title="Kaynaklarim"
-        sub="Ders bazinda elindeki kitap ve kaynaklar"
-        action={
-          <span className="badge badge-muted">
-            <KiIcon name="ki-book-open" />
-            {resources.length}
-          </span>
-        }
-      >
-        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div className="filters" style={{ flexWrap: "wrap" }}>
-            {STUDENT_RESOURCE_SUBJECTS.map((subject) => (
-              <button
-                key={subject}
-                type="button"
-                className={resourceSubject === subject ? "on" : ""}
-                onClick={() => setResourceSubject(subject)}
-              >
-                {subject}
-              </button>
-            ))}
-          </div>
-          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-            {resources.map((name) => (
-              <span key={name} className="chip" style={{ height: 30 }}>
-                <KiIcon name="ki-book-open" size={13} />
-                {name}
-              </span>
-            ))}
-          </div>
-        </div>
-      </UkSection>
+      <StudentResourcesCard />
 
       {resultTarget ? (
         <div className="modal-overlay" onClick={() => setResultTarget(null)}>
