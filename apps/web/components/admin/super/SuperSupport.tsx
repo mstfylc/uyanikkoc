@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 
-import { Icon, StatusBadge } from "@/components/admin/AdminKit";
+import { Icon } from "@/components/admin/AdminKit";
 import { useAdminStore } from "@/components/admin/AdminStore";
 import { InvitePersonDialog } from "@/components/admin/dialogs";
 import { TicketStatusBadge, TicketThread } from "./TicketThread";

@@ -90,6 +90,27 @@ export function isPublicPath(pathname: string): boolean {
   });
 }
 
+const YONETIM_ADMIN_ONLY_PREFIXES = [
+  "/yonetim/orgs",
+  "/yonetim/licenses",
+  "/yonetim/campaigns",
+  "/yonetim/modules",
+  "/yonetim/support",
+] as const;
+
+const YONETIM_BRANCH_ONLY_PREFIXES = [
+  "/yonetim/branches",
+  "/yonetim/license",
+  "/yonetim/managers",
+  "/yonetim/students",
+  "/yonetim/reports",
+  "/yonetim/settings",
+] as const;
+
+function matchesPrefix(pathname: string, prefix: string): boolean {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
 export function canAccessPath(role: AppRole, pathname: string): boolean {
   if (pathname.startsWith("/student")) {
     return role === "student";
@@ -104,7 +125,22 @@ export function canAccessPath(role: AppRole, pathname: string): boolean {
   }
 
   if (pathname.startsWith("/yonetim")) {
-    return role === "admin" || role === "branch";
+    if (role !== "admin" && role !== "branch") {
+      return false;
+    }
+    if (
+      role === "branch" &&
+      YONETIM_ADMIN_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
+    ) {
+      return false;
+    }
+    if (
+      role === "admin" &&
+      YONETIM_BRANCH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
+    ) {
+      return false;
+    }
+    return true;
   }
 
   if (pathname.startsWith("/branch")) {

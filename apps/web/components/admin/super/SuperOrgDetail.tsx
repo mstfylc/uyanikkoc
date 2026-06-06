@@ -22,7 +22,7 @@ import { canEdit } from "@/components/admin/selectors";
 import { SubscriberNotes } from "./SubscriberNotes";
 import { UkSection } from "@/components/design/UkSection";
 import { fmtShort, tl } from "@/lib/admin/format";
-import { moduleName, ORG_PLANS, orgPlanById } from "@/lib/admin/pricing";
+import { moduleName, ORG_PLANS } from "@/lib/admin/pricing";
 
 export function SuperOrgDetail({ orgId }: { orgId: string }) {
   const { snapshot, mutate, toast } = useAdminStore();
