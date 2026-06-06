@@ -1,0 +1,11 @@
+# Capacitor native projeleri — `npx cap add ios|android` ile üretilir
+/ios/
+/android/
+
+# Build çıktısı
+/dist/
+
+# Capacitor kopyaladığı web varlıkları
+.capacitor/
+
+*.log

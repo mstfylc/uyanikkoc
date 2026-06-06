@@ -1,8 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "react-native",
-    "rootDir": "src"
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "jsx": "react-jsx",
+    "rootDir": "src",
+    "paths": {
+      "@uyanik/shared": ["../../packages/shared/src/index.ts"],
+      "@uyanik/tokens": ["../../packages/tokens/src/index.ts"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }
