@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "dev:web": "turbo run dev --filter=@uyanik/web",
+    "dev:mobile": "pnpm --filter @uyanik/mobile dev",
     "dev:real": "powershell -ExecutionPolicy Bypass -File ./scripts/start-real-server.ps1",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
@@ -20,5 +21,11 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1"
   },
-  "packageManager": "pnpm@9.15.0"
+  "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.0.2",
+      "@types/react-dom": "19.0.2"
+    }
+  }
 }

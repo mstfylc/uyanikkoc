@@ -1,8 +1,13 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "strict": true,
     "jsx": "react-native",
-    "rootDir": "src"
+    "paths": {
+      "@/*": ["./src/*"],
+      "@uyanik/shared": ["../../packages/shared/src/index.ts"],
+      "@uyanik/tokens": ["../../packages/tokens/src/index.ts"]
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["app/**/*.tsx", "src/**/*.ts", "src/**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }

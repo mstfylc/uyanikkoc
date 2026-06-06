@@ -17,7 +17,7 @@ Codex / Cursor agent'ları bu repoda çalışırken aşağıdaki kurallara uyar.
 | Ekran şişmesi | Yeni ekran/CRUD ekleme; önce mevcut koç→öğrenci→veli dikey akışı güçlendir |
 | Auth | NextAuth/Auth.js — alternatif JWT sistemi ekleme |
 | DB | Prisma + PostgreSQL; sorgu doğrudan component'e yazılmaz |
-| Mobil | `apps/mobile` placeholder — içine kod yazma |
+| Mobil | `apps/mobile` Expo ogrenci uygulamasi — tasarim: `.design-import/mobile/` |
 | Metronic | v9 Tailwind Demo1; lisanslı asset'leri repoya commit etme |
 
 ## Çalışma biçimi
