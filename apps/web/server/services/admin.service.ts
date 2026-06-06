@@ -5,10 +5,19 @@
 // Bu service memory store (@/mocks/admin) üzerinden çalışır; DB eklendiğinde
 // `shouldUseDatabase()` dalına `adminRepository` çağrıları yerleştirilir.
 
-import { shouldUseDatabase } from "@/lib/data/env";
+import { assertMutationAllowed } from "@/lib/admin/mutation-scope";
 import type { AdminSnapshotContext } from "@/lib/admin/snapshot-context";
+import { shouldUseDatabase } from "@/lib/data/env";
+import type { AppRole } from "@uyanik/tokens";
 import * as memory from "@/mocks/admin";
 import type { AdminMutation, AdminSnapshot } from "@/lib/admin/types";
+
+export class AdminMutationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AdminMutationError";
+  }
+}
 
 // DB repository hazır olduğunda:
 // async function repo() {
@@ -25,8 +34,14 @@ export async function getAdminSnapshot(ctx: AdminSnapshotContext = {}): Promise<
 export async function applyAdminMutation(
   m: AdminMutation,
   ctx: AdminSnapshotContext = {},
+  role: AppRole = "admin",
 ): Promise<AdminSnapshot> {
-  // if (shouldUseDatabase()) { await (await repo()).apply(m); return (await repo()).getSnapshot(); }
+  const scopeError = assertMutationAllowed(m, ctx, role);
+  if (scopeError) {
+    throw new AdminMutationError(scopeError);
+  }
+
+  // if (shouldUseDatabase()) { await (await repo()).apply(m); return (await repo()).getSnapshot(ctx); }
   switch (m.kind) {
     case "renewOrg":
       memory.mockRenewOrg(m.orgId);

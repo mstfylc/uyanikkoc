@@ -62,7 +62,9 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
         const data = (await res.json()) as AdminSnapshot;
         if (!alive) return;
         setSnapshot(data);
-        setActiveOrgIdState((cur) => cur || data.activeOrgId);
+        setActiveOrgIdState((cur) =>
+          cur && data.orgs.some((o) => o.id === cur) ? cur : data.activeOrgId,
+        );
       } catch (e) {
         if (alive) setError(e instanceof Error ? e.message : "load error");
       } finally {
@@ -91,6 +93,7 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
     if (!res.ok) throw new Error("mutate " + res.status);
     const data = (await res.json()) as AdminSnapshot;
     setSnapshot(data);
+    setActiveOrgIdState((cur) => (cur && data.orgs.some((o) => o.id === cur) ? cur : data.activeOrgId));
   }, []);
 
   const value = useMemo<AdminStoreValue>(

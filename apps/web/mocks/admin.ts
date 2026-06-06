@@ -573,6 +573,10 @@ export function mockAssignTask(
   return task;
 }
 
+export function findTask(taskId: string): CoachTask | undefined {
+  return store().tasks.find((x) => x.id === taskId);
+}
+
 export function mockCompleteTask(taskId: string): void {
   const t = store().tasks.find((x) => x.id === taskId);
   if (t) t.status = t.status === "done" ? "open" : "done";
