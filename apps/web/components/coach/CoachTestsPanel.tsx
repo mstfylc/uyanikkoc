@@ -4,6 +4,7 @@ import { KiIcon } from "@/components/design/KiIcon";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { TestSendModal } from "@/components/coach/TestSendModal";
+import { TestBuilderModal } from "@/components/coach/TestBuilderModal";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
@@ -15,6 +16,7 @@ export function CoachTestsPanel() {
   const [assignments, setAssignments] = useState<TestAssignmentRecord[]>([]);
   const [students, setStudents] = useState<CoachRosterEntry[]>([]);
   const [sendModalOpen, setSendModalOpen] = useState(false);
+  const [builderOpen, setBuilderOpen] = useState(false);
   const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,10 +71,16 @@ export function CoachTestsPanel() {
         title="Envanter ve Testler"
         sub="Psikolojik testleri ogrencilere gonder"
         actions={
-          <button type="button" className="btn btn-primary" onClick={() => setSendModalOpen(true)}>
-            <KiIcon name="ki-send" />
-            Test gonder
-          </button>
+          <div className="row" style={{ gap: 8 }}>
+            <button type="button" className="btn btn-light" onClick={() => setBuilderOpen(true)}>
+              <KiIcon name="ki-notepad-edit" />
+              Test olustur
+            </button>
+            <button type="button" className="btn btn-primary" onClick={() => setSendModalOpen(true)}>
+              <KiIcon name="ki-send" />
+              Test gonder
+            </button>
+          </div>
         }
       />
 
@@ -195,6 +203,12 @@ export function CoachTestsPanel() {
         students={students}
         catalog={catalog}
         onSent={() => void load()}
+      />
+
+      <TestBuilderModal
+        open={builderOpen}
+        onClose={() => setBuilderOpen(false)}
+        onCreated={() => void load()}
       />
     </div>
   );

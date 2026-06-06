@@ -50,7 +50,14 @@ export function StudentTestsPanel() {
       return;
     }
     setActiveId(assignment.id);
-    setAnswers(Array(test.questions.length).fill(3));
+    setAnswers(
+      test.questions.map((question) => {
+        if (question.kind === "yesno") return 0;
+        if (question.kind === "scale") return 5;
+        if (question.kind === "choice") return 0;
+        return 3;
+      }),
+    );
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -189,23 +196,77 @@ export function StudentTestsPanel() {
                       <p className="label" style={{ marginBottom: 8 }}>
                         {index + 1}. {question.text}
                       </p>
-                      <div className="filters" style={{ flexWrap: "wrap" }}>
-                        {LIKERT_OPTIONS.map((label, scoreIndex) => {
-                          const score = scoreIndex + 1;
-                          return (
+                      {question.kind === "likert" ? (
+                        <div className="filters" style={{ flexWrap: "wrap" }}>
+                          {LIKERT_OPTIONS.map((label, scoreIndex) => {
+                            const score = scoreIndex + 1;
+                            return (
+                              <button
+                                key={label}
+                                type="button"
+                                className={answers[index] === score ? "on" : ""}
+                                onClick={() =>
+                                  setAnswers((current) => current.map((v, i) => (i === index ? score : v)))
+                                }
+                              >
+                                {score} · {label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                      {question.kind === "yesno" ? (
+                        <div className="row" style={{ gap: 8 }}>
+                          {[
+                            { label: "Evet", value: 1 },
+                            { label: "Hayir", value: 0 },
+                          ].map((option) => (
                             <button
-                              key={label}
+                              key={option.label}
                               type="button"
-                              className={answers[index] === score ? "on" : ""}
+                              className={`type-chip${answers[index] === option.value ? " on" : ""}`}
                               onClick={() =>
-                                setAnswers((current) => current.map((v, i) => (i === index ? score : v)))
+                                setAnswers((current) => current.map((v, i) => (i === index ? option.value : v)))
                               }
                             >
-                              {score} · {label}
+                              {option.label}
                             </button>
-                          );
-                        })}
-                      </div>
+                          ))}
+                        </div>
+                      ) : null}
+                      {question.kind === "scale" ? (
+                        <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+                          {Array.from({ length: 11 }, (_, value) => (
+                            <button
+                              key={value}
+                              type="button"
+                              className={`type-chip${answers[index] === value ? " on" : ""}`}
+                              style={{ minWidth: 36 }}
+                              onClick={() =>
+                                setAnswers((current) => current.map((v, i) => (i === index ? value : v)))
+                              }
+                            >
+                              {value}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+                      {question.kind === "choice" ? (
+                        <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+                          {(question.options ?? []).map((option, optionIndex) => (
+                            <button
+                              key={option}
+                              type="button"
+                              className={`type-chip${answers[index] === optionIndex ? " on" : ""}`}
+                              onClick={() =>
+                                setAnswers((current) => current.map((v, i) => (i === index ? optionIndex : v)))
+                              }
+                            >
+                              {option}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                   ))}
                   <div className="modal-foot" style={{ justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
