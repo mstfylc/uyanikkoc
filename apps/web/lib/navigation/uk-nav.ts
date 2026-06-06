@@ -30,6 +30,7 @@ const COACH_NAV: UkNavItem[] = [
   { href: "/coach/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/coach/appointments", label: "Randevular", icon: "ki-calendar-tick" },
   { href: "/coach/tests", label: "Envanter & Testler", icon: "ki-star" },
+  { href: "/coach/feedback", label: "Geri Bildirimlerim", icon: "ki-heart" },
   { href: "/coach/reports", label: "Raporlar", icon: "ki-chart-line-up" },
   { href: "/coach/revenue", label: "Gelir & Tahsilat", icon: "ki-dollar" },
 ];
