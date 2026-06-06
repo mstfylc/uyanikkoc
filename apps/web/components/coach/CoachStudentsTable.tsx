@@ -17,20 +17,56 @@ const RISK_TONE: Record<CoachStudentRow["risk"], "success" | "primary" | "warnin
   critical: "danger",
 };
 
+type SortKey = "name" | "completion" | "net" | "risk" | "activity";
+
 type CoachStudentsTableProps = {
   rows: CoachStudentRow[];
   isLoading?: boolean;
 };
 
+const RISK_ORDER: Record<CoachStudentRow["risk"], number> = {
+  critical: 0,
+  attention: 1,
+  normal: 2,
+  excellent: 3,
+};
+
 export function CoachStudentsTable({ rows, isLoading }: CoachStudentsTableProps) {
   const [filter, setFilter] = useState<"all" | "risk">("all");
+  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDir((current) => (current === "asc" ? "desc" : "asc"));
+      return;
+    }
+    setSortKey(key);
+    setSortDir(key === "name" || key === "activity" ? "asc" : "desc");
+  }
 
   const shown = useMemo(() => {
-    if (filter === "risk") {
-      return rows.filter((row) => row.risk === "attention" || row.risk === "critical");
-    }
-    return rows;
-  }, [filter, rows]);
+    const filtered =
+      filter === "risk"
+        ? rows.filter((row) => row.risk === "attention" || row.risk === "critical")
+        : rows;
+
+    const sorted = [...filtered].sort((left, right) => {
+      let cmp = 0;
+      if (sortKey === "name") cmp = left.displayName.localeCompare(right.displayName, "tr");
+      if (sortKey === "completion") cmp = left.completion - right.completion;
+      if (sortKey === "net") cmp = (left.net ?? 0) - (right.net ?? 0);
+      if (sortKey === "risk") cmp = RISK_ORDER[left.risk] - RISK_ORDER[right.risk];
+      if (sortKey === "activity") cmp = left.lastActivity.localeCompare(right.lastActivity, "tr");
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return sorted;
+  }, [filter, rows, sortDir, sortKey]);
+
+  function sortIcon(key: SortKey) {
+    if (sortKey !== key) return " ↕";
+    return sortDir === "asc" ? " ↑" : " ↓";
+  }
 
   return (
     <UkSection
@@ -56,11 +92,31 @@ export function CoachStudentsTable({ rows, isLoading }: CoachStudentsTableProps)
           <table className="tbl">
             <thead>
               <tr>
-                <th>Ogrenci</th>
-                <th>Tamamlama</th>
-                <th>Net trendi</th>
-                <th>Durum</th>
-                <th style={{ textAlign: "right" }}>Son aktivite</th>
+                <th>
+                  <button type="button" className="th-sort" onClick={() => toggleSort("name")}>
+                    Ogrenci{sortIcon("name")}
+                  </button>
+                </th>
+                <th>
+                  <button type="button" className="th-sort" onClick={() => toggleSort("completion")}>
+                    Tamamlama{sortIcon("completion")}
+                  </button>
+                </th>
+                <th>
+                  <button type="button" className="th-sort" onClick={() => toggleSort("net")}>
+                    Net trendi{sortIcon("net")}
+                  </button>
+                </th>
+                <th>
+                  <button type="button" className="th-sort" onClick={() => toggleSort("risk")}>
+                    Durum{sortIcon("risk")}
+                  </button>
+                </th>
+                <th style={{ textAlign: "right" }}>
+                  <button type="button" className="th-sort" onClick={() => toggleSort("activity")}>
+                    Son aktivite{sortIcon("activity")}
+                  </button>
+                </th>
               </tr>
             </thead>
             <tbody>

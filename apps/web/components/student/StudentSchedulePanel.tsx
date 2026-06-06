@@ -2,12 +2,14 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { useSession } from "next-auth/react";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkBarChart } from "@/components/design/UkBarChart";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { studentSinav } from "@/lib/design/student-exam";
 import { subjectColor } from "@/lib/design/subject-colors";
 import type { StudyBlockRecord } from "@/mocks/study-plan";
 import { SCHOOL_DAYS, SCHOOL_PERIODS } from "@/mocks/schedule";
@@ -18,6 +20,16 @@ const DAY_INDEX = new Date().getDay();
 const TODAY_LABEL = ["Paz", "Pzt", "Sal", "Car", "Per", "Cum", "Cmt"][DAY_INDEX] ?? "Pzt";
 
 export function StudentSchedulePanel() {
+  const { data: session } = useSession();
+  const examProfile = useMemo(
+    () =>
+      studentSinav({
+        email: session?.user?.email,
+        studentId: session?.user?.studentId,
+      }),
+    [session?.user?.email, session?.user?.studentId],
+  );
+
   const [schedule, setSchedule] = useState<SchoolScheduleRecord | null>(null);
   const [studyPlan, setStudyPlan] = useState<StudyBlockRecord[]>([]);
   const [activeDay, setActiveDay] = useState(TODAY_LABEL);
@@ -31,22 +43,42 @@ export function StudentSchedulePanel() {
     subject: "Matematik",
     topic: "",
     type: "Soru",
+    source: "",
+    correct: "",
+    wrong: "",
   });
+  const [studentSources, setStudentSources] = useState<string[]>([]);
   const [blockError, setBlockError] = useState<string | null>(null);
   const [isSavingBlock, setIsSavingBlock] = useState(false);
 
   const load = useCallback(async () => {
-    const response = await fetch("/api/student/schedule", { credentials: "same-origin" });
-    if (response.ok) {
-      const data = (await response.json()) as {
+    const [scheduleRes, sourcesRes] = await Promise.all([
+      fetch("/api/student/schedule", { credentials: "same-origin" }),
+      fetch("/api/student/sources", { credentials: "same-origin" }),
+    ]);
+    if (scheduleRes.ok) {
+      const data = (await scheduleRes.json()) as {
         schedule: SchoolScheduleRecord;
         studyPlan: StudyBlockRecord[];
       };
       setSchedule(data.schedule);
       setStudyPlan(data.studyPlan);
     }
+    if (sourcesRes.ok) {
+      const data = (await sourcesRes.json()) as { sources: string[] };
+      setStudentSources(data.sources);
+    }
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    setBlockDraft((current) => ({
+      ...current,
+      subject: examProfile.subjects.includes(current.subject)
+        ? current.subject
+        : (examProfile.subjects[0] ?? current.subject),
+    }));
+  }, [examProfile]);
 
   useEffect(() => {
     setMounted(true);
@@ -60,12 +92,12 @@ export function StudentSchedulePanel() {
 
   const weeklyChart = useMemo(() => weeklyCompletionByDay(studyPlan), [studyPlan]);
 
-  async function toggleStudyBlock(blockId: string) {
+  async function advanceStudyBlock(blockId: string, action: "start" | "finish" | "reset") {
     const response = await fetch("/api/student/schedule", {
       method: "PATCH",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ studyBlockId: blockId }),
+      body: JSON.stringify({ studyBlockId: blockId, studyAction: action }),
     });
     if (response.ok) {
       const data = (await response.json()) as { studyPlan: StudyBlockRecord[] };
@@ -119,7 +151,16 @@ export function StudentSchedulePanel() {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(blockDraft),
+      body: JSON.stringify({
+        day: blockDraft.day,
+        time: blockDraft.time,
+        subject: blockDraft.subject,
+        topic: blockDraft.topic,
+        type: blockDraft.type,
+        source: blockDraft.source || undefined,
+        correct: blockDraft.correct ? Number(blockDraft.correct) : undefined,
+        wrong: blockDraft.wrong ? Number(blockDraft.wrong) : undefined,
+      }),
     });
     setIsSavingBlock(false);
 
@@ -130,7 +171,7 @@ export function StudentSchedulePanel() {
 
     const data = (await response.json()) as { studyPlan: StudyBlockRecord[] };
     setStudyPlan(data.studyPlan);
-    setBlockDraft((current) => ({ ...current, topic: "" }));
+    setBlockDraft((current) => ({ ...current, topic: "", correct: "", wrong: "" }));
     setBlockModalOpen(false);
   }
 
@@ -138,7 +179,7 @@ export function StudentSchedulePanel() {
     <div className="stack rise" data-testid="student-schedule-panel">
       <UkPageHead
         title="Calisma Programi"
-        sub="Gunluk plan ve okul programi"
+        sub={`${examProfile.label} · gunluk plan`}
         actions={
           <button type="button" className="btn btn-primary btn-sm" onClick={() => setBlockModalOpen(true)}>
             <KiIcon name="ki-plus" />
@@ -186,8 +227,11 @@ export function StudentSchedulePanel() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {dayBlocks.map((block) => {
                 const color = subjectColor(block.subject);
+                const status =
+                  block.status ??
+                  ((block as StudyBlockRecord & { done?: boolean }).done ? "done" : "todo");
                 return (
-                  <div key={block.id} className={`lrow${block.done ? " done" : ""}`}>
+                  <div key={block.id} className={`lrow${status === "done" ? " done" : ""}`}>
                     <span className="tnum muted" style={{ width: 48, fontWeight: 700, fontSize: 12.5 }}>
                       {block.time}
                     </span>
@@ -208,15 +252,27 @@ export function StudentSchedulePanel() {
                           {block.subject}
                         </span>
                         <span className="d">{block.type}</span>
+                        {status === "progress" ? (
+                          <span className="badge badge-warning" style={{ height: 20, fontSize: 10 }}>Devam ediyor</span>
+                        ) : null}
+                        {block.net != null ? (
+                          <span className="d tnum">Net {block.net.toFixed(1)}</span>
+                        ) : null}
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      className={`btn btn-sm ${block.done ? "btn-light" : "btn-primary"}`}
-                      onClick={() => void toggleStudyBlock(block.id)}
-                    >
-                      {block.done ? "Bitti" : "Basla"}
-                    </button>
+                    {status === "todo" ? (
+                      <button type="button" className="btn btn-sm btn-primary" onClick={() => void advanceStudyBlock(block.id, "start")}>
+                        Başla
+                      </button>
+                    ) : status === "progress" ? (
+                      <button type="button" className="btn btn-sm btn-primary" onClick={() => void advanceStudyBlock(block.id, "finish")}>
+                        Bitir
+                      </button>
+                    ) : (
+                      <button type="button" className="btn btn-sm btn-light" disabled>
+                        Bitti
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -362,12 +418,20 @@ export function StudentSchedulePanel() {
                       <label className="label" htmlFor="block-subject">
                         Ders
                       </label>
-                      <input
+                      <select
                         id="block-subject"
-                        className="input"
+                        className="select"
                         value={blockDraft.subject}
-                        onChange={(event) => setBlockDraft((current) => ({ ...current, subject: event.target.value }))}
-                      />
+                        onChange={(event) =>
+                          setBlockDraft((current) => ({ ...current, subject: event.target.value }))
+                        }
+                      >
+                        {examProfile.subjects.map((subject) => (
+                          <option key={subject} value={subject}>
+                            {subject}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="field">
                       <label className="label" htmlFor="block-type">
@@ -398,6 +462,56 @@ export function StudentSchedulePanel() {
                       onChange={(event) => setBlockDraft((current) => ({ ...current, topic: event.target.value }))}
                     />
                   </div>
+                  {blockDraft.type === "Soru" ? (
+                    <>
+                      <div className="field">
+                        <label className="label" htmlFor="block-source">
+                          Kaynak
+                        </label>
+                        <select
+                          id="block-source"
+                          className="select"
+                          value={blockDraft.source}
+                          onChange={(event) => setBlockDraft((current) => ({ ...current, source: event.target.value }))}
+                        >
+                          <option value="">Kaynak sec (opsiyonel)</option>
+                          {studentSources.map((source) => (
+                            <option key={source} value={source}>
+                              {source}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="grid g-2">
+                        <div className="field">
+                          <label className="label" htmlFor="block-correct">
+                            Dogru
+                          </label>
+                          <input
+                            id="block-correct"
+                            className="input tnum"
+                            type="number"
+                            min={0}
+                            value={blockDraft.correct}
+                            onChange={(event) => setBlockDraft((current) => ({ ...current, correct: event.target.value }))}
+                          />
+                        </div>
+                        <div className="field">
+                          <label className="label" htmlFor="block-wrong">
+                            Yanlis
+                          </label>
+                          <input
+                            id="block-wrong"
+                            className="input tnum"
+                            type="number"
+                            min={0}
+                            value={blockDraft.wrong}
+                            onChange={(event) => setBlockDraft((current) => ({ ...current, wrong: event.target.value }))}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  ) : null}
                   {blockError ? (
                     <p role="alert" className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>
                       {blockError}

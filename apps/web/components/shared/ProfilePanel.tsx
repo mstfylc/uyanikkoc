@@ -5,10 +5,16 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-import { UkAvatar } from "@/components/design/UkAvatar";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
+import {
+  PROFILE_AVATAR_ICONS,
+  loadProfileAvatarIcon,
+  profileAvatarGlyph,
+  saveProfileAvatarIcon,
+} from "@/lib/design/profile-icons";
+import { studentSinav } from "@/lib/design/student-exam";
 
 type ProfilePanelProps = {
   role: "student" | "coach" | "parent";
@@ -25,6 +31,13 @@ const ROLE_SUB: Record<ProfilePanelProps["role"], string> = {
   coach: "YKS & LGS Kocu",
   parent: "Veli · Elif'in annesi",
 };
+
+function roleSub(role: ProfilePanelProps["role"], email?: string | null): string {
+  if (role === "student") {
+    return studentSinav({ email }).label;
+  }
+  return ROLE_SUB[role];
+}
 
 const ROLE_STATS: Record<ProfilePanelProps["role"], Array<{ icon: string; text: string }>> = {
   coach: [
@@ -73,6 +86,11 @@ export function ProfilePanel({ role }: ProfilePanelProps) {
   const [email, setEmail] = useState(sessionEmail || "—");
   const [phone, setPhone] = useState(role === "coach" ? "0532 000 00 00" : "0533 000 00 00");
   const [saved, setSaved] = useState(false);
+  const [avatarIcon, setAvatarIcon] = useState("rocket");
+
+  useEffect(() => {
+    setAvatarIcon(loadProfileAvatarIcon());
+  }, []);
 
   useEffect(() => {
     setName(sessionName);
@@ -96,13 +114,25 @@ export function ProfilePanel({ role }: ProfilePanelProps) {
           <div style={{ height: 84, background: "linear-gradient(135deg, var(--primary), var(--primary-700))" }} />
           <div className="card-pad" style={{ paddingTop: 0, textAlign: "center" }}>
             <div style={{ marginTop: -38, display: "flex", justifyContent: "center" }}>
-              <div style={{ border: "4px solid var(--surface)", borderRadius: "50%" }}>
-                <UkAvatar name={name} size={76} />
+              <div
+                style={{
+                  border: "4px solid var(--surface)",
+                  borderRadius: "50%",
+                  width: 84,
+                  height: 84,
+                  display: "grid",
+                  placeItems: "center",
+                  background: "var(--surface-2)",
+                  fontSize: 36,
+                }}
+                aria-hidden
+              >
+                {profileAvatarGlyph(avatarIcon)}
               </div>
             </div>
             <div style={{ fontSize: 17, fontWeight: 800, marginTop: 10 }}>{name}</div>
             <div className="muted" style={{ fontSize: 12.5 }}>
-              {ROLE_SUB[role]}
+              {roleSub(role, sessionEmail)}
             </div>
             <div className="row" style={{ justifyContent: "center", marginTop: 10, gap: 6 }}>
               <UkBadge tone={badgeTone}>
@@ -160,6 +190,33 @@ export function ProfilePanel({ role }: ProfilePanelProps) {
                   <input className="input" value="Dilek Emen" disabled />
                 </div>
               ) : null}
+            </div>
+          </UkSection>
+
+          <UkSection title="Hazir ikonlar" sub="Profil avatarini sec">
+            <div className="card-body">
+              <div className="grid g-4" style={{ gap: 10 }}>
+                {PROFILE_AVATAR_ICONS.map((icon) => (
+                  <button
+                    key={icon.id}
+                    type="button"
+                    className={`user-card${avatarIcon === icon.id ? " on" : ""}`}
+                    style={{
+                      borderRadius: 12,
+                      padding: 10,
+                      background: avatarIcon === icon.id ? "var(--primary-soft)" : "var(--surface-2)",
+                      border: avatarIcon === icon.id ? "1px solid var(--primary-300)" : "1px solid var(--border)",
+                    }}
+                    onClick={() => {
+                      setAvatarIcon(icon.id);
+                      saveProfileAvatarIcon(icon.id);
+                    }}
+                  >
+                    <span style={{ fontSize: 24 }}>{icon.glyph}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700 }}>{icon.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </UkSection>
 

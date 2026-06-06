@@ -366,6 +366,7 @@ export type AdminMutation =
       tone: string;
       email: string;
       phone: string;
+      ownerName?: string;
     }
   | { kind: "suspendCoach"; coachId: string }
   | { kind: "activateCoach"; coachId: string }
@@ -459,4 +460,5 @@ export type AdminMutation =
       name: string;
       parentEmail: string;
       branchId?: string;
-    };
+    }
+  | { kind: "resetDemo" };

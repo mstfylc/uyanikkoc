@@ -73,6 +73,7 @@ export async function applyAdminMutation(
         tone: m.tone,
         email: m.email,
         phone: m.phone,
+        ownerName: m.ownerName,
       });
       break;
     case "suspendCoach":
@@ -224,6 +225,9 @@ export async function applyAdminMutation(
         parentEmail: m.parentEmail,
         branchId: m.branchId,
       });
+      break;
+    case "resetDemo":
+      memory.resetMockStore();
       break;
     default: {
       const _exhaustive: never = m;

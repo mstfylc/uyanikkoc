@@ -17,6 +17,7 @@ import { buildCoachStudentRows } from "@/lib/design/coach-student-rows";
 import {
   buildNetData,
   buildPerSubjectStats,
+  buildQuestionTracking,
   buildSubjectWeekDistribution,
   buildWeakTopics,
   buildWeekSoru,
@@ -29,6 +30,7 @@ import {
   subjTarget,
   TOPIC_STATUS,
   type TopicState,
+  type QuestionChartMode,
 } from "@/lib/design/coach-topic-metrics";
 import { subjectColor } from "@/lib/design/subject-colors";
 import { NOTE_KIND_LABELS } from "@/mocks/coach-notes";
@@ -62,6 +64,9 @@ export function CoachTopicsPanel() {
   const [noteText, setNoteText] = useState("");
   const [noteKind, setNoteKind] = useState<CoachNoteKind>("general");
   const [activeSubject, setActiveSubject] = useState("");
+  const [kaynakFilter, setKaynakFilter] = useState<string | "all">("all");
+  const [chartMode, setChartMode] = useState<QuestionChartMode>("daily");
+  const [chartOffset, setChartOffset] = useState(0);
   const [targets, setTargets] = useState<Record<string, number>>({});
   const [expTarget, setExpTarget] = useState<string | null>(null);
   const [savedTick, setSavedTick] = useState(false);
@@ -131,6 +136,7 @@ export function CoachTopicsPanel() {
         }
         return names[0] ?? "";
       });
+      setKaynakFilter("all");
     }
 
     if (notesResponse.ok) {
@@ -159,10 +165,20 @@ export function CoachTopicsPanel() {
   const totalSoru = perSubj.reduce((sum, subject) => sum + subject.soru, 0);
   const overallPct = totalTopics > 0 ? Math.round((doneTopics / totalTopics) * 100) : completion;
   const { groups: netData, totalGain } = useMemo(() => buildNetData(examTrack, completion), [examTrack, completion]);
-  const { points: weekSoru, total: weekTotal } = useMemo(() => buildWeekSoru(completion), [completion]);
+  const weekTotal = useMemo(() => buildWeekSoru(completion).total, [completion]);
+  const questionChart = useMemo(
+    () => buildQuestionTracking(completion, chartMode, chartOffset),
+    [chartMode, chartOffset, completion],
+  );
   const subjWeek = useMemo(() => buildSubjectWeekDistribution(perSubj, weekTotal), [perSubj, weekTotal]);
   const weak = useMemo(() => buildWeakTopics(perSubj), [perSubj]);
   const activePerSubj = perSubj.find((subject) => subject.s === activeSubject) ?? perSubj[0];
+  const activeKaynakList = activePerSubj ? (KAYNAKLAR[activePerSubj.s] ?? KAYNAK_DEF) : KAYNAK_DEF;
+  const filteredTopics = useMemo(() => {
+    if (!activePerSubj) return [];
+    if (kaynakFilter === "all") return activePerSubj.t;
+    return activePerSubj.t.filter((topic) => topic.kaynak === kaynakFilter);
+  }, [activePerSubj, kaynakFilter]);
   const studentRow = useMemo(
     () => buildCoachStudentRows(students, assignments, []).find((row) => row.studentId === studentId),
     [students, assignments, studentId],
@@ -570,13 +586,36 @@ export function CoachTopicsPanel() {
 
       <UkSection
         title="Soru Takibi"
-        sub="Bu hafta gunluk cozulen soru"
-        action={<UkBadge tone="primary">{weekTotal.toLocaleString("tr-TR")} soru</UkBadge>}
+        sub={questionChart.caption}
+        action={
+          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+            <div className="seg" style={{ width: "fit-content" }}>
+              {(["daily", "weekly", "monthly"] as QuestionChartMode[]).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  className={chartMode === mode ? "on" : ""}
+                  onClick={() => setChartMode(mode)}
+                >
+                  {mode === "daily" ? "Gunluk" : mode === "weekly" ? "Haftalik" : "Aylik"}
+                </button>
+              ))}
+            </div>
+            <button type="button" className="btn btn-light btn-sm" onClick={() => setChartOffset((value) => value + 1)}>
+              Onceki
+            </button>
+            <UkBadge tone="primary">{questionChart.total.toLocaleString("tr-TR")} soru</UkBadge>
+          </div>
+        }
       >
         <div className="card-body">
           <UkBarChart
-            data={weekSoru.map((point) => ({ label: point.l, value: point.v }))}
-            peakIdx={weekSoru.reduce((maxIndex, point, index, array) => (point.v > array[maxIndex].v ? index : maxIndex), 0)}
+            data={questionChart.points}
+            gradient
+            peakIdx={questionChart.points.reduce(
+              (maxIndex, point, index, array) => (point.value > array[maxIndex].value ? index : maxIndex),
+              0,
+            )}
           />
         </div>
       </UkSection>
@@ -630,11 +669,25 @@ export function CoachTopicsPanel() {
             sub={`${activePerSubj.done}/${activePerSubj.total} konu tamamlandi · ${activePerSubj.soru} soru cozuldu`}
             action={
               <div className="row" style={{ gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                {(KAYNAKLAR[activePerSubj.s] ?? KAYNAK_DEF).map((source) => (
-                  <span key={source} className="chip" style={{ height: 24, fontSize: 11 }}>
+                <button
+                  type="button"
+                  className={`type-chip${kaynakFilter === "all" ? " on" : ""}`}
+                  style={{ height: 24, fontSize: 11 }}
+                  onClick={() => setKaynakFilter("all")}
+                >
+                  Tumu
+                </button>
+                {activeKaynakList.map((source) => (
+                  <button
+                    key={source}
+                    type="button"
+                    className={`type-chip${kaynakFilter === source ? " on" : ""}`}
+                    style={{ height: 24, fontSize: 11 }}
+                    onClick={() => setKaynakFilter(source)}
+                  >
                     <KiIcon name="ki-book-open" size={12} />
                     {source}
-                  </span>
+                  </button>
                 ))}
               </div>
             }
@@ -651,10 +704,17 @@ export function CoachTopicsPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {activePerSubj.t.map((topic) => {
+                  {filteredTopics.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="muted" style={{ padding: 16, textAlign: "center" }}>
+                        Secilen kaynakta konu yok.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredTopics.map((topic) => {
                     const cfg = TOPIC_STATUS[topic.s];
                     return (
-                      <tr key={topic.n}>
+                      <tr key={`${topic.n}-${topic.kaynak}`}>
                         <td>
                           <div className="row" style={{ gap: 10 }}>
                             <TopicStatusIcon state={topic.s} />
@@ -684,7 +744,8 @@ export function CoachTopicsPanel() {
                         </td>
                       </tr>
                     );
-                  })}
+                  })
+                  )}
                 </tbody>
               </table>
             </div>

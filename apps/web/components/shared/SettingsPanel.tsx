@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
 import { CurriculumEditor } from "@/components/coach/CurriculumEditor";
@@ -17,7 +17,21 @@ type SettingsPanelProps = {
   role: "student" | "coach" | "parent";
 };
 
-type SettingsTab = "mufredat" | "profil" | "bildirimler" | "odeme";
+type SettingsTab = "mufredat" | "profil" | "gorunum" | "bildirimler" | "gizlilik" | "odeme";
+
+const THEME_KEY = "uk_theme_v1";
+type ThemeChoice = "light" | "dark" | "system";
+
+function applyTheme(choice: ThemeChoice) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  if (choice === "system") {
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    root.setAttribute("data-theme", prefersDark ? "dark" : "light");
+    return;
+  }
+  root.setAttribute("data-theme", choice);
+}
 
 const EXAM_TYPES: TopicExamType[] = ["TYT", "AYT", "LGS", "GENEL"];
 
@@ -51,6 +65,8 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [theme, setTheme] = useState<ThemeChoice>("system");
+  const [passwordDraft, setPasswordDraft] = useState({ current: "", next: "", confirm: "" });
 
   const email = session?.user?.email ?? "—";
   const name = session?.user?.name ?? email.split("@")[0] ?? "Kullanici";
@@ -59,13 +75,17 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
     role === "coach"
       ? [
           { key: "mufredat", label: "Mufredat", icon: "ki-book-open" },
-          { key: "profil", label: "Profil", icon: "ki-profile-circle" },
+          { key: "profil", label: "Hesap", icon: "ki-profile-circle" },
+          { key: "gorunum", label: "Gorunum", icon: "ki-setting-2" },
           { key: "bildirimler", label: "Bildirimler", icon: "ki-notification-on" },
+          { key: "gizlilik", label: "Gizlilik", icon: "ki-lock" },
         ]
       : [
-          { key: "profil", label: "Profil", icon: "ki-profile-circle" },
+          { key: "profil", label: "Hesap", icon: "ki-profile-circle" },
+          { key: "gorunum", label: "Gorunum", icon: "ki-setting-2" },
           { key: "odeme", label: "Abonelik", icon: "ki-wallet" },
           { key: "bildirimler", label: "Bildirimler", icon: "ki-notification-on" },
+          { key: "gizlilik", label: "Gizlilik", icon: "ki-lock" },
         ];
 
   const load = useCallback(async () => {
@@ -87,10 +107,23 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
 
   useEffect(() => {
     const requested = searchParams.get("tab");
-    if (requested === "bildirimler" || requested === "profil" || requested === "odeme" || requested === "mufredat") {
+    if (
+      requested === "bildirimler" ||
+      requested === "profil" ||
+      requested === "odeme" ||
+      requested === "mufredat" ||
+      requested === "gorunum" ||
+      requested === "gizlilik"
+    ) {
       setTab(requested);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const saved = (localStorage.getItem(THEME_KEY) as ThemeChoice | null) ?? "system";
+    setTheme(saved);
+    applyTheme(saved);
+  }, []);
 
   function showToast(message: string) {
     setToast(message);
@@ -172,6 +205,21 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
 
   function handleProfileSave() {
     showToast("Profil tercihleri kaydedildi");
+  }
+
+  function handleThemeChange(choice: ThemeChoice) {
+    setTheme(choice);
+    localStorage.setItem(THEME_KEY, choice);
+    applyTheme(choice);
+    showToast("Tema guncellendi");
+  }
+
+  function handlePasswordSave() {
+    if (passwordDraft.next.length < 6 || passwordDraft.next !== passwordDraft.confirm) {
+      return;
+    }
+    setPasswordDraft({ current: "", next: "", confirm: "" });
+    showToast("Sifre guncellendi (demo)");
   }
 
   return (
@@ -277,10 +325,76 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
                 <div>
                   <div style={{ fontSize: 13.5, fontWeight: 700 }}>Tema</div>
                   <div className="muted" style={{ fontSize: 12 }}>
-                    Sistem temasi otomatik uygulanir
+                    Gorunum sekmesinden yonet
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </UkSection>
+      ) : null}
+
+      {tab === "gorunum" ? (
+        <UkSection title="Gorunum" sub="Tema ve arayuz tercihleri">
+          <div className="card-body">
+            <div className="seg" style={{ width: "fit-content" }}>
+              {(["light", "dark", "system"] as ThemeChoice[]).map((choice) => (
+                <button
+                  key={choice}
+                  type="button"
+                  className={theme === choice ? "on" : ""}
+                  onClick={() => handleThemeChange(choice)}
+                >
+                  {choice === "light" ? "Acik" : choice === "dark" ? "Koyu" : "Sistem"}
+                </button>
+              ))}
+            </div>
+            <p className="muted" style={{ fontSize: 12.5, marginTop: 12 }}>
+              Secimin tarayicida kaydedilir ve tum panellerde uygulanir.
+            </p>
+          </div>
+        </UkSection>
+      ) : null}
+
+      {tab === "gizlilik" ? (
+        <UkSection title="Gizlilik & Guvenlik" sub="Sifre ve oturum">
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div className="grid g-2" style={{ gap: 12 }}>
+              <div className="field">
+                <label className="label">Mevcut sifre</label>
+                <input
+                  className="input"
+                  type="password"
+                  value={passwordDraft.current}
+                  onChange={(event) => setPasswordDraft((current) => ({ ...current, current: event.target.value }))}
+                />
+              </div>
+              <div className="field">
+                <label className="label">Yeni sifre</label>
+                <input
+                  className="input"
+                  type="password"
+                  value={passwordDraft.next}
+                  onChange={(event) => setPasswordDraft((current) => ({ ...current, next: event.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="field">
+              <label className="label">Yeni sifre (tekrar)</label>
+              <input
+                className="input"
+                type="password"
+                value={passwordDraft.confirm}
+                onChange={(event) => setPasswordDraft((current) => ({ ...current, confirm: event.target.value }))}
+              />
+            </div>
+            <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
+              <button type="button" className="btn btn-primary btn-sm" onClick={handlePasswordSave}>
+                Sifreyi guncelle
+              </button>
+              <button type="button" className="btn btn-ghost-danger btn-sm" onClick={() => void signOut({ callbackUrl: "/login" })}>
+                Cikis yap
+              </button>
             </div>
           </div>
         </UkSection>

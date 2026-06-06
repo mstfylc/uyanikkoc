@@ -14,13 +14,30 @@ export async function getStudentStudyPlan(studentId: string) {
   return memoryStudyPlan.getStudyPlan(studentId);
 }
 
+export async function advanceStudentStudyBlock(
+  studentId: string,
+  blockId: string,
+  action: "start" | "finish" | "reset",
+) {
+  return memoryStudyPlan.advanceStudyBlock(studentId, blockId, action);
+}
+
 export async function toggleStudentStudyBlock(studentId: string, blockId: string) {
   return memoryStudyPlan.toggleStudyBlock(studentId, blockId);
 }
 
 export async function addStudentStudyBlock(
   studentId: string,
-  input: { day: string; time: string; subject: string; topic: string; type: string },
+  input: {
+    day: string;
+    time: string;
+    subject: string;
+    topic: string;
+    type: string;
+    source?: string;
+    correct?: number;
+    wrong?: number;
+  },
 ) {
   return memoryStudyPlan.addStudyBlock(studentId, input);
 }

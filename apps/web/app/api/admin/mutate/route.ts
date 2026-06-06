@@ -32,6 +32,7 @@ const BRANCH_ALLOWED: AdminMutation["kind"][] = [
   "cancelOrgSubscription",
   "inviteOrgCoach",
   "inviteStudent",
+  "resetDemo",
 ];
 
 const COACH_ALLOWED: AdminMutation["kind"][] = [

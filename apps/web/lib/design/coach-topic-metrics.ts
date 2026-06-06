@@ -95,9 +95,11 @@ export function pickKaynak(subject: string, index: number): string {
 }
 
 export function mapSubjectToTopicRows(subject: SubjectRecord): TopicMetricRow[] {
+  const sources = KAYNAKLAR[subject.name] ?? KAYNAK_DEF;
   let foundProgress = false;
+  const rows: TopicMetricRow[] = [];
 
-  return subject.topics.map((topic, index) => {
+  for (const [index, topic] of subject.topics.entries()) {
     let state: TopicState;
     if (topic.progress.completed) {
       state = "done";
@@ -108,18 +110,22 @@ export function mapSubjectToTopicRows(subject: SubjectRecord): TopicMetricRow[] 
       state = "todo";
     }
 
-    const soru =
-      state === "done" ? 50 + ((index * 23) % 90) : state === "progress" ? 20 + ((index * 7) % 20) : 0;
-    const dogru = state === "todo" ? 0 : Math.round(soru * (0.62 + ((index * 5) % 20) / 100));
+    const rowSources = state === "done" ? sources : [sources[0] ?? KAYNAK_DEF[0]];
+    for (const kaynak of rowSources) {
+      const soru =
+        state === "done" ? 50 + ((index * 23) % 90) : state === "progress" ? 20 + ((index * 7) % 20) : 0;
+      const dogru = state === "todo" ? 0 : Math.round(soru * (0.62 + ((index * 5) % 20) / 100));
+      rows.push({
+        n: topic.name,
+        s: state,
+        soru,
+        dogru,
+        kaynak,
+      });
+    }
+  }
 
-    return {
-      n: topic.name,
-      s: state,
-      soru,
-      dogru,
-      kaynak: pickKaynak(subject.name, index),
-    };
-  });
+  return rows;
 }
 
 export function buildPerSubjectStats(subjects: SubjectRecord[]): PerSubjectStats[] {
@@ -128,8 +134,8 @@ export function buildPerSubjectStats(subjects: SubjectRecord[]): PerSubjectStats
     return {
       s: subject.name,
       t: topics,
-      done: topics.filter((topic) => topic.s === "done").length,
-      total: topics.length,
+      done: subject.topics.filter((topic) => topic.progress.completed).length,
+      total: subject.topics.length,
       soru: topics.reduce((sum, topic) => sum + topic.soru, 0),
     };
   });
@@ -176,6 +182,62 @@ export function buildWeekSoru(completion: number): { points: Array<{ l: string; 
   }));
   const total = points.reduce((sum, point) => sum + point.v, 0);
   return { points, total };
+}
+
+export type QuestionChartMode = "daily" | "weekly" | "monthly";
+
+export function buildQuestionTracking(
+  completion: number,
+  mode: QuestionChartMode,
+  offset: number,
+): { points: Array<{ label: string; value: number }>; total: number; caption: string } {
+  const factor = 0.42 + 0.58 * (completion / 100);
+  const shift = Math.max(0, offset);
+
+  if (mode === "daily") {
+    const base = WEEK_BASE.map((value, index) => ({
+      label: DAY_LABELS[index],
+      value: Math.round(value * factor * (1 - shift * 0.04)),
+    }));
+    const total = base.reduce((sum, point) => sum + point.value, 0);
+    return {
+      points: base,
+      total,
+      caption: shift === 0 ? "Bu hafta" : `${shift} hafta once`,
+    };
+  }
+
+  if (mode === "weekly") {
+    const points = Array.from({ length: 4 }, (_, index) => {
+      const weekIndex = 3 - index + shift;
+      const avg = WEEK_BASE.reduce((sum, value) => sum + value, 0) / WEEK_BASE.length;
+      return {
+        label: `H${weekIndex}`,
+        value: Math.round(avg * factor * (0.82 + index * 0.06)),
+      };
+    });
+    return {
+      points,
+      total: points.reduce((sum, point) => sum + point.value, 0),
+      caption: "Haftalik toplam soru",
+    };
+  }
+
+  const months = ["Oca", "Sub", "Mar", "Nis", "May", "Haz"];
+  const now = new Date().getMonth();
+  const points = Array.from({ length: 4 }, (_, index) => {
+    const monthLabel = months[(now - 3 + index + 12) % 12] ?? "Ay";
+    const avg = WEEK_BASE.reduce((sum, value) => sum + value, 0) / WEEK_BASE.length;
+    return {
+      label: monthLabel,
+      value: Math.round(avg * 7 * factor * (0.75 + index * 0.08)),
+    };
+  });
+  return {
+    points,
+    total: points.reduce((sum, point) => sum + point.value, 0),
+    caption: "Aylik toplam soru",
+  };
 }
 
 export function buildSubjectWeekDistribution(

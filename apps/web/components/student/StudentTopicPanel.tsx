@@ -1,17 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { filterSubjectsForStudentExam, studentSinav } from "@/lib/design/student-exam";
 import { subjectColor } from "@/lib/design/subject-colors";
 import { TOPIC_EXAM_TYPE_LABELS } from "@uyanik/shared";
 import type { SubjectRecord, TopicExamType, TopicRecord, TopicTrackingSummary } from "@uyanik/database";
 
-const EXAM_TYPES: TopicExamType[] = ["TYT", "AYT", "LGS", "GENEL"];
 
 type TopicStatus = "todo" | "progress" | "done";
 
@@ -61,7 +62,18 @@ function downloadTopicReport(subjects: SubjectRecord[]) {
 }
 
 export function StudentTopicPanel() {
+  const { data: session } = useSession();
+  const examProfile = useMemo(
+    () =>
+      studentSinav({
+        email: session?.user?.email,
+        studentId: session?.user?.studentId,
+      }),
+    [session?.user?.email, session?.user?.studentId],
+  );
+
   const [subjects, setSubjects] = useState<SubjectRecord[]>([]);
+  const [studentSources, setStudentSources] = useState<string[]>([]);
   const [summary, setSummary] = useState<TopicTrackingSummary | null>(null);
   const [activeSubjectId, setActiveSubjectId] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState(false);
@@ -71,23 +83,36 @@ export function StudentTopicPanel() {
   const [topicNames, setTopicNames] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
-    const response = await fetch("/api/student/topics", { credentials: "same-origin" });
-    if (response.ok) {
-      const data = (await response.json()) as {
+    const [topicsRes, sourcesRes] = await Promise.all([
+      fetch("/api/student/topics", { credentials: "same-origin" }),
+      fetch("/api/student/sources", { credentials: "same-origin" }),
+    ]);
+    if (topicsRes.ok) {
+      const data = (await topicsRes.json()) as {
         subjects: SubjectRecord[];
         summary: TopicTrackingSummary;
       };
-      setSubjects(data.subjects);
+      const filtered = filterSubjectsForStudentExam(data.subjects, examProfile);
+      setSubjects(filtered);
       setSummary(data.summary);
       setActiveSubjectId((current) => {
-        if (current && data.subjects.some((subject) => subject.id === current)) {
+        if (current && filtered.some((subject) => subject.id === current)) {
           return current;
         }
-        return data.subjects[0]?.id ?? null;
+        return filtered[0]?.id ?? null;
       });
     }
+    if (sourcesRes.ok) {
+      const data = (await sourcesRes.json()) as { sources: string[] };
+      setStudentSources(data.sources);
+    }
     setIsLoading(false);
-  }, []);
+  }, [examProfile]);
+
+  useEffect(() => {
+    setSubjectExamType(examProfile.defaultExamType);
+    setSubjectName(examProfile.subjects[0] ?? "");
+  }, [examProfile]);
 
   useEffect(() => {
     void load();
@@ -135,6 +160,18 @@ export function StudentTopicPanel() {
     }
   }
 
+  async function toggleTopicSource(topic: TopicRecord, source: string) {
+    const response = await fetch(`/api/student/topics/${topic.id}?kind=topic`, {
+      method: "PATCH",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ toggleSource: source }),
+    });
+    if (response.ok) {
+      await load();
+    }
+  }
+
   async function cycleTopicStatus(topic: TopicRecord) {
     const next = nextTopicStatus(getTopicStatus(topic));
     const response = await fetch(`/api/student/topics/${topic.id}?kind=topic`, {
@@ -175,7 +212,7 @@ export function StudentTopicPanel() {
     <div className="stack rise" data-testid="student-topic-panel">
       <UkPageHead
         title="Konu Takibi"
-        sub="Ders bazinda ilerlemeni takip et"
+        sub={`${examProfile.label} · ders bazinda ilerleme`}
         actions={
           subjects.length > 0 ? (
             <button type="button" className="btn btn-light btn-sm" onClick={() => downloadTopicReport(subjects)}>
@@ -288,6 +325,26 @@ export function StudentTopicPanel() {
                         <div className="bar thin" style={{ marginTop: 8, maxWidth: 220 }}>
                           <span style={{ width: progressWidth, background: color }} />
                         </div>
+                        {status === "done" && studentSources.length > 0 ? (
+                          <div className="row" style={{ gap: 6, flexWrap: "wrap", marginTop: 10 }}>
+                            {studentSources.map((source) => {
+                              const done = topic.progress.completedSources?.includes(source);
+                              return (
+                                <button
+                                  key={source}
+                                  type="button"
+                                  className={`type-chip${done ? " on" : ""}`}
+                                  style={{ height: 26, fontSize: 11 }}
+                                  onClick={() => void toggleTopicSource(topic, source)}
+                                >
+                                  {done ? "✓ " : ""}
+                                  {source}
+                                  {done ? " · bitirdim" : ""}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ) : null}
                       </div>
                       <UkBadge tone={status === "done" ? "success" : status === "progress" ? "warning" : "muted"}>
                         {statusLabel(status)}
@@ -359,19 +416,26 @@ export function StudentTopicPanel() {
               value={subjectExamType}
               onChange={(event) => setSubjectExamType(event.target.value as TopicExamType)}
             >
-              {EXAM_TYPES.map((examType) => (
-                <option key={examType} value={examType}>
-                  {TOPIC_EXAM_TYPE_LABELS[examType]}
+              {(examProfile.kind === "LGS" ? (["LGS", "GENEL"] as TopicExamType[]) : (["TYT", "AYT", "GENEL"] as TopicExamType[])).map(
+                (examType) => (
+                  <option key={examType} value={examType}>
+                    {TOPIC_EXAM_TYPE_LABELS[examType]}
+                  </option>
+                ),
+              )}
+            </select>
+            <select
+              className="select"
+              style={{ minWidth: 160 }}
+              value={subjectName}
+              onChange={(event) => setSubjectName(event.target.value)}
+            >
+              {examProfile.subjects.map((subject) => (
+                <option key={subject} value={subject}>
+                  {subject}
                 </option>
               ))}
             </select>
-            <input
-              className="input"
-              style={{ flex: 1, minWidth: 180 }}
-              placeholder="Ornek: Matematik"
-              value={subjectName}
-              onChange={(event) => setSubjectName(event.target.value)}
-            />
             <button type="submit" className="btn btn-primary btn-sm">
               Ekle
             </button>

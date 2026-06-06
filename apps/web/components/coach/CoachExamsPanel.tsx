@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CoachExamImportModal } from "@/components/coach/CoachExamImportModal";
 import { CoachExamManualModal } from "@/components/coach/CoachExamManualModal";
 import { CoachExamStudentDetailModal } from "@/components/coach/CoachExamStudentDetailModal";
+import { CoachDenemeManager } from "@/components/coach/CoachDenemeManager";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkAvatar } from "@/components/design/UkAvatar";
 import { UkBadge } from "@/components/design/UkBadge";
@@ -330,6 +331,8 @@ export function CoachExamsPanel() {
           <UkBarChart data={trendData.map((point) => ({ label: point.label, value: point.value }))} />
         </div>
       </UkSection>
+
+      <CoachDenemeManager />
 
       <CoachExamImportModal
         open={importOpen}

@@ -1,7 +1,7 @@
 "use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { UkAvatar } from "@/components/design/UkAvatar";
 import { UkBadge } from "@/components/design/UkBadge";
@@ -17,6 +17,7 @@ import type { CoachReportSummary, ParentReportRecord } from "@uyanik/database";
 export function CoachReportsPanel() {
   const [report, setReport] = useState<CoachReportSummary | null>(null);
   const [detailReport, setDetailReport] = useState<ParentReportRecord | null>(null);
+  const [reportFilter, setReportFilter] = useState<"all" | "pending" | "sent">("all");
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -62,6 +63,23 @@ export function CoachReportsPanel() {
       ? Math.round(report.weekCompletion.reduce((sum, item) => sum + item.value, 0) / report.weekCompletion.length)
       : 0;
 
+  const filteredReports = useMemo(() => {
+    const rows = report?.parentReports ?? [];
+    if (reportFilter === "pending") return rows.filter((row) => row.status === "pending");
+    if (reportFilter === "sent") return rows.filter((row) => row.status === "approved");
+    return rows;
+  }, [report?.parentReports, reportFilter]);
+
+  const topGainer = useMemo(() => {
+    if (!report?.students.length) return null;
+    return [...report.students].sort((a, b) => (b.examTrend.at(-1) ?? 0) - (a.examTrend.at(-1) ?? 0))[0];
+  }, [report?.students]);
+
+  const needsAttention = useMemo(() => {
+    if (!report?.students.length) return null;
+    return report.students.find((student) => student.risk === "critical" || student.risk === "attention") ?? null;
+  }, [report?.students]);
+
   return (
     <div className="stack rise" data-testid="coach-reports-panel">
       <UkPageHead
@@ -96,6 +114,43 @@ export function CoachReportsPanel() {
         <UkStatCard icon="ki-information-2" tone="danger" value={report?.atRiskCount ?? "—"} label="Risk altinda" />
       </div>
 
+      <div className="grid g-2">
+        <UkSection title="En cok gelisen" sub="Son net trendine gore">
+          <div className="card-body">
+            {topGainer ? (
+              <div className="row" style={{ gap: 10 }}>
+                <UkAvatar name={topGainer.displayName} size={40} />
+                <div>
+                  <b>{topGainer.displayName}</b>
+                  <div className="muted" style={{ fontSize: 12 }}>
+                    Net {topGainer.latestNet ?? "—"} · %{topGainer.assignmentRate} tamamlama
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="muted" style={{ fontSize: 13 }}>Veri yok</p>
+            )}
+          </div>
+        </UkSection>
+        <UkSection title="Ilgi gerektiren" sub="Risk bandina gore">
+          <div className="card-body">
+            {needsAttention ? (
+              <div className="row" style={{ gap: 10 }}>
+                <UkAvatar name={needsAttention.displayName} size={40} />
+                <div>
+                  <b>{needsAttention.displayName}</b>
+                  <div className="muted" style={{ fontSize: 12 }}>
+                    %{needsAttention.assignmentRate} tamamlama · {needsAttention.risk}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="muted" style={{ fontSize: 13 }}>Risk altinda ogrenci yok</p>
+            )}
+          </div>
+        </UkSection>
+      </div>
+
       <UkSection
         title="Sinif Net Gelisimi"
         sub="Tum ogrencilerin ortalama neti"
@@ -123,7 +178,13 @@ export function CoachReportsPanel() {
       </UkSection>
 
       <div className="grid col-main">
-        <UkSection title="Veli Raporlari" sub={`${pending} onay bekliyor`}>
+        <UkSection title="Veli Raporlari" sub={`${pending} onay bekliyor`} action={
+          <div className="filters">
+            <button type="button" className={reportFilter === "all" ? "on" : ""} onClick={() => setReportFilter("all")}>Tumu</button>
+            <button type="button" className={reportFilter === "pending" ? "on" : ""} onClick={() => setReportFilter("pending")}>Bekleyen</button>
+            <button type="button" className={reportFilter === "sent" ? "on" : ""} onClick={() => setReportFilter("sent")}>Gonderilen</button>
+          </div>
+        }>
           <div className="card-body" style={{ padding: 0 }}>
             {isLoading ? (
               <p className="muted" style={{ padding: 20, fontSize: 13 }}>
@@ -141,7 +202,7 @@ export function CoachReportsPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(report?.parentReports ?? []).map((row) => {
+                  {(filteredReports).map((row) => {
                     const up = row.netDelta.startsWith("+");
                     return (
                       <tr key={row.id}>

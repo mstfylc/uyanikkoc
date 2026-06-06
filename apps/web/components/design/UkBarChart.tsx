@@ -7,9 +7,10 @@ type UkBarChartProps = {
   data: UkBarChartPoint[];
   peakIdx?: number;
   max?: number;
+  gradient?: boolean;
 };
 
-export function UkBarChart({ data, peakIdx, max }: UkBarChartProps) {
+export function UkBarChart({ data, peakIdx, max, gradient = false }: UkBarChartProps) {
   if (data.length === 0) {
     return (
       <p className="muted" style={{ fontSize: 13 }}>
@@ -27,7 +28,7 @@ export function UkBarChart({ data, peakIdx, max }: UkBarChartProps) {
         <div key={`${point.label}-${index}`} className={`col${index === highlightIndex ? " peak" : ""}`}>
           <div className="track">
             <div
-              className="fill"
+              className={`fill${gradient ? " gradient" : ""}`}
               style={{ height: `${(point.value / top) * 100}%` }}
               title={String(point.value)}
             />

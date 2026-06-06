@@ -39,6 +39,7 @@ export function CoachOdevAtaModal({
   const [activeSubject, setActiveSubject] = useState("");
   const [selected, setSelected] = useState<Record<string, number>>({});
   const [defaultSoru, setDefaultSoru] = useState(30);
+  const [unitType, setUnitType] = useState<"soru" | "test">("soru");
   const [note, setNote] = useState("");
   const [due, setDue] = useState("");
   const [done, setDone] = useState(false);
@@ -59,6 +60,7 @@ export function CoachOdevAtaModal({
     setDue("");
     setDone(false);
     setDefaultSoru(30);
+    setUnitType("soru");
 
     if (initialSubject && initialTopic) {
       setSelected({ [topicKey(initialSubject, initialTopic)]: 30 });
@@ -123,6 +125,7 @@ export function CoachOdevAtaModal({
       for (const key of selectedKeys) {
         const [subject, title] = key.split("::");
         const soruCount = selected[key] || defaultSoru;
+        const unitLabel = unitType === "test" ? "test" : "soru";
         const response = await fetch("/api/coach/assignments", {
           method: "POST",
           credentials: "same-origin",
@@ -133,8 +136,8 @@ export function CoachOdevAtaModal({
             title,
             type: "practice",
             description: note.trim()
-              ? `${note.trim()} · ${soruCount} soru · ${pickKaynak(subject, 0)}`
-              : `${soruCount} soru · ${pickKaynak(subject, 0)}`,
+              ? `${note.trim()} · ${soruCount} ${unitLabel} · ${pickKaynak(subject, 0)}`
+              : `${soruCount} ${unitLabel} · ${pickKaynak(subject, 0)}`,
             dueDate: due || undefined,
           }),
         });
@@ -190,10 +193,18 @@ export function CoachOdevAtaModal({
 
         <div className="modal-sub" style={{ flexDirection: "column", alignItems: "stretch", gap: 10 }}>
           <div className="row" style={{ gap: 10, flexWrap: "wrap", marginLeft: "auto" }}>
+            <div className="seg" style={{ width: "fit-content" }}>
+              <button type="button" className={unitType === "soru" ? "on" : ""} onClick={() => setUnitType("soru")}>
+                Soru
+              </button>
+              <button type="button" className={unitType === "test" ? "on" : ""} onClick={() => setUnitType("test")}>
+                Test
+              </button>
+            </div>
             <span className="muted" style={{ fontSize: 12, fontWeight: 700 }}>
-              Varsayilan soru
+              Varsayilan {unitType === "test" ? "test" : "soru"}
             </span>
-            <UkNumStepper value={defaultSoru} onChange={setDefaultSoru} step={10} min={0} max={500} size="sm" />
+            <UkNumStepper value={defaultSoru} onChange={setDefaultSoru} step={unitType === "test" ? 1 : 10} min={0} max={500} size="sm" />
           </div>
         </div>
 
@@ -349,7 +360,7 @@ export function CoachOdevAtaModal({
           <div className="row" style={{ gap: 14, flexShrink: 0, marginLeft: "auto" }}>
             <div style={{ textAlign: "right", lineHeight: 1.2 }}>
               <div className="tnum" style={{ fontSize: 15, fontWeight: 800 }}>
-                {selectedKeys.length} konu · {totalSoru} soru
+                {selectedKeys.length} konu · {totalSoru} {unitType === "test" ? "test" : "soru"}
               </div>
               <div className="muted" style={{ fontSize: 11 }}>
                 atanacak

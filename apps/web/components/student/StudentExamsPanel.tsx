@@ -9,6 +9,7 @@ import { UkSparkline } from "@/components/design/UkSparkline";
 import { UkStatCard } from "@/components/design/UkStatCard";
 import { StudentExamAnalysis } from "@/components/student/StudentExamAnalysis";
 import { StudentManualExamModal } from "@/components/student/StudentManualExamModal";
+import { DenemeKayitModal } from "@/components/student/DenemeKayitModal";
 import { OptikFormModal, OptikResultBadge } from "@/components/student/OptikFormModal";
 import { UkBadge } from "@/components/design/UkBadge";
 import { cargoBadgeLabel, cargoBadgeTone } from "@/lib/design/motivation-ui";
@@ -42,6 +43,7 @@ export function StudentExamsPanel() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [tab, setTab] = useState<ExamTab>("results");
   const [manualOpen, setManualOpen] = useState(false);
+  const [kayitOpen, setKayitOpen] = useState(false);
   const [onlineExams, setOnlineExams] = useState<OnlineExamRecord[]>([]);
   const [optikExam, setOptikExam] = useState<OnlineExamRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,10 +98,16 @@ export function StudentExamsPanel() {
         title="Denemeler"
         sub="Deneme sonuclarin ve performans trendi"
         actions={
-          <button type="button" className="btn btn-primary btn-sm" onClick={() => setManualOpen(true)}>
-            <KiIcon name="ki-plus" />
-            Manuel Gir
-          </button>
+          <div className="row" style={{ gap: 8 }}>
+            <button type="button" className="btn btn-light btn-sm" onClick={() => setKayitOpen(true)}>
+              <KiIcon name="ki-calendar-tick" />
+              Denemeye kayıt ol
+            </button>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => setManualOpen(true)}>
+              <KiIcon name="ki-plus" />
+              Manuel Gir
+            </button>
+          </div>
         }
       />
 
@@ -339,6 +347,12 @@ export function StudentExamsPanel() {
         exam={optikExam}
         onClose={() => setOptikExam(null)}
         onSubmitted={() => void loadOnline()}
+      />
+
+      <DenemeKayitModal
+        open={kayitOpen}
+        onClose={() => setKayitOpen(false)}
+        onGoOnline={() => setTab("online")}
       />
     </div>
   );

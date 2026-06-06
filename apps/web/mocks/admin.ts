@@ -604,13 +604,18 @@ export function mockToggleOrgModule(id: string, key: ModuleKey): void {
 
 export function mockUpdateOrgProfile(
   id: string,
-  patch: { name: string; tone: string; email: string; phone: string },
+  patch: { name: string; tone: string; email: string; phone: string; ownerName?: string },
 ): void {
   const o = findOrg(id);
   if (!o) return;
   o.name = patch.name;
   o.tone = patch.tone;
-  o.owner = { ...o.owner, email: patch.email, phone: patch.phone };
+  o.owner = {
+    ...o.owner,
+    ...(patch.ownerName ? { name: patch.ownerName } : {}),
+    email: patch.email,
+    phone: patch.phone,
+  };
 }
 
 export function mockSuspendCoach(id: string): void {

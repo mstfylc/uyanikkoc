@@ -67,7 +67,12 @@ export async function updateStudentSubject(
 export async function updateStudentTopic(
   topicId: string,
   studentId: string,
-  data: { name?: string; completed?: boolean; status?: "todo" | "progress" | "done" },
+  data: {
+    name?: string;
+    completed?: boolean;
+    status?: "todo" | "progress" | "done";
+    toggleSource?: string;
+  },
 ): Promise<TopicRecord | null> {
   if (shouldUseDatabase()) {
     const { topicRepository } = await import("@uyanik/database");

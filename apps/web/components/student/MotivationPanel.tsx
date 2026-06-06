@@ -11,11 +11,17 @@ import { CoachRatingCard } from "@/components/student/CoachRatingCard";
 
 const BADGE_CATALOG = [
   { id: "streak-7", name: "7 Gun Seri", desc: "7 gun ust uste calisma", icon: "ki-flame" },
+  { id: "streak-14", name: "14 Gun Seri", desc: "2 hafta kesintisiz calisma", icon: "ki-flash" },
   { id: "topics-10", name: "10 Konu", desc: "10 konu tamamla", icon: "ki-book-open" },
+  { id: "topics-25", name: "25 Konu", desc: "25 konu tamamla", icon: "ki-book-square" },
   { id: "exam-up", name: "Net Artisi", desc: "Denemede gelisim goster", icon: "ki-chart-line-up" },
-  { id: "homework", name: "Odev Ustasi", desc: "Haftalik odevleri bitir", icon: "ki-notepad-edit" },
+  { id: "deneme-3", name: "3 Deneme", desc: "3 deneme coz", icon: "ki-notepad-edit" },
+  { id: "homework", name: "Odev Ustasi", desc: "Haftalik odevleri bitir", icon: "ki-check-circle" },
   { id: "focus", name: "Odak", desc: "5 gun program takibi", icon: "ki-target" },
-  { id: "star", name: "Yildiz", desc: "Koçtan olumlu geri bildirim", icon: "ki-star" },
+  { id: "schedule", name: "Program", desc: "Duzenli calisma blogu", icon: "ki-calendar" },
+  { id: "star", name: "Yildiz", desc: "Kocundan olumlu geri bildirim", icon: "ki-star" },
+  { id: "coach-note", name: "Koc Notu", desc: "Gunluk motivasyon oku", icon: "ki-message-text" },
+  { id: "perfect-week", name: "Mukemmel Hafta", desc: "Haftalik hedefe ulas", icon: "ki-medal-star" },
 ];
 
 type MotivationSummary = {
@@ -178,7 +184,7 @@ export function MotivationPanel() {
       <UkSection title="Rozetler" sub="Kazanilan basarilar">
         <div className="card-body grid g-3" style={{ gap: 12 }}>
           {BADGE_CATALOG.map((badge) => {
-            const hasBadge = earned.has(badge.name) || earned.has(badge.id);
+            const hasBadge = earned.has(badge.id) || earned.has(badge.name);
             return (
               <div
                 key={badge.id}

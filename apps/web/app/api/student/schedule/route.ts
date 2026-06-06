@@ -6,6 +6,7 @@ import {
   getStudentSchedule,
   getStudentStudyPlan,
   setStudentScheduleCell,
+  advanceStudentStudyBlock,
   toggleStudentStudyBlock,
   updateStudentSchedule,
 } from "@/server/services/schedule.service";
@@ -34,7 +35,17 @@ export const PATCH = withApiAuth(["student"], async (req, { session }) => {
     grid?: Record<string, string[]>;
     cell?: { day: string; period: number; value: string };
     studyBlockId?: string;
+    studyAction?: "start" | "finish" | "reset";
   };
+
+  if (body.studyBlockId && body.studyAction) {
+    const block = await advanceStudentStudyBlock(studentId, body.studyBlockId, body.studyAction);
+    if (!block) {
+      return NextResponse.json({ error: "Study block not found" }, { status: 404 });
+    }
+    const studyPlan = await getStudentStudyPlan(studentId);
+    return NextResponse.json({ block, studyPlan }, { status: 200 });
+  }
 
   if (body.studyBlockId) {
     const block = await toggleStudentStudyBlock(studentId, body.studyBlockId);
@@ -74,6 +85,9 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
     subject?: string;
     topic?: string;
     type?: string;
+    source?: string;
+    correct?: number;
+    wrong?: number;
   };
 
   const day = body.day?.trim();
@@ -91,6 +105,9 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
     subject,
     topic,
     type: body.type?.trim() || "Soru",
+    source: body.source?.trim(),
+    correct: body.correct,
+    wrong: body.wrong,
   });
   const studyPlan = await getStudentStudyPlan(studentId);
   return NextResponse.json({ block, studyPlan }, { status: 200 });

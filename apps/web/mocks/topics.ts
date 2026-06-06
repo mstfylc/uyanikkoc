@@ -27,6 +27,7 @@ function emptyProgress(timestamp: string) {
     completed: false,
     completedAt: null as string | null,
     updatedAt: timestamp,
+    completedSources: [] as string[],
   };
 }
 
@@ -53,6 +54,7 @@ function seedIfEmpty() {
           completed: true,
           completedAt: timestamp,
           updatedAt: timestamp,
+          completedSources: ["Mikro Mat"],
         },
         createdAt: timestamp,
         updatedAt: timestamp,
@@ -147,7 +149,12 @@ export function updateSubject(
 export function updateTopic(
   topicId: string,
   studentId: string,
-  data: { name?: string; completed?: boolean; status?: "todo" | "progress" | "done" },
+  data: {
+    name?: string;
+    completed?: boolean;
+    status?: "todo" | "progress" | "done";
+    toggleSource?: string;
+  },
 ): TopicRecord | null {
   for (const subject of subjects) {
     const topic = subject.topics.find((item) => item.id === topicId && item.studentId === studentId);
@@ -158,6 +165,17 @@ export function updateTopic(
     const timestamp = nowIso();
     if (data.name) {
       topic.name = data.name.trim();
+    }
+    if (data.toggleSource) {
+      const source = data.toggleSource.trim();
+      const list = topic.progress.completedSources ?? (topic.progress.completedSources = []);
+      const index = list.indexOf(source);
+      if (index >= 0) {
+        list.splice(index, 1);
+      } else {
+        list.push(source);
+      }
+      topic.progress.updatedAt = timestamp;
     }
     if (data.status) {
       if (data.status === "done") {

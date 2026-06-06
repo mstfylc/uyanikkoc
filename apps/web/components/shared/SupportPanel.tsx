@@ -1,7 +1,7 @@
 "use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
@@ -9,7 +9,9 @@ import { UkSection } from "@/components/design/UkSection";
 import {
   SUPPORT_CATEGORIES,
   SUPPORT_FAQ,
+  SUPPORT_FAQ_CATEGORIES,
   type SupportCategory,
+  type SupportFaqCategory,
 } from "@/lib/design/support-faq";
 import type { SupportTicketRecord } from "@uyanik/database";
 
@@ -22,12 +24,22 @@ export function SupportPanel({ role }: SupportPanelProps) {
   const [category, setCategory] = useState<SupportCategory>("teknik");
   const [message, setMessage] = useState("");
   const [openFaq, setOpenFaq] = useState(0);
+  const [faqSearch, setFaqSearch] = useState("");
+  const [faqCategory, setFaqCategory] = useState<SupportFaqCategory | "all">("all");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const faqItems = SUPPORT_FAQ[role];
+  const filteredFaq = useMemo(() => {
+    const query = faqSearch.trim().toLowerCase();
+    return faqItems.filter((item) => {
+      if (faqCategory !== "all" && item.category !== faqCategory) return false;
+      if (!query) return true;
+      return item.question.toLowerCase().includes(query) || item.answer.toLowerCase().includes(query);
+    });
+  }, [faqCategory, faqItems, faqSearch]);
 
   const load = useCallback(async () => {
     const response = await fetch("/api/support", { credentials: "same-origin" });
@@ -100,8 +112,39 @@ export function SupportPanel({ role }: SupportPanelProps) {
 
       <div className="grid col-main">
         <UkSection title="Sik Sorulan Sorular" sub="En cok merak edilenler">
-          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {faqItems.map((item, index) => {
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <input
+              className="input"
+              placeholder="SSS ara..."
+              value={faqSearch}
+              onChange={(event) => {
+                setFaqSearch(event.target.value);
+                setOpenFaq(0);
+              }}
+            />
+            <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                className={`type-chip${faqCategory === "all" ? " on" : ""}`}
+                onClick={() => setFaqCategory("all")}
+              >
+                Tumu
+              </button>
+              {(Object.entries(SUPPORT_FAQ_CATEGORIES) as Array<[SupportFaqCategory, string]>).map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={`type-chip${faqCategory === key ? " on" : ""}`}
+                  onClick={() => setFaqCategory(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {filteredFaq.length === 0 ? (
+              <p className="muted" style={{ fontSize: 13 }}>Eslesen soru bulunamadi.</p>
+            ) : (
+              filteredFaq.map((item, index) => {
               const active = openFaq === index;
               return (
                 <div key={item.question} className={`acc-item${active ? " open" : ""}`}>
@@ -130,7 +173,8 @@ export function SupportPanel({ role }: SupportPanelProps) {
                   ) : null}
                 </div>
               );
-            })}
+            })
+            )}
           </div>
         </UkSection>
 

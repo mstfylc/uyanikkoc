@@ -136,6 +136,7 @@ export type TopicProgressRecord = {
   inProgress?: boolean;
   completedAt: string | null;
   updatedAt: string;
+  completedSources?: string[];
 };
 
 export type TopicRecord = {

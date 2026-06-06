@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { BillingAddCardModal } from "@/components/shared/billing/BillingAddCardModal";
 import { BillingCheckoutModal } from "@/components/shared/billing/BillingCheckoutModal";
 import { CardBrandBadge } from "@/components/shared/billing/CardBrandBadge";
+import { DenemeUyelikSection } from "@/components/shared/DenemeUyelikSection";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
@@ -50,7 +51,7 @@ const TABS: Array<{ key: BillingTab; label: string; icon: string }> = [
   { key: "methods", label: "Odeme Yontemleri", icon: "ki-wallet" },
 ];
 
-export function BillingPanel({ embedded = false }: BillingPanelProps) {
+export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
   const [tab, setTab] = useState<BillingTab>("sub");
   const [checkout, setCheckout] = useState<CheckoutState>(null);
   const [plans, setPlans] = useState<BillingPlanRecord[]>([]);
@@ -248,17 +249,18 @@ export function BillingPanel({ embedded = false }: BillingPanelProps) {
           ) : null}
 
           {tab === "sub" ? (
-            !subscription || !activePlan ? (
-              <UkSection title="Abonelik yok" sub="Kocluk paketi secmek icin Paketler sekmesine gec">
-                <div className="card-body">
-                  <button type="button" className="btn btn-primary" onClick={() => setTab("plans")}>
-                    Paketleri Gor
-                  </button>
-                </div>
-              </UkSection>
-            ) : (
-              <div className="stack" style={{ gap: 16 }}>
-                <div className={`sub-hero${canceled ? " canceled" : ""}`}>
+            <div className="stack" style={{ gap: 16 }}>
+              {!subscription || !activePlan ? (
+                <UkSection title="Abonelik yok" sub="Kocluk paketi secmek icin Paketler sekmesine gec">
+                  <div className="card-body">
+                    <button type="button" className="btn btn-primary" onClick={() => setTab("plans")}>
+                      Paketleri Gor
+                    </button>
+                  </div>
+                </UkSection>
+              ) : (
+                <>
+                  <div className={`sub-hero${canceled ? " canceled" : ""}`}>
                   <div className="sub-hero-main">
                     <div className="row" style={{ gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
                       <span className="plan-dot" style={{ background: planColor(activePlan.id), width: 12, height: 12 }} />
@@ -372,8 +374,12 @@ export function BillingPanel({ embedded = false }: BillingPanelProps) {
                     </div>
                   </UkSection>
                 )}
-              </div>
-            )
+                </>
+              )}
+              <DenemeUyelikSection
+                billingBasePath={role === "parent" ? "/parent/billing" : "/student/billing"}
+              />
+            </div>
           ) : null}
 
           {tab === "invoices" ? (

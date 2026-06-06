@@ -205,13 +205,8 @@ export function LoginForm() {
 
           <div className="muted" style={{ fontSize: 12, textAlign: "center", marginTop: 20 }}>
             Hesabin yok mu?{" "}
-            <a
-              href="#"
-              className="link-btn"
-              style={{ display: "inline" }}
-              onClick={(event) => event.preventDefault()}
-            >
-              Kurumundan davet iste
+            <a href="/register" className="link-btn" style={{ display: "inline" }}>
+              Uye ol
             </a>
           </div>
         </form>
