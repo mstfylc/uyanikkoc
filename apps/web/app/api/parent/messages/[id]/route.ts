@@ -20,7 +20,7 @@ export const GET = withApiAuth(["parent"], async (req, { session }) => {
   }
 
   const thread = await getMessageThread(getThreadId(req));
-  if (!thread || !canAccessThread(thread, { parentId })) {
+  if (!thread || !canAccessThread(thread, { parentId, userId: session.user.id })) {
     return NextResponse.json({ error: "Thread not found" }, { status: 404 });
   }
 
@@ -35,7 +35,7 @@ export const POST = withApiAuth(["parent"], async (req, { session }) => {
 
   const threadId = getThreadId(req);
   const thread = await getMessageThread(threadId);
-  if (!thread || !canAccessThread(thread, { parentId })) {
+  if (!thread || !canAccessThread(thread, { parentId, userId: session.user.id })) {
     return NextResponse.json({ error: "Thread not found" }, { status: 404 });
   }
 

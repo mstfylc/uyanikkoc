@@ -9,6 +9,6 @@ export const GET = withApiAuth(["student"], async (_req, { session }) => {
     return NextResponse.json({ error: "Student profile missing" }, { status: 400 });
   }
 
-  const threads = await listStudentMessageThreads(studentId);
+  const threads = await listStudentMessageThreads(studentId, session.user.id);
   return NextResponse.json({ threads }, { status: 200 });
 });

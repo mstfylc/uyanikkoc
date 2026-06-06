@@ -63,6 +63,8 @@ function seedIfEmpty() {
       coachId: DEMO_COACH_ID,
       studentId: DEMO_STUDENT_ID,
       parentId: null,
+      kind: "dm",
+      name: null,
       title: "Koç ile sohbet",
       messages: studentMessages,
       createdAt: timestamp,
@@ -73,6 +75,8 @@ function seedIfEmpty() {
       coachId: DEMO_COACH_ID,
       studentId: null,
       parentId: DEMO_PARENT_ID,
+      kind: "dm",
+      name: null,
       title: "Veli ile sohbet",
       messages: parentMessages,
       createdAt: timestamp,
@@ -92,18 +96,61 @@ export function listThreadsForCoach(coachId: string): MessageThreadRecord[] {
     .sort((left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime());
 }
 
-export function listThreadsForStudent(studentId: string): MessageThreadRecord[] {
+export function listThreadsForStudent(studentId: string, userId?: string): MessageThreadRecord[] {
   seedIfEmpty();
-  return threads
-    .filter((thread) => thread.studentId === studentId)
-    .sort((left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime());
+  const dms = threads.filter((thread) => thread.studentId === studentId && (thread.kind ?? "dm") === "dm");
+  const groups = userId
+    ? threads.filter(
+        (thread) =>
+          thread.kind === "group" && (thread.memberUserIds ?? []).includes(userId),
+      )
+    : [];
+  return [...dms, ...groups].sort(
+    (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
+  );
 }
 
-export function listThreadsForParent(parentId: string): MessageThreadRecord[] {
+export function listThreadsForParent(parentId: string, userId?: string): MessageThreadRecord[] {
   seedIfEmpty();
-  return threads
-    .filter((thread) => thread.parentId === parentId)
-    .sort((left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime());
+  const dms = threads.filter((thread) => thread.parentId === parentId && (thread.kind ?? "dm") === "dm");
+  const groups = userId
+    ? threads.filter(
+        (thread) =>
+          thread.kind === "group" && (thread.memberUserIds ?? []).includes(userId),
+      )
+    : [];
+  return [...dms, ...groups].sort(
+    (left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime(),
+  );
+}
+
+export function createGroup(coachId: string, name: string, memberUserIds: string[]): string {
+  seedIfEmpty();
+  const timestamp = nowIso();
+  const id = `thread_group_${Date.now()}`;
+  threads.unshift({
+    id,
+    coachId,
+    studentId: null,
+    parentId: null,
+    kind: "group",
+    name,
+    title: name,
+    memberUserIds,
+    messages: [],
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  });
+  return id;
+}
+
+export function setGroupMembers(threadId: string, memberUserIds: string[]): boolean {
+  seedIfEmpty();
+  const thread = threads.find((item) => item.id === threadId && item.kind === "group");
+  if (!thread) return false;
+  thread.memberUserIds = memberUserIds;
+  thread.updatedAt = nowIso();
+  return true;
 }
 
 export function getThreadById(threadId: string): MessageThreadRecord | null {

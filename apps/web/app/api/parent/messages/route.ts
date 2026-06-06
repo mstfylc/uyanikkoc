@@ -9,6 +9,6 @@ export const GET = withApiAuth(["parent"], async (_req, { session }) => {
     return NextResponse.json({ error: "Parent profile missing" }, { status: 400 });
   }
 
-  const threads = await listParentMessageThreads(parentId);
+  const threads = await listParentMessageThreads(parentId, session.user.id);
   return NextResponse.json({ threads }, { status: 200 });
 });

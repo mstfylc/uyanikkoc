@@ -12,22 +12,28 @@ export async function listCoachMessageThreads(coachId: string): Promise<MessageT
   return memoryMessages.listThreadsForCoach(coachId);
 }
 
-export async function listStudentMessageThreads(studentId: string): Promise<MessageThreadRecord[]> {
+export async function listStudentMessageThreads(
+  studentId: string,
+  userId?: string,
+): Promise<MessageThreadRecord[]> {
   if (shouldUseDatabase()) {
     const { messageRepository } = await import("@uyanik/database");
-    return messageRepository.listThreadsForStudent(studentId);
+    return messageRepository.listThreadsForStudent(studentId, userId);
   }
 
-  return memoryMessages.listThreadsForStudent(studentId);
+  return memoryMessages.listThreadsForStudent(studentId, userId);
 }
 
-export async function listParentMessageThreads(parentId: string): Promise<MessageThreadRecord[]> {
+export async function listParentMessageThreads(
+  parentId: string,
+  userId?: string,
+): Promise<MessageThreadRecord[]> {
   if (shouldUseDatabase()) {
     const { messageRepository } = await import("@uyanik/database");
-    return messageRepository.listThreadsForParent(parentId);
+    return messageRepository.listThreadsForParent(parentId, userId);
   }
 
-  return memoryMessages.listThreadsForParent(parentId);
+  return memoryMessages.listThreadsForParent(parentId, userId);
 }
 
 export async function getMessageThread(threadId: string): Promise<MessageThreadRecord | null> {
@@ -52,12 +58,45 @@ export async function appendThreadMessage(
   return memoryMessages.appendMessage(threadId, senderRole, body);
 }
 
+export async function createGroupThread(
+  coachId: string,
+  name: string,
+  memberUserIds: string[],
+): Promise<string> {
+  if (shouldUseDatabase()) {
+    const { groupRepository } = await import("@uyanik/database");
+    return groupRepository.createGroup(coachId, name, memberUserIds);
+  }
+
+  return memoryMessages.createGroup(coachId, name, memberUserIds);
+}
+
+export async function updateGroupMembers(threadId: string, memberUserIds: string[]): Promise<void> {
+  if (shouldUseDatabase()) {
+    const { groupRepository } = await import("@uyanik/database");
+    await groupRepository.setGroupMembers(threadId, memberUserIds);
+    return;
+  }
+
+  if (!memoryMessages.setGroupMembers(threadId, memberUserIds)) {
+    throw new Error("Group not found");
+  }
+}
+
 export function canAccessThread(
   thread: MessageThreadRecord,
-  viewer: { coachId?: string | null; studentId?: string | null; parentId?: string | null },
+  viewer: {
+    userId?: string;
+    coachId?: string | null;
+    studentId?: string | null;
+    parentId?: string | null;
+  },
 ): boolean {
   if (viewer.coachId && thread.coachId === viewer.coachId) {
     return true;
+  }
+  if (thread.kind === "group") {
+    return Boolean(viewer.userId && (thread.memberUserIds ?? []).includes(viewer.userId));
   }
   if (viewer.studentId && thread.studentId === viewer.studentId) {
     return true;
