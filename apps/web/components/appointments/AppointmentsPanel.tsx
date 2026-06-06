@@ -33,6 +33,7 @@ const STATUS_LABELS: Record<AppointmentStatus, { label: string; tone: "warning" 
 const MODE_LABELS: Record<AppointmentMode, string> = {
   online: "Online",
   in_person: "Yuz yuze",
+  phone: "Telefon",
 };
 
 function ApptRow({
@@ -285,6 +286,28 @@ function CoachAvailability({
               className={`switch${settings.allowInPerson ? " on" : ""}`}
               onClick={() => onChange({ allowInPerson: !settings.allowInPerson })}
               aria-label="Yuz yuze randevu"
+            >
+              <span />
+            </button>
+          </div>
+          <hr className="hr" />
+          <div className="between" style={{ padding: "10px 0" }}>
+            <div className="row" style={{ gap: 12 }}>
+              <span className="lr-icon" style={{ width: 38, height: 38, background: "var(--surface-3)" }}>
+                <KiIcon name="ki-phone" size={18} />
+              </span>
+              <div>
+                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Telefon randevu</div>
+                <div className="muted" style={{ fontSize: 12 }}>
+                  Ogrenciler telefon gorusmesi isteyebilir
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              className={`switch${settings.allowPhone ? " on" : ""}`}
+              onClick={() => onChange({ allowPhone: !settings.allowPhone })}
+              aria-label="Telefon randevu"
             >
               <span />
             </button>

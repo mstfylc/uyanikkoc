@@ -1,6 +1,7 @@
 import type {
   AppointmentDay,
   AppointmentRecord,
+  AppointmentMode,
   AppointmentSettingsRecord,
   AppointmentStatus,
 } from "@uyanik/database";
@@ -35,20 +36,40 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
+function buildSlotModes(
+  availability: Record<AppointmentDay, string[]>,
+  modes: AppointmentMode[],
+): Record<AppointmentDay, Record<string, AppointmentMode[]>> {
+  const out = {} as Record<AppointmentDay, Record<string, AppointmentMode[]>>;
+  for (const day of APPOINTMENT_DAYS) {
+    out[day] = {};
+    for (const slot of availability[day] ?? []) {
+      out[day][slot] = [...modes];
+    }
+  }
+  return out;
+}
+
 function defaultSettings(coachId: string): AppointmentSettingsRecord {
+  const availability: Record<AppointmentDay, string[]> = {
+    Pzt: ["16:00", "17:00", "18:00"],
+    Sal: ["17:00", "18:00", "19:00"],
+    Car: ["16:00", "17:00"],
+    Per: ["18:00", "19:00", "20:00"],
+    Cum: ["16:00", "17:00", "18:00"],
+    Cmt: ["10:00", "11:00", "13:00", "14:00"],
+  };
+  const modes: AppointmentMode[] = ["online", "in_person", "phone"];
   return {
     coachId,
     weeklyLimit: 2,
+    weeklyLimitStudent: 2,
+    weeklyLimitParent: 1,
     allowOnline: true,
     allowInPerson: true,
-    availability: {
-      Pzt: ["16:00", "17:00", "18:00"],
-      Sal: ["17:00", "18:00", "19:00"],
-      Car: ["16:00", "17:00"],
-      Per: ["18:00", "19:00", "20:00"],
-      Cum: ["16:00", "17:00", "18:00"],
-      Cmt: ["10:00", "11:00", "13:00", "14:00"],
-    },
+    allowPhone: true,
+    availability,
+    slotModes: buildSlotModes(availability, modes),
   };
 }
 

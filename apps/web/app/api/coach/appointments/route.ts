@@ -29,9 +29,13 @@ export const PATCH = withApiAuth(["coach"], async (req, { session }) => {
 
   const body = (await req.json()) as Partial<{
     weeklyLimit: number;
+    weeklyLimitStudent: number;
+    weeklyLimitParent: number;
     allowOnline: boolean;
     allowInPerson: boolean;
+    allowPhone: boolean;
     availability: Record<string, string[]>;
+    slotModes: Record<string, Record<string, ("online" | "in_person" | "phone")[]>>;
   }>;
 
   const settings = await updateCoachAppointmentSettings(coachId, body);

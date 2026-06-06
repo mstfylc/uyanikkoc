@@ -9,6 +9,8 @@ import {
   calculateCompletionRate,
   countOverdueAssignments,
   RISK_BAND_LABELS,
+  slotSupportsMode,
+  weeklyLimitFor,
 } from "@uyanik/shared";
 
 import * as memoryAppointments from "@/mocks/appointments";
@@ -45,19 +47,26 @@ export async function listStudentAppointments(studentId: string): Promise<Appoin
   return memoryAppointments.listAppointmentsForStudent(studentId);
 }
 
-export async function createStudentAppointment(input: {
-  coachId: string;
-  studentId: string;
-  studentName: string;
-  day: AppointmentRecord["day"];
-  slot: string;
-  mode: AppointmentRecord["mode"];
-  topic: string;
-}): Promise<AppointmentRecord> {
+export async function createStudentAppointment(
+  input: {
+    coachId: string;
+    studentId: string;
+    studentName: string;
+    day: AppointmentRecord["day"];
+    slot: string;
+    mode: AppointmentRecord["mode"];
+    topic: string;
+  },
+  role: "student" | "parent" = "student",
+): Promise<AppointmentRecord> {
   const settings = memoryAppointments.getAppointmentSettings(input.coachId);
   const activeCount = memoryAppointments.countActiveAppointmentsForStudent(input.studentId);
-  if (settings.weeklyLimit > 0 && activeCount >= settings.weeklyLimit) {
+  const limit = weeklyLimitFor(role, settings);
+  if (limit > 0 && activeCount >= limit) {
     throw new Error("Haftalik randevu limitine ulasildi.");
+  }
+  if (!slotSupportsMode(settings.slotModes, input.day, input.slot, input.mode)) {
+    throw new Error("Secilen slot bu gorunme tipini desteklemiyor.");
   }
 
   return memoryAppointments.createAppointment(input);

@@ -113,6 +113,16 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
                   Yuz yuze
                 </button>
               ) : null}
+              {settings.allowPhone ? (
+                <button
+                  type="button"
+                  className={mode === "phone" ? "on" : ""}
+                  onClick={() => setMode("phone")}
+                >
+                  <KiIcon name="ki-phone" size={15} />
+                  Telefon
+                </button>
+              ) : null}
             </div>
           </div>
           <div className="field">
