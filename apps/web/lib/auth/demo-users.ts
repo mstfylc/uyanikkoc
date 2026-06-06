@@ -3,6 +3,7 @@ import { hashSync } from "bcryptjs";
 
 export const DEMO_ORG_ID = "org_demo_001";
 export const DEMO_BRANCH_ID = "branch_demo_001";
+export const DEMO_COACH_ID = "coach_001";
 export const DEMO_PASSWORD = "uyanik123";
 
 /** Runtime hash — repodaki eski statik hash uyanik123 ile eşleşmiyordu (8cf8f9f regresyonu). */
@@ -46,7 +47,7 @@ export const demoUsers: DemoUser[] = [
     role: "COACH",
     organizationId: DEMO_ORG_ID,
     branchId: DEMO_BRANCH_ID,
-    coachId: "coach_001",
+    coachId: DEMO_COACH_ID,
   },
   {
     id: "user_parent_001",

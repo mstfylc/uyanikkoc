@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkAvatar } from "@/components/design/UkAvatar";
 import {
+  dashboardHref,
   findUkNavItem,
   getProfileHref,
   getUkGeneralNavItems,
@@ -50,6 +51,7 @@ export function Sidebar({ role }: SidebarProps) {
   const generalItems = getUkGeneralNavItems(role);
   const activeItem = findUkNavItem(role, pathname);
   const profileHref = getProfileHref(role);
+  const dash = dashboardHref(role);
 
   return (
     <aside className="sidebar theme-fade">
@@ -67,8 +69,7 @@ export function Sidebar({ role }: SidebarProps) {
         <div className="nav-label">Menu</div>
         {items.map((item) => {
           const active =
-            pathname === item.href ||
-            (item.href !== `/${role}/dashboard` && pathname.startsWith(`${item.href}/`));
+            pathname === item.href || (item.href !== dash && pathname.startsWith(`${item.href}/`));
 
           return (
             <Link key={item.href} href={item.href} className={`nav-item${active ? " active" : ""}`}>

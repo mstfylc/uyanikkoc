@@ -14,7 +14,7 @@ export function CoachFeedbackPanel() {
   const { snapshot, mutate, toast } = useAdminStore();
   if (!snapshot) return <div className="card card-pad muted">Yükleniyor…</div>;
 
-  const coachId = snapshot.activeOrgCoachId;
+  const coachId = snapshot.activeOrgCoachId || snapshot.myCoachId;
   const org = getActiveOrg(snapshot, snapshot.activeOrgId);
   const me = visibleOrgCoaches(snapshot, org).find((c) => c.id === coachId);
   const feedback = coachFeedback(snapshot, coachId);

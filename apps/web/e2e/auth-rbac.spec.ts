@@ -5,7 +5,7 @@ async function login(page: import("@playwright/test").Page, email: string) {
   await page.fill('[name="email"]', email);
   await page.fill('[name="password"]', "uyanik123");
   await page.click('[type="submit"]');
-  await page.waitForURL(/\/(coach|student|parent|branch|admin)\/dashboard/, { timeout: 45_000 });
+  await page.waitForURL(/\/(coach|student|parent|yonetim)\/dashboard/, { timeout: 45_000 });
 }
 
 test.describe("Auth ve RBAC iskeleti", () => {
@@ -29,17 +29,15 @@ test.describe("Auth ve RBAC iskeleti", () => {
     expect(page.url()).toContain("/student/dashboard");
   });
 
-  test("şube yöneticisi dashboard'a ulaşır", async ({ page }) => {
+  test("şube yöneticisi yonetim dashboard'a ulaşır", async ({ page }) => {
     await login(page, "branch@uyanik.local");
-    await expect(page).toHaveURL(/\/branch\/dashboard/);
-    await expect(page.getByTestId("branch-dashboard")).toBeVisible();
-    await expect(page.locator("h1")).toContainText("Şube Dashboard");
+    await expect(page).toHaveURL(/\/yonetim\/dashboard/);
+    await expect(page.getByRole("link", { name: "Koclar" })).toBeVisible();
   });
 
-  test("admin dashboard'a ulaşır", async ({ page }) => {
+  test("admin yonetim dashboard'a ulaşır", async ({ page }) => {
     await login(page, "admin@uyanik.local");
-    await expect(page).toHaveURL(/\/admin\/dashboard/);
-    await expect(page.getByTestId("admin-dashboard")).toBeVisible();
-    await expect(page.locator("h1")).toContainText("Admin Dashboard");
+    await expect(page).toHaveURL(/\/yonetim\/dashboard/);
+    await expect(page.getByText("Platform Genel Bakış")).toBeVisible();
   });
 });

@@ -83,6 +83,8 @@ function dashboardHref(role: AppRole): string {
   return `/${role}/dashboard`;
 }
 
+export { dashboardHref };
+
 export function getUkNavItems(role: AppRole): UkNavItem[] {
   switch (role) {
     case "student":
@@ -111,6 +113,9 @@ export function getUkGeneralNavItems(role: AppRole): UkNavItem[] {
 }
 
 export function getProfileHref(role: AppRole): string {
+  if (role === "admin" || role === "branch") {
+    return "/yonetim/profile";
+  }
   return `/${role}/profile`;
 }
 

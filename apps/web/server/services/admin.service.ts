@@ -6,6 +6,7 @@
 // `shouldUseDatabase()` dalına `adminRepository` çağrıları yerleştirilir.
 
 import { shouldUseDatabase } from "@/lib/data/env";
+import type { AdminSnapshotContext } from "@/lib/admin/snapshot-context";
 import * as memory from "@/mocks/admin";
 import type { AdminMutation, AdminSnapshot } from "@/lib/admin/types";
 
@@ -15,13 +16,16 @@ import type { AdminMutation, AdminSnapshot } from "@/lib/admin/types";
 //   return adminRepository;
 // }
 
-export async function getAdminSnapshot(): Promise<AdminSnapshot> {
-  // if (shouldUseDatabase()) return (await repo()).getSnapshot();
+export async function getAdminSnapshot(ctx: AdminSnapshotContext = {}): Promise<AdminSnapshot> {
+  // if (shouldUseDatabase()) return (await repo()).getSnapshot(ctx);
   void shouldUseDatabase;
-  return memory.getMockSnapshot();
+  return memory.getMockSnapshot(ctx);
 }
 
-export async function applyAdminMutation(m: AdminMutation): Promise<AdminSnapshot> {
+export async function applyAdminMutation(
+  m: AdminMutation,
+  ctx: AdminSnapshotContext = {},
+): Promise<AdminSnapshot> {
   // if (shouldUseDatabase()) { await (await repo()).apply(m); return (await repo()).getSnapshot(); }
   switch (m.kind) {
     case "renewOrg":
@@ -151,5 +155,5 @@ export async function applyAdminMutation(m: AdminMutation): Promise<AdminSnapsho
       void _exhaustive;
     }
   }
-  return memory.getMockSnapshot();
+  return memory.getMockSnapshot(ctx);
 }

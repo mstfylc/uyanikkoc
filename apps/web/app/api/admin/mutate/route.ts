@@ -3,6 +3,7 @@
 
 import { NextResponse } from "next/server";
 
+import { snapshotContextFromSession } from "@/lib/admin/snapshot-context";
 import { withApiAuth } from "@/lib/auth/api-guard";
 import { applyAdminMutation } from "@/server/services/admin.service";
 import type { AdminMutation } from "@/lib/admin/types";
@@ -36,6 +37,6 @@ export const POST = withApiAuth(["admin", "branch"], async (req, { session }) =>
     return NextResponse.json({ error: "forbidden mutation for branch role" }, { status: 403 });
   }
 
-  const snapshot = await applyAdminMutation(body);
+  const snapshot = await applyAdminMutation(body, snapshotContextFromSession(session.user));
   return NextResponse.json(snapshot, { status: 200 });
 });

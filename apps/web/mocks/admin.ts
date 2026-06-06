@@ -4,7 +4,9 @@
 // Prototip kaynağı: admin/admin-data.jsx (seedOrgs, seedCoaches, seedOrgInvoices, store + actions).
 
 import { modulesFromPlan, orgPlanById, coachPlanById } from "@/lib/admin/pricing";
+import { resolveActiveOrgId, resolveOrgCoachId, type AdminSnapshotContext } from "@/lib/admin/snapshot-context";
 import { orgCoaches, seedCoachFeedback } from "@/lib/admin/derive";
+import { DEMO_BRANCH_ID, DEMO_ORG_ID } from "@/lib/auth/demo-users";
 import type {
   AdminAccess,
   AdminSnapshot,
@@ -36,6 +38,34 @@ const NOW = Date.now();
 
 function seedOrgs(): Omit<Org, "managers">[] {
   return [
+    {
+      id: DEMO_ORG_ID,
+      name: "Uyanik Demo Kurum",
+      type: "kurum",
+      city: "Istanbul",
+      planId: "baslangic",
+      status: "active",
+      cycle: "monthly",
+      startedAt: NOW - 90 * DAY,
+      renewsAt: NOW + 275 * DAY,
+      feeMonthly: 4900,
+      seats: { used: 2, total: 50 },
+      coaches: { used: 1, total: 5 },
+      modules: modulesFromPlan(orgPlanById("baslangic").modules),
+      owner: { name: "Demo Yonetici", email: "branch@uyanik.local", phone: "0532 000 00 01" },
+      tone: "#6366f1",
+      branches: [
+        {
+          id: DEMO_BRANCH_ID,
+          name: "Demo Sube",
+          city: "Istanbul",
+          students: 2,
+          coaches: 1,
+          collect: 9800,
+          status: "active",
+        },
+      ],
+    },
     {
       id: "akademi-yildiz", name: "Kampüs Koç", type: "franchise", city: "İstanbul",
       planId: "franchise", status: "active", cycle: "annual",
@@ -213,38 +243,57 @@ function seedOrgInvoices(orgs: Org[]): OrgInvoice[] {
 const ACTIVE_ORG_ID = "akademi-yildiz";
 
 function seedTasks(orgs: Org[]): CoachTask[] {
-  const org = orgs.find((o) => o.id === ACTIVE_ORG_ID);
-  if (!org) return [];
-  const coaches = orgCoaches(org);
   const now = Date.now();
   const day = 86_400_000;
-  // İlk birkaç koça örnek görevler ata.
-  return [
-    {
-      id: "tsk-1001", orgId: org.id, coachId: coaches[0].id,
-      title: "Risk altındaki öğrencilerle birebir görüşme",
-      detail: "Son denemede neti düşen 3 öğrenciyle bu hafta birebir yapılacak.",
-      due: now + 4 * day, priority: "high", status: "open", createdAt: now - 2 * day,
-    },
-    {
-      id: "tsk-1002", orgId: org.id, coachId: coaches[0].id,
-      title: "Haftalık veli bilgilendirme mesajı",
-      detail: "Tüm velilere haftalık gelişim özetini gönder.",
-      due: now + 1 * day, priority: "med", status: "open", createdAt: now - 1 * day,
-    },
-    {
-      id: "tsk-1003", orgId: org.id, coachId: coaches[1].id,
-      title: "Deneme analizi raporlarını sisteme gir",
-      detail: "Son TYT denemesi optik sonuçları panele işlenecek.",
-      due: now - 1 * day, priority: "high", status: "open", createdAt: now - 5 * day,
-    },
-    {
-      id: "tsk-1004", orgId: org.id, coachId: coaches[2].id,
-      title: "Aylık çalışma programı güncellemesi",
-      detail: "Öğrencilerin yeni hedeflerine göre program revize edilecek.",
-      due: now + 6 * day, priority: "low", status: "done", createdAt: now - 8 * day,
-    },
-  ];
+  const out: CoachTask[] = [];
+
+  for (const orgId of [DEMO_ORG_ID, ACTIVE_ORG_ID]) {
+    const org = orgs.find((o) => o.id === orgId);
+    if (!org) continue;
+    const coaches = orgCoaches(org);
+    if (coaches.length === 0) continue;
+
+    out.push(
+      {
+        id: `tsk-${orgId}-1`,
+        orgId: org.id,
+        coachId: coaches[0].id,
+        title: "Risk altındaki öğrencilerle birebir görüşme",
+        detail: "Son denemede neti düşen öğrenciyle bu hafta birebir yapılacak.",
+        due: now + 4 * day,
+        priority: "high",
+        status: "open",
+        createdAt: now - 2 * day,
+      },
+      {
+        id: `tsk-${orgId}-2`,
+        orgId: org.id,
+        coachId: coaches[0].id,
+        title: "Haftalık veli bilgilendirme mesajı",
+        detail: "Velilere haftalık gelişim özetini gönder.",
+        due: now + 1 * day,
+        priority: "med",
+        status: "open",
+        createdAt: now - 1 * day,
+      },
+    );
+
+    if (coaches[1]) {
+      out.push({
+        id: `tsk-${orgId}-3`,
+        orgId: org.id,
+        coachId: coaches[1].id,
+        title: "Deneme analizi raporlarını sisteme gir",
+        detail: "Son deneme optik sonuçları panele işlenecek.",
+        due: now - 1 * day,
+        priority: "high",
+        status: "open",
+        createdAt: now - 5 * day,
+      });
+    }
+  }
+
+  return out;
 }
 
 function seedFeedback(orgs: Org[]): CoachFeedback[] {
@@ -270,25 +319,25 @@ function withManagers(orgs: Omit<Org, "managers">[]): Org[] {
         status: "active",
       },
     ];
+    if (o.id === ACTIVE_ORG_ID || o.id === DEMO_ORG_ID) {
+      managers.push({
+        id: o.id + "-mgr-2",
+        name: o.id === DEMO_ORG_ID ? "Demo Yonetici" : "Derya Soylu",
+        email: o.id === DEMO_ORG_ID ? "branch@uyanik.local" : "derya@kampuskoc.com",
+        role: "manager",
+        addedAt: NOW - 120 * DAY,
+        status: "active",
+      });
+    }
     if (o.id === ACTIVE_ORG_ID) {
-      managers.push(
-        {
-          id: o.id + "-mgr-2",
-          name: "Derya Soylu",
-          email: "derya@kampuskoc.com",
-          role: "manager",
-          addedAt: NOW - 120 * DAY,
-          status: "active",
-        },
-        {
-          id: o.id + "-mgr-3",
-          name: "Kerem Aksoy",
-          email: "kerem@kampuskoc.com",
-          role: "manager",
-          addedAt: NOW - 12 * DAY,
-          status: "invited",
-        },
-      );
+      managers.push({
+        id: o.id + "-mgr-3",
+        name: "Kerem Aksoy",
+        email: "kerem@kampuskoc.com",
+        role: "manager",
+        addedAt: NOW - 12 * DAY,
+        status: "invited",
+      });
     }
     return { ...o, managers } as Org;
   });
@@ -406,10 +455,11 @@ function store(): Store {
   return globalForAdmin.__ukAdminStore;
 }
 
-export function getMockSnapshot(): AdminSnapshot {
+export function getMockSnapshot(ctx: AdminSnapshotContext = {}): AdminSnapshot {
   const s = store();
-  const activeOrg = s.orgs.find((o) => o.id === ACTIVE_ORG_ID) ?? s.orgs[0];
-  const firstCoach = orgCoaches(activeOrg)[0];
+  const activeOrgId = resolveActiveOrgId(s.orgs, ctx);
+  const activeOrg = s.orgs.find((o) => o.id === activeOrgId) ?? s.orgs[0];
+  const activeOrgCoachId = resolveOrgCoachId(activeOrg, ctx.coachId, s.coaches);
   return {
     orgs: s.orgs,
     coaches: s.coaches,
@@ -424,9 +474,9 @@ export function getMockSnapshot(): AdminSnapshot {
     campaigns: s.campaigns,
     campaignGrants: s.campaignGrants,
     viewerAccess: "full",
-    activeOrgId: ACTIVE_ORG_ID,
-    myCoachId: "selin-yilmaz",
-    activeOrgCoachId: firstCoach ? firstCoach.id : "",
+    activeOrgId,
+    myCoachId: ctx.coachId ?? activeOrgCoachId,
+    activeOrgCoachId,
   };
 }
 

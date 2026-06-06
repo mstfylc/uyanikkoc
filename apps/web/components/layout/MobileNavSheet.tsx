@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { KiIcon } from "@/components/design/KiIcon";
-import { getUkGeneralNavItems, getUkNavItems } from "@/lib/navigation/uk-nav";
+import { dashboardHref, getUkGeneralNavItems, getUkNavItems } from "@/lib/navigation/uk-nav";
 
 type MobileNavSheetProps = {
   role: AppRole;
@@ -21,6 +21,7 @@ export function MobileNavSheet({ role, open, onClose }: MobileNavSheetProps) {
   }
 
   const items = [...getUkNavItems(role), ...getUkGeneralNavItems(role)];
+  const dash = dashboardHref(role);
 
   return (
     <>
@@ -51,8 +52,7 @@ export function MobileNavSheet({ role, open, onClose }: MobileNavSheetProps) {
       >
         {items.map((item) => {
           const active =
-            pathname === item.href ||
-            (item.href !== `/${role}/dashboard` && pathname.startsWith(`${item.href}/`));
+            pathname === item.href || (item.href !== dash && pathname.startsWith(`${item.href}/`));
 
           return (
             <Link
