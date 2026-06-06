@@ -8,11 +8,14 @@ import { UkSection } from "@/components/design/UkSection";
 import type { ParentReportRecord } from "@uyanik/database";
 import type { ReportDetail } from "@uyanik/shared";
 
+import { ParentReportDetailModal } from "./ParentReportDetailModal";
+
 type ParentReportView = ParentReportRecord & { detail: ReportDetail };
 
 export function ParentReportsPanel() {
   const [reports, setReports] = useState<ParentReportView[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selected, setSelected] = useState<ParentReportView | null>(null);
 
   const load = useCallback(async () => {
     const response = await fetch("/api/parent/reports", { credentials: "same-origin" });
@@ -42,7 +45,13 @@ export function ParentReportsPanel() {
             </p>
           ) : (
             reports.map((report) => (
-              <div key={report.id} className="lrow">
+              <button
+                key={report.id}
+                type="button"
+                className="lrow"
+                style={{ width: "100%", textAlign: "left", cursor: "pointer" }}
+                onClick={() => setSelected(report)}
+              >
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="lr-title">
                     {report.studentName} · {report.week}
@@ -54,11 +63,17 @@ export function ParentReportsPanel() {
                   </div>
                 </div>
                 <UkBadge tone="success">Onaylandi</UkBadge>
-              </div>
+              </button>
             ))
           )}
         </div>
       </UkSection>
+
+      <ParentReportDetailModal
+        open={Boolean(selected)}
+        report={selected}
+        onClose={() => setSelected(null)}
+      />
     </div>
   );
 }

@@ -8,7 +8,7 @@ describe("appointments helpers", () => {
   });
 
   it("slotSupportsMode", () => {
-    const avail = { Pzt: { "17:00": ["online", "phone"] as const } };
+    const avail = { Pzt: { "17:00": ["online", "phone"] as ("online" | "phone")[] } };
     expect(slotSupportsMode(avail, "Pzt", "17:00", "phone")).toBe(true);
     expect(slotSupportsMode(avail, "Pzt", "17:00", "in_person")).toBe(false);
   });

@@ -20,6 +20,7 @@
     "@uyanik/tokens": "workspace:*",
     "@uyanik/ui-web": "workspace:*",
     "bcryptjs": "^3.0.3",
+    "jose": "^5.9.6",
     "next": "^15.1.2",
     "next-auth": "5.0.0-beta.25",
     "react": "^19.0.0",
