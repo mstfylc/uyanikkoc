@@ -2,8 +2,9 @@
  * Gerçek uçlar apps/web'e eklendiğinde VITE_USE_MOCK=false ile devre dışı kalır.
  * KURAL: mock yalnızca bu klasörde. */
 import { ApiError } from "../lib/api-error";
-import type { AuthResponse, MeResponse, OtpRequestResponse, TokenPair } from "../lib/api-types";
-import { STUDENT } from "./student";
+import type { AuthResponse, ExamsResponse, MeResponse, OdevResponse, OtpRequestResponse, ScheduleResponse, TokenPair } from "../lib/api-types";
+import type { OdevResult } from "../types";
+import { DAYS, DAYS_FULL, EXAM_TREND, EXAMS, ODEVLER, SCHEDULE, STUDENT, TODAY, UPCOMING, WEEKS } from "./student";
 
 export interface MockRequest {
   method: string;
@@ -77,6 +78,25 @@ export function mockApi<T>(path: string, req: MockRequest): Promise<T> {
       };
       return delay(me) as Promise<T>;
     }
+
+    case "GET /api/mobile/odev":
+      return delay({ weeks: WEEKS, items: ODEVLER } as OdevResponse) as Promise<T>;
+
+    case "POST /api/mobile/odev/result": {
+      const id = String(body.id ?? "");
+      const item = ODEVLER.find((o) => o.id === id);
+      if (!item) throw new ApiError(404, "Ödev bulunamadı", "not_found");
+      const raw = body.result;
+      item.status = "done";
+      item.result = raw && typeof raw === "object" ? (raw as OdevResult) : null;
+      return delay({ item } as unknown as T);
+    }
+
+    case "GET /api/mobile/exams":
+      return delay({ exams: EXAMS, trend: EXAM_TREND, upcoming: UPCOMING } as ExamsResponse) as Promise<T>;
+
+    case "GET /api/mobile/schedule":
+      return delay({ days: DAYS, daysFull: DAYS_FULL, today: TODAY, schedule: SCHEDULE } as ScheduleResponse) as Promise<T>;
 
     case "POST /api/devices":
     case "DELETE /api/devices":

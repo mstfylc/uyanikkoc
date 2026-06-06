@@ -1,13 +1,21 @@
 /* DENEMELER — net trendi, geçmiş liste, detay/analiz. */
 import { useState } from "react";
 import { MIcon } from "../ui/MIcon";
-import { EXAMS, EXAM_TREND } from "../mocks/student";
+import { useApiData } from "../lib/useApiData";
+import { Loading, ErrorState } from "../ui/AsyncState";
+import type { ExamsResponse } from "../lib/api-types";
 import type { Exam } from "../types";
 
 export function DenemelerScreen() {
   const [sel, setSel] = useState<Exam | null>(null);
-  const latest = EXAMS[0];
-  const maxTrend = Math.max(...EXAM_TREND.map((d) => d.v));
+  const { data, loading, error, reload } = useApiData<ExamsResponse>("/api/mobile/exams");
+
+  if (loading) return <Loading />;
+  if (error || !data) return <ErrorState message={error ?? "Veri yüklenemedi"} reload={reload} />;
+
+  const { exams, trend } = data;
+  const latest = exams[0];
+  const maxTrend = Math.max(...trend.map((d) => d.v));
 
   if (sel) return <ExamDetail exam={sel} onBack={() => setSel(null)} />;
 
@@ -16,7 +24,7 @@ export function DenemelerScreen() {
       <div className="uk-safe-top" />
       <div className="uk-ptitle">
         <h1>Denemeler</h1>
-        <p>{EXAMS.length} deneme · ortalama yükseliyor</p>
+        <p>{exams.length} deneme · ortalama yükseliyor</p>
       </div>
 
       {/* Net trendi */}
@@ -37,8 +45,8 @@ export function DenemelerScreen() {
             <span className="uk-badge muted">Son 6</span>
           </div>
           <div className="uk-chart">
-            {EXAM_TREND.map((d, i) => (
-              <div key={i} className={`col${i === EXAM_TREND.length - 1 ? " peak" : ""}`}>
+            {trend.map((d, i) => (
+              <div key={i} className={`col${i === trend.length - 1 ? " peak" : ""}`}>
                 <span className="vv tnum">{d.v}</span>
                 <div className="track">
                   <div className="fill" style={{ height: (d.v / maxTrend) * 100 + "%" }} />
@@ -55,7 +63,7 @@ export function DenemelerScreen() {
         <div className="uk-sec-head">
           <h2>Geçmiş denemeler</h2>
         </div>
-        {EXAMS.map((e) => {
+        {exams.map((e) => {
           const up = !e.delta.startsWith("-");
           return (
             <button key={e.id} className="uk-exam" onClick={() => setSel(e)} style={{ width: "100%", textAlign: "left" }}>

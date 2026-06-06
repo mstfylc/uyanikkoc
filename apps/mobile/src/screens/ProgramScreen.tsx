@@ -1,12 +1,25 @@
 /* PROGRAM — gün segmenti, çalışma blokları. */
 import { useState } from "react";
 import { MIcon } from "../ui/MIcon";
-import { DAYS, DAYS_FULL, SCHEDULE, SUBJECT_COLORS, TODAY } from "../mocks/student";
+import { useApiData } from "../lib/useApiData";
+import { Loading, ErrorState } from "../ui/AsyncState";
+import { SUBJECT_COLORS } from "../mocks/student";
+import type { ScheduleResponse } from "../lib/api-types";
 
 export function ProgramScreen() {
-  const [day, setDay] = useState(TODAY);
-  const blocks = SCHEDULE[day] || [];
-  const todayIdx = DAYS.indexOf(TODAY);
+  const { data, loading, error, reload } = useApiData<ScheduleResponse>("/api/mobile/schedule");
+
+  if (loading) return <Loading />;
+  if (error || !data) return <ErrorState message={error ?? "Veri yüklenemedi"} reload={reload} />;
+
+  return <ProgramView data={data} />;
+}
+
+function ProgramView({ data }: { data: ScheduleResponse }) {
+  const { days, daysFull, today, schedule } = data;
+  const [day, setDay] = useState(today);
+  const blocks = schedule[day] || [];
+  const todayIdx = days.indexOf(today);
 
   return (
     <div className="uk-scroll">
@@ -14,12 +27,12 @@ export function ProgramScreen() {
       <div className="uk-ptitle">
         <h1>Program</h1>
         <p>
-          {DAYS_FULL[day]} · {blocks.length} çalışma bloğu
+          {daysFull[day]} · {blocks.length} çalışma bloğu
         </p>
       </div>
 
       <div className="uk-segrow">
-        {DAYS.map((d, i) => (
+        {days.map((d, i) => (
           <button key={d} className={`uk-seg${day === d ? " on" : ""}`} onClick={() => setDay(d)} style={{ flexDirection: "column", height: 52, padding: "0 14px", gap: 2 }}>
             <span style={{ fontSize: 12, opacity: 0.85 }}>{d}</span>
             {i === todayIdx ? <span style={{ fontSize: 9.5, fontWeight: 800 }}>BUGÜN</span> : null}

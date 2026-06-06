@@ -1,16 +1,24 @@
 /* ÖDEVLER — hafta segmenti, bekleyen/tamamlanan listeleri. */
 import { useState } from "react";
 import { OdevCard } from "./OdevCard";
-import { ODEVLER, WEEKS } from "../mocks/student";
+import { useApiData } from "../lib/useApiData";
+import { Loading, ErrorState } from "../ui/AsyncState";
+import type { OdevResponse } from "../lib/api-types";
 import type { Odev } from "../types";
 
-export function OdevlerScreen({ openResult }: { openResult: (o: Odev) => void }) {
+export function OdevlerScreen({ openResult, rev = 0 }: { openResult: (o: Odev) => void; rev?: number }) {
   const [week, setWeek] = useState("w0");
-  const wk = ODEVLER.filter((o) => o.week === week);
+  const { data, loading, error, reload } = useApiData<OdevResponse>("/api/mobile/odev", rev);
+
+  if (loading) return <Loading />;
+  if (error || !data) return <ErrorState message={error ?? "Veri yüklenemedi"} reload={reload} />;
+
+  const { items, weeks } = data;
+  const wk = items.filter((o) => o.week === week);
   const pending = wk.filter((o) => o.status !== "done");
   const doneList = wk.filter((o) => o.status === "done");
-  const weekHasData = (w: string) => ODEVLER.some((o) => o.week === w);
-  const winfo = WEEKS.find((w) => w.id === week);
+  const weekHasData = (w: string) => items.some((o) => o.week === w);
+  const winfo = weeks.find((w) => w.id === week);
 
   return (
     <div className="uk-scroll">
@@ -23,7 +31,7 @@ export function OdevlerScreen({ openResult }: { openResult: (o: Odev) => void })
       </div>
 
       <div className="uk-segrow">
-        {WEEKS.map((w) => (
+        {weeks.map((w) => (
           <button key={w.id} className={`uk-seg${week === w.id ? " on" : ""}`} disabled={!weekHasData(w.id)} onClick={() => setWeek(w.id)}>
             {w.label}
           </button>

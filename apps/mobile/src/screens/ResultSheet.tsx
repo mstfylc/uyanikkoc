@@ -1,6 +1,7 @@
 /* Sonuç giriş — bottom sheet (Doğru / Yanlış / Boş → net). */
 import { useState } from "react";
 import { MIcon } from "../ui/MIcon";
+import { api } from "../lib/apiClient";
 import { netOf } from "../lib/net";
 import { ODEV_TYPES, SUBJECT_COLORS } from "../mocks/student";
 import type { Odev } from "../types";
@@ -10,11 +11,12 @@ function toNum(x: string): number {
   return isNaN(n) ? 0 : n;
 }
 
-export function ResultSheet({ odev, onClose }: { odev: Odev; onClose: () => void }) {
+export function ResultSheet({ odev, onClose, onSaved }: { odev: Odev; onClose: () => void; onSaved?: () => void }) {
   const [d, setD] = useState("");
   const [y, setY] = useState("");
   const [b, setB] = useState("");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const typeList = odev.types.length ? odev.types : (["soru"] as const);
   const needs = typeList.some((k) => ODEV_TYPES[k]?.needsResult);
@@ -24,9 +26,18 @@ export function ResultSheet({ odev, onClose }: { odev: Odev; onClose: () => void
   const net = netOf(td, ty);
   const valid = !needs || td + ty + toNum(b) > 0;
 
-  const save = () => {
-    setSaved(true);
-    setTimeout(onClose, 950);
+  const save = async () => {
+    if (saving) return;
+    setSaving(true);
+    const result = needs ? { d: td, y: ty, b: toNum(b) } : null;
+    try {
+      await api<{ item: Odev }>("/api/mobile/odev/result", { method: "POST", body: { id: odev.id, result } });
+      setSaved(true);
+      onSaved?.();
+      setTimeout(onClose, 950);
+    } catch {
+      setSaving(false);
+    }
   };
 
   return (
@@ -86,7 +97,7 @@ export function ResultSheet({ odev, onClose }: { odev: Odev; onClose: () => void
           </div>
         )}
 
-        <button className="uk-btn uk-btn-primary uk-btn-block" style={{ marginTop: 20, background: saved ? "var(--success)" : undefined }} disabled={!valid} onClick={save}>
+        <button className="uk-btn uk-btn-primary uk-btn-block" style={{ marginTop: 20, background: saved ? "var(--success)" : undefined }} disabled={!valid || saving} onClick={save}>
           <MIcon name={saved ? "check" : "checkCircle"} size={18} /> {saved ? "Kaydedildi!" : needs ? "Sonucu Kaydet" : "Tamamlandı olarak işaretle"}
         </button>
         <button className="uk-btn uk-btn-light uk-btn-block" style={{ marginTop: 10, height: 46, boxShadow: "none" }} onClick={onClose}>

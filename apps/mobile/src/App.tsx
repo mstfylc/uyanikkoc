@@ -10,14 +10,14 @@ import { ProgramScreen } from "./screens/ProgramScreen";
 import { ProfilScreen } from "./screens/ProfilScreen";
 import { ResultSheet } from "./screens/ResultSheet";
 import { Splash } from "./ui/Splash";
-import { ODEVLER } from "./mocks/student";
 import type { Odev, TabId, ThemeMode } from "./types";
 
 export function App() {
-  const { status } = useSession();
+  const { status, me } = useSession();
   const [tab, setTab] = useState<TabId>("home");
   const [result, setResult] = useState<Odev | null>(null);
   const [theme, setTheme] = useState<ThemeMode>("light");
+  const [odevRev, setOdevRev] = useState(0);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const go = (t: TabId) => {
@@ -25,7 +25,7 @@ export function App() {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   };
 
-  const pendingCount = ODEVLER.filter((o) => o.week === "w0" && o.status !== "done").length;
+  const pendingCount = me?.counts.pendingOdev ?? 0;
 
   if (status === "loading") {
     return (
@@ -48,13 +48,13 @@ export function App() {
       <div className="uk-screen" data-screen-label={tab}>
         <div ref={scrollRef} style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }} key={tab}>
           {tab === "home" && <HomeScreen go={go} openResult={setResult} />}
-          {tab === "odevler" && <OdevlerScreen openResult={setResult} />}
+          {tab === "odevler" && <OdevlerScreen openResult={setResult} rev={odevRev} />}
           {tab === "denemeler" && <DenemelerScreen />}
           {tab === "program" && <ProgramScreen />}
           {tab === "profil" && <ProfilScreen theme={theme} setTheme={setTheme} />}
         </div>
         <TabBar active={tab} go={go} pendingCount={pendingCount} />
-        {result && <ResultSheet odev={result} onClose={() => setResult(null)} />}
+        {result && <ResultSheet odev={result} onClose={() => setResult(null)} onSaved={() => setOdevRev((r) => r + 1)} />}
       </div>
     </div>
   );
