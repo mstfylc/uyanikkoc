@@ -7,12 +7,12 @@ import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { parseCsvExamImport } from "@/lib/coach/exam-import";
 import {
-  CAT_ORDER,
+  getPreviewCellValue,
   mapDenemeXlsxToImportFormat,
   parseDenemeXlsx,
   type DenemeXlsxResult,
 } from "@/lib/coach/exam-xlsx-import";
-import type { CoachRosterEntry } from "@uyanik/database";
+import type { CoachRosterEntry, ResultExamType } from "@uyanik/database";
 
 type CoachExamImportModalProps = {
   open: boolean;
@@ -28,6 +28,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
   const [stage, setStage] = useState<ImportStage>("idle");
   const [parsed, setParsed] = useState<DenemeXlsxResult | null>(null);
   const [examName, setExamName] = useState("");
+  const [examType, setExamType] = useState<"TYT" | "AYT" | "LGS">("TYT");
   const [csvText, setCsvText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +43,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
       setStage("idle");
       setParsed(null);
       setExamName("");
+      setExamType("TYT");
       setCsvText("");
       setError(null);
     }
@@ -57,12 +59,13 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
 
     try {
       const buffer = await file.arrayBuffer();
-      const result = await parseDenemeXlsx(buffer);
+      const result = await parseDenemeXlsx(buffer, file.name);
       if (result.students.length === 0) {
         throw new Error("Dosyada ogrenci satiri bulunamadi.");
       }
       setParsed(result);
-      setExamName(file.name.replace(/\.xlsx?$/i, "").replace(/[_(].*$/, "").trim() || "TYT Denemesi");
+      setExamName(result.name);
+      setExamType(result.examType);
       setStage("preview");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Dosya okunamadi.");
@@ -102,6 +105,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
 
     const exams = mapDenemeXlsxToImportFormat(parsed, roster, {
       label: examName || parsed.name,
+      examType,
     });
 
     if (exams.length === 0) {
@@ -202,10 +206,25 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
                   onChange={(event) => setExamName(event.target.value)}
                 />
               </div>
+              <div className="field">
+                <label className="label">Sinav turu</label>
+                <div className="seg" style={{ width: "fit-content" }}>
+                  {(["TYT", "AYT", "LGS"] as ResultExamType[]).map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      className={examType === type ? "on" : ""}
+                      onClick={() => setExamType(type)}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
                 <UkBadge tone="success">{parsed.students.length} ogrenci okundu</UkBadge>
                 <UkBadge tone="muted">{parsed.subjects.length} ders</UkBadge>
-                <UkBadge tone="primary">Ort. {avg} net</UkBadge>
+                <UkBadge tone="primary">{parsed.examType} · Ort. {avg} net</UkBadge>
               </div>
               <div className="card" style={{ overflow: "hidden" }}>
                 <div className="card-body" style={{ padding: 0, maxHeight: 280, overflowY: "auto" }}>
@@ -215,9 +234,9 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
                         <th>#</th>
                         <th>Ad Soyad</th>
                         <th>Sube</th>
-                        {CAT_ORDER.map((category) => (
-                          <th key={category} style={{ textAlign: "center" }}>
-                            {category}
+                        {parsed.previewColumns.map((column) => (
+                          <th key={column} style={{ textAlign: "center" }}>
+                            {column}
                           </th>
                         ))}
                         <th style={{ textAlign: "right" }}>Net</th>
@@ -237,10 +256,12 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
                               {student.sube}
                             </span>
                           </td>
-                          {CAT_ORDER.map((category) => (
-                            <td key={category} style={{ textAlign: "center" }}>
+                          {parsed.previewColumns.map((column) => (
+                            <td key={column} style={{ textAlign: "center" }}>
                               <span className="tnum" style={{ fontSize: 12 }}>
-                                {(student.byCat[category]?.n ?? 0).toFixed(2).replace(/\.00$/, "")}
+                                {getPreviewCellValue(student, column, parsed.examType)
+                                  .toFixed(2)
+                                  .replace(/\.00$/, "")}
                               </span>
                             </td>
                           ))}
