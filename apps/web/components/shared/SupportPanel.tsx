@@ -55,7 +55,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        subject: SUPPORT_CATEGORIES[category],
+        category,
         message: message.trim(),
       }),
     });
@@ -199,14 +199,23 @@ export function SupportPanel({ role }: SupportPanelProps) {
                   <KiIcon name="ki-message-text" />
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="lr-title">{ticket.subject}</div>
+                  <div className="lr-title">{SUPPORT_CATEGORIES[ticket.category]}</div>
                   <div className="lr-meta">
                     <span className="d">{ticket.message}</span>
+                    {ticket.reply ? <span className="d">Yanit: {ticket.reply}</span> : null}
                     <span className="d">{new Date(ticket.createdAt).toLocaleDateString("tr-TR")}</span>
                   </div>
                 </div>
-                <UkBadge tone={ticket.status === "open" ? "warning" : "success"}>
-                  {ticket.status === "open" ? "Acik" : "Kapali"}
+                <UkBadge
+                  tone={
+                    ticket.status === "open"
+                      ? "warning"
+                      : ticket.status === "answered"
+                        ? "info"
+                        : "success"
+                  }
+                >
+                  {ticket.status === "open" ? "Acik" : ticket.status === "answered" ? "Yanitlandi" : "Kapali"}
                 </UkBadge>
               </div>
             ))

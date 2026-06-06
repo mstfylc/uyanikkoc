@@ -297,14 +297,87 @@ export type CurriculumRecord = {
   subjects: Record<string, CurriculumTopicGroup[]>;
 };
 
+export type SupportCategory = "teknik" | "oneri" | "hesap" | "diger";
+export type SupportStatus = "open" | "answered" | "closed";
+
 export type SupportTicketRecord = {
   id: string;
   userId: string;
   role: string;
-  subject: string;
+  category: SupportCategory;
   message: string;
-  status: "open" | "closed";
+  status: SupportStatus;
+  reply: string | null;
   createdAt: string;
+};
+
+export type CreateSupportTicketInput = {
+  userId: string;
+  role: string;
+  category: SupportCategory;
+  message: string;
+};
+
+export type CoachRatingRecord = {
+  id: string;
+  studentId: string;
+  coachId: string;
+  stars: number;
+  comment: string | null;
+  createdAt: string;
+};
+
+export type CoachRatingSummary = {
+  average: number;
+  count: number;
+  ratings: (CoachRatingRecord & { studentName?: string })[];
+};
+
+export type UpsertRatingInput = {
+  studentId: string;
+  coachId: string;
+  stars: number;
+  comment?: string | null;
+};
+
+export type OnlineExamRecord = {
+  id: string;
+  title: string;
+  publisher: string;
+  examType: "TYT" | "AYT" | "LGS";
+  questionCount: number;
+  cargoStatus: string;
+  branchId: string;
+  createdAt: string;
+  submission?: OptikSubmissionRecord | null;
+};
+
+export type OptikSubmissionRecord = {
+  id: string;
+  examId: string;
+  studentId: string;
+  answers: string[];
+  correct: number;
+  wrong: number;
+  blank: number;
+  net: number;
+  createdAt: string;
+};
+
+export type CreateOnlineExamInput = {
+  title: string;
+  publisher: string;
+  examType: "TYT" | "AYT" | "LGS";
+  questionCount: number;
+  answerKey: string[];
+  branchId: string;
+  cargoStatus?: string;
+};
+
+export type SubmitOptikInput = {
+  examId: string;
+  studentId: string;
+  answers: (string | null)[];
 };
 
 export type CoachReportStudentRow = {

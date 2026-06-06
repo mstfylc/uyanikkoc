@@ -14,6 +14,9 @@ export * as templateRepository from "./repositories/templates";
 export * as studentRepository from "./repositories/students";
 export * as rosterRepository from "./repositories/roster";
 export * as billingRepository from "./repositories/billing";
+export * as supportRepository from "./repositories/support";
+export * as ratingRepository from "./repositories/ratings";
+export * as onlineExamRepository from "./repositories/online-exam";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
@@ -58,6 +61,16 @@ export type {
   CurriculumRecord,
   CurriculumTopicGroup,
   SupportTicketRecord,
+  SupportCategory,
+  SupportStatus,
+  CreateSupportTicketInput,
+  CoachRatingRecord,
+  CoachRatingSummary,
+  UpsertRatingInput,
+  OnlineExamRecord,
+  OptikSubmissionRecord,
+  CreateOnlineExamInput,
+  SubmitOptikInput,
   CoachReportSummary,
   CoachReportStudentRow,
   ParentReportRecord,

@@ -1,4 +1,4 @@
-import type { SupportTicketRecord } from "@uyanik/database";
+import type { CreateSupportTicketInput, SupportTicketRecord } from "@uyanik/database";
 
 const globalStore = globalThis as typeof globalThis & {
   __uyanikSupportTickets?: SupportTicketRecord[];
@@ -6,29 +6,28 @@ const globalStore = globalThis as typeof globalThis & {
 
 const tickets = globalStore.__uyanikSupportTickets ?? (globalStore.__uyanikSupportTickets = []);
 
-function nowIso(): string {
-  return new Date().toISOString();
+export async function listTicketsForUser(userId: string): Promise<SupportTicketRecord[]> {
+  return tickets.filter((t) => t.userId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function listSupportTickets(userId: string): SupportTicketRecord[] {
-  return tickets.filter((item) => item.userId === userId);
-}
-
-export function createSupportTicket(input: {
-  userId: string;
-  role: string;
-  subject: string;
-  message: string;
-}): SupportTicketRecord {
-  const record: SupportTicketRecord = {
-    id: `support_${Date.now()}`,
+export async function createTicket(input: CreateSupportTicketInput): Promise<SupportTicketRecord> {
+  const rec: SupportTicketRecord = {
+    id: `DST-${Math.floor(2100 + Math.random() * 800)}`,
     userId: input.userId,
     role: input.role,
-    subject: input.subject.trim(),
-    message: input.message.trim(),
+    category: input.category,
+    message: input.message,
     status: "open",
-    createdAt: nowIso(),
+    reply: null,
+    createdAt: new Date().toISOString(),
   };
-  tickets.unshift(record);
-  return record;
+  tickets.unshift(rec);
+  return rec;
+}
+
+export async function closeTicket(userId: string, ticketId: string): Promise<SupportTicketRecord | null> {
+  const t = tickets.find((x) => x.id === ticketId && x.userId === userId);
+  if (!t) return null;
+  t.status = "closed";
+  return t;
 }

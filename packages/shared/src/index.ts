@@ -112,3 +112,5 @@ export {
   planPrice,
 } from "./billing";
 export type { BillingCycle, InstallmentOption, PlanPricing } from "./billing";
+export { gradeOptik, optikNetCoef } from "./optik";
+export type { OptikExamType, OptikResult } from "./optik";

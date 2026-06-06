@@ -1,16 +1,24 @@
-import type { SupportTicketRecord } from "@uyanik/database";
+import type { CreateSupportTicketInput, SupportTicketRecord } from "@uyanik/database";
 
+import { shouldUseDatabase } from "@/lib/data/env";
 import * as memorySupport from "@/mocks/support";
 
-export async function listUserSupportTickets(userId: string): Promise<SupportTicketRecord[]> {
-  return memorySupport.listSupportTickets(userId);
+async function repo() {
+  const { supportRepository } = await import("@uyanik/database");
+  return supportRepository;
 }
 
-export async function createUserSupportTicket(input: {
-  userId: string;
-  role: string;
-  subject: string;
-  message: string;
-}): Promise<SupportTicketRecord> {
-  return memorySupport.createSupportTicket(input);
+export async function listMyTickets(userId: string): Promise<SupportTicketRecord[]> {
+  if (shouldUseDatabase()) return (await repo()).listTicketsForUser(userId);
+  return memorySupport.listTicketsForUser(userId);
+}
+
+export async function createTicket(input: CreateSupportTicketInput): Promise<SupportTicketRecord> {
+  if (shouldUseDatabase()) return (await repo()).createTicket(input);
+  return memorySupport.createTicket(input);
+}
+
+export async function closeTicket(userId: string, ticketId: string): Promise<SupportTicketRecord | null> {
+  if (shouldUseDatabase()) return (await repo()).closeTicket(userId, ticketId);
+  return memorySupport.closeTicket(userId, ticketId);
 }
