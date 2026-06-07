@@ -74,4 +74,13 @@ export const demoUsers: DemoUser[] = [
     organizationId: DEMO_ORG_ID,
     branchId: DEMO_BRANCH_ID,
   },
+  /** Super Admin alias — ayni ORG_ADMIN oturumu (platform yonetimi). */
+  {
+    id: "user_superadmin_001",
+    email: "superadmin@uyanik.local",
+    passwordHash: DEMO_PASSWORD_HASH,
+    role: "ORG_ADMIN",
+    organizationId: DEMO_ORG_ID,
+    branchId: DEMO_BRANCH_ID,
+  },
 ];

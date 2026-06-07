@@ -70,6 +70,12 @@ describe("RBAC path erişim kontrolü", () => {
     expect(result).toBe("/coach/dashboard");
   });
 
+  it("kurum rolu super admin sayfasina yonlenince uyarir", () => {
+    const session = { user: { id: "1", role: "branch" as const } };
+    const result = getUnauthorizedRedirect("/yonetim/orgs", session);
+    expect(result).toBe("/yonetim/dashboard?need=superadmin");
+  });
+
   it("ROLE_HOME_PATH tüm roller için tanımlı", () => {
     expect(ROLE_HOME_PATH.student).toBe("/student/dashboard");
     expect(ROLE_HOME_PATH.coach).toBe("/coach/dashboard");

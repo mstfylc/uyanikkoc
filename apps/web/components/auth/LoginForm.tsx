@@ -3,26 +3,66 @@
 import { KiIcon } from "@/components/design/KiIcon";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
-type DemoRole = "student" | "coach" | "parent";
+type DemoRole = "student" | "coach" | "parent" | "admin" | "branch";
 
-const DEMO_BY_ROLE: Record<DemoRole, { email: string; password: string }> = {
-  student: { email: "student@uyanik.local", password: "uyanik123" },
-  coach: { email: "coach@uyanik.local", password: "uyanik123" },
-  parent: { email: "parent@uyanik.local", password: "uyanik123" },
+const DEMO_BY_ROLE: Record<DemoRole, { email: string; password: string; label: string }> = {
+  student: { email: "student@uyanik.local", password: "uyanik123", label: "Ogrenci" },
+  coach: { email: "coach@uyanik.local", password: "uyanik123", label: "Koc" },
+  parent: { email: "parent@uyanik.local", password: "uyanik123", label: "Veli" },
+  admin: { email: "admin@uyanik.local", password: "uyanik123", label: "Super Admin" },
+  branch: { email: "branch@uyanik.local", password: "uyanik123", label: "Kurum" },
 };
+
+const DEMO_ROLE_ICON: Record<DemoRole, string> = {
+  student: "ki-book",
+  coach: "ki-people",
+  parent: "ki-heart",
+  admin: "ki-shield-tick",
+  branch: "ki-office-bag",
+};
+
+const ADMIN_ONLY_YONETIM = ["/yonetim/orgs", "/yonetim/licenses", "/yonetim/campaigns", "/yonetim/modules", "/yonetim/support"];
+const BRANCH_ONLY_YONETIM = ["/yonetim/branches", "/yonetim/license", "/yonetim/managers", "/yonetim/students", "/yonetim/reports", "/yonetim/settings"];
+
+function yonetimDemoRole(nextPath: string, roleParam: string | null): DemoRole | null {
+  if (roleParam === "admin" || roleParam === "branch") {
+    return roleParam;
+  }
+  if (!nextPath.startsWith("/yonetim")) {
+    return null;
+  }
+  if (ADMIN_ONLY_YONETIM.some((p) => nextPath === p || nextPath.startsWith(`${p}/`))) {
+    return "admin";
+  }
+  if (BRANCH_ONLY_YONETIM.some((p) => nextPath === p || nextPath.startsWith(`${p}/`))) {
+    return "branch";
+  }
+  return "admin";
+}
 
 export function LoginForm() {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") ?? "/post-login";
+  const roleParam = searchParams.get("role");
 
-  const [demoRole, setDemoRole] = useState<DemoRole>("student");
+  const [demoRole, setDemoRole] = useState<DemoRole>(() => yonetimDemoRole(nextPath, roleParam) ?? "student");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const role = yonetimDemoRole(nextPath, roleParam);
+    if (!role) {
+      return;
+    }
+    setDemoRole(role);
+    setEmail(DEMO_BY_ROLE[role].email);
+    setPassword(DEMO_BY_ROLE[role].password);
+  }, [nextPath, roleParam]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -110,17 +150,22 @@ export function LoginForm() {
             </p>
           </div>
 
-          <div className="seg" style={{ width: "100%", marginBottom: 18 }}>
-            {(["student", "coach", "parent"] as DemoRole[]).map((role) => (
+          <div className="seg" style={{ width: "100%", marginBottom: 18, flexWrap: "wrap" }}>
+            {(["student", "coach", "parent", "admin", "branch"] as DemoRole[]).map((role) => (
               <button
                 key={role}
                 type="button"
                 className={demoRole === role ? "on" : ""}
-                style={{ flex: 1, justifyContent: "center" }}
-                onClick={() => setDemoRole(role)}
+                style={{ flex: "1 1 auto", minWidth: 88, justifyContent: "center" }}
+                onClick={() => {
+                  setDemoRole(role);
+                  const demo = DEMO_BY_ROLE[role];
+                  setEmail(demo.email);
+                  setPassword(demo.password);
+                }}
               >
-                <KiIcon name={role === "student" ? "ki-book" : role === "coach" ? "ki-people" : "ki-heart"} />
-                {role === "student" ? "Ogrenci" : role === "coach" ? "Koc" : "Veli"}
+                <KiIcon name={DEMO_ROLE_ICON[role]} />
+                {DEMO_BY_ROLE[role].label}
               </button>
             ))}
           </div>

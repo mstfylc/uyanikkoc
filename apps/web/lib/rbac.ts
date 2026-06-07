@@ -168,6 +168,20 @@ export function getUnauthorizedRedirect(
 
   const role = resolveSessionRole(session);
   if (!role || !canAccessPath(role, pathname)) {
+    if (
+      role === "branch" &&
+      pathname.startsWith("/yonetim") &&
+      YONETIM_ADMIN_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
+    ) {
+      return "/yonetim/dashboard?need=superadmin";
+    }
+    if (
+      role === "admin" &&
+      pathname.startsWith("/yonetim") &&
+      YONETIM_BRANCH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
+    ) {
+      return "/yonetim/dashboard?need=branch";
+    }
     return role ? ROLE_HOME_PATH[role] : `/login?next=${encodeURIComponent(pathname)}`;
   }
 
