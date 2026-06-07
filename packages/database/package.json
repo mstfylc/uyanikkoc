@@ -9,7 +9,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint src prisma/seed.ts --max-warnings 0",
-    "generate": "prisma generate",
+    "generate": "pnpm exec prisma generate --schema=./prisma/schema.prisma",
     "migrate": "prisma migrate deploy",
     "migrate:dev": "prisma migrate dev",
     "studio": "prisma studio",
@@ -19,12 +19,12 @@
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",
-    "@uyanik/shared": "workspace:*"
+    "@uyanik/shared": "workspace:*",
+    "prisma": "^6.4.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "bcryptjs": "^3.0.3",
-    "prisma": "^6.4.1",
     "tsx": "^4.19.3"
   },
   "prisma": {

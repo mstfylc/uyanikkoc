@@ -151,6 +151,9 @@ importers:
       '@uyanik/shared':
         specifier: workspace:*
         version: link:../shared
+      prisma:
+        specifier: ^6.4.1
+        version: 6.19.3(typescript@5.9.3)
     devDependencies:
       '@types/node':
         specifier: ^22.10.2
@@ -158,9 +161,6 @@ importers:
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
-      prisma:
-        specifier: ^6.4.1
-        version: 6.19.3(typescript@5.9.3)
       tsx:
         specifier: ^4.19.3
         version: 4.22.4
