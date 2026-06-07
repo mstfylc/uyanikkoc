@@ -115,6 +115,7 @@ model StudentProfile {
   denemeRegistrations DenemeRegistration[]
   denemeMembership  DenemeMembership?
   testAssignments   TestAssignment[]
+  parentReports     ParentReport[]
 
   @@map("student_profiles")
 }
@@ -134,6 +135,7 @@ model CoachProfile {
   denemeEvents DenemeEvent[]
   customTests CustomPsychTest[]
   testAssignments TestAssignment[]
+  parentReports ParentReport[]
 
   @@map("coach_profiles")
 }
@@ -729,4 +731,31 @@ model TestAssignment {
   @@index([coachId])
   @@index([studentId])
   @@map("test_assignments")
+}
+
+enum ParentReportStatus {
+  pending
+  approved
+}
+
+model ParentReport {
+  id          String             @id @default(cuid())
+  coachId     String
+  studentId   String
+  parentId    String?
+  studentName String
+  parentName  String
+  week        String
+  completion  Int
+  netDelta    String
+  status      ParentReportStatus @default(pending)
+  sentAt      DateTime?
+  createdAt   DateTime           @default(now())
+  coach       CoachProfile       @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  student     StudentProfile     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([coachId, studentId, week])
+  @@index([coachId])
+  @@index([parentId])
+  @@map("parent_reports")
 }

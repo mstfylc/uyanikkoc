@@ -447,15 +447,19 @@ export type CoachReportStudentRow = {
   risk: "excellent" | "normal" | "attention" | "critical";
 };
 
+export type ParentReportStatus = "pending" | "approved";
+
 export type ParentReportRecord = {
   id: string;
   parentId: string;
+  coachId?: string;
+  studentId?: string;
   studentName: string;
   parentName: string;
   week: string;
   completion: number;
   netDelta: string;
-  status: "pending" | "approved";
+  status: ParentReportStatus;
   sentAt: string | null;
 };
 
