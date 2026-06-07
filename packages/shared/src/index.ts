@@ -1,3 +1,9 @@
+// Telefon yardımcıları (tarayıcı-güvenli). OTP/token yardımcıları sunucu-tarafıdır
+// ve node:crypto kullandığından barrel'a dahil edilmez — alt-yoldan import edilir:
+//   import { generateOtp } from "@uyanik/shared/otp";
+//   import { signAccess } from "@uyanik/shared/token";
+export { formatPhoneTR, maskPhone, normalizePhoneTR } from "./phone";
+
 export type RiskBand = "excellent" | "normal" | "attention" | "critical";
 
 export type ExamTrack = "TYT" | "SAYISAL" | "SOZEL" | "EA" | "DIL";
