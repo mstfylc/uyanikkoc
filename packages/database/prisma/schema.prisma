@@ -109,6 +109,7 @@ model StudentProfile {
   optikSubmissions  OptikSubmission[]
   motivationMessages MotivationMessage[]
   coachTasks        CoachTask[]
+  coachNotes        CoachStudentNote[]
 
   @@map("student_profiles")
 }
@@ -123,6 +124,7 @@ model CoachProfile {
   ratings     CoachRating[]
   tasks       CoachTask[]
   announcements CoachAnnouncement[]
+  studentNotes CoachStudentNote[]
 
   @@map("coach_profiles")
 }
@@ -564,4 +566,26 @@ model CoachAnnouncement {
 
   @@index([coachId])
   @@map("coach_announcements")
+}
+
+enum CoachNoteKind {
+  meeting
+  warning
+  general
+}
+
+model CoachStudentNote {
+  id        String         @id @default(cuid())
+  coachId   String
+  studentId String
+  text      String
+  kind      CoachNoteKind  @default(general)
+  pinned    Boolean        @default(false)
+  createdAt DateTime       @default(now())
+  coach     CoachProfile   @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([coachId, studentId])
+  @@index([studentId])
+  @@map("coach_student_notes")
 }

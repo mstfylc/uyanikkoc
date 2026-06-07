@@ -21,6 +21,7 @@ export * as motivationBroadcastRepository from "./repositories/motivation-broadc
 export * as groupRepository from "./repositories/groups";
 export * as coachTaskRepository from "./repositories/coach-tasks";
 export * as announcementRepository from "./repositories/announcements";
+export * as coachNotesRepository from "./repositories/coach-notes";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
