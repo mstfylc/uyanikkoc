@@ -11,11 +11,15 @@ import type {
 
 function mapProgress(progress: {
   completed: boolean;
+  inProgress: boolean;
+  completedSources: string[];
   completedAt: Date | null;
   updatedAt: Date;
 }): TopicProgressRecord {
   return {
     completed: progress.completed,
+    inProgress: progress.inProgress,
+    completedSources: progress.completedSources,
     completedAt: progress.completedAt?.toISOString() ?? null,
     updatedAt: progress.updatedAt.toISOString(),
   };
@@ -30,12 +34,16 @@ function mapTopic(topic: {
   updatedAt: Date;
   progress: {
     completed: boolean;
+    inProgress: boolean;
+    completedSources: string[];
     completedAt: Date | null;
     updatedAt: Date;
   } | null;
 }): TopicRecord {
   const progress = topic.progress ?? {
     completed: false,
+    inProgress: false,
+    completedSources: [],
     completedAt: null,
     updatedAt: topic.updatedAt,
   };
@@ -67,6 +75,8 @@ function mapSubject(subject: {
     updatedAt: Date;
     progress: {
       completed: boolean;
+      inProgress: boolean;
+      completedSources: string[];
       completedAt: Date | null;
       updatedAt: Date;
     } | null;
@@ -182,7 +192,12 @@ export async function updateSubject(
 export async function updateTopic(
   topicId: string,
   studentId: string,
-  data: { name?: string; completed?: boolean },
+  data: {
+    name?: string;
+    completed?: boolean;
+    status?: "todo" | "progress" | "done";
+    toggleSource?: string;
+  },
 ): Promise<TopicRecord | null> {
   const existing = await prisma.topic.findFirst({
     where: { id: topicId, studentId },
@@ -194,7 +209,38 @@ export async function updateTopic(
   }
 
   const timestamp = new Date();
-  const completed = data.completed ?? existing.progress?.completed ?? false;
+  const current = existing.progress;
+
+  // Mevcut ilerleme durumundan başla, gelen alana göre güncelle (mock ile aynı mantık).
+  let completed = current?.completed ?? false;
+  let inProgress = current?.inProgress ?? false;
+  let completedAt = current?.completedAt ?? null;
+  let completedSources = current?.completedSources ?? [];
+
+  if (data.toggleSource) {
+    const source = data.toggleSource.trim();
+    completedSources = completedSources.includes(source)
+      ? completedSources.filter((item) => item !== source)
+      : [...completedSources, source];
+  }
+
+  if (data.status === "done") {
+    completed = true;
+    inProgress = false;
+    completedAt = timestamp;
+  } else if (data.status === "progress") {
+    completed = false;
+    inProgress = true;
+    completedAt = null;
+  } else if (data.status === "todo") {
+    completed = false;
+    inProgress = false;
+    completedAt = null;
+  } else if (data.completed !== undefined) {
+    completed = data.completed;
+    inProgress = false;
+    completedAt = data.completed ? timestamp : null;
+  }
 
   const topic = await prisma.topic.update({
     where: { id: topicId },
@@ -202,16 +248,8 @@ export async function updateTopic(
       name: data.name?.trim() ?? undefined,
       progress: {
         upsert: {
-          create: {
-            studentId,
-            completed,
-            completedAt: completed ? timestamp : null,
-          },
-          update: {
-            completed,
-            completedAt: completed ? timestamp : null,
-            updatedAt: timestamp,
-          },
+          create: { studentId, completed, inProgress, completedAt, completedSources },
+          update: { completed, inProgress, completedAt, completedSources, updatedAt: timestamp },
         },
       },
     },
