@@ -8,6 +8,7 @@ import {
   setAutoRenew,
   subscribe,
 } from "@/server/services/billing.service";
+import { resolveParentIdForStudent } from "@/server/services/roster.service";
 
 const CYCLES = ["monthly", "annual"] as const;
 
@@ -34,10 +35,21 @@ export const POST = withApiAuth(["student", "parent"], async (req, { session }) 
     return NextResponse.json({ error: "cycle must be monthly|annual" }, { status: 400 });
   }
 
+  // Öğrenci kendi adına, veli yalnızca kendi çocuğu için abone olabilir.
+  // İstemciden gelen studentId'ye körü körüne güvenilmez (IDOR koruması).
+  let studentId = session.user.studentId ?? null;
+  if (!studentId && body.studentId) {
+    const ownerParentId = await resolveParentIdForStudent(body.studentId);
+    if (!ownerParentId || ownerParentId !== session.user.parentId) {
+      return NextResponse.json({ error: "Bu öğrenci için yetkiniz yok" }, { status: 403 });
+    }
+    studentId = body.studentId;
+  }
+
   try {
     const result = await subscribe({
       payerUserId: session.user.id,
-      studentId: session.user.studentId ?? body.studentId ?? null,
+      studentId,
       planId,
       cycle,
       paymentMethodId: body.paymentMethodId ?? null,

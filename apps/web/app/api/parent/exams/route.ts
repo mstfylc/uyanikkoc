@@ -18,9 +18,10 @@ export const GET = withApiAuth(["parent"], async (_req, { session }) => {
 
   const result = await listStudentExams(studentId);
   const coachId = resolveCoachIdForStudent(studentId);
-  const childName =
-    listCoachStudents(coachId ?? "coach_001").find((entry) => entry.studentId === studentId)?.displayName ??
-    "Ogrenci";
+  const childName = coachId
+    ? (listCoachStudents(coachId).find((entry) => entry.studentId === studentId)?.displayName ??
+      "Ogrenci")
+    : "Ogrenci";
 
   return NextResponse.json({ ...result, childName }, { status: 200 });
 });
