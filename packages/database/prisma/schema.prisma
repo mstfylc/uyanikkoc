@@ -158,6 +158,7 @@ model Assignment {
   student     StudentProfile     @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
   branch      Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
 
+  @@index([coachId])
   @@index([studentId])
   @@index([parentId])
   @@index([branchId])

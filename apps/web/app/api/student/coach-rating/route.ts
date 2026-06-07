@@ -18,12 +18,14 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
   const studentId = session.user.studentId;
   if (!studentId) return NextResponse.json({ error: "Student profile missing" }, { status: 400 });
 
-  const body = (await req.json()) as { stars?: number; comment?: string; coachId?: string };
+  const body = (await req.json()) as { stars?: number; comment?: string };
   const stars = Number(body.stars);
   if (!stars || stars < 1 || stars > 5) {
     return NextResponse.json({ error: "stars must be 1..5" }, { status: 400 });
   }
-  const coachId = session.user.coachId ?? body.coachId;
+  // Öğrenci yalnızca kendi koçunu puanlayabilir; coachId roster'dan çözülür,
+  // istemciden gelen coachId'ye güvenilmez (IDOR koruması).
+  const coachId = session.user.coachId ?? (await resolveCoachIdForStudent(studentId));
   if (!coachId) return NextResponse.json({ error: "coach not resolved" }, { status: 400 });
 
   const rating = await submitRating({ studentId, coachId, stars, comment: body.comment ?? null });
