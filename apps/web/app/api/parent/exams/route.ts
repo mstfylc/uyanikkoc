@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { withApiAuth } from "@/lib/auth/api-guard";
 import { listStudentExams } from "@/server/services/exam.service";
 import { resolveStudentIdForParent } from "@/server/services/motivation.service";
-import { listCoachStudents, resolveCoachIdForStudent } from "@/mocks/roster";
+import { listCoachRoster, resolveCoachIdForStudent } from "@/server/services/roster.service";
 
 export const GET = withApiAuth(["parent"], async (_req, { session }) => {
   const parentId = session.user.parentId;
@@ -17,11 +17,10 @@ export const GET = withApiAuth(["parent"], async (_req, { session }) => {
   }
 
   const result = await listStudentExams(studentId);
-  const coachId = resolveCoachIdForStudent(studentId);
-  const childName = coachId
-    ? (listCoachStudents(coachId).find((entry) => entry.studentId === studentId)?.displayName ??
-      "Ogrenci")
-    : "Ogrenci";
+  const coachId = await resolveCoachIdForStudent(studentId);
+  const roster = coachId ? await listCoachRoster(coachId) : [];
+  const childName =
+    roster.find((entry) => entry.studentId === studentId)?.displayName ?? "Ogrenci";
 
   return NextResponse.json({ ...result, childName }, { status: 200 });
 });
