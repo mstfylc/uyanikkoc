@@ -31,7 +31,7 @@ export async function getOptikReview(
   examId: string,
   studentId: string,
 ): Promise<{ submission: OptikSubmissionRecord; answerKey: string[] } | null> {
-  if (shouldUseDatabase()) return null;
+  if (shouldUseDatabase()) return (await repo()).getSubmissionReview(examId, studentId);
   return memoryOnline.getSubmissionReview(examId, studentId);
 }
 
