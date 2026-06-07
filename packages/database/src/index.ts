@@ -19,6 +19,8 @@ export * as ratingRepository from "./repositories/ratings";
 export * as onlineExamRepository from "./repositories/online-exam";
 export * as motivationBroadcastRepository from "./repositories/motivation-broadcast";
 export * as groupRepository from "./repositories/groups";
+export * as coachTaskRepository from "./repositories/coach-tasks";
+export * as announcementRepository from "./repositories/announcements";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
@@ -88,4 +90,10 @@ export type {
   InvoiceRecord,
   CreatePaymentMethodInput,
   CreateSubscriptionInput,
+  CoachTaskPriority,
+  CoachTaskRecord,
+  CreateCoachTaskInput,
+  CoachAnnouncementRecord,
+  CreateCoachAnnouncementInput,
+  AnnouncementTargets,
 } from "./types";

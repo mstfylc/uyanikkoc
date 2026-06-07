@@ -1,0 +1,90 @@
+name: Android APK
+
+# Expo (apps/mobile) için yüklenebilir bir debug APK üretir ve artifact olarak yayınlar.
+# Bu sandbox Google'ın Android sunucularına erişemediği için build CI'da yapılır.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/elegant-mccarthy-9tfNd]
+    paths:
+      - "apps/mobile/**"
+      - ".github/workflows/android-apk.yml"
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      # Expo + pnpm autolinking, hoisted node-linker gerektirir (kök .npmrc'de
+      # commit'li). Aksi halde PackageList.java legacy expo.core.* üretip patlar.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Expo prebuild (android)
+        working-directory: apps/mobile
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Gradle assembleDebug
+        working-directory: apps/mobile/android
+        run: ./gradlew :app:assembleDebug --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+
+      - name: Rename APK
+        run: cp apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk uyanik-koc-debug.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uyanik-koc-android-debug
+          path: uyanik-koc-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      # APK'yı doğrudan indirilebilir bir Release asset'i olarak yayınlar
+      # (telefondan .apk'ya dokunup kurmak için en pratik yol).
+      - name: Publish APK to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mobile-debug-latest
+          name: "Uyanık Koç — Android Debug (son sürüm)"
+          prerelease: true
+          files: uyanik-koc-debug.apk
+          body: |
+            Otomatik üretilen yüklenebilir **debug APK** — `com.uyanik.mobile`.
+
+            - Commit: `${{ github.sha }}`
+            - Kurulum: telefonda bu sayfayı aç → `uyanik-koc-debug.apk`'ya dokun → "bilinmeyen kaynaklara izin ver" → kur.
+            - API: `https://uyanikkoc.vercel.app` (app.json `extra.apiUrl`)

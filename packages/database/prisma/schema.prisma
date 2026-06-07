@@ -108,6 +108,7 @@ model StudentProfile {
   rating            CoachRating?
   optikSubmissions  OptikSubmission[]
   motivationMessages MotivationMessage[]
+  coachTasks        CoachTask[]
 
   @@map("student_profiles")
 }
@@ -120,6 +121,8 @@ model CoachProfile {
   templates   AssignmentTemplate[]
   students    CoachStudent[]
   ratings     CoachRating[]
+  tasks       CoachTask[]
+  announcements CoachAnnouncement[]
 
   @@map("coach_profiles")
 }
@@ -520,4 +523,42 @@ model ThreadMember {
   @@unique([threadId, userId])
   @@index([userId])
   @@map("thread_members")
+}
+
+enum CoachTaskPriority {
+  high
+  med
+  low
+}
+
+model CoachTask {
+  id        String            @id @default(cuid())
+  coachId   String
+  studentId String?
+  text      String
+  due       String?
+  done      Boolean           @default(false)
+  priority  CoachTaskPriority @default(med)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  coach     CoachProfile      @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  student   StudentProfile?   @relation(fields: [studentId], references: [id], onDelete: SetNull)
+
+  @@index([coachId])
+  @@index([studentId])
+  @@map("coach_tasks")
+}
+
+model CoachAnnouncement {
+  id        String       @id @default(cuid())
+  coachId   String
+  title     String
+  body      String
+  audience  String
+  reach     Int          @default(0)
+  createdAt DateTime     @default(now())
+  coach     CoachProfile @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@index([coachId])
+  @@map("coach_announcements")
 }

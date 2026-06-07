@@ -1,12 +1,34 @@
 {
   "expo": {
-    "name": "Uyanik Koc",
+    "name": "Uyanık Koç",
     "slug": "uyanik-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "uyanik",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#534AB7"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "bundleIdentifier": "com.uyanik.mobile",
+      "buildNumber": "1",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.uyanik.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#534AB7"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
     "plugins": ["expo-router", "expo-secure-store"],
     "experiments": {
       "typedRoutes": true

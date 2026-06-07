@@ -515,3 +515,46 @@ export type CreateSubscriptionInput = {
   paymentMethodId?: string | null;
   installments?: number;
 };
+
+export type CoachTaskPriority = "high" | "med" | "low";
+
+export type CoachTaskRecord = {
+  id: string;
+  coachId: string;
+  studentId: string | null;
+  text: string;
+  due: string | null;
+  done: boolean;
+  priority: CoachTaskPriority;
+  createdAt: string;
+};
+
+export type CreateCoachTaskInput = {
+  coachId: string;
+  studentId?: string | null;
+  text: string;
+  due?: string | null;
+  priority?: CoachTaskPriority;
+};
+
+export type CoachAnnouncementRecord = {
+  id: string;
+  coachId: string;
+  title: string;
+  body: string;
+  audience: string;
+  reach: number;
+  createdAt: string;
+};
+
+export type CreateCoachAnnouncementInput = {
+  coachId: string;
+  title: string;
+  body: string;
+  audience: string;
+};
+
+export type AnnouncementTargets = {
+  studentIds: string[];
+  parentIds: string[];
+};

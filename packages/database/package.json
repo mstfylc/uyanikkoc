@@ -18,7 +18,8 @@
     "test": "node --test"
   },
   "dependencies": {
-    "@prisma/client": "^6.4.1"
+    "@prisma/client": "^6.4.1",
+    "@uyanik/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
