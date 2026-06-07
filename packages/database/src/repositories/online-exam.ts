@@ -62,3 +62,16 @@ export async function submitOptik(input: SubmitOptikInput): Promise<OptikSubmiss
   });
   return mapSub(sub);
 }
+
+export async function getSubmissionReview(
+  examId: string,
+  studentId: string,
+): Promise<{ submission: OptikSubmissionRecord; answerKey: string[] } | null> {
+  const exam = await prisma.onlineExam.findUnique({ where: { id: examId } });
+  if (!exam) return null;
+  const sub = await prisma.optikSubmission.findUnique({
+    where: { examId_studentId: { examId, studentId } },
+  });
+  if (!sub) return null;
+  return { submission: mapSub(sub), answerKey: exam.answerKey };
+}

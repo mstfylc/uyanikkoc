@@ -38,6 +38,6 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
     return NextResponse.json({ error: "Assignment not found" }, { status: 404 });
   }
 
-  const test = getPsychTestById(assignment.testId);
+  const test = await getPsychTestById(assignment.testId);
   return NextResponse.json({ assignment, test }, { status: 200 });
 });

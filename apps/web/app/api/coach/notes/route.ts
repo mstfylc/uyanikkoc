@@ -8,7 +8,7 @@ import {
   listCoachStudentNotes,
   toggleCoachStudentNotePin,
 } from "@/server/services/coach-notes.service";
-import { coachHasStudent } from "@/mocks/roster";
+import { coachHasStudent } from "@/server/services/roster.service";
 
 export const GET = withApiAuth(["coach"], async (req, { session }) => {
   const coachId = session.user.coachId;
@@ -17,7 +17,7 @@ export const GET = withApiAuth(["coach"], async (req, { session }) => {
   }
 
   const studentId = req.nextUrl.searchParams.get("studentId")?.trim();
-  if (!studentId || !coachHasStudent(coachId, studentId)) {
+  if (!studentId || !(await coachHasStudent(coachId, studentId))) {
     return NextResponse.json({ error: "Student not found" }, { status: 404 });
   }
 
@@ -59,7 +59,7 @@ export const POST = withApiAuth(["coach"], async (req, { session }) => {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  if (!coachHasStudent(coachId, body.studentId)) {
+  if (!(await coachHasStudent(coachId, body.studentId))) {
     return NextResponse.json({ error: "Student not found" }, { status: 404 });
   }
 

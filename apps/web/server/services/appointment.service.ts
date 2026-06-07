@@ -18,10 +18,10 @@ import { listCoachStudents, resolveParentIdForStudent } from "@/mocks/roster";
 import { getParentSummary, listAssignmentsForCoach } from "@/mocks/assignments";
 import { listExamResultsForStudent, listExamResultsForStudents } from "@/mocks/exams";
 import { listSubjectsForStudent } from "@/mocks/topics";
-import { listParentReports } from "@/mocks/parent-reports";
 import { buildTopicSummary } from "@uyanik/database";
 
 import { shouldUseDatabase } from "@/lib/data/env";
+import { listReportsForCoach } from "@/server/services/report.service";
 
 export {
   APPOINTMENT_DAYS,
@@ -92,7 +92,7 @@ export async function buildCoachReportSummary(coachId: string): Promise<CoachRep
   const pendingAppointments = appointments.filter((item) => item.status === "pending").length;
   const coachAssignments = listAssignmentsForCoach(coachId);
   const allExams = listExamResultsForStudents(roster.map((entry) => entry.studentId));
-  const parentReports = listParentReports();
+  const parentReports = await listReportsForCoach(coachId);
   const pendingReports = parentReports.filter((item) => item.status === "pending").length;
 
   const students = roster.map((entry) => {

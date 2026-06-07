@@ -109,6 +109,13 @@ model StudentProfile {
   optikSubmissions  OptikSubmission[]
   motivationMessages MotivationMessage[]
   coachTasks        CoachTask[]
+  coachNotes        CoachStudentNote[]
+  schedule          StudentSchedule?
+  studyBlocks       StudyBlock[]
+  denemeRegistrations DenemeRegistration[]
+  denemeMembership  DenemeMembership?
+  testAssignments   TestAssignment[]
+  parentReports     ParentReport[]
 
   @@map("student_profiles")
 }
@@ -123,6 +130,12 @@ model CoachProfile {
   ratings     CoachRating[]
   tasks       CoachTask[]
   announcements CoachAnnouncement[]
+  studentNotes CoachStudentNote[]
+  curriculum  CoachCurriculum?
+  denemeEvents DenemeEvent[]
+  customTests CustomPsychTest[]
+  testAssignments TestAssignment[]
+  parentReports ParentReport[]
 
   @@map("coach_profiles")
 }
@@ -158,6 +171,7 @@ model Assignment {
   student     StudentProfile     @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
   branch      Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
 
+  @@index([coachId])
   @@index([studentId])
   @@index([parentId])
   @@index([branchId])
@@ -195,13 +209,15 @@ model Topic {
 }
 
 model TopicProgress {
-  id          String    @id @default(cuid())
-  topicId     String    @unique
-  studentId   String
-  completed   Boolean   @default(false)
-  completedAt DateTime?
-  updatedAt   DateTime  @updatedAt
-  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  id               String    @id @default(cuid())
+  topicId          String    @unique
+  studentId        String
+  completed        Boolean   @default(false)
+  inProgress       Boolean   @default(false)
+  completedSources String[]
+  completedAt      DateTime?
+  updatedAt        DateTime  @updatedAt
+  topic            Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@map("topic_progress")
@@ -561,4 +577,185 @@ model CoachAnnouncement {
 
   @@index([coachId])
   @@map("coach_announcements")
+}
+
+enum CoachNoteKind {
+  meeting
+  warning
+  general
+}
+
+model CoachStudentNote {
+  id        String         @id @default(cuid())
+  coachId   String
+  studentId String
+  text      String
+  kind      CoachNoteKind  @default(general)
+  pinned    Boolean        @default(false)
+  createdAt DateTime       @default(now())
+  coach     CoachProfile   @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([coachId, studentId])
+  @@index([studentId])
+  @@map("coach_student_notes")
+}
+
+enum StudyBlockStatus {
+  todo
+  progress
+  done
+}
+
+model StudentSchedule {
+  id            String         @id @default(cuid())
+  studentId     String         @unique
+  attendsSchool Boolean        @default(false)
+  grid          Json
+  updatedAt     DateTime       @updatedAt
+  student       StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("student_schedules")
+}
+
+model StudyBlock {
+  id        String           @id @default(cuid())
+  studentId String
+  day       String
+  time      String
+  subject   String
+  topic     String
+  type      String
+  status    StudyBlockStatus @default(todo)
+  source    String?
+  correct   Int?
+  wrong     Int?
+  net       Float?
+  createdAt DateTime         @default(now())
+  student   StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("study_blocks")
+}
+
+model CoachCurriculum {
+  id        String        @id @default(cuid())
+  coachId   String        @unique
+  examType  TopicExamType @default(TYT)
+  subjects  Json
+  updatedAt DateTime      @updatedAt
+  coach     CoachProfile  @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@map("coach_curriculums")
+}
+
+model DenemeEvent {
+  id            String               @id @default(cuid())
+  coachId       String
+  name          String
+  examType      ResultExamType
+  date          String
+  time          String
+  place         String
+  questionCount Int
+  price         Int
+  createdAt     DateTime             @default(now())
+  coach         CoachProfile         @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  registrations DenemeRegistration[]
+
+  @@index([coachId])
+  @@map("deneme_events")
+}
+
+model DenemeRegistration {
+  id           String         @id @default(cuid())
+  eventId      String
+  studentId    String
+  payment      String
+  mode         String
+  registeredAt DateTime       @default(now())
+  event        DenemeEvent    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  student      StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, studentId])
+  @@index([studentId])
+  @@map("deneme_registrations")
+}
+
+model DenemeMembership {
+  id        String         @id @default(cuid())
+  studentId String         @unique
+  planId    String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("deneme_memberships")
+}
+
+enum TestAssignmentStatus {
+  sent
+  completed
+}
+
+model CustomPsychTest {
+  id          String       @id @default(cuid())
+  coachId     String
+  name        String
+  icon        String
+  tone        String
+  description String
+  questions   Json
+  bands       Json
+  createdAt   DateTime     @default(now())
+  coach       CoachProfile @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@index([coachId])
+  @@map("custom_psych_tests")
+}
+
+model TestAssignment {
+  id          String               @id @default(cuid())
+  coachId     String
+  studentId   String
+  studentName String
+  testId      String
+  status      TestAssignmentStatus @default(sent)
+  score       Float?
+  band        String?
+  bandTone    String?
+  coachNote   String               @default("")
+  sentAt      DateTime             @default(now())
+  completedAt DateTime?
+  coach       CoachProfile         @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  student     StudentProfile       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([coachId])
+  @@index([studentId])
+  @@map("test_assignments")
+}
+
+enum ParentReportStatus {
+  pending
+  approved
+}
+
+model ParentReport {
+  id          String             @id @default(cuid())
+  coachId     String
+  studentId   String
+  parentId    String?
+  studentName String
+  parentName  String
+  week        String
+  completion  Int
+  netDelta    String
+  status      ParentReportStatus @default(pending)
+  sentAt      DateTime?
+  createdAt   DateTime           @default(now())
+  coach       CoachProfile       @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  student     StudentProfile     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([coachId, studentId, week])
+  @@index([coachId])
+  @@index([parentId])
+  @@map("parent_reports")
 }

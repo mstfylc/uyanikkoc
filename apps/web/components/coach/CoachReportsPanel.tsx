@@ -57,6 +57,25 @@ export function CoachReportsPanel() {
     }
   }
 
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  async function generateReports() {
+    setIsGenerating(true);
+    try {
+      const response = await fetch("/api/coach/reports", {
+        method: "PATCH",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ generate: true }),
+      });
+      if (response.ok) {
+        await load();
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
   const pending = report?.pendingReports ?? 0;
   const weekAvg =
     report && report.weekCompletion.length > 0
@@ -86,14 +105,25 @@ export function CoachReportsPanel() {
         title="Raporlar"
         sub="Sinif performansi ve veli raporlari"
         actions={
-          pending > 0 ? (
-            <button type="button" className="btn btn-primary btn-sm" onClick={() => void approveAll()}>
-              <KiIcon name="ki-check" size={16} />
-              Tumunu onayla ({pending})
+          <div className="hstack" style={{ gap: 8 }}>
+            <button
+              type="button"
+              className="btn btn-light btn-sm"
+              onClick={() => void generateReports()}
+              disabled={isGenerating}
+            >
+              <KiIcon name="ki-notepad-edit" size={16} />
+              {isGenerating ? "Olusturuluyor…" : "Rapor Olustur"}
             </button>
-          ) : (
-            <UkBadge tone="success">Tumu onaylandi</UkBadge>
-          )
+            {pending > 0 ? (
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => void approveAll()}>
+                <KiIcon name="ki-check" size={16} />
+                Tumunu onayla ({pending})
+              </button>
+            ) : (
+              <UkBadge tone="success">Tumu onaylandi</UkBadge>
+            )}
+          </div>
         }
       />
 

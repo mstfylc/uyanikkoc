@@ -1,31 +1,23 @@
+import type {
+  DenemeEvent,
+  DenemeExamType,
+  DenemeParticipationMode,
+  DenemePaymentKind,
+  DenemeRegistration,
+} from "@uyanik/database";
+
 import { DEMO_COACH_ID } from "@/lib/auth/demo-users";
 import { DEMO_STUDENT_ID } from "@/mocks/assignments";
 import { DEMO_STUDENT_002_ID, resolveCoachIdForStudent } from "@/mocks/roster";
 import type { DenemeMembershipId } from "@/lib/design/deneme-plans";
 
-export type DenemeExamType = "TYT" | "AYT" | "LGS";
-export type DenemeParticipationMode = "yuzyuze" | "online";
-export type DenemePaymentKind = "paket" | "odendi";
-
-export type DenemeEvent = {
-  id: string;
-  coachId: string;
-  name: string;
-  examType: DenemeExamType;
-  date: string;
-  time: string;
-  place: string;
-  questionCount: number;
-  price: number;
-};
-
-export type DenemeRegistration = {
-  eventId: string;
-  studentId: string;
-  payment: DenemePaymentKind;
-  mode: DenemeParticipationMode;
-  registeredAt: number;
-};
+export type {
+  DenemeEvent,
+  DenemeExamType,
+  DenemeParticipationMode,
+  DenemePaymentKind,
+  DenemeRegistration,
+} from "@uyanik/database";
 
 const globalStore = globalThis as typeof globalThis & {
   __uyanikDenemeEvents?: DenemeEvent[];

@@ -1,5 +1,5 @@
 import { Stack, useRouter } from "expo-router";
-import { Pressable, Text, View, StyleSheet } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
 import { MIcon } from "@/components/MIcon";
 import { ukColors } from "@/lib/theme";

@@ -41,6 +41,20 @@ Bkz. `apps/web/.env.production.example`:
 - Metronic: lisanslı asset’ler repoda yok; sunucuda `apps/web/public/assets/metronic/` manuel veya güvenli pipeline ile kopyalanır.
 - Sağlık: `GET /api/health` (ileride DB durumu genişletilebilir).
 
+### Yönetim paneli erişimi — path, subdomain DEĞİL
+
+**Karar:** Yönetim paneli ana domain üzerinde **path** ile sunulur:
+`https://uyanikkoc.com/yonetim`. Ayrı bir alt alan adı (`yonetim.uyanikkoc.com`)
+**açılmaz** — ek DNS/sertifika/cookie izolasyonu gerektirmez, tek Next.js
+süreci tüm rolleri (öğrenci/koç/veli + Super Admin/Kurum) aynı origin'de servis eder.
+
+- `/yonetim/*` App Router route'udur; ek reverse-proxy kuralı gerekmez.
+- `/admin` ve `/branch` legacy yolları `next.config.mjs` ile `/yonetim`'e redirect edilir.
+- Super Admin (ORG_ADMIN) tüm yönetim ekranlarına erişir; Kurum yöneticisi
+  (BRANCH_MANAGER) platform/franchise ekranlarından kısıtlanır (bkz. `lib/rbac.ts`).
+- Auth cookie'leri aynı origin'de paylaşıldığından `AUTH_URL=https://uyanikkoc.com`
+  yeterlidir; rol bazlı erişim middleware + `rbac.ts` ile yapılır.
+
 ### Neden self-host?
 
 - Kalıcı upload/log yolları ve tek sunucu politikası
@@ -70,7 +84,7 @@ Bkz. `apps/web/.env.production.example`:
 
 `Output Directory` = `apps/web/.next` gibi **statik çıktı** modu kullanılırsa site 404 verebilir. Next.js server uygulaması için output override **kullanılmamalı**.
 
-`vercel.json` ile `rootDirectory` denemesi geçmişte anında hata üretmişti; bu repoda **`vercel.json` yok** — ayarlar Dashboard üzerinden yapılır.
+`vercel.json` ile `rootDirectory` denemesi geçmişte anında hata üretmişti. Bu repoda yalnızca **`apps/web/vercel.json`** vardır ve **sadece** monorepo `installCommand`'ı (`cd ../.. && pnpm install`) içerir; `rootDirectory`, `buildCommand`, `framework`, `outputDirectory` **kullanılmaz** — bunlar Dashboard üzerinden ayarlanır.
 
 ### Vercel env (preview)
 

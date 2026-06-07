@@ -59,15 +59,23 @@ const YONETIM_BRANCH_NAV: UkNavItem[] = [
   { href: "/yonetim/settings", label: "Ayarlar", icon: "ki-setting-2" },
 ];
 
+// Super Admin tüm yönetim ekranlarına erişir (platform + kurum), bu yüzden nav
+// branch panelindeki kurum ekranlarını da içerir (hiyerarşik superset).
 const YONETIM_ADMIN_NAV: UkNavItem[] = [
   { href: "/yonetim/dashboard", label: "Genel Bakis", icon: "ki-element-11" },
   { href: "/yonetim/orgs", label: "Kurumlar & Franchise", icon: "ki-office-bag" },
+  { href: "/yonetim/branches", label: "Subeler", icon: "ki-flag" },
   { href: "/yonetim/licenses", label: "Lisans Takibi", icon: "ki-shield-tick" },
-  { href: "/yonetim/coaches", label: "Bireysel Koclar", icon: "ki-people" },
+  { href: "/yonetim/license", label: "Lisans & Kapasite", icon: "ki-chart-pie-simple" },
+  { href: "/yonetim/coaches", label: "Koclar", icon: "ki-people" },
+  { href: "/yonetim/students", label: "Ogrenciler", icon: "ki-teacher" },
+  { href: "/yonetim/managers", label: "Yoneticiler", icon: "ki-crown-2" },
   { href: "/yonetim/revenue", label: "Gelir & Faturalama", icon: "ki-dollar" },
+  { href: "/yonetim/reports", label: "Raporlar", icon: "ki-chart-line-up" },
   { href: "/yonetim/campaigns", label: "Kampanyalar", icon: "ki-flash" },
   { href: "/yonetim/modules", label: "Modul Bayraklari", icon: "ki-technology-2" },
   { href: "/yonetim/support", label: "Destek & Sistem", icon: "ki-messages" },
+  { href: "/yonetim/settings", label: "Ayarlar", icon: "ki-setting-2" },
 ];
 
 export const UK_ROLE_CRUMB: Record<AppRole, string> = {

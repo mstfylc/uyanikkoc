@@ -42,9 +42,19 @@ describe("RBAC path erişim kontrolü", () => {
 
   it("yonetim alt yollarini role gore kisitlar", () => {
     expect(canAccessPath("branch", "/yonetim/orgs")).toBe(false);
-    expect(canAccessPath("admin", "/yonetim/students")).toBe(false);
     expect(canAccessPath("admin", "/yonetim/profile")).toBe(true);
     expect(canAccessPath("branch", "/yonetim/profile")).toBe(true);
+  });
+
+  it("super admin tum yonetim ekranlarina erisir (superset)", () => {
+    expect(canAccessPath("admin", "/yonetim/students")).toBe(true);
+    expect(canAccessPath("admin", "/yonetim/branches")).toBe(true);
+    expect(canAccessPath("admin", "/yonetim/reports")).toBe(true);
+    expect(canAccessPath("admin", "/yonetim/settings")).toBe(true);
+    expect(canAccessPath("admin", "/yonetim/managers")).toBe(true);
+    // Super admin kurum ekranina girince geri yonlendirilmez.
+    const session = { user: { id: "1", role: "admin" as const } };
+    expect(getUnauthorizedRedirect("/yonetim/students", session)).toBeNull();
   });
 
   it("yanlış rol için erişimi reddeder", () => {

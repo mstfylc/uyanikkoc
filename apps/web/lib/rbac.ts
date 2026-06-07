@@ -141,17 +141,13 @@ function yonetimMismatchRedirect(role: AppRole, pathname: string): string | null
   if (!pathname.startsWith("/yonetim")) {
     return null;
   }
+  // Super Admin hiçbir yönetim ekranından geri yönlendirilmez; yalnızca kurum
+  // yöneticisi platform ekranlarına girmeye çalışınca uyarılır.
   if (
     role === "branch" &&
     YONETIM_ADMIN_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
   ) {
     return "/yonetim/dashboard?need=superadmin";
-  }
-  if (
-    role === "admin" &&
-    YONETIM_BRANCH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
-  ) {
-    return "/yonetim/dashboard?need=branch";
   }
   return null;
 }
@@ -173,15 +169,11 @@ export function canAccessPath(role: AppRole, pathname: string): boolean {
     if (role !== "admin" && role !== "branch") {
       return false;
     }
+    // Super Admin (admin) tüm yönetim ekranlarına erişir (hiyerarşik superset).
+    // Kurum yöneticisi (branch) yalnızca platform/franchise ekranlarından kısıtlanır.
     if (
       role === "branch" &&
       YONETIM_ADMIN_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
-    ) {
-      return false;
-    }
-    if (
-      role === "admin" &&
-      YONETIM_BRANCH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
     ) {
       return false;
     }

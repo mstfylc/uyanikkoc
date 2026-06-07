@@ -224,6 +224,31 @@ export type AppointmentMode = "online" | "in_person" | "phone";
 export type AppointmentStatus = "pending" | "approved" | "rejected" | "cancelled";
 export type AppointmentDay = "Pzt" | "Sal" | "Car" | "Per" | "Cum" | "Cmt";
 
+export type DenemeExamType = "TYT" | "AYT" | "LGS";
+export type DenemeParticipationMode = "yuzyuze" | "online";
+export type DenemePaymentKind = "paket" | "odendi";
+export type DenemeMembershipId = "yuzyuze" | "kargo";
+
+export type DenemeEvent = {
+  id: string;
+  coachId: string;
+  name: string;
+  examType: DenemeExamType;
+  date: string;
+  time: string;
+  place: string;
+  questionCount: number;
+  price: number;
+};
+
+export type DenemeRegistration = {
+  eventId: string;
+  studentId: string;
+  payment: DenemePaymentKind;
+  mode: DenemeParticipationMode;
+  registeredAt: number;
+};
+
 export type AppointmentRecord = {
   id: string;
   coachId: string;
@@ -288,6 +313,22 @@ export type SchoolScheduleRecord = {
   studentId: string;
   attendsSchool: boolean;
   grid: Record<string, string[]>;
+};
+
+export type StudyBlockStatus = "todo" | "progress" | "done";
+
+export type StudyBlockRecord = {
+  id: string;
+  day: string;
+  time: string;
+  subject: string;
+  topic: string;
+  type: string;
+  status: StudyBlockStatus;
+  source?: string;
+  correct?: number;
+  wrong?: number;
+  net?: number;
 };
 
 export type CoachNoteKind = "meeting" | "warning" | "general";
@@ -406,15 +447,19 @@ export type CoachReportStudentRow = {
   risk: "excellent" | "normal" | "attention" | "critical";
 };
 
+export type ParentReportStatus = "pending" | "approved";
+
 export type ParentReportRecord = {
   id: string;
   parentId: string;
+  coachId?: string;
+  studentId?: string;
   studentName: string;
   parentName: string;
   week: string;
   completion: number;
   netDelta: string;
-  status: "pending" | "approved";
+  status: ParentReportStatus;
   sentAt: string | null;
 };
 

@@ -21,6 +21,13 @@ export * as motivationBroadcastRepository from "./repositories/motivation-broadc
 export * as groupRepository from "./repositories/groups";
 export * as coachTaskRepository from "./repositories/coach-tasks";
 export * as announcementRepository from "./repositories/announcements";
+export * as coachNotesRepository from "./repositories/coach-notes";
+export * as scheduleRepository from "./repositories/schedule";
+export * as curriculumRepository from "./repositories/curriculum";
+export { DEFAULT_CURRICULUM_SUBJECTS } from "./repositories/curriculum";
+export * as denemeRepository from "./repositories/deneme-events";
+export * as testRepository from "./repositories/tests";
+export * as parentReportRepository from "./repositories/parent-reports";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
@@ -61,6 +68,14 @@ export type {
   TestAssignmentRecord,
   TestAssignmentStatus,
   SchoolScheduleRecord,
+  StudyBlockRecord,
+  StudyBlockStatus,
+  DenemeEvent,
+  DenemeRegistration,
+  DenemeExamType,
+  DenemeParticipationMode,
+  DenemePaymentKind,
+  DenemeMembershipId,
   CoachStudentNoteRecord,
   CoachNoteKind,
   CurriculumRecord,
@@ -80,6 +95,7 @@ export type {
   CoachReportSummary,
   CoachReportStudentRow,
   ParentReportRecord,
+  ParentReportStatus,
   BillingCycle,
   SubscriptionStatus,
   InvoiceStatus,

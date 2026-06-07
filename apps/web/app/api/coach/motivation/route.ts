@@ -12,8 +12,13 @@ export const POST = withApiAuth(["coach"], async (req, { session }) => {
   const message = body.message?.trim();
   if (!message) return NextResponse.json({ error: "message required" }, { status: 400 });
 
+  // Koç yalnızca kendi rosterindeki öğrencilere mesaj gönderebilir; istemciden
+  // gelen studentIds roster ile kesiştirilir (yetkisiz hedefleme koruması).
+  const roster = await listCoachStudentIds(coachId);
   const targets =
-    body.scope === "all" ? await listCoachStudentIds(coachId) : (body.studentIds ?? []);
+    body.scope === "all"
+      ? roster
+      : (body.studentIds ?? []).filter((id) => roster.includes(id));
   if (targets.length === 0) return NextResponse.json({ error: "no targets" }, { status: 400 });
 
   const sent = await broadcastMotivation(coachId, targets, message);
