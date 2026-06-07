@@ -49,12 +49,8 @@ jobs:
         run: |
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-      # Expo + pnpm: React Native autolinking, izole node_modules ile bozuluyor
-      # (PackageList.java legacy `expo.core.ExpoModulesPackage` üretip derleme
-      # patlıyor). Expo monorepo rehberinin önerisi: hoisted node-linker.
-      - name: Enable hoisted node-linker for native build
-        run: echo "node-linker=hoisted" > .npmrc
-
+      # Expo + pnpm autolinking, hoisted node-linker gerektirir (kök .npmrc'de
+      # commit'li). Aksi halde PackageList.java legacy expo.core.* üretip patlar.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
