@@ -114,6 +114,7 @@ model StudentProfile {
   studyBlocks       StudyBlock[]
   denemeRegistrations DenemeRegistration[]
   denemeMembership  DenemeMembership?
+  testAssignments   TestAssignment[]
 
   @@map("student_profiles")
 }
@@ -131,6 +132,8 @@ model CoachProfile {
   studentNotes CoachStudentNote[]
   curriculum  CoachCurriculum?
   denemeEvents DenemeEvent[]
+  customTests CustomPsychTest[]
+  testAssignments TestAssignment[]
 
   @@map("coach_profiles")
 }
@@ -684,4 +687,46 @@ model DenemeMembership {
   student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@map("deneme_memberships")
+}
+
+enum TestAssignmentStatus {
+  sent
+  completed
+}
+
+model CustomPsychTest {
+  id          String       @id @default(cuid())
+  coachId     String
+  name        String
+  icon        String
+  tone        String
+  description String
+  questions   Json
+  bands       Json
+  createdAt   DateTime     @default(now())
+  coach       CoachProfile @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@index([coachId])
+  @@map("custom_psych_tests")
+}
+
+model TestAssignment {
+  id          String               @id @default(cuid())
+  coachId     String
+  studentId   String
+  studentName String
+  testId      String
+  status      TestAssignmentStatus @default(sent)
+  score       Float?
+  band        String?
+  bandTone    String?
+  coachNote   String               @default("")
+  sentAt      DateTime             @default(now())
+  completedAt DateTime?
+  coach       CoachProfile         @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  student     StudentProfile       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([coachId])
+  @@index([studentId])
+  @@map("test_assignments")
 }

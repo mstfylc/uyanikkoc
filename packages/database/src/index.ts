@@ -26,6 +26,7 @@ export * as scheduleRepository from "./repositories/schedule";
 export * as curriculumRepository from "./repositories/curriculum";
 export { DEFAULT_CURRICULUM_SUBJECTS } from "./repositories/curriculum";
 export * as denemeRepository from "./repositories/deneme-events";
+export * as testRepository from "./repositories/tests";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
