@@ -25,6 +25,7 @@ export * as coachNotesRepository from "./repositories/coach-notes";
 export * as scheduleRepository from "./repositories/schedule";
 export * as curriculumRepository from "./repositories/curriculum";
 export { DEFAULT_CURRICULUM_SUBJECTS } from "./repositories/curriculum";
+export * as denemeRepository from "./repositories/deneme-events";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
@@ -67,6 +68,12 @@ export type {
   SchoolScheduleRecord,
   StudyBlockRecord,
   StudyBlockStatus,
+  DenemeEvent,
+  DenemeRegistration,
+  DenemeExamType,
+  DenemeParticipationMode,
+  DenemePaymentKind,
+  DenemeMembershipId,
   CoachStudentNoteRecord,
   CoachNoteKind,
   CurriculumRecord,

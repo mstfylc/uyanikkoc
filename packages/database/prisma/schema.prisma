@@ -112,6 +112,8 @@ model StudentProfile {
   coachNotes        CoachStudentNote[]
   schedule          StudentSchedule?
   studyBlocks       StudyBlock[]
+  denemeRegistrations DenemeRegistration[]
+  denemeMembership  DenemeMembership?
 
   @@map("student_profiles")
 }
@@ -128,6 +130,7 @@ model CoachProfile {
   announcements CoachAnnouncement[]
   studentNotes CoachStudentNote[]
   curriculum  CoachCurriculum?
+  denemeEvents DenemeEvent[]
 
   @@map("coach_profiles")
 }
@@ -639,4 +642,46 @@ model CoachCurriculum {
   coach     CoachProfile  @relation(fields: [coachId], references: [id], onDelete: Cascade)
 
   @@map("coach_curriculums")
+}
+
+model DenemeEvent {
+  id            String               @id @default(cuid())
+  coachId       String
+  name          String
+  examType      ResultExamType
+  date          String
+  time          String
+  place         String
+  questionCount Int
+  price         Int
+  createdAt     DateTime             @default(now())
+  coach         CoachProfile         @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  registrations DenemeRegistration[]
+
+  @@index([coachId])
+  @@map("deneme_events")
+}
+
+model DenemeRegistration {
+  id           String         @id @default(cuid())
+  eventId      String
+  studentId    String
+  payment      String
+  mode         String
+  registeredAt DateTime       @default(now())
+  event        DenemeEvent    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  student      StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, studentId])
+  @@index([studentId])
+  @@map("deneme_registrations")
+}
+
+model DenemeMembership {
+  id        String         @id @default(cuid())
+  studentId String         @unique
+  planId    String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("deneme_memberships")
 }

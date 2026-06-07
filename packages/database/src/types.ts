@@ -224,6 +224,31 @@ export type AppointmentMode = "online" | "in_person" | "phone";
 export type AppointmentStatus = "pending" | "approved" | "rejected" | "cancelled";
 export type AppointmentDay = "Pzt" | "Sal" | "Car" | "Per" | "Cum" | "Cmt";
 
+export type DenemeExamType = "TYT" | "AYT" | "LGS";
+export type DenemeParticipationMode = "yuzyuze" | "online";
+export type DenemePaymentKind = "paket" | "odendi";
+export type DenemeMembershipId = "yuzyuze" | "kargo";
+
+export type DenemeEvent = {
+  id: string;
+  coachId: string;
+  name: string;
+  examType: DenemeExamType;
+  date: string;
+  time: string;
+  place: string;
+  questionCount: number;
+  price: number;
+};
+
+export type DenemeRegistration = {
+  eventId: string;
+  studentId: string;
+  payment: DenemePaymentKind;
+  mode: DenemeParticipationMode;
+  registeredAt: number;
+};
+
 export type AppointmentRecord = {
   id: string;
   coachId: string;
