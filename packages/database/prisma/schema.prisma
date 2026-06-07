@@ -127,6 +127,7 @@ model CoachProfile {
   tasks       CoachTask[]
   announcements CoachAnnouncement[]
   studentNotes CoachStudentNote[]
+  curriculum  CoachCurriculum?
 
   @@map("coach_profiles")
 }
@@ -627,4 +628,15 @@ model StudyBlock {
 
   @@index([studentId])
   @@map("study_blocks")
+}
+
+model CoachCurriculum {
+  id        String        @id @default(cuid())
+  coachId   String        @unique
+  examType  TopicExamType @default(TYT)
+  subjects  Json
+  updatedAt DateTime      @updatedAt
+  coach     CoachProfile  @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@map("coach_curriculums")
 }

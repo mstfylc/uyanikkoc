@@ -23,6 +23,8 @@ export * as coachTaskRepository from "./repositories/coach-tasks";
 export * as announcementRepository from "./repositories/announcements";
 export * as coachNotesRepository from "./repositories/coach-notes";
 export * as scheduleRepository from "./repositories/schedule";
+export * as curriculumRepository from "./repositories/curriculum";
+export { DEFAULT_CURRICULUM_SUBJECTS } from "./repositories/curriculum";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
