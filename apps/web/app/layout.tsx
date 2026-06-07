@@ -4,6 +4,8 @@ import { AuthProvider } from "./providers";
 import "./globals.css";
 import "../styles/uk-design.css";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: {
     default: "Uyanık Koç",

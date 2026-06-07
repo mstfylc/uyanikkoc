@@ -15,14 +15,15 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const needSuperAdmin = searchParams.get("need") === "superadmin";
-  const needBranch = searchParams.get("need") === "branch";
+  const path = pathname ?? "/yonetim/dashboard";
+  const needSuperAdmin = searchParams?.get("need") === "superadmin";
+  const needBranch = searchParams?.get("need") === "branch";
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace(loginHrefForPath(pathname));
+      router.replace(loginHrefForPath(path));
     }
-  }, [status, pathname, router]);
+  }, [status, path, router]);
 
   if (status === "loading") {
     return <div className="card card-pad muted" style={{ margin: 24 }}>Yukleniyor…</div>;
@@ -48,10 +49,10 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-          <Link href={loginHrefForPath(pathname, "admin")} className="btn btn-primary">
+          <Link href={loginHrefForPath(path, "admin")} className="btn btn-primary">
             Super Admin ile giris
           </Link>
-          <Link href={loginHrefForPath(pathname, "branch")} className="btn btn-light">
+          <Link href={loginHrefForPath(path, "branch")} className="btn btn-light">
             Kurum ile giris
           </Link>
         </div>

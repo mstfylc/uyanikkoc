@@ -13,7 +13,7 @@ import {
   NotificationBell,
   shouldShowNotificationBell,
 } from "@/components/shared/NotificationBell";
-import { findUkNavItem, UK_ROLE_CRUMB } from "@/lib/navigation/uk-nav";
+import { dashboardHref, findUkNavItem, UK_ROLE_CRUMB } from "@/lib/navigation/uk-nav";
 
 type HeaderProps = {
   role: AppRole;
@@ -21,12 +21,13 @@ type HeaderProps = {
 
 export function Header({ role }: HeaderProps) {
   const pathname = usePathname();
+  const path = pathname ?? dashboardHref(role);
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
 
   const displayName = session?.user?.name ?? session?.user?.email ?? "Kullanici";
-  const activeItem = findUkNavItem(role, pathname);
+  const activeItem = findUkNavItem(role, path);
   const pageTitle = activeItem?.label ?? "Dashboard";
 
   return (

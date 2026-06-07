@@ -22,6 +22,7 @@ type SidebarProps = {
 
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
+  const path = pathname ?? dashboardHref(role);
   const [motivationEnabled, setMotivationEnabled] = useState(true);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export function Sidebar({ role }: SidebarProps) {
   }, [role, motivationEnabled]);
 
   const generalItems = getUkGeneralNavItems(role);
-  const activeItem = findUkNavItem(role, pathname);
+  const activeItem = findUkNavItem(role, path);
   const profileHref = getProfileHref(role);
   const dash = dashboardHref(role);
 
@@ -69,7 +70,7 @@ export function Sidebar({ role }: SidebarProps) {
         <div className="nav-label">Menu</div>
         {items.map((item) => {
           const active =
-            pathname === item.href || (item.href !== dash && pathname.startsWith(`${item.href}/`));
+            path === item.href || (item.href !== dash && path.startsWith(`${item.href}/`));
 
           return (
             <Link key={item.href} href={item.href} className={`nav-item${active ? " active" : ""}`}>
@@ -84,7 +85,7 @@ export function Sidebar({ role }: SidebarProps) {
           <>
             <div className="nav-label">Genel</div>
             {generalItems.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const active = path === item.href || path.startsWith(`${item.href}/`);
               return (
                 <Link key={item.href} href={item.href} className={`nav-item${active ? " active" : ""}`}>
                   <KiIcon name={item.icon} size={18} />

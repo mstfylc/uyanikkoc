@@ -15,6 +15,7 @@ type MobileNavSheetProps = {
 
 export function MobileNavSheet({ role, open, onClose }: MobileNavSheetProps) {
   const pathname = usePathname();
+  const path = pathname ?? dashboardHref(role);
 
   if (!open) {
     return null;
@@ -52,7 +53,7 @@ export function MobileNavSheet({ role, open, onClose }: MobileNavSheetProps) {
       >
         {items.map((item) => {
           const active =
-            pathname === item.href || (item.href !== dash && pathname.startsWith(`${item.href}/`));
+            path === item.href || (item.href !== dash && path.startsWith(`${item.href}/`));
 
           return (
             <Link

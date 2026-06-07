@@ -30,8 +30,8 @@ function resolveDemoRole(nextPath: string, roleParam: string | null): DemoRole {
 
 export function LoginForm() {
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/post-login";
-  const roleParam = searchParams.get("role");
+  const nextPath = searchParams?.get("next") ?? "/post-login";
+  const roleParam = searchParams?.get("role") ?? null;
   const initialRole = useMemo(() => resolveDemoRole(nextPath, roleParam), [nextPath, roleParam]);
   const initialDemo = DEMO_BY_ROLE[initialRole];
   const yonetimHint = yonetimLoginRoleHint(nextPath, roleParam);

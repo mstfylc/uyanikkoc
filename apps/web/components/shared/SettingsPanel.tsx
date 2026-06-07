@@ -106,7 +106,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
   }, [load]);
 
   useEffect(() => {
-    const requested = searchParams.get("tab");
+    const requested = searchParams?.get("tab");
     if (
       requested === "bildirimler" ||
       requested === "profil" ||
