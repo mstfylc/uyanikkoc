@@ -14,6 +14,9 @@ concurrency:
   group: android-apk-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build debug APK
@@ -63,10 +66,29 @@ jobs:
         working-directory: apps/mobile/android
         run: ./gradlew :app:assembleDebug --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
 
-      - name: Upload APK
+      - name: Rename APK
+        run: cp apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk uyanik-koc-debug.apk
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: uyanik-koc-android-debug
-          path: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          path: uyanik-koc-debug.apk
           if-no-files-found: error
           retention-days: 14
+
+      # APK'yı doğrudan indirilebilir bir Release asset'i olarak yayınlar
+      # (telefondan .apk'ya dokunup kurmak için en pratik yol).
+      - name: Publish APK to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mobile-debug-latest
+          name: "Uyanık Koç — Android Debug (son sürüm)"
+          prerelease: true
+          files: uyanik-koc-debug.apk
+          body: |
+            Otomatik üretilen yüklenebilir **debug APK** — `com.uyanik.mobile`.
+
+            - Commit: `${{ github.sha }}`
+            - Kurulum: telefonda bu sayfayı aç → `uyanik-koc-debug.apk`'ya dokun → "bilinmeyen kaynaklara izin ver" → kur.
+            - API: `https://uyanikkoc.vercel.app` (app.json `extra.apiUrl`)
