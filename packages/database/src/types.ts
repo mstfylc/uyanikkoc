@@ -290,6 +290,22 @@ export type SchoolScheduleRecord = {
   grid: Record<string, string[]>;
 };
 
+export type StudyBlockStatus = "todo" | "progress" | "done";
+
+export type StudyBlockRecord = {
+  id: string;
+  day: string;
+  time: string;
+  subject: string;
+  topic: string;
+  type: string;
+  status: StudyBlockStatus;
+  source?: string;
+  correct?: number;
+  wrong?: number;
+  net?: number;
+};
+
 export type CoachNoteKind = "meeting" | "warning" | "general";
 
 export type CoachStudentNoteRecord = {

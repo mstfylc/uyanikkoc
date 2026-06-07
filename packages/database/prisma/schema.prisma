@@ -110,6 +110,8 @@ model StudentProfile {
   motivationMessages MotivationMessage[]
   coachTasks        CoachTask[]
   coachNotes        CoachStudentNote[]
+  schedule          StudentSchedule?
+  studyBlocks       StudyBlock[]
 
   @@map("student_profiles")
 }
@@ -588,4 +590,41 @@ model CoachStudentNote {
   @@index([coachId, studentId])
   @@index([studentId])
   @@map("coach_student_notes")
+}
+
+enum StudyBlockStatus {
+  todo
+  progress
+  done
+}
+
+model StudentSchedule {
+  id            String         @id @default(cuid())
+  studentId     String         @unique
+  attendsSchool Boolean        @default(false)
+  grid          Json
+  updatedAt     DateTime       @updatedAt
+  student       StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("student_schedules")
+}
+
+model StudyBlock {
+  id        String           @id @default(cuid())
+  studentId String
+  day       String
+  time      String
+  subject   String
+  topic     String
+  type      String
+  status    StudyBlockStatus @default(todo)
+  source    String?
+  correct   Int?
+  wrong     Int?
+  net       Float?
+  createdAt DateTime         @default(now())
+  student   StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("study_blocks")
 }

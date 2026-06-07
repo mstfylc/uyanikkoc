@@ -1,20 +1,8 @@
+import type { StudyBlockRecord, StudyBlockStatus } from "@uyanik/database";
+
 import { DEMO_STUDENT_ID } from "@/mocks/assignments";
 
-export type StudyBlockStatus = "todo" | "progress" | "done";
-
-export type StudyBlockRecord = {
-  id: string;
-  day: string;
-  time: string;
-  subject: string;
-  topic: string;
-  type: string;
-  status: StudyBlockStatus;
-  source?: string;
-  correct?: number;
-  wrong?: number;
-  net?: number;
-};
+export type { StudyBlockRecord, StudyBlockStatus } from "@uyanik/database";
 
 const globalStore = globalThis as typeof globalThis & {
   __uyanikStudyPlans?: Record<string, StudyBlockRecord[]>;

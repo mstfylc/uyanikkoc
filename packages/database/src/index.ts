@@ -22,6 +22,7 @@ export * as groupRepository from "./repositories/groups";
 export * as coachTaskRepository from "./repositories/coach-tasks";
 export * as announcementRepository from "./repositories/announcements";
 export * as coachNotesRepository from "./repositories/coach-notes";
+export * as scheduleRepository from "./repositories/schedule";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {
@@ -62,6 +63,8 @@ export type {
   TestAssignmentRecord,
   TestAssignmentStatus,
   SchoolScheduleRecord,
+  StudyBlockRecord,
+  StudyBlockStatus,
   CoachStudentNoteRecord,
   CoachNoteKind,
   CurriculumRecord,
