@@ -13,4 +13,12 @@ describe("demo auth users", () => {
     expect(student).toBeDefined();
     expect(compareSync(DEMO_PASSWORD, student!.passwordHash)).toBe(true);
   });
+
+  it("super admin demo hesaplari vardir", () => {
+    for (const email of ["admin@uyanik.local", "superadmin@uyanik.local"]) {
+      const user = demoUsers.find((entry) => entry.email === email);
+      expect(user?.role).toBe("ORG_ADMIN");
+      expect(compareSync(DEMO_PASSWORD, user!.passwordHash)).toBe(true);
+    }
+  });
 });

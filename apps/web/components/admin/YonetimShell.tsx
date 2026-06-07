@@ -3,11 +3,12 @@
 import type { AppRole } from "@uyanik/tokens";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 import { AdminStoreProvider } from "@/components/admin/AdminStore";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { loginHrefForPath } from "@/lib/rbac";
 
 export function YonetimShell({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
@@ -19,7 +20,7 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+      router.replace(loginHrefForPath(pathname));
     }
   }, [status, pathname, router]);
 
@@ -34,7 +35,7 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
   const userRole = session?.user?.role;
   if (userRole !== "admin" && userRole !== "branch") {
     return (
-      <div className="card card-pad stack" style={{ margin: 24, maxWidth: 520 }}>
+      <div className="card card-pad stack" style={{ margin: 24, maxWidth: 520, gap: 12 }}>
         <b style={{ fontSize: 16 }}>Yonetim paneline erisim yok</b>
         <p className="muted" style={{ fontSize: 13.5, lineHeight: 1.55 }}>
           Bu alan yalnizca Super Admin veya Kurum yoneticisi hesaplari icindir.
@@ -46,9 +47,14 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
             <div className="muted">Sifre: uyanik123</div>
           </div>
         </div>
-        <Link href={`/login?next=${encodeURIComponent(pathname)}&role=admin`} className="btn btn-primary" style={{ width: "fit-content" }}>
-          Super Admin ile giris yap
-        </Link>
+        <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+          <Link href={loginHrefForPath(pathname, "admin")} className="btn btn-primary">
+            Super Admin ile giris
+          </Link>
+          <Link href={loginHrefForPath(pathname, "branch")} className="btn btn-light">
+            Kurum ile giris
+          </Link>
+        </div>
       </div>
     );
   }
@@ -67,9 +73,15 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
               !
             </span>
             <div style={{ flex: 1, fontSize: 13 }}>
-              <b>Bu sayfa Super Admin icindir.</b> Kurum menusu farklidir;{" "}
-              <b>admin@uyanik.local</b> ile cikis yapip tekrar girin.
+              <b>Bu sayfa Super Admin icindir.</b> Kurum hesabiyla erisemezsiniz.
             </div>
+            <button
+              type="button"
+              className="btn btn-sm btn-primary"
+              onClick={() => void signOut({ callbackUrl: loginHrefForPath("/yonetim/dashboard", "admin") })}
+            >
+              Super Admin ile gir
+            </button>
           </div>
         ) : null}
         {needBranch && userRole === "admin" ? (
@@ -81,9 +93,15 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
               i
             </span>
             <div style={{ flex: 1, fontSize: 13 }}>
-              <b>Bu sayfa Kurum yoneticisi icindir.</b>{" "}
-              <b>branch@uyanik.local</b> ile giris yapin.
+              <b>Bu sayfa Kurum yoneticisi icindir.</b> Super Admin hesabiyla erisemezsiniz.
             </div>
+            <button
+              type="button"
+              className="btn btn-sm btn-light"
+              onClick={() => void signOut({ callbackUrl: loginHrefForPath("/yonetim/dashboard", "branch") })}
+            >
+              Kurum ile gir
+            </button>
           </div>
         ) : null}
         {children}

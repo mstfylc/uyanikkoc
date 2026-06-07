@@ -1,9 +1,10 @@
 "use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { yonetimLoginRoleHint } from "@/lib/rbac";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type DemoRole = "student" | "coach" | "parent" | "admin" | "branch";
 
@@ -23,45 +24,33 @@ const DEMO_ROLE_ICON: Record<DemoRole, string> = {
   branch: "ki-office-bag",
 };
 
-const ADMIN_ONLY_YONETIM = ["/yonetim/orgs", "/yonetim/licenses", "/yonetim/campaigns", "/yonetim/modules", "/yonetim/support"];
-const BRANCH_ONLY_YONETIM = ["/yonetim/branches", "/yonetim/license", "/yonetim/managers", "/yonetim/students", "/yonetim/reports", "/yonetim/settings"];
-
-function yonetimDemoRole(nextPath: string, roleParam: string | null): DemoRole | null {
-  if (roleParam === "admin" || roleParam === "branch") {
-    return roleParam;
-  }
-  if (!nextPath.startsWith("/yonetim")) {
-    return null;
-  }
-  if (ADMIN_ONLY_YONETIM.some((p) => nextPath === p || nextPath.startsWith(`${p}/`))) {
-    return "admin";
-  }
-  if (BRANCH_ONLY_YONETIM.some((p) => nextPath === p || nextPath.startsWith(`${p}/`))) {
-    return "branch";
-  }
-  return "admin";
+function resolveDemoRole(nextPath: string, roleParam: string | null): DemoRole {
+  return yonetimLoginRoleHint(nextPath, roleParam) ?? "student";
 }
 
 export function LoginForm() {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") ?? "/post-login";
   const roleParam = searchParams.get("role");
+  const initialRole = useMemo(() => resolveDemoRole(nextPath, roleParam), [nextPath, roleParam]);
+  const initialDemo = DEMO_BY_ROLE[initialRole];
+  const yonetimHint = yonetimLoginRoleHint(nextPath, roleParam);
 
-  const [demoRole, setDemoRole] = useState<DemoRole>(() => yonetimDemoRole(nextPath, roleParam) ?? "student");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [demoRole, setDemoRole] = useState<DemoRole>(initialRole);
+  const [email, setEmail] = useState(yonetimHint ? initialDemo.email : "");
+  const [password, setPassword] = useState(yonetimHint ? initialDemo.password : "");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const role = yonetimDemoRole(nextPath, roleParam);
-    if (!role) {
-      return;
-    }
+    const role = resolveDemoRole(nextPath, roleParam);
+    const hint = yonetimLoginRoleHint(nextPath, roleParam);
     setDemoRole(role);
-    setEmail(DEMO_BY_ROLE[role].email);
-    setPassword(DEMO_BY_ROLE[role].password);
+    if (hint) {
+      setEmail(DEMO_BY_ROLE[role].email);
+      setPassword(DEMO_BY_ROLE[role].password);
+    }
   }, [nextPath, roleParam]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -82,12 +71,18 @@ export function LoginForm() {
       return;
     }
 
-    // Tam sayfa geçiş — App Router'da router.push oturum çerezini server'a taşımıyor.
     window.location.assign(nextPath);
   }
 
   function fillDemo() {
     const demo = DEMO_BY_ROLE[demoRole];
+    setEmail(demo.email);
+    setPassword(demo.password);
+  }
+
+  function selectDemoRole(role: DemoRole) {
+    setDemoRole(role);
+    const demo = DEMO_BY_ROLE[role];
     setEmail(demo.email);
     setPassword(demo.password);
   }
@@ -150,6 +145,23 @@ export function LoginForm() {
             </p>
           </div>
 
+          {yonetimHint ? (
+            <div
+              className="alert-strip"
+              style={{ marginBottom: 14, background: "var(--primary-soft)", borderColor: "var(--primary)" }}
+            >
+              <span className="as-ic" style={{ background: "var(--primary)", color: "#fff" }}>
+                <KiIcon name="ki-shield-tick" size={14} />
+              </span>
+              <div style={{ flex: 1, fontSize: 12.5, lineHeight: 1.5 }}>
+                <b>Yonetim paneli girisi.</b>{" "}
+                {yonetimHint === "admin"
+                  ? "Super Admin hesabi secildi (admin@uyanik.local)."
+                  : "Kurum yoneticisi hesabi secildi (branch@uyanik.local)."}
+              </div>
+            </div>
+          ) : null}
+
           <div className="seg" style={{ width: "100%", marginBottom: 18, flexWrap: "wrap" }}>
             {(["student", "coach", "parent", "admin", "branch"] as DemoRole[]).map((role) => (
               <button
@@ -157,12 +169,7 @@ export function LoginForm() {
                 type="button"
                 className={demoRole === role ? "on" : ""}
                 style={{ flex: "1 1 auto", minWidth: 88, justifyContent: "center" }}
-                onClick={() => {
-                  setDemoRole(role);
-                  const demo = DEMO_BY_ROLE[role];
-                  setEmail(demo.email);
-                  setPassword(demo.password);
-                }}
+                onClick={() => selectDemoRole(role)}
               >
                 <KiIcon name={DEMO_ROLE_ICON[role]} />
                 {DEMO_BY_ROLE[role].label}

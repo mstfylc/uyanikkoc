@@ -5,7 +5,7 @@ import { orgCoaches } from "@/lib/admin/derive";
 import { modulesFromPlan, orgPlanById } from "@/lib/admin/pricing";
 import { resolveActiveOrgId, resolveOrgCoachId } from "@/lib/admin/snapshot-context";
 import type { Org } from "@/lib/admin/types";
-import { ROLE_HOME_PATH, canAccessPath, getUnauthorizedRedirect, isPublicPath } from "@/lib/rbac";
+import { ROLE_HOME_PATH, canAccessPath, getUnauthorizedRedirect, isPublicPath, loginHrefForPath, yonetimLoginRoleHint } from "@/lib/rbac";
 
 const demoOrg: Org = {
   id: DEMO_ORG_ID,
@@ -57,6 +57,19 @@ describe("RBAC path erişim kontrolü", () => {
   it("session yoksa login'e yönlendirir", () => {
     const result = getUnauthorizedRedirect("/student/dashboard", null);
     expect(result).toBe("/login?next=%2Fstudent%2Fdashboard");
+  });
+
+  it("yonetim hedefi icin login role ipucu ekler", () => {
+    expect(getUnauthorizedRedirect("/yonetim/orgs", null)).toBe(
+      "/login?next=%2Fyonetim%2Forgs&role=admin",
+    );
+    expect(getUnauthorizedRedirect("/yonetim/students", null)).toBe(
+      "/login?next=%2Fyonetim%2Fstudents&role=branch",
+    );
+    expect(yonetimLoginRoleHint("/yonetim/dashboard")).toBe("admin");
+    expect(loginHrefForPath("/yonetim/orgs", "admin")).toBe(
+      "/login?next=%2Fyonetim%2Forgs&role=admin",
+    );
   });
 
   it("post-login oturum kontrolünü sayfa yapar (middleware public)", () => {

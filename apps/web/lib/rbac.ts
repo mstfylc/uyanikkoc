@@ -111,6 +111,51 @@ function matchesPrefix(pathname: string, prefix: string): boolean {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }
 
+/** /yonetim hedefi icin login formunda onerilecek demo rolu. */
+export function yonetimLoginRoleHint(
+  pathname: string,
+  roleParam?: string | null,
+): "admin" | "branch" | null {
+  if (roleParam === "admin" || roleParam === "branch") {
+    return roleParam;
+  }
+  if (!pathname.startsWith("/yonetim")) {
+    return null;
+  }
+  if (YONETIM_ADMIN_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))) {
+    return "admin";
+  }
+  if (YONETIM_BRANCH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))) {
+    return "branch";
+  }
+  return "admin";
+}
+
+export function loginHrefForPath(pathname: string, roleHint?: "admin" | "branch" | null): string {
+  const role = roleHint ?? yonetimLoginRoleHint(pathname);
+  const base = `/login?next=${encodeURIComponent(pathname)}`;
+  return role ? `${base}&role=${role}` : base;
+}
+
+function yonetimMismatchRedirect(role: AppRole, pathname: string): string | null {
+  if (!pathname.startsWith("/yonetim")) {
+    return null;
+  }
+  if (
+    role === "branch" &&
+    YONETIM_ADMIN_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
+  ) {
+    return "/yonetim/dashboard?need=superadmin";
+  }
+  if (
+    role === "admin" &&
+    YONETIM_BRANCH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
+  ) {
+    return "/yonetim/dashboard?need=branch";
+  }
+  return null;
+}
+
 export function canAccessPath(role: AppRole, pathname: string): boolean {
   if (pathname.startsWith("/student")) {
     return role === "student";
@@ -163,26 +208,16 @@ export function getUnauthorizedRedirect(
   }
 
   if (!hasSessionUser(session)) {
-    return `/login?next=${encodeURIComponent(pathname)}`;
+    return loginHrefForPath(pathname);
   }
 
   const role = resolveSessionRole(session);
   if (!role || !canAccessPath(role, pathname)) {
-    if (
-      role === "branch" &&
-      pathname.startsWith("/yonetim") &&
-      YONETIM_ADMIN_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
-    ) {
-      return "/yonetim/dashboard?need=superadmin";
+    const mismatch = role ? yonetimMismatchRedirect(role, pathname) : null;
+    if (mismatch) {
+      return mismatch;
     }
-    if (
-      role === "admin" &&
-      pathname.startsWith("/yonetim") &&
-      YONETIM_BRANCH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
-    ) {
-      return "/yonetim/dashboard?need=branch";
-    }
-    return role ? ROLE_HOME_PATH[role] : `/login?next=${encodeURIComponent(pathname)}`;
+    return role ? ROLE_HOME_PATH[role] : loginHrefForPath(pathname);
   }
 
   return null;
