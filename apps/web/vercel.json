@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm db:generate && pnpm --filter @uyanik/web exec next build"
+  "buildCommand": "cd ../.. && pnpm db:generate && cd apps/web && node ../../node_modules/next/dist/bin/next build"
 }
