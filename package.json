@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "test:unit": "turbo run test",
     "test:e2e": "pnpm --filter @uyanik/web test:e2e",
-    "db:generate": "pnpm --filter @uyanik/database generate",
+    "db:generate": "node node_modules/prisma/build/index.js generate --schema=packages/database/prisma/schema.prisma",
     "db:migrate": "pnpm --filter @uyanik/database migrate",
     "db:seed": "pnpm --filter @uyanik/database seed",
     "db:verify-alpha": "pnpm --filter @uyanik/database verify:alpha"

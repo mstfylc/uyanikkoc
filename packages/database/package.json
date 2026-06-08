@@ -9,7 +9,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "lint": "eslint src prisma/seed.ts --max-warnings 0",
-    "generate": "pnpm exec prisma generate --schema=./prisma/schema.prisma",
+    "generate": "node ../../node_modules/prisma/build/index.js generate --schema=./prisma/schema.prisma",
     "migrate": "prisma migrate deploy",
     "migrate:dev": "prisma migrate dev",
     "studio": "prisma studio",
