@@ -551,6 +551,25 @@ export function getMockSnapshot(ctx: AdminSnapshotContext = {}): AdminSnapshot {
   };
 }
 
+export function loadMockSnapshot(snapshot: AdminSnapshot): void {
+  globalForAdmin.__ukAdminStore = {
+    orgs: structuredClone(snapshot.orgs),
+    coaches: structuredClone(snapshot.coaches),
+    studentSubscriptions: structuredClone(snapshot.studentSubscriptions),
+    orgInvites: structuredClone(snapshot.orgInvites),
+    orgInvoices: structuredClone(snapshot.orgInvoices),
+    tasks: structuredClone(snapshot.tasks),
+    feedback: structuredClone(snapshot.feedback),
+    removedCoachIds: structuredClone(snapshot.removedCoachIds),
+    team: structuredClone(snapshot.team),
+    tickets: structuredClone(snapshot.tickets),
+    systemNotes: structuredClone(snapshot.systemNotes),
+    licenseNotes: structuredClone(snapshot.licenseNotes),
+    campaigns: structuredClone(snapshot.campaigns),
+    campaignGrants: structuredClone(snapshot.campaignGrants),
+  };
+}
+
 export function resetMockStore(): void {
   globalForAdmin.__ukAdminStore = freshStore();
 }

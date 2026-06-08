@@ -1,4 +1,5 @@
 import type {
+  CoachTopicTargetsRecord,
   CreateSubjectInput,
   CreateTopicInput,
   SubjectRecord,
@@ -17,6 +18,16 @@ export type StudentTopicListResult = {
   subjects: SubjectRecord[];
   summary: TopicTrackingSummary;
 };
+
+function normalizeTargets(targets: Record<string, number>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [key, value] of Object.entries(targets)) {
+    if (key.length > 0) {
+      out[key] = Math.max(0, Math.min(99999, Math.round(Number(value) || 0)));
+    }
+  }
+  return out;
+}
 
 async function listSubjectsForStudent(studentId: string): Promise<SubjectRecord[]> {
   if (shouldUseDatabase()) {
@@ -103,6 +114,33 @@ export async function deleteStudentTopic(topicId: string, studentId: string): Pr
   }
 
   return memoryTopics.deleteTopic(topicId, studentId);
+}
+
+export async function getCoachTopicTargets(
+  coachId: string,
+  studentId: string,
+): Promise<CoachTopicTargetsRecord | null> {
+  if (shouldUseDatabase()) {
+    const { topicRepository } = await import("@uyanik/database");
+    return topicRepository.getCoachTopicTargets(coachId, studentId);
+  }
+
+  return memoryTopics.getCoachTopicTargets(coachId, studentId);
+}
+
+export async function saveCoachTopicTargets(
+  coachId: string,
+  studentId: string,
+  targets: Record<string, number>,
+): Promise<CoachTopicTargetsRecord> {
+  const normalized = normalizeTargets(targets);
+
+  if (shouldUseDatabase()) {
+    const { topicRepository } = await import("@uyanik/database");
+    return topicRepository.upsertCoachTopicTargets(coachId, studentId, normalized);
+  }
+
+  return memoryTopics.upsertCoachTopicTargets(coachId, studentId, normalized);
 }
 
 export async function listStudentTopicStudySessions(

@@ -12,6 +12,32 @@ import type { AppRole } from "@uyanik/tokens";
 import * as memory from "@/mocks/admin";
 import type { AdminMutation, AdminSnapshot } from "@/lib/admin/types";
 
+async function loadDbAdminState(): Promise<void> {
+  if (!shouldUseDatabase()) {
+    return;
+  }
+
+  const { adminStateRepository } = await import("@uyanik/database");
+  const snapshot = await adminStateRepository.getAdminState();
+  if (snapshot) {
+    memory.loadMockSnapshot(snapshot as AdminSnapshot);
+    return;
+  }
+
+  const initial = memory.getMockSnapshot({});
+  await adminStateRepository.saveAdminState(initial);
+  memory.loadMockSnapshot(initial);
+}
+
+async function saveDbAdminState(): Promise<void> {
+  if (!shouldUseDatabase()) {
+    return;
+  }
+
+  const { adminStateRepository } = await import("@uyanik/database");
+  await adminStateRepository.saveAdminState(memory.getMockSnapshot({}));
+}
+
 export class AdminMutationError extends Error {
   constructor(message: string) {
     super(message);
@@ -27,7 +53,7 @@ export class AdminMutationError extends Error {
 
 export async function getAdminSnapshot(ctx: AdminSnapshotContext = {}): Promise<AdminSnapshot> {
   // if (shouldUseDatabase()) return (await repo()).getSnapshot(ctx);
-  void shouldUseDatabase;
+  await loadDbAdminState();
   return memory.getMockSnapshot(ctx);
 }
 
@@ -36,6 +62,8 @@ export async function applyAdminMutation(
   ctx: AdminSnapshotContext = {},
   role: AppRole = "admin",
 ): Promise<AdminSnapshot> {
+  await loadDbAdminState();
+
   const scopeError = assertMutationAllowed(m, ctx, role);
   if (scopeError) {
     throw new AdminMutationError(scopeError);
@@ -234,5 +262,6 @@ export async function applyAdminMutation(
       void _exhaustive;
     }
   }
+  await saveDbAdminState();
   return memory.getMockSnapshot(ctx);
 }

@@ -7,7 +7,9 @@ import {
   listSubjectsForStudent,
   listStudySessionsForStudent,
   resetTopicsForTests,
+  getCoachTopicTargets,
   updateTopic,
+  upsertCoachTopicTargets,
   upsertStudySession,
 } from "@/mocks/topics";
 import { filterSubjectsForStudentExam, studentSinav } from "@/lib/design/student-exam";
@@ -94,6 +96,17 @@ describe("topic tracking mock store", () => {
     expect(updated?.id).toBe(created?.id);
     expect(listStudySessionsForStudent(DEMO_STUDENT_ID)).toHaveLength(1);
     expect(listStudySessionsForStudent(DEMO_STUDENT_ID)[0]?.correctCount).toBe(36);
+  });
+
+  it("persists coach topic targets in mock mode", () => {
+    const saved = upsertCoachTopicTargets("coach_001", DEMO_STUDENT_ID, {
+      "Matematik:Problemler": 120,
+      "Fizik:Hareket": -5,
+    });
+
+    expect(saved.targets["Matematik:Problemler"]).toBe(120);
+    expect(saved.targets["Fizik:Hareket"]).toBe(0);
+    expect(getCoachTopicTargets("coach_001", DEMO_STUDENT_ID)?.targets).toEqual(saved.targets);
   });
 });
 

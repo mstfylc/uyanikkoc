@@ -1,4 +1,5 @@
 import type {
+  CoachTopicTargetsRecord,
   CreateSubjectInput,
   CreateTopicInput,
   SubjectRecord,
@@ -17,11 +18,14 @@ export { DEMO_STUDENT_ID };
 const globalStore = globalThis as typeof globalThis & {
   __uyanikSubjects?: SubjectRecord[];
   __uyanikTopicStudySessions?: TopicStudySessionRecord[];
+  __uyanikCoachTopicTargets?: Record<string, CoachTopicTargetsRecord>;
 };
 
 const subjects = globalStore.__uyanikSubjects ?? (globalStore.__uyanikSubjects = []);
 const studySessions =
   globalStore.__uyanikTopicStudySessions ?? (globalStore.__uyanikTopicStudySessions = []);
+const coachTopicTargets =
+  globalStore.__uyanikCoachTopicTargets ?? (globalStore.__uyanikCoachTopicTargets = {});
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -80,6 +84,45 @@ function seedIfEmpty() {
 export function resetTopicsForTests() {
   subjects.length = 0;
   studySessions.length = 0;
+  for (const key of Object.keys(coachTopicTargets)) {
+    delete coachTopicTargets[key];
+  }
+}
+
+function coachTargetKey(coachId: string, studentId: string): string {
+  return `${coachId}:${studentId}`;
+}
+
+function normalizeTargets(targets: Record<string, number>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [key, value] of Object.entries(targets)) {
+    if (key.length > 0) {
+      out[key] = Math.max(0, Math.min(99999, Math.round(Number(value) || 0)));
+    }
+  }
+  return out;
+}
+
+export function getCoachTopicTargets(
+  coachId: string,
+  studentId: string,
+): CoachTopicTargetsRecord | null {
+  return coachTopicTargets[coachTargetKey(coachId, studentId)] ?? null;
+}
+
+export function upsertCoachTopicTargets(
+  coachId: string,
+  studentId: string,
+  targets: Record<string, number>,
+): CoachTopicTargetsRecord {
+  const record: CoachTopicTargetsRecord = {
+    coachId,
+    studentId,
+    targets: normalizeTargets(targets),
+    updatedAt: nowIso(),
+  };
+  coachTopicTargets[coachTargetKey(coachId, studentId)] = record;
+  return record;
 }
 
 export function listSubjectsForStudent(studentId: string): SubjectRecord[] {

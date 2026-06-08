@@ -2,6 +2,7 @@ import { prisma } from "../client";
 import type {
   CreateSubjectInput,
   CreateTopicInput,
+  CoachTopicTargetsRecord,
   SubjectRecord,
   TopicExamType,
   TopicProgressRecord,
@@ -10,6 +11,31 @@ import type {
   TopicTrackingSummary,
   UpsertTopicStudySessionInput,
 } from "../types";
+
+function normalizeTargets(targets: Record<string, number>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [key, value] of Object.entries(targets)) {
+    if (key.length > 0) {
+      out[key] = Math.max(0, Math.min(99999, Math.round(Number(value) || 0)));
+    }
+  }
+  return out;
+}
+
+function mapTargets(row: {
+  coachId: string;
+  studentId: string;
+  targets: unknown;
+  updatedAt: Date;
+}): CoachTopicTargetsRecord {
+  const raw = row.targets && typeof row.targets === "object" ? row.targets : {};
+  return {
+    coachId: row.coachId,
+    studentId: row.studentId,
+    targets: normalizeTargets(raw as Record<string, number>),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
 
 function mapProgress(progress: {
   completed: boolean;
@@ -313,6 +339,30 @@ export async function deleteTopic(topicId: string, studentId: string): Promise<b
 
   await prisma.topic.delete({ where: { id: topicId } });
   return true;
+}
+
+export async function getCoachTopicTargets(
+  coachId: string,
+  studentId: string,
+): Promise<CoachTopicTargetsRecord | null> {
+  const row = await prisma.coachTopicTarget.findUnique({
+    where: { coachId_studentId: { coachId, studentId } },
+  });
+  return row ? mapTargets(row) : null;
+}
+
+export async function upsertCoachTopicTargets(
+  coachId: string,
+  studentId: string,
+  targets: Record<string, number>,
+): Promise<CoachTopicTargetsRecord> {
+  const normalized = normalizeTargets(targets);
+  const row = await prisma.coachTopicTarget.upsert({
+    where: { coachId_studentId: { coachId, studentId } },
+    create: { coachId, studentId, targets: normalized },
+    update: { targets: normalized },
+  });
+  return mapTargets(row);
 }
 
 export async function listStudySessionsForStudent(

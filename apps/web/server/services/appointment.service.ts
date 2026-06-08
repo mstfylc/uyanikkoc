@@ -29,6 +29,11 @@ export {
 } from "@/mocks/appointments";
 
 export async function getCoachAppointmentSettings(coachId: string): Promise<AppointmentSettingsRecord> {
+  if (shouldUseDatabase()) {
+    const { appointmentRepository } = await import("@uyanik/database");
+    return appointmentRepository.getAppointmentSettings(coachId);
+  }
+
   return memoryAppointments.getAppointmentSettings(coachId);
 }
 
@@ -36,14 +41,29 @@ export async function updateCoachAppointmentSettings(
   coachId: string,
   patch: Partial<Omit<AppointmentSettingsRecord, "coachId">>,
 ): Promise<AppointmentSettingsRecord> {
+  if (shouldUseDatabase()) {
+    const { appointmentRepository } = await import("@uyanik/database");
+    return appointmentRepository.updateAppointmentSettings(coachId, patch);
+  }
+
   return memoryAppointments.updateAppointmentSettings(coachId, patch);
 }
 
 export async function listCoachAppointments(coachId: string): Promise<AppointmentRecord[]> {
+  if (shouldUseDatabase()) {
+    const { appointmentRepository } = await import("@uyanik/database");
+    return appointmentRepository.listAppointmentsForCoach(coachId);
+  }
+
   return memoryAppointments.listAppointmentsForCoach(coachId);
 }
 
 export async function listStudentAppointments(studentId: string): Promise<AppointmentRecord[]> {
+  if (shouldUseDatabase()) {
+    const { appointmentRepository } = await import("@uyanik/database");
+    return appointmentRepository.listAppointmentsForStudent(studentId);
+  }
+
   return memoryAppointments.listAppointmentsForStudent(studentId);
 }
 
@@ -59,14 +79,21 @@ export async function createStudentAppointment(
   },
   role: "student" | "parent" = "student",
 ): Promise<AppointmentRecord> {
-  const settings = memoryAppointments.getAppointmentSettings(input.coachId);
-  const activeCount = memoryAppointments.countActiveAppointmentsForStudent(input.studentId);
+  const settings = await getCoachAppointmentSettings(input.coachId);
+  const activeCount = shouldUseDatabase()
+    ? await (await import("@uyanik/database")).appointmentRepository.countActiveAppointmentsForStudent(input.studentId)
+    : memoryAppointments.countActiveAppointmentsForStudent(input.studentId);
   const limit = weeklyLimitFor(role, settings);
   if (limit > 0 && activeCount >= limit) {
     throw new Error("Haftalik randevu limitine ulasildi.");
   }
   if (!slotSupportsMode(settings.slotModes, input.day, input.slot, input.mode)) {
     throw new Error("Secilen slot bu gorunme tipini desteklemiyor.");
+  }
+
+  if (shouldUseDatabase()) {
+    const { appointmentRepository } = await import("@uyanik/database");
+    return appointmentRepository.createAppointment(input);
   }
 
   return memoryAppointments.createAppointment(input);
@@ -77,6 +104,11 @@ export async function setCoachAppointmentStatus(
   appointmentId: string,
   status: AppointmentStatus,
 ): Promise<AppointmentRecord | null> {
+  if (shouldUseDatabase()) {
+    const { appointmentRepository } = await import("@uyanik/database");
+    return appointmentRepository.setAppointmentStatus(coachId, appointmentId, status);
+  }
+
   const appointments = memoryAppointments.listAppointmentsForCoach(coachId);
   const match = appointments.find((item) => item.id === appointmentId);
   if (!match) {

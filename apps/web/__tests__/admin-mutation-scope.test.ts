@@ -5,7 +5,7 @@ import { orgCoaches } from "@/lib/admin/derive";
 import { modulesFromPlan, orgPlanById } from "@/lib/admin/pricing";
 import { assertMutationAllowed } from "@/lib/admin/mutation-scope";
 import type { Org } from "@/lib/admin/types";
-import { getMockSnapshot, findTask } from "@/mocks/admin";
+import { getMockSnapshot, findTask, loadMockSnapshot, resetMockStore } from "@/mocks/admin";
 
 const demoOrg: Org = {
   id: DEMO_ORG_ID,
@@ -60,5 +60,17 @@ describe("admin mutation scope", () => {
     expect(
       assertMutationAllowed({ kind: "renewOrg", orgId: DEMO_ORG_ID }, { coachId: DEMO_COACH_ID, role: "coach" }, "coach"),
     ).toBe("forbidden mutation for coach role");
+  });
+
+  it("snapshot store'a geri yuklenebilir", () => {
+    const snapshot = getMockSnapshot({});
+    const renamed = {
+      ...snapshot,
+      orgs: snapshot.orgs.map((org, index) => index === 0 ? { ...org, name: "Kalici Demo Kurum" } : org),
+    };
+
+    loadMockSnapshot(renamed);
+    expect(getMockSnapshot({}).orgs[0]?.name).toBe("Kalici Demo Kurum");
+    resetMockStore();
   });
 });

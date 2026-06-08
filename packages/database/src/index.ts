@@ -23,6 +23,8 @@ export * as coachTaskRepository from "./repositories/coach-tasks";
 export * as announcementRepository from "./repositories/announcements";
 export * as coachNotesRepository from "./repositories/coach-notes";
 export * as scheduleRepository from "./repositories/schedule";
+export * as appointmentRepository from "./repositories/appointments";
+export * as adminStateRepository from "./repositories/admin-state";
 export * as curriculumRepository from "./repositories/curriculum";
 export { DEFAULT_CURRICULUM_SUBJECTS } from "./repositories/curriculum";
 export * as denemeRepository from "./repositories/deneme-events";
@@ -39,6 +41,7 @@ export type {
   AssignmentType,
   AuthUserRecord,
   CoachRosterEntry,
+  CoachTopicTargetsRecord,
   CreateAssignmentTemplateInput,
   CreateExamResultInput,
   CreateSubjectInput,

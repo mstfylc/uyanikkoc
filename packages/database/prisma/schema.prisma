@@ -87,9 +87,33 @@ model User {
   subscriptions  Subscription[]  @relation("PayerSubscriptions")
   invoices       Invoice[]
   supportTickets SupportTicket[]
+  passwordResetTokens PasswordResetToken[]
 
   @@index([organizationId, branchId])
   @@map("users")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model AdminState {
+  id        String   @id
+  snapshot  Json
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("admin_states")
 }
 
 model StudentProfile {
@@ -117,6 +141,8 @@ model StudentProfile {
   testAssignments   TestAssignment[]
   parentReports     ParentReport[]
   topicStudySessions TopicStudySession[]
+  coachTopicTargets CoachTopicTarget[]
+  appointments Appointment[]
 
   @@map("student_profiles")
 }
@@ -137,6 +163,9 @@ model CoachProfile {
   customTests CustomPsychTest[]
   testAssignments TestAssignment[]
   parentReports ParentReport[]
+  topicTargets CoachTopicTarget[]
+  appointmentSettings AppointmentSettings?
+  appointments Appointment[]
 
   @@map("coach_profiles")
 }
@@ -223,6 +252,80 @@ model TopicProgress {
 
   @@index([studentId])
   @@map("topic_progress")
+}
+
+enum AppointmentMode {
+  online
+  in_person
+  phone
+}
+
+enum AppointmentStatus {
+  pending
+  approved
+  rejected
+  cancelled
+}
+
+enum AppointmentDay {
+  Pzt
+  Sal
+  Car
+  Per
+  Cum
+  Cmt
+}
+
+model AppointmentSettings {
+  id                 String       @id @default(cuid())
+  coachId            String       @unique
+  weeklyLimit        Int          @default(2)
+  weeklyLimitStudent Int          @default(2)
+  weeklyLimitParent  Int          @default(1)
+  allowOnline        Boolean      @default(true)
+  allowInPerson      Boolean      @default(true)
+  allowPhone         Boolean      @default(true)
+  availability       Json
+  slotModes          Json
+  updatedAt          DateTime     @updatedAt
+  coach              CoachProfile @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@map("appointment_settings")
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  coachId   String
+  studentId String
+  day       AppointmentDay
+  slot      String
+  mode      AppointmentMode
+  topic     String
+  status    AppointmentStatus @default(pending)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  coach     CoachProfile      @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  student   StudentProfile    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([coachId])
+  @@index([studentId])
+  @@index([status])
+  @@map("appointments")
+}
+
+model CoachTopicTarget {
+  id        String         @id @default(cuid())
+  coachId   String
+  studentId String
+  targets   Json
+  updatedAt DateTime       @updatedAt
+  createdAt DateTime       @default(now())
+  coach     CoachProfile   @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([coachId, studentId])
+  @@index([studentId])
+  @@map("coach_topic_targets")
 }
 
 model TopicStudySession {

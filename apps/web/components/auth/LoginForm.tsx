@@ -41,7 +41,10 @@ export function LoginForm() {
   const [password, setPassword] = useState(yonetimHint ? initialDemo.password : "");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [resetUrl, setResetUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResetSubmitting, setIsResetSubmitting] = useState(false);
 
   useEffect(() => {
     const role = resolveDemoRole(nextPath, roleParam);
@@ -85,6 +88,40 @@ export function LoginForm() {
     const demo = DEMO_BY_ROLE[role];
     setEmail(demo.email);
     setPassword(demo.password);
+  }
+
+  async function requestReset() {
+    setError(null);
+    setResetMessage(null);
+    setResetUrl(null);
+    const resetEmail = email.trim();
+    if (!resetEmail) {
+      setError("Sifre sifirlama icin e-posta adresini gir.");
+      return;
+    }
+
+    setIsResetSubmitting(true);
+    const response = await fetch("/api/auth/password-reset/request", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: resetEmail }),
+    });
+    setIsResetSubmitting(false);
+
+    const data = (await response.json().catch(() => ({}))) as {
+      error?: string;
+      message?: string;
+      resetUrl?: string;
+    };
+
+    if (!response.ok) {
+      setError(data.error ?? "Sifre sifirlama talebi olusturulamadi.");
+      return;
+    }
+
+    setResetMessage(data.message ?? "Sifre sifirlama talebi olusturuldu.");
+    setResetUrl(data.resetUrl ?? null);
   }
 
   return (
@@ -230,18 +267,33 @@ export function LoginForm() {
               </span>
               Beni hatirla
             </button>
-            <a
-              href="#"
+            <button
+              type="button"
               className="link-btn"
-              onClick={(event) => event.preventDefault()}
+              onClick={requestReset}
+              disabled={isResetSubmitting}
             >
-              Sifremi unuttum
-            </a>
+              {isResetSubmitting ? "Gonderiliyor..." : "Sifremi unuttum"}
+            </button>
           </div>
 
           {error ? (
             <div className="badge badge-danger" style={{ marginBottom: 14, height: "auto", padding: "10px 12px" }}>
               {error}
+            </div>
+          ) : null}
+
+          {resetMessage ? (
+            <div className="badge badge-success" style={{ marginBottom: 14, height: "auto", padding: "10px 12px", display: "block" }}>
+              {resetMessage}
+              {resetUrl ? (
+                <>
+                  {" "}
+                  <a href={resetUrl} className="link-btn">
+                    Sifreyi yenile
+                  </a>
+                </>
+              ) : null}
             </div>
           ) : null}
 

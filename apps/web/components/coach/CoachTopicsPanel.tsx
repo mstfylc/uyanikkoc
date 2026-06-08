@@ -70,6 +70,7 @@ export function CoachTopicsPanel() {
   const [chartMode, setChartMode] = useState<QuestionChartMode>("daily");
   const [chartOffset, setChartOffset] = useState(0);
   const [targets, setTargets] = useState<Record<string, number>>({});
+  const [savedTargets, setSavedTargets] = useState<Record<string, number>>({});
   const [expTarget, setExpTarget] = useState<string | null>(null);
   const [savedTick, setSavedTick] = useState(false);
   const [odevModal, setOdevModal] = useState<{ open: boolean; subject: string | null; topic: string | null }>({
@@ -82,6 +83,7 @@ export function CoachTopicsPanel() {
   const [assignments, setAssignments] = useState<Array<{ studentId: string; completed: boolean; status: string; dueDate: string | null; updatedAt: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingNote, setIsSavingNote] = useState(false);
+  const [isSavingTargets, setIsSavingTargets] = useState(false);
 
   useEffect(() => {
     async function loadStudents() {
@@ -113,7 +115,7 @@ export function CoachTopicsPanel() {
       return;
     }
 
-    const [topicsResponse, notesResponse, assignmentsResponse] = await Promise.all([
+    const [topicsResponse, notesResponse, assignmentsResponse, targetsResponse] = await Promise.all([
       fetch(`/api/coach/students/topics?studentId=${encodeURIComponent(studentId)}`, {
         credentials: "same-origin",
       }),
@@ -121,6 +123,9 @@ export function CoachTopicsPanel() {
         credentials: "same-origin",
       }),
       fetch("/api/coach/assignments", { credentials: "same-origin" }),
+      fetch(`/api/coach/students/topic-targets?studentId=${encodeURIComponent(studentId)}`, {
+        credentials: "same-origin",
+      }),
     ]);
 
     if (topicsResponse.ok) {
@@ -151,6 +156,13 @@ export function CoachTopicsPanel() {
         assignments: Array<{ studentId: string; completed: boolean; status: string; dueDate: string | null; updatedAt: string }>;
       };
       setAssignments(data.assignments);
+    }
+
+    if (targetsResponse.ok) {
+      const data = (await targetsResponse.json()) as { targets: Record<string, number> };
+      setSavedTargets(data.targets);
+    } else {
+      setSavedTargets({});
     }
   }, [studentId]);
 
@@ -188,9 +200,9 @@ export function CoachTopicsPanel() {
 
   useEffect(() => {
     if (curriculum) {
-      setTargets(defaultGroupTargets(curriculum, subjWeek));
+      setTargets({ ...defaultGroupTargets(curriculum, subjWeek), ...savedTargets });
     }
-  }, [studentId, curriculum, subjWeek]);
+  }, [studentId, curriculum, subjWeek, savedTargets]);
 
   const totalTarget = curriculum
     ? Object.keys(curriculum.subjects).reduce((sum, subject) => sum + subjTarget(subject, curriculum, targets), 0)
@@ -230,9 +242,26 @@ export function CoachTopicsPanel() {
     }
   }
 
-  function saveTargets() {
-    setSavedTick(true);
-    setTimeout(() => setSavedTick(false), 2000);
+  async function saveTargets() {
+    if (!studentId) {
+      return;
+    }
+
+    setIsSavingTargets(true);
+    const response = await fetch("/api/coach/students/topic-targets", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentId, targets }),
+    });
+    setIsSavingTargets(false);
+
+    if (response.ok) {
+      const data = (await response.json()) as { targets: Record<string, number> };
+      setSavedTargets(data.targets);
+      setSavedTick(true);
+      setTimeout(() => setSavedTick(false), 2000);
+    }
   }
 
   const sortedNotes = [...notes].sort((left, right) => Number(right.pinned) - Number(left.pinned));
@@ -393,9 +422,9 @@ export function CoachTopicsPanel() {
           title="Haftalik Soru Hedefi"
           sub="Ogrencin icin ders bazinda hedef belirle"
           action={
-            <button type="button" className="btn btn-primary btn-sm" onClick={saveTargets}>
+            <button type="button" className="btn btn-primary btn-sm" onClick={saveTargets} disabled={isSavingTargets}>
               <KiIcon name={savedTick ? "ki-check" : "ki-target"} size={15} />
-              {savedTick ? "Kaydedildi" : "Hedefleri kaydet"}
+              {isSavingTargets ? "Kaydediliyor" : savedTick ? "Kaydedildi" : "Hedefleri kaydet"}
             </button>
           }
         >

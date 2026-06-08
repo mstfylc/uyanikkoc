@@ -171,6 +171,13 @@ export type UpsertTopicStudySessionInput = {
   correctCount: number;
 };
 
+export type CoachTopicTargetsRecord = {
+  coachId: string;
+  studentId: string;
+  targets: Record<string, number>;
+  updatedAt: string;
+};
+
 export type SubjectRecord = {
   id: string;
   studentId: string;
