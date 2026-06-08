@@ -6,7 +6,7 @@ import { BranchDashboard } from "@/components/admin/branch/BranchDashboard";
 import { SuperOverview } from "@/components/admin/super/SuperOverview";
 import { CoachLicensePanel } from "@/components/coach/CoachLicensePanel";
 
-export default function YonetimDashboardPage() {
+export function YonetimDashboardContent() {
   const { data: session } = useSession();
 
   if (session?.user?.role === "admin") {
@@ -17,4 +17,8 @@ export default function YonetimDashboardPage() {
   }
 
   return <BranchDashboard />;
+}
+
+export default function YonetimDashboardPage() {
+  return <YonetimDashboardContent />;
 }

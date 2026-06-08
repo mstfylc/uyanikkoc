@@ -73,6 +73,9 @@ describe("RBAC path erişim kontrolü", () => {
   });
 
   it("yonetim hedefi icin login role ipucu ekler", () => {
+    expect(getUnauthorizedRedirect("/yonetim", null)).toBe(
+      "/login?next=%2Fyonetim%2Fdashboard&role=admin",
+    );
     expect(getUnauthorizedRedirect("/yonetim/orgs", null)).toBe(
       "/login?next=%2Fyonetim%2Forgs&role=admin",
     );

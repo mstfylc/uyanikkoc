@@ -138,8 +138,9 @@ export function yonetimLoginRoleHint(
 }
 
 export function loginHrefForPath(pathname: string, roleHint?: "admin" | "branch" | "coach" | null): string {
-  const role = roleHint ?? yonetimLoginRoleHint(pathname);
-  const base = `/login?next=${encodeURIComponent(pathname)}`;
+  const targetPath = pathname === "/yonetim" ? "/yonetim/dashboard" : pathname;
+  const role = roleHint ?? yonetimLoginRoleHint(targetPath);
+  const base = `/login?next=${encodeURIComponent(targetPath)}`;
   return role ? `${base}&role=${role}` : base;
 }
 

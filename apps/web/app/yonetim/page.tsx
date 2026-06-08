@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { YonetimDashboardContent } from "./dashboard/page";
 
 export default function YonetimIndexPage() {
-  redirect("/yonetim/dashboard");
+  return <YonetimDashboardContent />;
 }
