@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { StudentResourcesCard } from "@/components/student/StudentResourcesCard";
 import { subjectColor } from "@/lib/design/subject-colors";
 import {
   calculateCompletionRate,
@@ -241,6 +242,13 @@ export function ParentDashboard() {
           </UkSection>
         </div>
       </div>
+
+      <StudentResourcesCard
+        apiPath="/api/parent/sources"
+        title="Kaynak Takibi"
+        sub="Ogrencinin kitap ilerlemesi ve odev harici calisma kayitlari"
+        editable={false}
+      />
     </div>
   );
 }

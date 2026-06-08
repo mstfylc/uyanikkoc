@@ -9,6 +9,7 @@ import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { StudentResourcesCard } from "@/components/student/StudentResourcesCard";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_STATUS_LABELS,
@@ -246,6 +247,19 @@ export function CoachAssignmentsPanel() {
           )}
         </div>
       </UkSection>
+
+      {studentFilter === "all" ? (
+        <div className="card card-pad" style={{ textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
+          Kaynak takibi ve odev harici calismalari gormek icin yukaridan bir ogrenci sec.
+        </div>
+      ) : (
+        <StudentResourcesCard
+          apiPath={`/api/coach/students/${studentFilter}/sources`}
+          title="Kaynak Takibi"
+          sub="Ogrencinin kitap durumu, ilerlemesi ve odev harici calismalari"
+          editable
+        />
+      )}
     </div>
   );
 }
