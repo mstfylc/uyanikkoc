@@ -87,7 +87,9 @@ describe("RBAC path erişim kontrolü", () => {
 
   it("post-login oturum kontrolünü sayfa yapar (middleware public)", () => {
     expect(isPublicPath("/post-login")).toBe(true);
+    expect(isPublicPath("/reset-password")).toBe(true);
     expect(getUnauthorizedRedirect("/post-login", null)).toBeNull();
+    expect(getUnauthorizedRedirect("/reset-password", null)).toBeNull();
   });
 
   it("yanlış rol kendi home'una yönlendirir", () => {
