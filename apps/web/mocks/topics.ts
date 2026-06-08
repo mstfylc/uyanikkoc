@@ -40,6 +40,58 @@ function emptyProgress(timestamp: string) {
   };
 }
 
+function daysBefore(days: number, hour = 12): string {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  date.setHours(hour, 0, 0, 0);
+  return date.toISOString();
+}
+
+function seedDemoStudySessions(timestamp: string): void {
+  if (studySessions.some((session) => session.studentId === DEMO_STUDENT_ID)) {
+    return;
+  }
+
+  const topicMeta = new Map<string, { subjectName: string; topicName: string }>();
+  for (const subject of subjects) {
+    if (subject.studentId !== DEMO_STUDENT_ID) continue;
+    for (const topic of subject.topics) {
+      topicMeta.set(topic.id, { subjectName: subject.name, topicName: topic.name });
+    }
+  }
+
+  const plans: Array<{ topicId: string; baseQuestion: number; baseCorrect: number; count: number; everyDays: number }> = [
+    { topicId: "topic_mem_tyt_1", baseQuestion: 35, baseCorrect: 29, count: 12, everyDays: 6 },
+    { topicId: "topic_mem_tyt_2", baseQuestion: 40, baseCorrect: 27, count: 12, everyDays: 7 },
+    { topicId: "topic_mem_tur_1", baseQuestion: 30, baseCorrect: 25, count: 10, everyDays: 5 },
+    { topicId: "topic_mem_tur_2", baseQuestion: 24, baseCorrect: 18, count: 8, everyDays: 8 },
+    { topicId: "topic_mem_fen_1", baseQuestion: 25, baseCorrect: 17, count: 8, everyDays: 9 },
+    { topicId: "topic_mem_fen_2", baseQuestion: 28, baseCorrect: 22, count: 9, everyDays: 6 },
+  ];
+
+  for (const plan of plans) {
+    const meta = topicMeta.get(plan.topicId);
+    if (!meta) continue;
+    for (let index = 0; index < plan.count; index += 1) {
+      const drift = index % 4;
+      const questionCount = plan.baseQuestion + drift * 5;
+      const correctCount = Math.min(questionCount, plan.baseCorrect + drift * 3 + Math.floor(index / 4));
+      studySessions.push({
+        id: `topic_session_demo_${plan.topicId}_${index + 1}`,
+        topicId: plan.topicId,
+        studentId: DEMO_STUDENT_ID,
+        subjectName: meta.subjectName,
+        topicName: meta.topicName,
+        date: daysBefore((plan.count - index - 1) * plan.everyDays, 18),
+        questionCount,
+        correctCount,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      });
+    }
+  }
+}
+
 function seedIfEmpty() {
   if (subjects.length > 0) {
     return;
@@ -79,6 +131,95 @@ function seedIfEmpty() {
       },
     ],
   });
+
+  subjects.push(
+    {
+      id: "subject_mem_tyt_tur",
+      studentId: DEMO_STUDENT_ID,
+      examType: "TYT",
+      name: "Turkce",
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      topics: [
+        {
+          id: "topic_mem_tur_1",
+          subjectId: "subject_mem_tyt_tur",
+          studentId: DEMO_STUDENT_ID,
+          name: "Paragrafta anlam",
+          progress: {
+            completed: true,
+            completedAt: timestamp,
+            updatedAt: timestamp,
+            completedSources: ["Limit Paragraf"],
+          },
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+        {
+          id: "topic_mem_tur_2",
+          subjectId: "subject_mem_tyt_tur",
+          studentId: DEMO_STUDENT_ID,
+          name: "Cumlede anlam",
+          progress: { ...emptyProgress(timestamp), inProgress: true },
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+        {
+          id: "topic_mem_tur_3",
+          subjectId: "subject_mem_tyt_tur",
+          studentId: DEMO_STUDENT_ID,
+          name: "Sozcukte anlam",
+          progress: { ...emptyProgress(timestamp), inProgress: true },
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+      ],
+    },
+    {
+      id: "subject_mem_tyt_fen",
+      studentId: DEMO_STUDENT_ID,
+      examType: "TYT",
+      name: "Fen Bilimleri",
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      topics: [
+        {
+          id: "topic_mem_fen_1",
+          subjectId: "subject_mem_tyt_fen",
+          studentId: DEMO_STUDENT_ID,
+          name: "Hareket ve kuvvet",
+          progress: { ...emptyProgress(timestamp), inProgress: true },
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+        {
+          id: "topic_mem_fen_2",
+          subjectId: "subject_mem_tyt_fen",
+          studentId: DEMO_STUDENT_ID,
+          name: "Mol kavrami",
+          progress: {
+            completed: true,
+            completedAt: timestamp,
+            updatedAt: timestamp,
+            completedSources: ["345 TYT Kimya"],
+          },
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+        {
+          id: "topic_mem_fen_3",
+          subjectId: "subject_mem_tyt_fen",
+          studentId: DEMO_STUDENT_ID,
+          name: "Canlilarin temel bilesenleri",
+          progress: emptyProgress(timestamp),
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+      ],
+    },
+  );
+
+  seedDemoStudySessions(timestamp);
 }
 
 export function resetTopicsForTests() {
