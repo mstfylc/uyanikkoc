@@ -10,6 +10,31 @@ const globalStore = globalThis as typeof globalThis & {
 const messages = globalStore.__uyanikMotivationMessages ?? (globalStore.__uyanikMotivationMessages = []);
 let seq = globalStore.__uyanikMotivationSeq ?? (globalStore.__uyanikMotivationSeq = 1);
 
+function seedIfEmpty(): void {
+  if (messages.length > 0) {
+    return;
+  }
+
+  const timestamp = new Date(Date.now() - 2 * 60 * 60_000).toISOString();
+  messages.push(
+    {
+      id: `mm_${seq++}`,
+      studentId: "student_001",
+      coachId: "coach_001",
+      body: "Bugun hedefimiz net: once paragraf, sonra turev. Kucuk ama tam odakli iki blok yeter.",
+      createdAt: timestamp,
+    },
+    {
+      id: `mm_${seq++}`,
+      studentId: "student_002",
+      coachId: "coach_001",
+      body: "Geometri tekrarini kisa tutup yanlis defterine don. Iyi gidiyorsun.",
+      createdAt: timestamp,
+    },
+  );
+  globalStore.__uyanikMotivationSeq = seq;
+}
+
 export async function sendToStudents(
   coachId: string,
   studentIds: string[],
@@ -30,5 +55,6 @@ export async function sendToStudents(
 }
 
 export async function latestForStudent(studentId: string): Promise<MotivationMessageRecord | null> {
+  seedIfEmpty();
   return messages.find((item) => item.studentId === studentId) ?? null;
 }

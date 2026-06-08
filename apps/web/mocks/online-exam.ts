@@ -6,6 +6,8 @@ import type {
   SubmitOptikInput,
 } from "@uyanik/database";
 
+import { DEMO_STUDENT_ID } from "@/mocks/assignments";
+
 type StoredExam = Omit<OnlineExamRecord, "submission"> & { answerKey: string[] };
 
 const globalStore = globalThis as typeof globalThis & {
@@ -54,11 +56,35 @@ let seq = globalStore.__uyanikOnlineSeq ?? (globalStore.__uyanikOnlineSeq = 1);
 
 const k = (examId: string, studentId: string) => `${examId}|${studentId}`;
 
+function seedSubmissionsIfEmpty(studentId: string): void {
+  if (subs.size > 0 || studentId !== DEMO_STUDENT_ID) {
+    return;
+  }
+
+  const exam = exams.find((item) => item.id === "oe1");
+  if (!exam) {
+    return;
+  }
+
+  const answers = exam.answerKey.map((answer, index) => (index % 6 === 0 ? "E" : answer));
+  const graded = gradeOptik(answers, exam.answerKey, exam.examType);
+  subs.set(k(exam.id, studentId), {
+    id: `os_${seq++}`,
+    examId: exam.id,
+    studentId,
+    answers,
+    ...graded,
+    createdAt: new Date(Date.now() - 36 * 60 * 60_000).toISOString(),
+  });
+  globalStore.__uyanikOnlineSeq = seq;
+}
+
 export async function listExamsForStudent(
   _branchId: string,
   studentId: string,
   examTypes: ("TYT" | "AYT" | "LGS")[],
 ): Promise<OnlineExamRecord[]> {
+  seedSubmissionsIfEmpty(studentId);
   return exams.filter((e) => examTypes.includes(e.examType)).map((e) => {
     const { answerKey, ...rest } = e;
     void answerKey;
@@ -105,6 +131,7 @@ export async function getSubmissionReview(
   examId: string,
   studentId: string,
 ): Promise<{ submission: OptikSubmissionRecord; answerKey: string[] } | null> {
+  seedSubmissionsIfEmpty(studentId);
   const exam = exams.find((e) => e.id === examId);
   const submission = subs.get(k(examId, studentId));
   if (!exam || !submission) return null;

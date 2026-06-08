@@ -22,6 +22,7 @@ function seedIfEmpty() {
   const timestamp = nowIso();
   const studentThreadId = "thread_coach_student_001";
   const parentThreadId = "thread_coach_parent_001";
+  const groupThreadId = "thread_group_demo_001";
 
   const studentMessages: MessageRecord[] = [
     {
@@ -36,6 +37,13 @@ function seedIfEmpty() {
       threadId: studentThreadId,
       senderRole: "STUDENT",
       body: "Tamam hocam, bugun bitirecegim.",
+      createdAt: timestamp,
+    },
+    {
+      id: "msg_student_3",
+      threadId: studentThreadId,
+      senderRole: "COACH",
+      body: "Bitirince sonuc gir; dogru/yanlis uzerinden yarin programi ayarlayacagim.",
       createdAt: timestamp,
     },
   ];
@@ -53,6 +61,30 @@ function seedIfEmpty() {
       threadId: parentThreadId,
       senderRole: "COACH",
       body: "Tabii, son TYT denemesinde net artisi var. Detaylari paylasacagim.",
+      createdAt: timestamp,
+    },
+    {
+      id: "msg_parent_3",
+      threadId: parentThreadId,
+      senderRole: "COACH",
+      body: "Bu hafta raporu onayladim; Gelisim Raporlari ekraninda gorebilirsiniz.",
+      createdAt: timestamp,
+    },
+  ];
+
+  const groupMessages: MessageRecord[] = [
+    {
+      id: "msg_group_1",
+      threadId: groupThreadId,
+      senderRole: "COACH",
+      body: "TYT kamp grubu: Her gun 20 paragraf + 20 problem hedefini isaretleyin.",
+      createdAt: timestamp,
+    },
+    {
+      id: "msg_group_2",
+      threadId: groupThreadId,
+      senderRole: "STUDENT",
+      body: "Hocam bugunku problem setini tamamladim.",
       createdAt: timestamp,
     },
   ];
@@ -79,6 +111,19 @@ function seedIfEmpty() {
       name: null,
       title: "Veli ile sohbet",
       messages: parentMessages,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    },
+    {
+      id: groupThreadId,
+      coachId: DEMO_COACH_ID,
+      studentId: null,
+      parentId: null,
+      kind: "group",
+      name: "TYT Kamp Grubu",
+      title: "TYT Kamp Grubu",
+      memberUserIds: ["user_student_001", "user_student_002", "user_parent_001"],
+      messages: groupMessages,
       createdAt: timestamp,
       updatedAt: timestamp,
     },

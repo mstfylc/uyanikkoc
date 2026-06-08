@@ -36,6 +36,135 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
+function daysFromNow(days: number, hour = 12): string {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  date.setHours(hour, 0, 0, 0);
+  return date.toISOString();
+}
+
+function seedIfEmpty(): void {
+  if (assignments.length > 0) {
+    return;
+  }
+
+  const timestamp = nowIso();
+  assignments.push(
+    {
+      id: "assignment_demo_001",
+      title: "Turev kurallari - 40 soru",
+      description: "Apotemi fasikulunden zincir ve carpim kuralini bitir.",
+      type: "homework",
+      priority: "high",
+      status: "pending",
+      subject: "Matematik",
+      dueDate: daysFromNow(1, 20),
+      coachId: "coach_001",
+      studentId: DEMO_STUDENT_ID,
+      parentId: DEMO_PARENT_ID,
+      branchId: DEMO_BRANCH_ID,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      completed: false,
+      completedAt: null,
+    },
+    {
+      id: "assignment_demo_002",
+      title: "Paragraf hiz calismasi",
+      description: "Bilgi Sarmal Paragraf kitabindan sure tutarak 30 soru.",
+      type: "homework",
+      priority: "medium",
+      status: "completed",
+      subject: "Turkce",
+      dueDate: daysFromNow(-2, 18),
+      coachId: "coach_001",
+      studentId: DEMO_STUDENT_ID,
+      parentId: DEMO_PARENT_ID,
+      branchId: DEMO_BRANCH_ID,
+      createdAt: daysFromNow(-4, 10),
+      updatedAt: daysFromNow(-1, 19),
+      completed: true,
+      completedAt: daysFromNow(-1, 19),
+    },
+    {
+      id: "assignment_demo_003",
+      title: "TYT deneme yanlis analizi",
+      description: "Son denemedeki matematik ve fen yanlislarini deftere isle.",
+      type: "exam_prep",
+      priority: "high",
+      status: "pending",
+      subject: "Genel",
+      dueDate: daysFromNow(3, 21),
+      coachId: "coach_001",
+      studentId: DEMO_STUDENT_ID,
+      parentId: DEMO_PARENT_ID,
+      branchId: DEMO_BRANCH_ID,
+      createdAt: daysFromNow(-1, 9),
+      updatedAt: daysFromNow(-1, 9),
+      completed: false,
+      completedAt: null,
+    },
+    {
+      id: "assignment_demo_004",
+      title: "Fonksiyonlar karma tekrar",
+      description: "Kazanimi kapatmak icin 25 karma soru.",
+      type: "homework",
+      priority: "medium",
+      status: "completed",
+      subject: "Matematik",
+      dueDate: daysFromNow(-9, 19),
+      coachId: "coach_001",
+      studentId: DEMO_STUDENT_ID,
+      parentId: DEMO_PARENT_ID,
+      branchId: DEMO_BRANCH_ID,
+      createdAt: daysFromNow(-12, 10),
+      updatedAt: daysFromNow(-9, 20),
+      completed: true,
+      completedAt: daysFromNow(-9, 20),
+    },
+    {
+      id: "assignment_demo_005",
+      title: "Mert - AYT geometri tarama",
+      description: "Ucgen ve dortgen problemleri icin 35 soru.",
+      type: "homework",
+      priority: "medium",
+      status: "pending",
+      subject: "Geometri",
+      dueDate: daysFromNow(2, 18),
+      coachId: "coach_001",
+      studentId: "student_002",
+      parentId: "parent_002",
+      branchId: DEMO_BRANCH_ID,
+      createdAt: daysFromNow(-2, 11),
+      updatedAt: daysFromNow(-2, 11),
+      completed: false,
+      completedAt: null,
+    },
+    {
+      id: "assignment_demo_006",
+      title: "Mert - Kimya mol kavrami",
+      description: "Konu ozeti + 20 soru.",
+      type: "reading",
+      priority: "low",
+      status: "completed",
+      subject: "Kimya",
+      dueDate: daysFromNow(-5, 18),
+      coachId: "coach_001",
+      studentId: "student_002",
+      parentId: "parent_002",
+      branchId: DEMO_BRANCH_ID,
+      createdAt: daysFromNow(-7, 10),
+      updatedAt: daysFromNow(-5, 19),
+      completed: true,
+      completedAt: daysFromNow(-5, 19),
+    },
+  );
+
+  assignmentResults.assignment_demo_002 = { correct: 24, wrong: 4, blank: 2, net: 23 };
+  assignmentResults.assignment_demo_004 = { correct: 21, wrong: 3, blank: 1, net: 20.25 };
+  assignmentResults.assignment_demo_006 = { correct: 17, wrong: 2, blank: 1, net: 16.5 };
+}
+
 export function createAssignment(input: AssignmentCreateInput): Assignment {
   const timestamp = nowIso();
   const assignment: Assignment = {
@@ -62,14 +191,17 @@ export function createAssignment(input: AssignmentCreateInput): Assignment {
 }
 
 export function listAssignmentsForStudent(studentId: string): Assignment[] {
+  seedIfEmpty();
   return assignments.filter((assignment) => assignment.studentId === studentId);
 }
 
 export function listAssignmentsForCoach(coachId: string): Assignment[] {
+  seedIfEmpty();
   return assignments.filter((assignment) => assignment.coachId === coachId);
 }
 
 export function listAssignmentsForParent(parentId: string): Assignment[] {
+  seedIfEmpty();
   return assignments.filter((assignment) => assignment.parentId === parentId);
 }
 
@@ -129,6 +261,7 @@ export function submitAssignmentResult(
 }
 
 export function getParentSummary(parentId: string): ParentSummary {
+  seedIfEmpty();
   const parentAssignments = listAssignmentsForParent(parentId);
   const completedCount = parentAssignments.filter(
     (assignment) => assignment.status === "completed" || assignment.completed,
