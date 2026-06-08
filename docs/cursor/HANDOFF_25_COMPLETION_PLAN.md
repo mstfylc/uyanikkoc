@@ -50,8 +50,30 @@ Validation:
 
 ## Backlog From This Audit
 
-- Continue area-by-area comparison after Kaynak Takibi is complete:
-  - assignments result entry and source linkage
-  - coach assignment source tracker section
+### 2. Odev Ata / Kaynak Secici
+
+Status: Complete in this pass.
+
+Handoff source:
+- `src/coach-odev-ata.jsx`
+- `src/odev-student.jsx`
+
+Current repo finding:
+- Student result entry existed.
+- Coach assignment modal did not expose the handoff source picker.
+- Assigned source was hidden inside automatic text and was not visible in student/coach lists.
+
+Implemented:
+- Coach assignment modal now loads the selected student's source tracker.
+- Added per-subject source select with student-owned sources first and recommended catalog fallbacks.
+- Assigned source is written into assignment description as `Kaynak: ...`.
+- Student and coach assignment rows now show assignment description/source details.
+
+Validation:
+- `pnpm --filter @uyanik/web test -- assignments.test.ts student-sources.test.ts` passed.
+- `pnpm --filter @uyanik/web typecheck` passed.
+- `pnpm --filter @uyanik/web lint` passed.
+
+- Continue area-by-area comparison:
   - parent read-only progress widgets
   - dashboard buttons/actions from `src/student-pages.jsx`, `src/coach-pages.jsx`, and admin handoff components

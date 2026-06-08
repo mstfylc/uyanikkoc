@@ -23,6 +23,7 @@ import type { AssignmentPriority, AssignmentStatus, AssignmentType, CoachRosterE
 type AssignmentItem = {
   id: string;
   title: string;
+  description: string | null;
   studentId: string;
   type: AssignmentType;
   priority: AssignmentPriority;
@@ -233,6 +234,11 @@ export function CoachAssignmentsPanel() {
                         </span>
                       ) : null}
                     </div>
+                    {assignment.description ? (
+                      <div className="muted" style={{ fontSize: 12, marginTop: 5 }}>
+                        {assignment.description}
+                      </div>
+                    ) : null}
                   </div>
                   {assignment.completed ? (
                     <UkBadge tone="success">{ASSIGNMENT_STATUS_LABELS[assignment.status]}</UkBadge>

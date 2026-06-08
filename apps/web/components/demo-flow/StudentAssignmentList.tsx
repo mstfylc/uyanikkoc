@@ -238,6 +238,11 @@ export function StudentAssignmentList() {
                           {assignment.subject ? <span className="d">{assignment.subject}</span> : null}
                           <span className="d">{formatAssignmentDueDate(assignment.dueDate)}</span>
                         </div>
+                        {assignment.description ? (
+                          <div className="muted" style={{ fontSize: 12, marginTop: 5 }}>
+                            {assignment.description}
+                          </div>
+                        ) : null}
                       </div>
                       {open ? (
                         <div className="row" style={{ gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>

@@ -6,7 +6,9 @@ import { createPortal } from "react-dom";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkNumStepper } from "@/components/design/UkNumStepper";
 import { groupTargetKey, pickKaynak } from "@/lib/design/coach-topic-metrics";
+import { getStudentResources } from "@/lib/design/student-resources";
 import { subjectColor } from "@/lib/design/subject-colors";
+import type { StudentSourceTracker } from "@/mocks/student-sources";
 import type { CurriculumRecord } from "@uyanik/database";
 
 type CoachOdevAtaModalProps = {
@@ -44,6 +46,8 @@ export function CoachOdevAtaModal({
   const [due, setDue] = useState("");
   const [done, setDone] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sourceBySubject, setSourceBySubject] = useState<Record<string, string>>({});
+  const [tracker, setTracker] = useState<StudentSourceTracker | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -61,6 +65,8 @@ export function CoachOdevAtaModal({
     setDone(false);
     setDefaultSoru(30);
     setUnitType("soru");
+    setSourceBySubject({});
+    setTracker(null);
 
     if (initialSubject && initialTopic) {
       setSelected({ [topicKey(initialSubject, initialTopic)]: 30 });
@@ -68,6 +74,27 @@ export function CoachOdevAtaModal({
       setSelected({});
     }
   }, [open, initialSubject, initialTopic, subjects]);
+
+  useEffect(() => {
+    if (!open || !studentId) {
+      return;
+    }
+
+    let active = true;
+    async function loadSources() {
+      const response = await fetch(`/api/coach/students/${studentId}/sources`, { credentials: "same-origin" });
+      if (!active) return;
+      if (response.ok) {
+        const data = (await response.json()) as { tracker?: StudentSourceTracker };
+        setTracker(data.tracker ?? null);
+      }
+    }
+
+    void loadSources();
+    return () => {
+      active = false;
+    };
+  }, [open, studentId]);
 
   const selectedKeys = Object.keys(selected);
   const totalSoru = selectedKeys.reduce((sum, key) => sum + (selected[key] || 0), 0);
@@ -115,6 +142,23 @@ export function CoachOdevAtaModal({
     [selectedKeys],
   );
 
+  const sourceOptions = useMemo(() => {
+    if (!activeSubject) {
+      return [];
+    }
+    const owned = tracker?.items.map((item) => item.name) ?? [];
+    return [...new Set([...owned, ...getStudentResources(activeSubject).slice(0, 6)])];
+  }, [activeSubject, tracker]);
+
+  function sourceForSubject(subject: string): string {
+    return (
+      sourceBySubject[subject] ||
+      tracker?.items.find((item) => item.status === "aktif")?.name ||
+      getStudentResources(subject)[0] ||
+      pickKaynak(subject, 0)
+    );
+  }
+
   async function handleAssign() {
     if (!studentId || selectedKeys.length === 0) {
       return;
@@ -126,6 +170,10 @@ export function CoachOdevAtaModal({
         const [subject, title] = key.split("::");
         const soruCount = selected[key] || defaultSoru;
         const unitLabel = unitType === "test" ? "test" : "soru";
+        const source = sourceForSubject(subject);
+        const description = [note.trim(), `${soruCount} ${unitLabel}`, source ? `Kaynak: ${source}` : ""]
+          .filter(Boolean)
+          .join(" - ");
         const response = await fetch("/api/coach/assignments", {
           method: "POST",
           credentials: "same-origin",
@@ -135,9 +183,7 @@ export function CoachOdevAtaModal({
             subject,
             title,
             type: "practice",
-            description: note.trim()
-              ? `${note.trim()} · ${soruCount} ${unitLabel} · ${pickKaynak(subject, 0)}`
-              : `${soruCount} ${unitLabel} · ${pickKaynak(subject, 0)}`,
+            description,
             dueDate: due || undefined,
           }),
         });
@@ -206,6 +252,30 @@ export function CoachOdevAtaModal({
             </span>
             <UkNumStepper value={defaultSoru} onChange={setDefaultSoru} step={unitType === "test" ? 1 : 10} min={0} max={500} size="sm" />
           </div>
+          <label className="field" style={{ display: "grid", gap: 6 }}>
+            <span className="label">
+              Kaynak <span className="muted" style={{ fontWeight: 600 }}>({activeSubject || "ders sec"})</span>
+            </span>
+            <select
+              className="select"
+              value={sourceBySubject[activeSubject] ?? ""}
+              onChange={(event) =>
+                setSourceBySubject((current) => ({ ...current, [activeSubject]: event.target.value }))
+              }
+              style={{ minWidth: 260 }}
+              disabled={!activeSubject}
+            >
+              <option value="">Otomatik - ogrencinin aktif kaynagi</option>
+              {sourceOptions.map((source) => {
+                const owned = tracker?.items.find((item) => item.name === source);
+                return (
+                  <option key={source} value={source}>
+                    {owned ? `${source} (%${owned.progress} - ${owned.status})` : source}
+                  </option>
+                );
+              })}
+            </select>
+          </label>
         </div>
 
         <div className="modal-body ata-body">
