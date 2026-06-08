@@ -287,6 +287,7 @@ export type AppointmentRecord = {
   slot: string;
   mode: AppointmentMode;
   topic: string;
+  requesterRole: "student" | "parent";
   status: AppointmentStatus;
   createdAt: string;
 };

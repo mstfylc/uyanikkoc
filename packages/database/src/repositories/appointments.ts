@@ -85,6 +85,7 @@ function mapAppointment(row: {
   slot: string;
   mode: AppointmentMode;
   topic: string;
+  requesterRole: "student" | "parent";
   status: AppointmentStatus;
   createdAt: Date;
   student: { user: { email: string } };
@@ -98,6 +99,7 @@ function mapAppointment(row: {
     slot: row.slot,
     mode: row.mode,
     topic: row.topic,
+    requesterRole: row.requesterRole,
     status: row.status,
     createdAt: row.createdAt.toISOString(),
   };
@@ -186,6 +188,19 @@ export async function countActiveAppointmentsForStudent(studentId: string): Prom
   });
 }
 
+export async function countActiveAppointmentsForStudentByRequester(
+  studentId: string,
+  requesterRole: "student" | "parent",
+): Promise<number> {
+  return prisma.appointment.count({
+    where: {
+      studentId,
+      requesterRole,
+      status: { notIn: ["rejected", "cancelled"] },
+    },
+  });
+}
+
 export async function createAppointment(
   input: Omit<AppointmentRecord, "id" | "createdAt" | "status">,
 ): Promise<AppointmentRecord> {
@@ -197,6 +212,7 @@ export async function createAppointment(
       slot: input.slot,
       mode: input.mode,
       topic: input.topic,
+      requesterRole: input.requesterRole,
     },
     include: { student: { include: { user: true } } },
   });

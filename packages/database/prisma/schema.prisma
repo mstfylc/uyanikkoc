@@ -280,6 +280,11 @@ enum AppointmentStatus {
   cancelled
 }
 
+enum AppointmentRequesterRole {
+  student
+  parent
+}
+
 enum AppointmentDay {
   Pzt
   Sal
@@ -314,6 +319,7 @@ model Appointment {
   slot      String
   mode      AppointmentMode
   topic     String
+  requesterRole AppointmentRequesterRole @default(student)
   status    AppointmentStatus @default(pending)
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt

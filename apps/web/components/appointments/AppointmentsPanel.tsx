@@ -119,7 +119,7 @@ function StudentAppointmentsView() {
     () => appointments.filter((item) => item.status !== "rejected" && item.status !== "cancelled").length,
     [appointments],
   );
-  const limit = settings?.weeklyLimit ?? 0;
+  const limit = settings?.weeklyLimitStudent ?? settings?.weeklyLimit ?? 0;
   const canRequest = limit === 0 || used < limit;
 
   async function handleRequest(payload: {
@@ -649,23 +649,112 @@ function CoachAppointmentsView() {
 
 function ParentAppointmentsView() {
   const [appointments, setAppointments] = useState<AppointmentRecord[]>([]);
+  const [settings, setSettings] = useState<AppointmentSettingsRecord | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    async function load() {
-      const response = await fetch("/api/parent/appointments", { credentials: "same-origin" });
-      if (response.ok) {
-        const data = (await response.json()) as { appointments: AppointmentRecord[] };
-        setAppointments(data.appointments);
-      }
-      setIsLoading(false);
+  const load = useCallback(async () => {
+    const response = await fetch("/api/parent/appointments", { credentials: "same-origin" });
+    if (response.ok) {
+      const data = (await response.json()) as {
+        appointments: AppointmentRecord[];
+        settings: AppointmentSettingsRecord | null;
+      };
+      setAppointments(data.appointments);
+      setSettings(data.settings);
     }
-    void load();
+    setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const used = useMemo(
+    () =>
+      appointments.filter(
+        (item) =>
+          item.requesterRole === "parent" &&
+          item.status !== "rejected" &&
+          item.status !== "cancelled",
+      ).length,
+    [appointments],
+  );
+  const limit = settings?.weeklyLimitParent ?? 0;
+  const canRequest = limit === 0 || used < limit;
+
+  async function handleRequest(payload: {
+    day: AppointmentDay;
+    slot: string;
+    mode: AppointmentMode;
+    topic: string;
+  }) {
+    setError(null);
+    const response = await fetch("/api/parent/appointments", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const data = (await response.json()) as { error?: string };
+      setError(data.error ?? "Randevu olusturulamadi.");
+      return;
+    }
+
+    const data = (await response.json()) as {
+      settings: AppointmentSettingsRecord;
+    };
+    setSettings(data.settings);
+    await load();
+  }
 
   return (
     <>
-      <UkPageHead title="Randevular" sub="Ogrencinin koc gorusmeleri" />
+      <UkPageHead
+        title="Randevular"
+        sub="Ogrencinin koc gorusmeleri"
+        actions={
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={!canRequest || !settings}
+            onClick={() => setShowModal(true)}
+            style={{ opacity: canRequest && settings ? 1 : 0.5 }}
+          >
+            <KiIcon name="ki-plus" />
+            Randevu Iste
+          </button>
+        }
+      />
+
+      {settings ? (
+        <div className="card">
+          <div className="card-pad row" style={{ gap: 16, flexWrap: "wrap" }}>
+            <span className="stat-icon tone-primary" style={{ width: 46, height: 46, borderRadius: 13 }}>
+              <KiIcon name="ki-target text-xl" />
+            </span>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>
+                {limit === 0 ? "Sinirsiz veli randevu hakkin var" : `Bu hafta ${used}/${limit} veli randevusu kullandin`}
+              </div>
+              <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
+                {canRequest
+                  ? "Kocun musait saatlerinden veli gorusmesi talep edebilirsin."
+                  : "Haftalik veli randevu hakkin doldu."}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {error ? (
+        <p className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>
+          {error}
+        </p>
+      ) : null}
 
       <UkSection title="Randevu listesi" sub={`${appointments.length} kayit`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -682,6 +771,15 @@ function ParentAppointmentsView() {
           )}
         </div>
       </UkSection>
+
+      {settings ? (
+        <ApptRequestModal
+          open={showModal}
+          onClose={() => setShowModal(false)}
+          settings={settings}
+          onSubmit={handleRequest}
+        />
+      ) : null}
     </>
   );
 }

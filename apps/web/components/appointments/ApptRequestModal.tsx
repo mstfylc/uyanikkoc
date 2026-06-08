@@ -7,6 +7,12 @@ import { KiIcon } from "@/components/design/KiIcon";
 import { APPOINTMENT_DAYS } from "@/mocks/appointments";
 import type { AppointmentDay, AppointmentMode, AppointmentSettingsRecord } from "@uyanik/database";
 
+function firstAllowedMode(settings: AppointmentSettingsRecord): AppointmentMode {
+  if (settings.allowOnline) return "online";
+  if (settings.allowInPerson) return "in_person";
+  return "phone";
+}
+
 type ApptRequestModalProps = {
   open: boolean;
   onClose: () => void;
@@ -18,7 +24,7 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
   const [mounted, setMounted] = useState(false);
   const [day, setDay] = useState<AppointmentDay | "">("");
   const [slot, setSlot] = useState("");
-  const [mode, setMode] = useState<AppointmentMode>(settings.allowOnline ? "online" : "in_person");
+  const [mode, setMode] = useState<AppointmentMode>(firstAllowedMode(settings));
   const [topic, setTopic] = useState("");
   const [done, setDone] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,18 +37,20 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
     if (open) {
       setDay("");
       setSlot("");
-      setMode(settings.allowOnline ? "online" : "in_person");
+      setMode(firstAllowedMode(settings));
       setTopic("");
       setDone(false);
     }
-  }, [open, settings.allowOnline]);
+  }, [open, settings]);
 
   const days = useMemo(
     () => APPOINTMENT_DAYS.filter((item) => (settings.availability[item] ?? []).length > 0),
     [settings.availability],
   );
 
-  const slots = day ? settings.availability[day] ?? [] : [];
+  const slots = day
+    ? (settings.availability[day] ?? []).filter((item) => (settings.slotModes[day]?.[item] ?? []).includes(mode))
+    : [];
   const valid = Boolean(day && slot && mode);
 
   async function handleSubmit() {

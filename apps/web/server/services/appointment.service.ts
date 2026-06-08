@@ -76,13 +76,17 @@ export async function createStudentAppointment(
     slot: string;
     mode: AppointmentRecord["mode"];
     topic: string;
+    requesterRole?: AppointmentRecord["requesterRole"];
   },
   role: "student" | "parent" = "student",
 ): Promise<AppointmentRecord> {
   const settings = await getCoachAppointmentSettings(input.coachId);
   const activeCount = shouldUseDatabase()
-    ? await (await import("@uyanik/database")).appointmentRepository.countActiveAppointmentsForStudent(input.studentId)
-    : memoryAppointments.countActiveAppointmentsForStudent(input.studentId);
+    ? await (await import("@uyanik/database")).appointmentRepository.countActiveAppointmentsForStudentByRequester(
+        input.studentId,
+        role,
+      )
+    : memoryAppointments.countActiveAppointmentsForStudentByRequester(input.studentId, role);
   const limit = weeklyLimitFor(role, settings);
   if (limit > 0 && activeCount >= limit) {
     throw new Error("Haftalik randevu limitine ulasildi.");
@@ -93,10 +97,10 @@ export async function createStudentAppointment(
 
   if (shouldUseDatabase()) {
     const { appointmentRepository } = await import("@uyanik/database");
-    return appointmentRepository.createAppointment(input);
+    return appointmentRepository.createAppointment({ ...input, requesterRole: input.requesterRole ?? role });
   }
 
-  return memoryAppointments.createAppointment(input);
+  return memoryAppointments.createAppointment({ ...input, requesterRole: input.requesterRole ?? role });
 }
 
 export async function setCoachAppointmentStatus(

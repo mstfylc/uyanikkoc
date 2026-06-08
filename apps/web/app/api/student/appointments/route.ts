@@ -59,6 +59,7 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
       slot: body.slot,
       mode: body.mode,
       topic: body.topic.trim(),
+      requesterRole: "student",
     });
     return NextResponse.json({ appointment, settings }, { status: 200 });
   } catch (error) {

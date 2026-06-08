@@ -89,6 +89,7 @@ function seedIfEmpty() {
       slot: "17:00",
       mode: "in_person",
       topic: "Turev konusunda zorlaniyorum",
+      requesterRole: "student",
       status: "approved",
       createdAt: timestamp,
     },
@@ -101,6 +102,7 @@ function seedIfEmpty() {
       slot: "18:00",
       mode: "online",
       topic: "AYT matematik strateji",
+      requesterRole: "student",
       status: "pending",
       createdAt: timestamp,
     },
@@ -136,6 +138,18 @@ export function listAppointmentsForStudent(studentId: string): AppointmentRecord
 export function countActiveAppointmentsForStudent(studentId: string): number {
   return listAppointmentsForStudent(studentId).filter(
     (item) => item.status !== "rejected" && item.status !== "cancelled",
+  ).length;
+}
+
+export function countActiveAppointmentsForStudentByRequester(
+  studentId: string,
+  requesterRole: "student" | "parent",
+): number {
+  return listAppointmentsForStudent(studentId).filter(
+    (item) =>
+      item.requesterRole === requesterRole &&
+      item.status !== "rejected" &&
+      item.status !== "cancelled",
   ).length;
 }
 
