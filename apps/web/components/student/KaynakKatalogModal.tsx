@@ -18,6 +18,7 @@ import {
 } from "@/lib/design/kaynak-catalog";
 
 type ExamFilter = "Tumu" | KaynakExamGroup;
+const MAX_VISIBLE_RESULTS = 120;
 
 type KaynakKatalogModalProps = {
   open: boolean;
@@ -60,6 +61,8 @@ function KatalogRow({
           <b style={{ color: "var(--text-2)", fontWeight: 700 }}>{entry.p}</b>
           <span className="d">{tur.label}</span>
           <span className="d">{entry.e.join(" · ")}</span>
+          {entry.g ? <span className="d">{entry.g}. sinif</span> : null}
+          {entry.q ? <span className="d">{entry.q} soru</span> : null}
         </div>
       </div>
       <button
@@ -135,15 +138,17 @@ export function KaynakKatalogModal({
     type,
     q: query,
   });
+  const visibleResults = results.slice(0, MAX_VISIBLE_RESULTS);
+  const hiddenResultCount = Math.max(0, results.length - visibleResults.length);
 
   const groups = useMemo(() => {
     const map: Record<string, KaynakCatalogEntry[]> = {};
-    for (const entry of results) {
+    for (const entry of visibleResults) {
       map[entry.s] ??= [];
       map[entry.s].push(entry);
     }
     return map;
-  }, [results]);
+  }, [visibleResults]);
 
   if (!open || !mounted) {
     return null;
@@ -252,34 +257,47 @@ export function KaynakKatalogModal({
               Eslesen kaynak yok. Filtreyi gevset ya da ozel kaynagini serbest ekle.
             </div>
           ) : (
-            Object.entries(groups).map(([group, entries]) => {
-              const color = catalogSubjectColor(group);
-              return (
-                <div key={group} style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-                  <div className="row" style={{ gap: 8, padding: "0 2px" }}>
-                    <span style={{ width: 9, height: 9, borderRadius: 3, background: color }} />
-                    <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".02em", color: "var(--text-2)" }}>
-                      {group}
-                    </span>
-                    <span className="muted" style={{ fontSize: 11.5 }}>
-                      {entries.length}
-                    </span>
+            <>
+              {hiddenResultCount > 0 ? (
+                <div className="alert-strip" style={{ alignItems: "center" }}>
+                  <span className="as-ic">
+                    <KiIcon name="ki-magnifier" size={14} />
+                  </span>
+                  <div style={{ fontSize: 12.5, lineHeight: 1.5 }}>
+                    {results.length} kaynak bulundu; ilk {MAX_VISIBLE_RESULTS} kaynak gosteriliyor. Daha net sonuc icin
+                    kitap, yayinevi veya ders filtresi kullan.
                   </div>
-                  {entries.map((entry) => {
-                    const label = kaynakLabel(entry);
-                    const added = sources.includes(label);
-                    return (
-                      <KatalogRow
-                        key={entry.id}
-                        entry={entry}
-                        added={added}
-                        onToggle={() => onToggle(label, !added)}
-                      />
-                    );
-                  })}
                 </div>
-              );
-            })
+              ) : null}
+              {Object.entries(groups).map(([group, entries]) => {
+                const color = catalogSubjectColor(group);
+                return (
+                  <div key={group} style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                    <div className="row" style={{ gap: 8, padding: "0 2px" }}>
+                      <span style={{ width: 9, height: 9, borderRadius: 3, background: color }} />
+                      <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".02em", color: "var(--text-2)" }}>
+                        {group}
+                      </span>
+                      <span className="muted" style={{ fontSize: 11.5 }}>
+                        {entries.length}
+                      </span>
+                    </div>
+                    {entries.map((entry) => {
+                      const label = kaynakLabel(entry);
+                      const added = sources.includes(label);
+                      return (
+                        <KatalogRow
+                          key={entry.id}
+                          entry={entry}
+                          added={added}
+                          onToggle={() => onToggle(label, !added)}
+                        />
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </>
           )}
         </div>
 

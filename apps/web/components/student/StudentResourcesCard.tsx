@@ -1,12 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 
-import { KaynakKatalogModal } from "@/components/student/KaynakKatalogModal";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
-import { KAYNAK_TUR, katalogByLabel } from "@/lib/design/kaynak-catalog";
+
+const KaynakKatalogModal = dynamic(
+  () => import("@/components/student/KaynakKatalogModal").then((mod) => mod.KaynakKatalogModal),
+  { ssr: false },
+);
 
 type StudentResourcesCardProps = {
   defaultExam?: "Tumu" | "YKS" | "LGS";
@@ -85,20 +89,14 @@ export function StudentResourcesCard({ defaultExam = "Tumu" }: StudentResourcesC
           ) : (
             <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
               {sources.map((label) => {
-                const entry = katalogByLabel(label);
-                const tur = entry ? KAYNAK_TUR[entry.t] : null;
                 return (
                   <span
                     key={label}
                     className="chip"
                     style={{ height: 30, paddingRight: 6 }}
-                    title={entry ? `${entry.s} · ${tur?.label ?? ""}` : "Ozel kaynak"}
+                    title={label}
                   >
-                    <KiIcon
-                      name={tur?.icon ?? "ki-book-open"}
-                      size={13}
-                      style={{ color: entry ? "var(--primary)" : "var(--faint)" }}
-                    />
+                    <KiIcon name="ki-book-open" size={13} style={{ color: "var(--primary)" }} />
                     {label}
                     <button
                       type="button"
