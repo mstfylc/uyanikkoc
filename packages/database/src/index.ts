@@ -12,6 +12,7 @@ export * as notificationRepository from "./repositories/notifications";
 export * as messageRepository from "./repositories/messages";
 export * as templateRepository from "./repositories/templates";
 export * as studentRepository from "./repositories/students";
+export * as studentSourcesRepository from "./repositories/student-sources";
 export * as rosterRepository from "./repositories/roster";
 export * as billingRepository from "./repositories/billing";
 export * as supportRepository from "./repositories/support";
