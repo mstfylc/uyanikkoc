@@ -26,6 +26,8 @@ export default defineConfig({
     timeout: 180_000,
     env: {
       ...process.env,
+      AUTH_SECRET: process.env.AUTH_SECRET ?? "playwright-local-secret",
+      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ?? "playwright-local-secret",
       DEMO_AUTH_ALLOW_IN_MEMORY: "true",
     },
   },

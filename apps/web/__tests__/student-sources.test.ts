@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
+import { KAYNAK_CATALOG, kaynakLabel, sourcesForSubject } from "@/lib/design/kaynak-catalog";
 import {
   addSelfStudy,
   addSource,
@@ -49,5 +50,21 @@ describe("student sources", () => {
 
     expect(removeSelfStudy("student_1", self[0]!.id)).toEqual([]);
     expect(getSourceTracker("student_1").activity["Mikro Mat"]?.selfCount).toBe(0);
+  });
+});
+
+describe("source catalog", () => {
+  it("uses the real books_clean catalog for every user path", () => {
+    expect(KAYNAK_CATALOG).toHaveLength(9108);
+    expect(KAYNAK_CATALOG.some((entry) => kaynakLabel(entry) === "TONGUÇ ZORU 7 BANKASI  SÖZEL")).toBe(true);
+  });
+
+  it("maps curriculum subject aliases to the real catalog", () => {
+    const hasText = (subject: string, text: string) =>
+      sourcesForSubject(subject).some((label) => label.toLocaleUpperCase("tr-TR").includes(text));
+
+    expect(hasText("Turkce", "TÜRKÇE")).toBe(true);
+    expect(hasText("Ingilizce", "İNGİLİZCE")).toBe(true);
+    expect(hasText("Din Kulturu", "DİN")).toBe(true);
   });
 });

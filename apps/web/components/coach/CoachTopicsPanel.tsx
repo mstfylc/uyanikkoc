@@ -25,8 +25,6 @@ import {
   defaultGroupTargets,
   groupDone,
   groupTargetKey,
-  KAYNAKLAR,
-  KAYNAK_DEF,
   resolveExamTrack,
   subjTarget,
   TOPIC_STATUS,
@@ -187,11 +185,14 @@ export function CoachTopicsPanel() {
   const subjWeek = useMemo(() => buildSubjectWeekDistribution(perSubj, weekTotal), [perSubj, weekTotal]);
   const weak = useMemo(() => buildWeakTopics(perSubj), [perSubj]);
   const activePerSubj = perSubj.find((subject) => subject.s === activeSubject) ?? perSubj[0];
-  const activeKaynakList = activePerSubj ? (KAYNAKLAR[activePerSubj.s] ?? KAYNAK_DEF) : KAYNAK_DEF;
+  const activeKaynakList = useMemo(
+    () => (activePerSubj ? [...new Set(activePerSubj.t.flatMap((topic) => topic.kaynaklar))] : []),
+    [activePerSubj],
+  );
   const filteredTopics = useMemo(() => {
     if (!activePerSubj) return [];
     if (kaynakFilter === "all") return activePerSubj.t;
-    return activePerSubj.t.filter((topic) => topic.kaynak === kaynakFilter);
+    return activePerSubj.t.filter((topic) => topic.kaynaklar.includes(kaynakFilter));
   }, [activePerSubj, kaynakFilter]);
   const studentRow = useMemo(
     () => buildCoachStudentRows(students, assignments, []).find((row) => row.studentId === studentId),
@@ -757,7 +758,7 @@ export function CoachTopicsPanel() {
                 <thead>
                   <tr>
                     <th>Konu</th>
-                    <th>Kaynak</th>
+                    <th>Kaynaklar</th>
                     <th style={{ textAlign: "center" }}>Soru</th>
                     <th style={{ textAlign: "center" }}>Dogru</th>
                     <th style={{ textAlign: "right" }}>Durum</th>
@@ -774,7 +775,7 @@ export function CoachTopicsPanel() {
                     filteredTopics.map((topic) => {
                     const cfg = TOPIC_STATUS[topic.s];
                     return (
-                      <tr key={`${topic.n}-${topic.kaynak}`}>
+                      <tr key={`${topic.n}-${topic.kaynaklar.join("-")}`}>
                         <td>
                           <div className="row" style={{ gap: 10 }}>
                             <TopicStatusIcon state={topic.s} />
@@ -782,9 +783,25 @@ export function CoachTopicsPanel() {
                           </div>
                         </td>
                         <td>
-                          <span className="muted" style={{ fontSize: 12 }}>
-                            {topic.kaynak}
-                          </span>
+                          <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+                            {topic.kaynaklar.map((source, sourceIndex) => {
+                              const done = topic.kaynakDone[sourceIndex];
+                              return (
+                                <span
+                                  key={source}
+                                  className="src-pill"
+                                  style={{
+                                    borderColor: done ? "var(--success)" : "var(--border)",
+                                    color: done ? "var(--success)" : "var(--text-2)",
+                                    background: done ? "var(--success-soft)" : "var(--surface-2)",
+                                  }}
+                                >
+                                  <KiIcon name={done ? "ki-check" : "ki-book-open"} size={11} />
+                                  {source}
+                                </span>
+                              );
+                            })}
+                          </div>
                         </td>
                         <td style={{ textAlign: "center" }}>
                           <span className="tnum" style={{ fontWeight: 700 }}>

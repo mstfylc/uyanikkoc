@@ -669,6 +669,8 @@ button { font-family: inherit; cursor: pointer; }
 .src-item svg { color: var(--faint); }
 .src-item:hover { background: var(--surface-3); color: var(--text); }
 .src-item.on { background: var(--primary-soft); color: var(--primary-600); }
+.src-pill { display: inline-flex; align-items: center; gap: 5px; min-height: 23px; padding: 0 8px; border: 1px solid var(--border); border-radius: 999px; font-size: 11px; font-weight: 800; line-height: 1; white-space: nowrap; }
+.src-pill svg { flex-shrink: 0; }
 
 /* randevu müsaitlik grid */
 .avail-grid { display: grid; grid-template-columns: 56px repeat(6, 1fr); gap: 4px; min-width: 520px; }

@@ -1,19 +1,5 @@
+import { sourcesForSubject } from "@/lib/design/kaynak-catalog";
 import type { CurriculumRecord, CurriculumTopicGroup, SubjectRecord } from "@uyanik/database";
-
-export const KAYNAKLAR: Record<string, string[]> = {
-  Turkce: ["Hiz ve Renk Paragraf", "Bilgi Sarmali", "Ari Paragraf"],
-  Matematik: ["Mikro Mat", "Bilgi Sarmali (BS)"],
-  Geometri: ["Antrenmanlarla Geo 1"],
-  Fizik: ["Bilgi Sarmali", "Paraf", "ENS"],
-  Kimya: ["Hiz ve Renk", "Bilgi Sarmali", "Orbital"],
-  Biyoloji: ["Bilgi Sarmali", "Biyotik", "Aydin"],
-  "Fen Bilimleri": ["Hiz ve Renk", "Tonguc", "3D"],
-  "T.C. Inkılap Tarihi": ["Tonguc", "Bilgi Sarmali"],
-  "Din Kulturu": ["Tonguc", "Aydin"],
-  Ingilizce: ["Tonguc", "Rehber"],
-};
-
-export const KAYNAK_DEF = ["Bilgi Sarmali", "Tonguc", "3D"];
 
 export const NET_CONFIG = {
   YKS: {
@@ -53,6 +39,8 @@ export type TopicMetricRow = {
   soru: number;
   dogru: number;
   kaynak: string;
+  kaynaklar: string[];
+  kaynakDone: boolean[];
 };
 
 export type PerSubjectStats = {
@@ -90,12 +78,12 @@ export function resolveExamTrack(subjects: SubjectRecord[]): ExamTrack {
 }
 
 export function pickKaynak(subject: string, index: number): string {
-  const sources = KAYNAKLAR[subject] ?? KAYNAK_DEF;
+  const sources = sourcesForSubject(subject);
   return sources[index % sources.length];
 }
 
 export function mapSubjectToTopicRows(subject: SubjectRecord): TopicMetricRow[] {
-  const sources = KAYNAKLAR[subject.name] ?? KAYNAK_DEF;
+  const sources = sourcesForSubject(subject.name);
   let foundProgress = false;
   const rows: TopicMetricRow[] = [];
 
@@ -110,19 +98,27 @@ export function mapSubjectToTopicRows(subject: SubjectRecord): TopicMetricRow[] 
       state = "todo";
     }
 
-    const rowSources = state === "done" ? sources : [sources[0] ?? KAYNAK_DEF[0]];
-    for (const kaynak of rowSources) {
-      const soru =
-        state === "done" ? 50 + ((index * 23) % 90) : state === "progress" ? 20 + ((index * 7) % 20) : 0;
-      const dogru = state === "todo" ? 0 : Math.round(soru * (0.62 + ((index * 5) % 20) / 100));
-      rows.push({
-        n: topic.name,
-        s: state,
-        soru,
-        dogru,
-        kaynak,
-      });
-    }
+    const start = (index * 3) % Math.max(1, sources.length);
+    const count = Math.min(sources.length, state === "todo" ? 1 : 1 + ((index + (state === "done" ? 1 : 0)) % 3));
+    const kaynaklar = Array.from({ length: count }, (_, sourceIndex) => sources[(start + sourceIndex) % sources.length] ?? sources[0] ?? "");
+    const uniqueSources = [...new Set(kaynaklar)];
+    const completedSources = topic.progress.completedSources ?? [];
+    const kaynakDone = uniqueSources.map((source, sourceIndex) =>
+      completedSources.includes(source) || (state === "done" && sourceIndex < uniqueSources.length - (index % 2)),
+    );
+    const soru =
+      state === "done" ? 50 + ((index * 23) % 90) : state === "progress" ? 20 + ((index * 7) % 20) : 0;
+    const dogru = state === "todo" ? 0 : Math.round(soru * (0.62 + ((index * 5) % 20) / 100));
+
+    rows.push({
+      n: topic.name,
+      s: state,
+      soru,
+      dogru,
+      kaynak: uniqueSources[0] ?? sources[0] ?? "",
+      kaynaklar: uniqueSources,
+      kaynakDone,
+    });
   }
 
   return rows;

@@ -44,16 +44,11 @@ export const KAYNAK_DERSLER: Record<"YKS" | "LGS", string[]> = (() => {
   return { YKS: sort(yks), LGS: sort(lgs) };
 })();
 
-export const KAYNAK_DEFAULTS = [
-  "Konu Anlatim Foyu",
-  "Soru Bankasi",
-  "Deneme / Brans Denemesi",
-  "Video Ders",
-];
-
 export function kaynakLabel(entry: Pick<KaynakCatalogEntry, "p" | "n">): string {
   return `${entry.p} ${entry.n}`;
 }
+
+export const KAYNAK_DEFAULTS = KAYNAK_CATALOG.slice(0, 4).map((entry) => kaynakLabel(entry));
 
 export function katalogByLabel(label: string): KaynakCatalogEntry | null {
   return KAYNAK_CATALOG.find((entry) => kaynakLabel(entry) === label) ?? null;
@@ -112,8 +107,17 @@ export const KAYNAK_HAVUZU: Record<string, string[]> = (() => {
   return map;
 })();
 
+const SUBJECT_ALIASES: Record<string, string> = {
+  Turkce: "Türkçe",
+  Ingilizce: "İngilizce",
+  "Din Kulturu": "Din Kültürü",
+  "T.C. Inkılap Tarihi": "T.C. İnkılap Tarihi",
+  "Sosyal Bilimler": "Sosyal Bilgiler",
+};
+
 export function sourcesForSubject(subject: string): string[] {
-  return KAYNAK_HAVUZU[subject] ?? KAYNAK_DEFAULTS;
+  const catalogSubject = SUBJECT_ALIASES[subject] ?? subject;
+  return KAYNAK_HAVUZU[catalogSubject] ?? KAYNAK_DEFAULTS;
 }
 
 export function catalogSubjectColor(subject: string): string {

@@ -26,6 +26,13 @@ type CellDraft = {
   date: string;
 };
 
+type PeriodDetail = {
+  title: string;
+  topic: TopicRecord;
+  subjectName: string;
+  sessions: TopicStudySessionRecord[];
+};
+
 const WEEK_DAYS = ["Pzt", "Sal", "Car", "Per", "Cum", "Cmt", "Paz"];
 const REPEAT_COLUMNS = Array.from({ length: 12 }, (_, index) => index + 1);
 const WEEK_COLUMNS = Array.from({ length: 12 }, (_, index) => index);
@@ -86,7 +93,9 @@ export function KonuCizelge({
   const [mode, setMode] = useState<ViewMode>("repeat");
   const [weekStart, setWeekStart] = useState(() => isoDate(mondayOf(new Date())));
   const [localSubject, setLocalSubject] = useState("");
+  const [query, setQuery] = useState("");
   const [draft, setDraft] = useState<CellDraft | null>(null);
+  const [detail, setDetail] = useState<PeriodDetail | null>(null);
   const [questionCount, setQuestionCount] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
@@ -168,11 +177,31 @@ export function KonuCizelge({
     }
   }
 
-  function renderCell(topic: TopicRecord, subjectName: string, cellSessions: TopicStudySessionRecord[], date: string) {
+  function openCell(
+    topic: TopicRecord,
+    subjectName: string,
+    cellSessions: TopicStudySessionRecord[],
+    date: string,
+    title: string,
+  ) {
+    if (mode === "repeat") {
+      openDraft({ session: cellSessions[0], topic, subjectName, date });
+      return;
+    }
+
+    setDetail({ title, topic, subjectName, sessions: cellSessions });
+  }
+
+  function renderCell(
+    topic: TopicRecord,
+    subjectName: string,
+    cellSessions: TopicStudySessionRecord[],
+    date: string,
+    title: string,
+  ) {
     const total = cellSessions.reduce((sum, session) => sum + session.questionCount, 0);
     const correct = cellSessions.reduce((sum, session) => sum + session.correctCount, 0);
     const ratio = pct(correct, total);
-    const first = cellSessions[0];
 
     return (
       <button
@@ -188,7 +217,7 @@ export function KonuCizelge({
           flexDirection: "column",
           gap: 2,
         }}
-        onClick={() => openDraft({ session: first, topic, subjectName, date })}
+        onClick={() => openCell(topic, subjectName, cellSessions, date, title)}
       >
         <span className="tnum" style={{ fontWeight: 800, fontSize: 12 }}>
           {total ? `${total}/${correct}` : "-"}
@@ -201,6 +230,41 @@ export function KonuCizelge({
   }
 
   const rows = active?.topics ?? [];
+  const visibleRows = useMemo(() => {
+    const needle = query.trim().toLocaleLowerCase("tr-TR");
+    if (!needle) return rows;
+    return rows.filter((topic) => topic.name.toLocaleLowerCase("tr-TR").includes(needle));
+  }, [query, rows]);
+  const columns = mode === "repeat" ? REPEAT_COLUMNS : mode === "daily" ? WEEK_DAYS : WEEK_COLUMNS;
+  const columnTotals = columns.map((_, index) => {
+    let cellSessions: TopicStudySessionRecord[] = [];
+
+    for (const topic of visibleRows) {
+      const topicSessions = sessionsForTopic(sessions, topic.id);
+      if (mode === "repeat") {
+        const session = topicSessions[index];
+        if (session) cellSessions.push(session);
+      } else if (mode === "daily") {
+        const date = isoDate(addDays(currentWeek, index));
+        cellSessions = cellSessions.concat(topicSessions.filter((session) => sessionDate(session) === date));
+      } else {
+        const start = addDays(currentWeek, -7 * (11 - index));
+        const end = addDays(start, 7);
+        cellSessions = cellSessions.concat(
+          topicSessions.filter((session) => {
+            const date = parseDay(sessionDate(session));
+            return date >= start && date < end;
+          }),
+        );
+      }
+    }
+
+    const total = cellSessions.reduce((sum, session) => sum + session.questionCount, 0);
+    const correct = cellSessions.reduce((sum, session) => sum + session.correctCount, 0);
+    return { total, correct, ratio: pct(correct, total) };
+  });
+  const grandTotal = columnTotals.reduce((sum, item) => sum + item.total, 0);
+  const grandCorrect = columnTotals.reduce((sum, item) => sum + item.correct, 0);
 
   return (
     <div className="card" data-testid="konu-cizelge">
@@ -210,6 +274,14 @@ export function KonuCizelge({
           <div className="sub">Soru / dogru takibi · tekrar, gunluk ve haftalik gorunum</div>
         </div>
         <div className="row" style={{ gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <div className="field" style={{ marginBottom: 0, minWidth: 220 }}>
+            <input
+              className="input"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Konu ara..."
+            />
+          </div>
           <div className="seg" style={{ width: "fit-content" }}>
             {(["repeat", "daily", "weekly"] as ViewMode[]).map((item) => (
               <button key={item} type="button" className={mode === item ? "on" : ""} onClick={() => setMode(item)}>
@@ -263,11 +335,14 @@ export function KonuCizelge({
           <table className="tbl" style={{ minWidth: mode === "daily" ? 820 : 1060 }}>
             <thead>
               <tr>
-                <th style={{ position: "sticky", left: 0, zIndex: 3, background: "var(--surface)", minWidth: 240 }}>
+                <th style={{ position: "sticky", top: 0, left: 0, zIndex: 4, background: "var(--surface)", minWidth: 240 }}>
                   Konu
                 </th>
-                {(mode === "repeat" ? REPEAT_COLUMNS : mode === "daily" ? WEEK_DAYS : WEEK_COLUMNS).map((col, index) => (
-                  <th key={String(col)} style={{ textAlign: "center", minWidth: 82 }}>
+                {columns.map((col, index) => (
+                  <th
+                    key={String(col)}
+                    style={{ position: "sticky", top: 0, zIndex: 3, background: "var(--surface)", textAlign: "center", minWidth: 82 }}
+                  >
                     {mode === "repeat"
                       ? `${col}.`
                       : mode === "daily"
@@ -275,20 +350,20 @@ export function KonuCizelge({
                         : `${index + 1}. hf`}
                   </th>
                 ))}
-                <th style={{ position: "sticky", right: 0, zIndex: 3, background: "var(--surface)", minWidth: 110, textAlign: "right" }}>
+                <th style={{ position: "sticky", top: 0, right: 0, zIndex: 4, background: "var(--surface)", minWidth: 118, textAlign: "right" }}>
                   TOP / ORT
                 </th>
               </tr>
             </thead>
             <tbody>
-              {rows.length === 0 ? (
+              {visibleRows.length === 0 ? (
                 <tr>
                   <td colSpan={14} className="muted" style={{ padding: 16, textAlign: "center" }}>
-                    Secili derste konu yok.
+                    {rows.length === 0 ? "Secili derste konu yok." : "Aramana uygun konu bulunamadi."}
                   </td>
                 </tr>
               ) : (
-                rows.map((topic) => {
+                visibleRows.map((topic) => {
                   const topicSessions = sessionsForTopic(sessions, topic.id);
                   const total = topicSessions.reduce((sum, session) => sum + session.questionCount, 0);
                   const correct = topicSessions.reduce((sum, session) => sum + session.correctCount, 0);
@@ -309,7 +384,7 @@ export function KonuCizelge({
                             const session = topicSessions[index];
                             return (
                               <td key={number} style={{ textAlign: "center" }}>
-                                {renderCell(topic, active?.name ?? "", session ? [session] : [], session?.date ?? new Date().toISOString())}
+                                {renderCell(topic, active?.name ?? "", session ? [session] : [], session?.date ?? new Date().toISOString(), `${number}. tekrar`)}
                               </td>
                             );
                           })
@@ -319,11 +394,11 @@ export function KonuCizelge({
                               const daySessions = topicSessions.filter((session) => sessionDate(session) === date);
                               return (
                                 <td key={day} style={{ textAlign: "center" }}>
-                                  {renderCell(topic, active?.name ?? "", daySessions, `${date}T12:00:00.000Z`)}
+                                  {renderCell(topic, active?.name ?? "", daySessions, `${date}T12:00:00.000Z`, `${day} ${date}`)}
                                 </td>
                               );
                             })
-                          : WEEK_COLUMNS.map((week) => {
+                          : WEEK_COLUMNS.map((week, index) => {
                               const start = addDays(currentWeek, -7 * (11 - week));
                               const end = addDays(start, 7);
                               const weekSessions = topicSessions.filter((session) => {
@@ -332,7 +407,7 @@ export function KonuCizelge({
                               });
                               return (
                                 <td key={week} style={{ textAlign: "center" }}>
-                                  {renderCell(topic, active?.name ?? "", weekSessions, `${isoDate(start)}T12:00:00.000Z`)}
+                                  {renderCell(topic, active?.name ?? "", weekSessions, `${isoDate(start)}T12:00:00.000Z`, `${index + 1}. hafta`)}
                                 </td>
                               );
                             })}
@@ -343,12 +418,54 @@ export function KonuCizelge({
                         <span className="muted" style={{ fontSize: 11 }}>
                           %{average}
                         </span>
+                        <div className="bar" style={{ width: 74, marginLeft: "auto", marginTop: 5 }}>
+                          <span
+                            style={{
+                              width: `${average}%`,
+                              background:
+                                average >= 85
+                                  ? "var(--success)"
+                                  : average >= 70
+                                    ? "var(--warning)"
+                                    : average > 0
+                                      ? "var(--danger)"
+                                      : "var(--border-strong)",
+                            }}
+                          />
+                        </div>
                       </td>
                     </tr>
                   );
                 })
               )}
             </tbody>
+            {visibleRows.length > 0 ? (
+              <tfoot>
+                <tr>
+                  <th style={{ position: "sticky", left: 0, bottom: 0, zIndex: 4, background: "var(--surface-2)", minWidth: 240 }}>
+                    SUTUN TOPLAMI
+                  </th>
+                  {columnTotals.map((item, index) => (
+                    <th key={index} style={{ position: "sticky", bottom: 0, zIndex: 3, background: "var(--surface-2)", textAlign: "center" }}>
+                      <span className="tnum" style={{ display: "block", fontWeight: 800 }}>
+                        {item.total || "-"}
+                      </span>
+                      <span className="muted" style={{ fontSize: 10 }}>
+                        {item.total ? `%${item.ratio}` : "S/D"}
+                      </span>
+                    </th>
+                  ))}
+                  <th style={{ position: "sticky", right: 0, bottom: 0, zIndex: 4, background: "var(--surface-2)", textAlign: "right" }}>
+                    <span className="tnum" style={{ display: "block", fontWeight: 800 }}>
+                      {grandTotal}
+                    </span>
+                    <span className="muted" style={{ fontSize: 10 }}>
+                      %{pct(grandCorrect, grandTotal)}
+                    </span>
+                  </th>
+                </tr>
+              </tfoot>
+            ) : null}
           </table>
         </div>
         {showTip ? (
@@ -411,6 +528,56 @@ export function KonuCizelge({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      ) : null}
+
+      {detail ? (
+        <div className="modal-overlay" onClick={() => setDetail(null)}>
+          <div className="modal-panel" style={{ maxWidth: 520 }} onClick={(event) => event.stopPropagation()}>
+            <div className="modal-head">
+              <div>
+                <h3>{detail.topic.name}</h3>
+                <p className="muted" style={{ fontSize: 12, marginTop: 3 }}>
+                  {detail.subjectName} Â· {detail.title}
+                </p>
+              </div>
+              <button type="button" className="mini-btn" onClick={() => setDetail(null)} aria-label="Kapat">
+                <KiIcon name="ki-plus" size={16} style={{ transform: "rotate(45deg)" }} />
+              </button>
+            </div>
+            <div className="modal-body" style={{ gap: 10 }}>
+              {detail.sessions.length === 0 ? (
+                <p className="muted" style={{ fontSize: 13 }}>
+                  Bu donemde calisma kaydi yok.
+                </p>
+              ) : (
+                detail.sessions.map((session) => {
+                  const ratio = pct(session.correctCount, session.questionCount);
+                  return (
+                    <div key={session.id} className="lrow">
+                      <span
+                        className="lr-icon"
+                        style={{
+                          background: heatTone(ratio),
+                          color: ratio >= 70 ? "var(--success)" : "var(--warning)",
+                        }}
+                      >
+                        <KiIcon name="ki-book-open" size={17} />
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className="lr-title">{session.date.slice(0, 10)}</div>
+                        <div className="lr-meta">
+                          <span className="d">{session.questionCount} soru</span>
+                          <span className="d">{session.correctCount} dogru</span>
+                          <span className="d">%{ratio}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       ) : null}
