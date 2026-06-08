@@ -5,6 +5,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { CoachOdevAtaModal } from "@/components/coach/CoachOdevAtaModal";
+import { KonuCizelge } from "@/components/coach/KonuCizelge";
 import { CoachSchoolScheduleModal } from "@/components/coach/CoachSchoolScheduleModal";
 import { UkAvatar } from "@/components/design/UkAvatar";
 import { UkBadge } from "@/components/design/UkBadge";
@@ -65,6 +66,7 @@ export function CoachTopicsPanel() {
   const [noteKind, setNoteKind] = useState<CoachNoteKind>("general");
   const [activeSubject, setActiveSubject] = useState("");
   const [kaynakFilter, setKaynakFilter] = useState<string | "all">("all");
+  const [topicView, setTopicView] = useState<"liste" | "cizelge">("cizelge");
   const [chartMode, setChartMode] = useState<QuestionChartMode>("daily");
   const [chartOffset, setChartOffset] = useState(0);
   const [targets, setTargets] = useState<Record<string, number>>({});
@@ -620,8 +622,37 @@ export function CoachTopicsPanel() {
         </div>
       </UkSection>
 
-      <div className="grid col-rail">
-        <div className="card" style={{ overflow: "hidden" }}>
+      <div className="between" style={{ alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
+        <div>
+          <h2 style={{ fontSize: 18, fontWeight: 800 }}>Konu Tablosu</h2>
+          <p className="muted" style={{ fontSize: 13, marginTop: 3 }}>
+            Ders bazinda konu ilerlemesi ve soru takibi
+          </p>
+        </div>
+        <div className="seg" style={{ width: "fit-content" }}>
+          <button type="button" className={topicView === "liste" ? "on" : ""} onClick={() => setTopicView("liste")}>
+            <KiIcon name="ki-notepad-edit" size={15} />
+            Liste
+          </button>
+          <button type="button" className={topicView === "cizelge" ? "on" : ""} onClick={() => setTopicView("cizelge")}>
+            <KiIcon name="ki-book-open" size={15} />
+            Cizelge
+          </button>
+        </div>
+      </div>
+
+      {topicView === "cizelge" ? (
+        <KonuCizelge
+          studentId={studentId}
+          subjects={subjects}
+          maxHeight="58vh"
+          showTip={false}
+          subj={activeSubject}
+          onSubj={setActiveSubject}
+        />
+      ) : (
+        <div className="grid col-rail">
+          <div className="card" style={{ overflow: "hidden" }}>
           <div className="card-head">
             <h3>Dersler</h3>
           </div>
@@ -751,7 +782,8 @@ export function CoachTopicsPanel() {
             </div>
           </UkSection>
         ) : null}
-      </div>
+        </div>
+      )}
 
       <UkSection title="Ogrenci notlari" sub={`${notes.length} not`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>

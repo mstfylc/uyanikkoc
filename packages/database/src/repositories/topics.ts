@@ -6,7 +6,9 @@ import type {
   TopicExamType,
   TopicProgressRecord,
   TopicRecord,
+  TopicStudySessionRecord,
   TopicTrackingSummary,
+  UpsertTopicStudySessionInput,
 } from "../types";
 
 function mapProgress(progress: {
@@ -56,6 +58,34 @@ function mapTopic(topic: {
     progress: mapProgress(progress),
     createdAt: topic.createdAt.toISOString(),
     updatedAt: topic.updatedAt.toISOString(),
+  };
+}
+
+function mapStudySession(session: {
+  id: string;
+  topicId: string;
+  studentId: string;
+  date: Date;
+  questionCount: number;
+  correctCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+  topic: {
+    name: string;
+    subject: { name: string };
+  };
+}): TopicStudySessionRecord {
+  return {
+    id: session.id,
+    topicId: session.topicId,
+    studentId: session.studentId,
+    subjectName: session.topic.subject.name,
+    topicName: session.topic.name,
+    date: session.date.toISOString(),
+    questionCount: session.questionCount,
+    correctCount: session.correctCount,
+    createdAt: session.createdAt.toISOString(),
+    updatedAt: session.updatedAt.toISOString(),
   };
 }
 
@@ -283,4 +313,63 @@ export async function deleteTopic(topicId: string, studentId: string): Promise<b
 
   await prisma.topic.delete({ where: { id: topicId } });
   return true;
+}
+
+export async function listStudySessionsForStudent(
+  studentId: string,
+): Promise<TopicStudySessionRecord[]> {
+  const sessions = await prisma.topicStudySession.findMany({
+    where: { studentId },
+    orderBy: [{ date: "asc" }, { createdAt: "asc" }],
+    include: { topic: { include: { subject: true } } },
+  });
+
+  return sessions.map(mapStudySession);
+}
+
+export async function upsertStudySession(
+  input: UpsertTopicStudySessionInput,
+): Promise<TopicStudySessionRecord | null> {
+  const topic = await prisma.topic.findFirst({
+    where: { id: input.topicId, studentId: input.studentId },
+  });
+  if (!topic) {
+    return null;
+  }
+
+  const date = new Date(input.date);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const data = {
+    topicId: input.topicId,
+    studentId: input.studentId,
+    date,
+    questionCount: Math.max(0, Math.round(input.questionCount)),
+    correctCount: Math.max(0, Math.round(input.correctCount)),
+  };
+
+  if (input.id) {
+    const existing = await prisma.topicStudySession.findFirst({
+      where: { id: input.id, studentId: input.studentId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return null;
+    }
+  }
+
+  const session = input.id
+    ? await prisma.topicStudySession.update({
+        where: { id: input.id },
+        data,
+        include: { topic: { include: { subject: true } } },
+      })
+    : await prisma.topicStudySession.create({
+        data,
+        include: { topic: { include: { subject: true } } },
+      });
+
+  return mapStudySession(session);
 }

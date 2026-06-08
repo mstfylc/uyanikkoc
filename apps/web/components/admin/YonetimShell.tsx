@@ -18,6 +18,7 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
   const path = pathname ?? "/yonetim/dashboard";
   const needSuperAdmin = searchParams?.get("need") === "superadmin";
   const needBranch = searchParams?.get("need") === "branch";
+  const needCoach = searchParams?.get("need") === "coach";
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -34,17 +35,18 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
   }
 
   const userRole = session?.user?.role;
-  if (userRole !== "admin" && userRole !== "branch") {
+  if (userRole !== "admin" && userRole !== "branch" && userRole !== "coach") {
     return (
       <div className="card card-pad stack" style={{ margin: 24, maxWidth: 520, gap: 12 }}>
         <b style={{ fontSize: 16 }}>Yonetim paneline erisim yok</b>
         <p className="muted" style={{ fontSize: 13.5, lineHeight: 1.55 }}>
-          Bu alan yalnizca Super Admin veya Kurum yoneticisi hesaplari icindir.
+          Bu alan yalnizca Super Admin, Kurum yoneticisi veya Koc hesaplari icindir.
         </p>
         <div className="alert-strip" style={{ background: "var(--surface-2)" }}>
           <div style={{ fontSize: 12.5, lineHeight: 1.6 }}>
             <div><b>Super Admin</b> — admin@uyanik.local</div>
             <div><b>Kurum</b> — branch@uyanik.local</div>
+            <div><b>Koc</b> - coach@uyanik.local</div>
             <div className="muted">Sifre: uyanik123</div>
           </div>
         </div>
@@ -54,6 +56,9 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
           </Link>
           <Link href={loginHrefForPath(path, "branch")} className="btn btn-light">
             Kurum ile giris
+          </Link>
+          <Link href={loginHrefForPath("/yonetim/dashboard", "coach")} className="btn btn-light">
+            Koc ile giris
           </Link>
         </div>
       </div>
@@ -103,6 +108,19 @@ export function YonetimShell({ children }: { children: React.ReactNode }) {
             >
               Kurum ile gir
             </button>
+          </div>
+        ) : null}
+        {needCoach && userRole === "coach" ? (
+          <div
+            className="alert-strip"
+            style={{ marginBottom: 16, background: "var(--info-soft)", borderColor: "var(--info)" }}
+          >
+            <span className="as-ic" style={{ background: "var(--info)", color: "#fff" }}>
+              i
+            </span>
+            <div style={{ flex: 1, fontSize: 13 }}>
+              <b>Koc yonetim alani lisans ve kontrol ekraniyla sinirlidir.</b>
+            </div>
           </div>
         ) : null}
         {children}

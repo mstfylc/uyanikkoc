@@ -102,6 +102,24 @@ export function StudentAssignmentList() {
     setResultDraft({ correct: "", wrong: "", blank: "" });
   }
 
+  async function completeAssignment(assignmentId: string) {
+    setError(null);
+    const response = await fetch("/api/student/assignments", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ assignmentId, status: "completed" }),
+    });
+
+    if (!response.ok) {
+      setError("Odev tamamlanamadi.");
+      return;
+    }
+
+    setFilter("all");
+    await loadAssignments();
+  }
+
   async function submitResult(event: React.FormEvent) {
     event.preventDefault();
     if (!resultTarget) {
@@ -222,11 +240,16 @@ export function StudentAssignmentList() {
                         </div>
                       </div>
                       {open ? (
-                        <button type="button" className="btn btn-sm btn-primary" onClick={() => openResultModal(assignment)}>
-                          Sonuc Gir
-                        </button>
+                        <div className="row" style={{ gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                          <button type="button" className="btn btn-sm btn-primary" onClick={() => openResultModal(assignment)}>
+                            Sonuc Gir
+                          </button>
+                          <button type="button" className="btn btn-sm btn-light" onClick={() => void completeAssignment(assignment.id)}>
+                            Tamamla
+                          </button>
+                        </div>
                       ) : (
-                        <UkBadge tone="success">Tamamlandi</UkBadge>
+                        <UkBadge tone="success">(Tamamlandi)</UkBadge>
                       )}
                     </div>
                   </li>

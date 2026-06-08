@@ -107,6 +107,11 @@ const YONETIM_BRANCH_ONLY_PREFIXES = [
   "/yonetim/settings",
 ] as const;
 
+const YONETIM_COACH_ONLY_PREFIXES = [
+  "/yonetim/dashboard",
+  "/yonetim/license",
+] as const;
+
 function matchesPrefix(pathname: string, prefix: string): boolean {
   return pathname === prefix || pathname.startsWith(`${prefix}/`);
 }
@@ -115,8 +120,8 @@ function matchesPrefix(pathname: string, prefix: string): boolean {
 export function yonetimLoginRoleHint(
   pathname: string,
   roleParam?: string | null,
-): "admin" | "branch" | null {
-  if (roleParam === "admin" || roleParam === "branch") {
+): "admin" | "branch" | "coach" | null {
+  if (roleParam === "admin" || roleParam === "branch" || roleParam === "coach") {
     return roleParam;
   }
   if (!pathname.startsWith("/yonetim")) {
@@ -131,7 +136,7 @@ export function yonetimLoginRoleHint(
   return "admin";
 }
 
-export function loginHrefForPath(pathname: string, roleHint?: "admin" | "branch" | null): string {
+export function loginHrefForPath(pathname: string, roleHint?: "admin" | "branch" | "coach" | null): string {
   const role = roleHint ?? yonetimLoginRoleHint(pathname);
   const base = `/login?next=${encodeURIComponent(pathname)}`;
   return role ? `${base}&role=${role}` : base;
@@ -148,6 +153,12 @@ function yonetimMismatchRedirect(role: AppRole, pathname: string): string | null
     YONETIM_ADMIN_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
   ) {
     return "/yonetim/dashboard?need=superadmin";
+  }
+  if (
+    role === "coach" &&
+    !YONETIM_COACH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))
+  ) {
+    return "/yonetim/dashboard?need=coach";
   }
   return null;
 }
@@ -166,8 +177,11 @@ export function canAccessPath(role: AppRole, pathname: string): boolean {
   }
 
   if (pathname.startsWith("/yonetim")) {
-    if (role !== "admin" && role !== "branch") {
+    if (role !== "admin" && role !== "branch" && role !== "coach") {
       return false;
+    }
+    if (role === "coach") {
+      return YONETIM_COACH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix));
     }
     // Super Admin (admin) tüm yönetim ekranlarına erişir (hiyerarşik superset).
     // Kurum yöneticisi (branch) yalnızca platform/franchise ekranlarından kısıtlanır.

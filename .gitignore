@@ -1,5 +1,7 @@
 node_modules/
 .turbo
+.vercel/
+.design-import/
 dist
 .next/
 .env

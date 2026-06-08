@@ -8,6 +8,7 @@ import { UkBarChart } from "@/components/design/UkBarChart";
 import { CoachStudentsTable } from "@/components/coach/CoachStudentsTable";
 import { MotivationSendModal } from "@/components/coach/MotivationSendModal";
 import { UkBadge } from "@/components/design/UkBadge";
+import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
 import { buildCoachStudentRows } from "@/lib/design/coach-student-rows";
@@ -94,6 +95,8 @@ export function CoachDashboard() {
   return (
     <>
     <div className="stack rise" data-testid="coach-dashboard">
+      <UkPageHead title="Dashboard" sub="Ogrenci ilerlemesi, odev durumu ve kocluk aksiyonlari" />
+
       <div className="grid g-4">
         <UkStatCard icon="ki-people" tone="primary" value={students.length} label="Toplam ogrenci" />
         <UkStatCard

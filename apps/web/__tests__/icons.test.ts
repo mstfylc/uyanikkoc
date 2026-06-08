@@ -25,6 +25,7 @@ describe("KiIcon mapping", () => {
       "ki-element-11",
       "ki-calendar",
       "ki-book-open",
+      "ki-notebook",
       "ki-chart-simple",
       "ki-notepad-edit",
       "ki-calendar-tick",

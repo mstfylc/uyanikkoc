@@ -5,8 +5,10 @@ import {
   createSubject,
   createTopic,
   listSubjectsForStudent,
+  listStudySessionsForStudent,
   resetTopicsForTests,
   updateTopic,
+  upsertStudySession,
 } from "@/mocks/topics";
 import { filterSubjectsForStudentExam, studentSinav } from "@/lib/design/student-exam";
 
@@ -53,6 +55,45 @@ describe("topic tracking mock store", () => {
     updateTopic(topic.id, DEMO_STUDENT_ID, { toggleSource: "Mikro Mat" });
     updated = listSubjectsForStudent(DEMO_STUDENT_ID)[0]?.topics[0];
     expect(updated?.progress.completedSources ?? []).not.toContain("Mikro Mat");
+  });
+
+  it("creates and updates topic study sessions for yearly grid", () => {
+    const subject = createSubject({
+      studentId: DEMO_STUDENT_ID,
+      examType: "TYT",
+      name: "Matematik",
+    });
+    const topic = createTopic({
+      subjectId: subject.id,
+      studentId: DEMO_STUDENT_ID,
+      name: "Problemler",
+    });
+    if (!topic) throw new Error("topic missing");
+
+    const created = upsertStudySession({
+      topicId: topic.id,
+      studentId: DEMO_STUDENT_ID,
+      date: "2026-06-08T09:00:00.000Z",
+      questionCount: 40,
+      correctCount: 32,
+    });
+
+    expect(created?.subjectName).toBe("Matematik");
+    expect(created?.topicName).toBe("Problemler");
+    expect(created?.questionCount).toBe(40);
+
+    const updated = upsertStudySession({
+      id: created?.id,
+      topicId: topic.id,
+      studentId: DEMO_STUDENT_ID,
+      date: "2026-06-08T09:00:00.000Z",
+      questionCount: 45,
+      correctCount: 36,
+    });
+
+    expect(updated?.id).toBe(created?.id);
+    expect(listStudySessionsForStudent(DEMO_STUDENT_ID)).toHaveLength(1);
+    expect(listStudySessionsForStudent(DEMO_STUDENT_ID)[0]?.correctCount).toBe(36);
   });
 });
 

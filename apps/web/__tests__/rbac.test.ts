@@ -36,6 +36,8 @@ describe("RBAC path erişim kontrolü", () => {
     expect(canAccessPath("parent", "/parent/dashboard")).toBe(true);
     expect(canAccessPath("branch", "/yonetim/dashboard")).toBe(true);
     expect(canAccessPath("admin", "/yonetim/dashboard")).toBe(true);
+    expect(canAccessPath("coach", "/yonetim/dashboard")).toBe(true);
+    expect(canAccessPath("coach", "/yonetim/license")).toBe(true);
     expect(canAccessPath("branch", "/branch/dashboard")).toBe(true);
     expect(canAccessPath("admin", "/admin/dashboard")).toBe(true);
   });
@@ -61,7 +63,8 @@ describe("RBAC path erişim kontrolü", () => {
     expect(canAccessPath("student", "/coach/dashboard")).toBe(false);
     expect(canAccessPath("parent", "/admin/users")).toBe(false);
     expect(canAccessPath("coach", "/student/assignments")).toBe(false);
-    expect(canAccessPath("coach", "/yonetim/dashboard")).toBe(false);
+    expect(canAccessPath("coach", "/yonetim/orgs")).toBe(false);
+    expect(canAccessPath("coach", "/yonetim/students")).toBe(false);
   });
 
   it("session yoksa login'e yönlendirir", () => {
@@ -97,6 +100,13 @@ describe("RBAC path erişim kontrolü", () => {
     const session = { user: { id: "1", role: "branch" as const } };
     const result = getUnauthorizedRedirect("/yonetim/orgs", session);
     expect(result).toBe("/yonetim/dashboard?need=superadmin");
+  });
+
+  it("koc yonetimde yalnizca lisans ve kontrol alanina erisir", () => {
+    const session = { user: { id: "1", role: "coach" as const } };
+    expect(getUnauthorizedRedirect("/yonetim/dashboard", session)).toBeNull();
+    expect(getUnauthorizedRedirect("/yonetim/license", session)).toBeNull();
+    expect(getUnauthorizedRedirect("/yonetim/students", session)).toBe("/yonetim/dashboard?need=coach");
   });
 
   it("ROLE_HOME_PATH tüm roller için tanımlı", () => {

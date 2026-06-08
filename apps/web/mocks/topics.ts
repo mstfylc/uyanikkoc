@@ -4,7 +4,9 @@ import type {
   SubjectRecord,
   TopicExamType,
   TopicRecord,
+  TopicStudySessionRecord,
   TopicTrackingSummary,
+  UpsertTopicStudySessionInput,
 } from "@uyanik/database";
 import { buildTopicSummary } from "@uyanik/database";
 
@@ -14,9 +16,12 @@ export { DEMO_STUDENT_ID };
 
 const globalStore = globalThis as typeof globalThis & {
   __uyanikSubjects?: SubjectRecord[];
+  __uyanikTopicStudySessions?: TopicStudySessionRecord[];
 };
 
 const subjects = globalStore.__uyanikSubjects ?? (globalStore.__uyanikSubjects = []);
+const studySessions =
+  globalStore.__uyanikTopicStudySessions ?? (globalStore.__uyanikTopicStudySessions = []);
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -74,6 +79,7 @@ function seedIfEmpty() {
 
 export function resetTopicsForTests() {
   subjects.length = 0;
+  studySessions.length = 0;
 }
 
 export function listSubjectsForStudent(studentId: string): SubjectRecord[] {
@@ -233,4 +239,57 @@ export function deleteTopic(topicId: string, studentId: string): boolean {
   }
 
   return false;
+}
+
+function topicLookup(topicId: string, studentId: string) {
+  for (const subject of subjects) {
+    const topic = subject.topics.find((item) => item.id === topicId && item.studentId === studentId);
+    if (topic) {
+      return { subject, topic };
+    }
+  }
+  return null;
+}
+
+export function listStudySessionsForStudent(studentId: string): TopicStudySessionRecord[] {
+  seedIfEmpty();
+  return studySessions
+    .filter((item) => item.studentId === studentId)
+    .sort((left, right) => left.date.localeCompare(right.date));
+}
+
+export function upsertStudySession(
+  input: UpsertTopicStudySessionInput,
+): TopicStudySessionRecord | null {
+  seedIfEmpty();
+  const match = topicLookup(input.topicId, input.studentId);
+  if (!match) {
+    return null;
+  }
+
+  const timestamp = nowIso();
+  const existingIndex = input.id
+    ? studySessions.findIndex((item) => item.id === input.id && item.studentId === input.studentId)
+    : -1;
+
+  const record: TopicStudySessionRecord = {
+    id: existingIndex >= 0 ? studySessions[existingIndex]!.id : `topic_session_${Date.now()}`,
+    topicId: input.topicId,
+    studentId: input.studentId,
+    subjectName: match.subject.name,
+    topicName: match.topic.name,
+    date: new Date(input.date).toISOString(),
+    questionCount: Math.max(0, Math.round(input.questionCount)),
+    correctCount: Math.max(0, Math.round(input.correctCount)),
+    createdAt: existingIndex >= 0 ? studySessions[existingIndex]!.createdAt : timestamp,
+    updatedAt: timestamp,
+  };
+
+  if (existingIndex >= 0) {
+    studySessions[existingIndex] = record;
+  } else {
+    studySessions.push(record);
+  }
+
+  return record;
 }

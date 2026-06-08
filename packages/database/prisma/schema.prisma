@@ -116,6 +116,7 @@ model StudentProfile {
   denemeMembership  DenemeMembership?
   testAssignments   TestAssignment[]
   parentReports     ParentReport[]
+  topicStudySessions TopicStudySession[]
 
   @@map("student_profiles")
 }
@@ -202,6 +203,7 @@ model Topic {
   updatedAt DateTime       @updatedAt
   subject   Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   progress  TopicProgress?
+  studySessions TopicStudySession[]
 
   @@index([subjectId])
   @@index([studentId])
@@ -221,6 +223,23 @@ model TopicProgress {
 
   @@index([studentId])
   @@map("topic_progress")
+}
+
+model TopicStudySession {
+  id            String         @id @default(cuid())
+  topicId       String
+  studentId     String
+  date          DateTime
+  questionCount Int
+  correctCount  Int
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  topic         Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  student       StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, date])
+  @@index([topicId, date])
+  @@map("topic_study_sessions")
 }
 
 model ExamResult {

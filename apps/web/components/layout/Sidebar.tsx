@@ -23,6 +23,7 @@ type SidebarProps = {
 export function Sidebar({ role }: SidebarProps) {
   const pathname = usePathname();
   const path = pathname ?? dashboardHref(role);
+  const isYonetimCoach = role === "coach" && path.startsWith("/yonetim");
   const [motivationEnabled, setMotivationEnabled] = useState(true);
 
   useEffect(() => {
@@ -42,17 +43,25 @@ export function Sidebar({ role }: SidebarProps) {
   }, [role]);
 
   const items = useMemo(() => {
+    if (isYonetimCoach) {
+      return [
+        { href: "/yonetim/dashboard", label: "Lisansim", icon: "ki-shield-tick" },
+        { href: "/yonetim/license", label: "Lisans & Kontrol", icon: "ki-chart-pie-simple" },
+      ];
+    }
     const base = getUkNavItems(role);
     if (role !== "student" || motivationEnabled) {
       return base;
     }
     return base.filter((item) => item.href !== "/student/motivation");
-  }, [role, motivationEnabled]);
+  }, [role, motivationEnabled, isYonetimCoach]);
 
-  const generalItems = getUkGeneralNavItems(role);
-  const activeItem = findUkNavItem(role, path);
-  const profileHref = getProfileHref(role);
-  const dash = dashboardHref(role);
+  const generalItems = isYonetimCoach ? [] : getUkGeneralNavItems(role);
+  const activeItem = isYonetimCoach
+    ? items.find((item) => path === item.href || path.startsWith(`${item.href}/`))
+    : findUkNavItem(role, path);
+  const profileHref = isYonetimCoach ? "/yonetim/dashboard" : getProfileHref(role);
+  const dash = isYonetimCoach ? "/yonetim/dashboard" : dashboardHref(role);
 
   return (
     <aside className="sidebar theme-fade">

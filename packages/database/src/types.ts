@@ -149,6 +149,28 @@ export type TopicRecord = {
   updatedAt: string;
 };
 
+export type TopicStudySessionRecord = {
+  id: string;
+  topicId: string;
+  studentId: string;
+  subjectName: string;
+  topicName: string;
+  date: string;
+  questionCount: number;
+  correctCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UpsertTopicStudySessionInput = {
+  id?: string;
+  topicId: string;
+  studentId: string;
+  date: string;
+  questionCount: number;
+  correctCount: number;
+};
+
 export type SubjectRecord = {
   id: string;
   studentId: string;

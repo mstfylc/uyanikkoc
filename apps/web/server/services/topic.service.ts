@@ -4,7 +4,9 @@ import type {
   SubjectRecord,
   TopicExamType,
   TopicRecord,
+  TopicStudySessionRecord,
   TopicTrackingSummary,
+  UpsertTopicStudySessionInput,
 } from "@uyanik/database";
 import { buildTopicSummary } from "@uyanik/database";
 
@@ -101,4 +103,44 @@ export async function deleteStudentTopic(topicId: string, studentId: string): Pr
   }
 
   return memoryTopics.deleteTopic(topicId, studentId);
+}
+
+export async function listStudentTopicStudySessions(
+  studentId: string,
+): Promise<TopicStudySessionRecord[]> {
+  if (shouldUseDatabase()) {
+    const { topicRepository } = await import("@uyanik/database");
+    return topicRepository.listStudySessionsForStudent(studentId);
+  }
+
+  return memoryTopics.listStudySessionsForStudent(studentId);
+}
+
+export async function upsertStudentTopicStudySession(
+  input: UpsertTopicStudySessionInput,
+): Promise<TopicStudySessionRecord | null> {
+  const date = new Date(input.date);
+  const questionCount = Math.max(0, Math.round(input.questionCount));
+  const correctCount = Math.max(0, Math.round(input.correctCount));
+
+  if (!input.topicId || !input.studentId || Number.isNaN(date.getTime())) {
+    return null;
+  }
+  if (correctCount > questionCount) {
+    throw new Error("Dogru sayisi soru sayisini gecemez.");
+  }
+
+  const normalized = {
+    ...input,
+    date: date.toISOString(),
+    questionCount,
+    correctCount,
+  };
+
+  if (shouldUseDatabase()) {
+    const { topicRepository } = await import("@uyanik/database");
+    return topicRepository.upsertStudySession(normalized);
+  }
+
+  return memoryTopics.upsertStudySession(normalized);
 }

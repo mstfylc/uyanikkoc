@@ -1,0 +1,6 @@
+.design-import/
+.vercel/
+node_modules/
+.next/
+.turbo/
+*.log
