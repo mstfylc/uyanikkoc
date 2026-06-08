@@ -36,6 +36,9 @@ function seedIfEmpty(coachId: string) {
 }
 
 export async function getForStudent(studentId: string): Promise<CoachRatingRecord | null> {
+  if (studentId === DEMO_STUDENT_ID || studentId === DEMO_STUDENT_002_ID) {
+    seedIfEmpty("coach_001");
+  }
   return byStudent.get(studentId) ?? null;
 }
 

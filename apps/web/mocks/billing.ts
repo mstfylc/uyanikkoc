@@ -64,6 +64,48 @@ const subscriptions = new Map<string, SubscriptionRecord>();
 const invoices = new Map<string, InvoiceRecord[]>();
 let seq = 1;
 
+const DEMO_BILLING_USERS = [
+  {
+    userId: "user_student_001",
+    studentId: "student_001",
+    planId: "plus",
+    cycle: "annual" as const,
+    brand: "visa" as const,
+    last4: "4242",
+    holder: "Demo Ogrenci",
+    amount: 22990,
+  },
+  {
+    userId: "user_student_002",
+    studentId: "student_002",
+    planId: "standart",
+    cycle: "monthly" as const,
+    brand: "mastercard" as const,
+    last4: "8821",
+    holder: "Mert Demir",
+    amount: 1499,
+  },
+  {
+    userId: "user_parent_001",
+    studentId: "student_001",
+    planId: "vip",
+    cycle: "annual" as const,
+    brand: "visa" as const,
+    last4: "3409",
+    holder: "Demo Veli",
+    amount: 34990,
+  },
+] satisfies Array<{
+  userId: string;
+  studentId: string;
+  planId: string;
+  cycle: "monthly" | "annual";
+  brand: "visa" | "mastercard";
+  last4: string;
+  holder: string;
+  amount: number;
+}>;
+
 function nextRenewal(cycle: "monthly" | "annual", from = new Date()): Date {
   const d = new Date(from);
   if (cycle === "annual") {
@@ -72,6 +114,81 @@ function nextRenewal(cycle: "monthly" | "annual", from = new Date()): Date {
     d.setMonth(d.getMonth() + 1);
   }
   return d;
+}
+
+function isoDaysAgo(days: number): string {
+  return new Date(Date.now() - days * 86_400_000).toISOString();
+}
+
+function seedDemoBillingForUser(userId: string): void {
+  const demo = DEMO_BILLING_USERS.find((item) => item.userId === userId);
+  if (!demo) {
+    return;
+  }
+
+  if (!methods.has(userId)) {
+    methods.set(userId, [
+      {
+        id: `pm_demo_${userId}`,
+        userId,
+        brand: demo.brand,
+        last4: demo.last4,
+        holder: demo.holder,
+        expMonth: 12,
+        expYear: 2029,
+        isDefault: true,
+        createdAt: isoDaysAgo(42),
+      },
+    ]);
+  }
+
+  if (!subscriptions.has(userId)) {
+    const startedAt = isoDaysAgo(demo.cycle === "annual" ? 86 : 18);
+    subscriptions.set(userId, {
+      id: `sub_demo_${userId}`,
+      payerUserId: userId,
+      studentId: demo.studentId,
+      planId: demo.planId,
+      cycle: demo.cycle,
+      status: "active",
+      autoRenew: true,
+      startedAt,
+      renewsAt: nextRenewal(demo.cycle, new Date(startedAt)).toISOString(),
+      canceledAt: null,
+      paymentMethodId: `pm_demo_${userId}`,
+    });
+  }
+
+  if (!invoices.has(userId)) {
+    invoices.set(userId, [
+      {
+        id: `UK-2026-${demo.userId.endsWith("001") ? "2407" : "2411"}`,
+        subscriptionId: `sub_demo_${userId}`,
+        payerUserId: userId,
+        planId: demo.planId,
+        cycle: demo.cycle,
+        amount: demo.amount,
+        status: "paid",
+        installments: demo.cycle === "annual" ? 3 : 1,
+        methodLabel: `${demo.brand === "visa" ? "Visa" : "MasterCard"} •${demo.last4}`,
+        paymentMethodId: `pm_demo_${userId}`,
+        issuedAt: isoDaysAgo(18),
+      },
+      {
+        id: `UK-2026-${demo.userId.endsWith("001") ? "2319" : "2304"}`,
+        subscriptionId: `sub_demo_${userId}`,
+        payerUserId: userId,
+        planId: demo.planId,
+        cycle: demo.cycle,
+        amount: demo.cycle === "annual" ? Math.round(demo.amount / 3) : demo.amount,
+        status: "paid",
+        installments: 1,
+        methodLabel: `${demo.brand === "visa" ? "Visa" : "MasterCard"} •${demo.last4}`,
+        paymentMethodId: `pm_demo_${userId}`,
+        issuedAt: isoDaysAgo(48),
+      },
+    ]);
+  }
 }
 
 export async function listPlans(): Promise<BillingPlanRecord[]> {
@@ -83,6 +200,7 @@ export async function getPlan(planId: string): Promise<BillingPlanRecord | null>
 }
 
 export async function listPaymentMethods(userId: string): Promise<PaymentMethodRecord[]> {
+  seedDemoBillingForUser(userId);
   return [...(methods.get(userId) ?? [])].sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
 }
 
@@ -138,6 +256,7 @@ export async function removePaymentMethod(userId: string, methodId: string): Pro
 }
 
 export async function getActiveSubscription(payerUserId: string): Promise<SubscriptionRecord | null> {
+  seedDemoBillingForUser(payerUserId);
   return subscriptions.get(payerUserId) ?? null;
 }
 
@@ -224,5 +343,6 @@ export async function resumeSubscription(payerUserId: string): Promise<Subscript
 }
 
 export async function listInvoices(payerUserId: string): Promise<InvoiceRecord[]> {
+  seedDemoBillingForUser(payerUserId);
   return invoices.get(payerUserId) ?? [];
 }
