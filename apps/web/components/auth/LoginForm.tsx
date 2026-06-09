@@ -24,6 +24,8 @@ const DEMO_ROLE_ICON: Record<DemoRole, string> = {
   branch: "ki-office-bag",
 };
 
+const DEMO_LOGIN_ENABLED = process.env.NODE_ENV !== "production";
+
 function resolveDemoRole(nextPath: string, roleParam: string | null): DemoRole {
   return yonetimLoginRoleHint(nextPath, roleParam) ?? "student";
 }
@@ -37,8 +39,8 @@ export function LoginForm() {
   const yonetimHint = yonetimLoginRoleHint(nextPath, roleParam);
 
   const [demoRole, setDemoRole] = useState<DemoRole>(initialRole);
-  const [email, setEmail] = useState(yonetimHint ? initialDemo.email : "");
-  const [password, setPassword] = useState(yonetimHint ? initialDemo.password : "");
+  const [email, setEmail] = useState(DEMO_LOGIN_ENABLED && yonetimHint ? initialDemo.email : "");
+  const [password, setPassword] = useState(DEMO_LOGIN_ENABLED && yonetimHint ? initialDemo.password : "");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
@@ -50,7 +52,7 @@ export function LoginForm() {
     const role = resolveDemoRole(nextPath, roleParam);
     const hint = yonetimLoginRoleHint(nextPath, roleParam);
     setDemoRole(role);
-    if (hint) {
+    if (DEMO_LOGIN_ENABLED && hint) {
       setEmail(DEMO_BY_ROLE[role].email);
       setPassword(DEMO_BY_ROLE[role].password);
     }
@@ -193,26 +195,32 @@ export function LoginForm() {
               <div style={{ flex: 1, fontSize: 12.5, lineHeight: 1.5 }}>
                 <b>Yonetim paneli girisi.</b>{" "}
                 {yonetimHint === "admin"
-                  ? "Super Admin hesabi secildi (admin@uyanik.local)."
-                  : "Kurum yoneticisi hesabi secildi (branch@uyanik.local)."}
+                  ? DEMO_LOGIN_ENABLED
+                    ? "Super Admin hesabi secildi (admin@uyanik.local)."
+                    : "Super Admin hesabinla giris yap."
+                  : DEMO_LOGIN_ENABLED
+                    ? "Kurum yoneticisi hesabi secildi (branch@uyanik.local)."
+                    : "Kurum yoneticisi hesabinla giris yap."}
               </div>
             </div>
           ) : null}
 
-          <div className="seg" style={{ width: "100%", marginBottom: 18, flexWrap: "wrap" }}>
-            {(["student", "coach", "parent", "admin", "branch"] as DemoRole[]).map((role) => (
-              <button
-                key={role}
-                type="button"
-                className={demoRole === role ? "on" : ""}
-                style={{ flex: "1 1 auto", minWidth: 88, justifyContent: "center" }}
-                onClick={() => selectDemoRole(role)}
-              >
-                <KiIcon name={DEMO_ROLE_ICON[role]} />
-                {DEMO_BY_ROLE[role].label}
-              </button>
-            ))}
-          </div>
+          {DEMO_LOGIN_ENABLED ? (
+            <div className="seg" style={{ width: "100%", marginBottom: 18, flexWrap: "wrap" }}>
+              {(["student", "coach", "parent", "admin", "branch"] as DemoRole[]).map((role) => (
+                <button
+                  key={role}
+                  type="button"
+                  className={demoRole === role ? "on" : ""}
+                  style={{ flex: "1 1 auto", minWidth: 88, justifyContent: "center" }}
+                  onClick={() => selectDemoRole(role)}
+                >
+                  <KiIcon name={DEMO_ROLE_ICON[role]} />
+                  {DEMO_BY_ROLE[role].label}
+                </button>
+              ))}
+            </div>
+          ) : null}
 
           <div className="field" style={{ marginBottom: 14 }}>
             <label className="label" htmlFor="email">
@@ -226,7 +234,7 @@ export function LoginForm() {
               autoComplete="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder={DEMO_BY_ROLE[demoRole].email}
+              placeholder={DEMO_LOGIN_ENABLED ? DEMO_BY_ROLE[demoRole].email : "ornek@uyanikkoc.com"}
               required
             />
           </div>
@@ -302,10 +310,12 @@ export function LoginForm() {
             {isSubmitting ? "Giris yapiliyor..." : "Giris Yap"}
           </button>
 
-          <button type="button" className="btn btn-light" style={{ width: "100%", marginTop: 10 }} onClick={fillDemo}>
-            <KiIcon name="ki-flash" />
-            Demo bilgileriyle doldur
-          </button>
+          {DEMO_LOGIN_ENABLED ? (
+            <button type="button" className="btn btn-light" style={{ width: "100%", marginTop: 10 }} onClick={fillDemo}>
+              <KiIcon name="ki-flash" />
+              Demo bilgileriyle doldur
+            </button>
+          ) : null}
 
           <div className="muted" style={{ fontSize: 12, textAlign: "center", marginTop: 20 }}>
             Hesabin yok mu?{" "}
