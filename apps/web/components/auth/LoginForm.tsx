@@ -1,6 +1,7 @@
 "use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { UkSparkline } from "@/components/design/UkSparkline";
 import { yonetimLoginRoleHint } from "@/lib/rbac";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -79,12 +80,6 @@ export function LoginForm() {
     window.location.assign(nextPath);
   }
 
-  function fillDemo() {
-    const demo = DEMO_BY_ROLE[demoRole];
-    setEmail(demo.email);
-    setPassword(demo.password);
-  }
-
   function selectDemoRole(role: DemoRole) {
     setDemoRole(role);
     const demo = DEMO_BY_ROLE[role];
@@ -129,45 +124,88 @@ export function LoginForm() {
   return (
     <div className="auth-wrap">
       <div className="auth-art">
+        <span className="auth-orb auth-orb-1" aria-hidden="true" />
+        <span className="auth-orb auth-orb-2" aria-hidden="true" />
+        <div className="auth-grid" aria-hidden="true" />
+
         <div className="auth-art-inner">
-          <div className="row" style={{ gap: 12 }}>
-            <span className="logo-mark" style={{ width: 44, height: 44, borderRadius: 13 }}>
-              <KiIcon name="ki-flash text-white text-xl" />
+          <div className="auth-brand">
+            <span className="auth-logo">
+              <KiIcon name="ki-flash text-white text-xl" size={27} />
             </span>
-            <div className="logo-text">
-              <b style={{ fontSize: 19, color: "#fff" }}>Uyanik Koc</b>
-              <span style={{ color: "rgba(255,255,255,.7)" }}>Akilli kocluk platformu</span>
+            <div className="auth-brand-text">
+              <b>Uyanik Koc</b>
+              <span>Akilli kocluk platformu</span>
             </div>
           </div>
-          <div style={{ marginTop: "auto" }}>
-            <h2 style={{ fontSize: 30, fontWeight: 800, letterSpacing: "-.02em", lineHeight: 1.18 }}>
+
+          <div className="auth-stage" aria-hidden="true">
+            <div className="auth-pcard auth-pcard-main">
+              <div className="ap-head">
+                <div>
+                  <div className="ap-kicker">Deneme net gelisimi</div>
+                  <div className="ap-val">
+                    147,5<span> net</span>
+                  </div>
+                </div>
+                <span className="ap-delta">
+                  <KiIcon name="ki-arrow-up" size={13} />
+                  +53
+                </span>
+              </div>
+              <div className="ap-spark">
+                <UkSparkline data={[58, 64, 71, 69, 82, 96, 110, 121, 147]} color="#ffffff" height={64} width={300} />
+              </div>
+              <div className="ap-axis">
+                <span>Eyl</span>
+                <span>Kas</span>
+                <span>Oca</span>
+                <span>Mar</span>
+                <span>May</span>
+              </div>
+            </div>
+
+            <div className="auth-pcard auth-pcard-ring">
+              <div className="ap-ring">
+                <svg viewBox="0 0 48 48">
+                  <circle className="ap-ring-track" cx="24" cy="24" r="20" />
+                  <circle className="ap-ring-val" cx="24" cy="24" r="20" />
+                </svg>
+                <b>74%</b>
+              </div>
+              <div className="ap-ring-lab">Konu tamamlama</div>
+            </div>
+
+            <div className="auth-pcard auth-pcard-chip">
+              <span className="ap-chip-ic">
+                <KiIcon name="ki-flame" size={17} />
+              </span>
+              <div className="ap-chip-text">
+                <b>12 gun seri</b>
+                <span>Bugunun odevleri tamam</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="auth-foot">
+            <h2>
               Hedefe giden yolu
               <br />
               birlikte planlayalim.
             </h2>
-            <p
-              style={{
-                fontSize: 14.5,
-                color: "rgba(255,255,255,.8)",
-                marginTop: 14,
-                maxWidth: 420,
-                lineHeight: 1.6,
-              }}
-            >
-              Koc, ogrenci ve veliyi tek ekranda bulusturan; deneme analizleri, konu takibi ve odev
-              takibi ile calisan kocluk sistemi.
+            <p>
+              Koc, ogrenci ve veliyi tek ekranda bulusturan; deneme analizleri, konu takibi ve soru
+              hedefleriyle calisan kocluk sistemi.
             </p>
-            <div className="row" style={{ gap: 22, marginTop: 30 }}>
+            <div className="auth-stats">
               {[
                 ["18", "Aktif ogrenci"],
                 ["%74", "Ort. tamamlama"],
                 ["+53", "Net gelisimi"],
               ].map(([value, label]) => (
-                <div key={label}>
-                  <div className="tnum" style={{ fontSize: 24, fontWeight: 800 }}>
-                    {value}
-                  </div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.7)" }}>{label}</div>
+                <div className="auth-stat" key={label}>
+                  <div className="tnum auth-stat-v">{value}</div>
+                  <div className="auth-stat-l">{label}</div>
                 </div>
               ))}
             </div>
@@ -309,13 +347,6 @@ export function LoginForm() {
             <KiIcon name="ki-entrance-right" />
             {isSubmitting ? "Giris yapiliyor..." : "Giris Yap"}
           </button>
-
-          {DEMO_LOGIN_ENABLED ? (
-            <button type="button" className="btn btn-light" style={{ width: "100%", marginTop: 10 }} onClick={fillDemo}>
-              <KiIcon name="ki-flash" />
-              Demo bilgileriyle doldur
-            </button>
-          ) : null}
 
           <div className="muted" style={{ fontSize: 12, textAlign: "center", marginTop: 20 }}>
             Hesabin yok mu?{" "}
