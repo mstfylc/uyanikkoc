@@ -146,11 +146,13 @@ export function CoachLicensePanel() {
     return (
       <div className="stack rise">
         <UkPageHead title="Lisansım" sub="Bireysel koç aboneliğini yönet" />
-        <div className="alert-strip">
-          <span className="as-ic"><Icon name="building" size={18} /></span>
-          <div style={{ flex: 1 }}>
-            <b style={{ fontSize: 13.5 }}>Kurum koçu hesabı</b>
-            <div className="muted" style={{ fontSize: 12.5 }}>Lisansın kurum yöneticin tarafından yönetiliyor. Bireysel plan için solo koç hesabı kullanın.</div>
+        <div className="card">
+          <div className="alert-strip" style={{ border: 0, borderRadius: 0 }}>
+            <span className="as-ic"><Icon name="building" size={18} /></span>
+            <div style={{ flex: 1 }}>
+              <b style={{ fontSize: 13.5 }}>Kurum koçu hesabı</b>
+              <div className="muted" style={{ fontSize: 12.5 }}>Lisansın kurum yöneticin tarafından yönetiliyor. Bireysel plan için solo koç hesabı kullanın.</div>
+            </div>
           </div>
         </div>
       </div>

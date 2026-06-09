@@ -21,7 +21,13 @@ export function CoachInvoicesPanel() {
     return (
       <div className="stack rise">
         <UkPageHead title="Faturalar" sub="Bireysel koç ödeme geçmişi" />
-        <p className="muted">Fatura geçmişi yalnızca bireysel koç hesapları için kullanılabilir.</p>
+        <div className="card">
+          <div className="card-body">
+            <p className="muted" style={{ fontSize: 13.5, lineHeight: 1.55 }}>
+              Fatura geçmişi yalnızca bireysel koç hesapları için kullanılabilir.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
