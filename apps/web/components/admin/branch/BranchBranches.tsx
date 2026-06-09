@@ -13,13 +13,11 @@ import { UkPageHead } from "@/components/design/UkPageHead";
 import { downloadCSV } from "@/lib/admin/csv";
 import { tl } from "@/lib/admin/format";
 import { orgPlanById } from "@/lib/admin/pricing";
-import type { Branch } from "@/lib/admin/types";
 
 export function BranchBranches() {
-  const { snapshot, activeOrgId, mutate, toast } = useAdminStore();
-  const [manage, setManage] = useState<Branch | null>(null);
-  const [addOpen, setAddOpen] = useState(false);
-
+  const { snapshot, activeOrgId, toast } = useAdminStore();
+  const [addingBranch, setAddingBranch] = useState(false);
+  const [managingBranchId, setManagingBranchId] = useState<string | null>(null);
   if (!snapshot) return <div className="card card-pad muted">Yükleniyor…</div>;
   const o = getActiveOrg(snapshot, activeOrgId);
 
@@ -33,14 +31,7 @@ export function BranchBranches() {
           actions={
             <div className="row" style={{ gap: 9 }}>
               <OrgSwitcher />
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={async () => {
-                  await mutate({ kind: "changeOrgPlan", orgId: o.id, planId: "franchise" });
-                  toast("Franchise planına geçildi", { icon: "ki-office-bag" });
-                }}
-              >
+              <button type="button" className="btn btn-primary" onClick={() => toast("Franchise yükseltme akışı", { icon: "ki-office-bag" })}>
                 <Icon name="building" size={16} />Franchise'a yükselt
               </button>
             </div>
@@ -52,25 +43,18 @@ export function BranchBranches() {
             <b style={{ fontSize: 13.5 }}>{b.name}</b>
             <div className="muted" style={{ fontSize: 12.5 }}>{b.city} · {b.students} öğrenci · {b.coaches} koç</div>
           </div>
-          <button type="button" className="btn btn-sm btn-light" onClick={() => setManage(b)}>
-            Şubeyi yönet<Icon name="chevronRight" size={15} />
-          </button>
+          <span className="badge badge-info">Çok şubeli yapı için Franchise planına geçin</span>
         </div>
         <div className="grid g-3">
           <StatCard icon="cap" tone="primary" value={b.students} label="Öğrenci" />
           <StatCard icon="users" tone="info" value={b.coaches} label="Koç" />
           <StatCard icon="banknote" tone="success" value={tl(b.collect)} label="Aylık tahsilat" />
         </div>
-        {manage ? (
-          <BranchManageDialog orgId={o.id} branchId={manage.id} onClose={() => setManage(null)} />
-        ) : null}
       </div>
     );
   }
 
   const totalCollect = o.branches.reduce((s, b) => s + b.collect, 0);
-  const atCapacity = o.branches.length >= orgPlanById(o.planId).branches;
-
   return (
     <div className="stack rise">
       <UkPageHead
@@ -79,20 +63,10 @@ export function BranchBranches() {
         actions={
           <div className="row" style={{ gap: 9 }}>
             <OrgSwitcher />
-            <button
-              type="button"
-              className="btn btn-light"
-              onClick={() => {
-                downloadCSV("subeler.csv", [
-                  ["Şube", "Şehir", "Öğrenci", "Koç", "Aylık tahsilat"],
-                  ...o.branches.map((b) => [b.name, b.city, b.students, b.coaches, b.collect]),
-                ]);
-                toast("Liste indirildi", { icon: "ki-cloud-download" });
-              }}
-            >
+            <button type="button" className="btn btn-light" onClick={() => { downloadCSV("subeler.csv", [["Şube", "Şehir", "Öğrenci", "Koç", "Aylık tahsilat"], ...o.branches.map((b) => [b.name, b.city, b.students, b.coaches, b.collect])]); toast("Liste indirildi", { icon: "ki-cloud-download" }); }}>
               <Icon name="download" size={16} />Dışa aktar
             </button>
-            <button type="button" className="btn btn-primary" disabled={atCapacity} onClick={() => setAddOpen(true)}>
+            <button type="button" className="btn btn-primary" disabled={o.branches.length >= orgPlanById(o.planId).branches} onClick={() => setAddingBranch(true)}>
               <Icon name="plus" size={16} />Şube ekle
             </button>
           </div>
@@ -109,8 +83,6 @@ export function BranchBranches() {
       <div className="grid g-2">
         {o.branches.map((b) => {
           const share = Math.round((b.collect / totalCollect) * 100);
-          const cap = Math.max(b.students + 8, Math.round((b.students || 1) / 0.82));
-          const occ = Math.min(100, Math.round((b.students / cap) * 100));
           return (
             <div key={b.id} className="card">
               <div className="card-pad" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -128,14 +100,8 @@ export function BranchBranches() {
                   <div><div className="muted" style={{ fontSize: 11 }}>Aylık tahsilat</div><b className="tnum" style={{ fontSize: 17 }}>{tl(b.collect)}</b></div>
                   <div style={{ marginLeft: "auto", textAlign: "right" }}><div className="muted" style={{ fontSize: 11 }}>Gelir payı</div><b className="tnum" style={{ fontSize: 17, color: o.tone }}>%{share}</b></div>
                 </div>
-                <div>
-                  <div className="between" style={{ marginBottom: 6 }}>
-                    <span className="muted" style={{ fontSize: 11 }}>Doluluk</span>
-                    <span className="tnum muted" style={{ fontSize: 11 }}>{b.students}/{cap}</span>
-                  </div>
-                  <div className="meter-bar"><span style={{ width: `${occ}%`, background: o.tone }} /></div>
-                </div>
-                <button type="button" className="btn btn-light btn-sm" style={{ alignSelf: "flex-start" }} onClick={() => setManage(b)}>
+                <div className="meter-bar"><span style={{ width: share + "%", background: o.tone }} /></div>
+                <button type="button" className="btn btn-light btn-sm" style={{ alignSelf: "flex-start" }} onClick={() => setManagingBranchId(b.id)}>
                   Şubeyi yönet<Icon name="chevronRight" size={15} />
                 </button>
               </div>
@@ -143,11 +109,10 @@ export function BranchBranches() {
           );
         })}
       </div>
-
-      {manage ? (
-        <BranchManageDialog orgId={o.id} branchId={manage.id} onClose={() => setManage(null)} />
+      {addingBranch ? <AddBranchDialog orgId={o.id} onClose={() => setAddingBranch(false)} /> : null}
+      {managingBranchId ? (
+        <BranchManageDialog orgId={o.id} branchId={managingBranchId} onClose={() => setManagingBranchId(null)} />
       ) : null}
-      {addOpen ? <AddBranchDialog orgId={o.id} onClose={() => setAddOpen(false)} /> : null}
     </div>
   );
 }

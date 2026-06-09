@@ -7,7 +7,7 @@ import { useState } from "react";
 
 import { ConfirmModal, EmptyState, Icon, StatCard, StatusBadge } from "@/components/admin/AdminKit";
 import { useAdminStore } from "@/components/admin/AdminStore";
-import { AssignTaskDialog, InviteCoachDialog } from "@/components/admin/dialogs";
+import { AssignTaskDialog } from "@/components/admin/dialogs";
 import { getActiveOrg, visibleOrgCoaches } from "@/components/admin/selectors";
 import { OrgSwitcher } from "./OrgSwitcher";
 import { UkAvatar } from "@/components/design/UkAvatar";
@@ -21,7 +21,6 @@ export function BranchCoaches() {
   const [branch, setBranch] = useState("all");
   const [assignFor, setAssignFor] = useState<{ id: string; name: string } | null>(null);
   const [removeFor, setRemoveFor] = useState<{ id: string; name: string } | null>(null);
-  const [inviteOpen, setInviteOpen] = useState(false);
   if (!snapshot) return <div className="card card-pad muted">Yükleniyor…</div>;
 
   const o = getActiveOrg(snapshot, activeOrgId);
@@ -40,7 +39,7 @@ export function BranchCoaches() {
             <button type="button" className="btn btn-light" onClick={() => { downloadCSV("koclar.csv", [["Koç", "Şube", "Öğrenci", "Puan", "Doluluk"], ...coaches.map((c) => [c.name, c.branch, c.students, c.rating, c.load + "%"])]); toast("Liste indirildi", { icon: "ki-cloud-download" }); }}>
               <Icon name="download" size={16} />Dışa aktar
             </button>
-            <button type="button" className="btn btn-primary" onClick={() => setInviteOpen(true)}>
+            <button type="button" className="btn btn-primary" onClick={() => toast("Koç davet bağlantısı oluşturuldu", { icon: "ki-people" })}>
               <Icon name="plus" size={16} />Koç davet et
             </button>
           </div>
@@ -86,7 +85,7 @@ export function BranchCoaches() {
               {list.map((c) => (
                 <tr key={c.id}>
                   <td>
-                    <div className="name" style={{ cursor: "pointer" }} onClick={() => router.push(`/yonetim/coaches/${c.id}`)}>
+                    <div className="name" style={{ cursor: "pointer" }} onClick={() => router.push(`/branch/coaches/${c.id}`)}>
                       <UkAvatar name={c.name} size={34} />
                       <div><b>{c.name}</b><span>Koç</span></div>
                     </div>
@@ -105,7 +104,7 @@ export function BranchCoaches() {
                       <button type="button" className="btn btn-light btn-sm" onClick={() => setAssignFor({ id: c.id, name: c.name })}>
                         <Icon name="flag" size={14} />Görev ata
                       </button>
-                      <button type="button" className="icon-btn" style={{ width: 32, height: 32 }} title="Detay" onClick={() => router.push(`/yonetim/coaches/${c.id}`)}>
+                      <button type="button" className="icon-btn" style={{ width: 32, height: 32 }} title="Detay" onClick={() => router.push(`/branch/coaches/${c.id}`)}>
                         <Icon name="chevronRight" size={16} />
                       </button>
                       <button type="button" className="icon-btn" style={{ width: 32, height: 32, color: "var(--danger)" }} title="Sistemden çıkar" onClick={() => setRemoveFor({ id: c.id, name: c.name })}>
@@ -158,13 +157,6 @@ export function BranchCoaches() {
         }}
         onClose={() => setRemoveFor(null)}
       />
-      {inviteOpen ? (
-        <InviteCoachDialog
-          orgId={o.id}
-          branches={o.branches.map((b) => ({ id: b.id, name: b.name }))}
-          onClose={() => setInviteOpen(false)}
-        />
-      ) : null}
     </div>
   );
 }

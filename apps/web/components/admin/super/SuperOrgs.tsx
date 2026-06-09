@@ -5,7 +5,6 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { CreateOrgDialog } from "@/components/admin/dialogs";
 import { EmptyState, Icon, Meter, OrgLogo, StatusBadge } from "@/components/admin/AdminKit";
 import { useAdminStore } from "@/components/admin/AdminStore";
 import { UkPageHead } from "@/components/design/UkPageHead";
@@ -23,7 +22,6 @@ export function SuperOrgs() {
   const { snapshot, toast } = useAdminStore();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState("all");
-  const [createOpen, setCreateOpen] = useState(false);
   if (!snapshot) return <div className="card card-pad muted">Yükleniyor…</div>;
 
   const orgs = snapshot.orgs;
@@ -60,7 +58,7 @@ export function SuperOrgs() {
               <Icon name="download" size={16} />
               Dışa aktar
             </button>
-            <button type="button" className="btn btn-primary" onClick={() => setCreateOpen(true)}>
+            <button type="button" className="btn btn-primary" onClick={() => toast("Yeni kurum davet bağlantısı oluşturuldu", { icon: "ki-office-bag" })}>
               <Icon name="plus" size={16} />
               Yeni kurum ekle
             </button>
@@ -87,7 +85,7 @@ export function SuperOrgs() {
           const p = orgPlanById(o.planId);
           const dl = daysLeft(o.renewsAt);
           return (
-            <Link key={o.id} href={`/yonetim/orgs/${o.id}`} className="card" style={{ cursor: "pointer", textDecoration: "none", color: "inherit" }}>
+            <Link key={o.id} href={`/admin/orgs/${o.id}`} className="card" style={{ cursor: "pointer", textDecoration: "none", color: "inherit" }}>
               <div className="card-pad" style={{ display: "flex", flexDirection: "column", gap: 15 }}>
                 <div className="row" style={{ gap: 13 }}>
                   <OrgLogo name={o.name} tone={o.tone} size={46} />
@@ -132,7 +130,6 @@ export function SuperOrgs() {
         })}
       </div>
       {list.length === 0 ? <EmptyState icon="building" title="Kurum bulunamadı" sub="Arama veya filtreyi değiştir" /> : null}
-      {createOpen ? <CreateOrgDialog onClose={() => setCreateOpen(false)} /> : null}
     </div>
   );
 }

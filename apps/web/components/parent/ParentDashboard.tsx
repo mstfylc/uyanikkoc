@@ -1,39 +1,25 @@
 "use client";
 
-import { KiIcon } from "@/components/design/KiIcon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { UkBadge } from "@/components/design/UkBadge";
-import { UkSection } from "@/components/design/UkSection";
-import { UkStatCard } from "@/components/design/UkStatCard";
-import { StudentResourcesCard } from "@/components/student/StudentResourcesCard";
-import { subjectColor } from "@/lib/design/subject-colors";
 import {
+  ASSIGNMENT_PRIORITY_LABELS,
+  ASSIGNMENT_STATUS_LABELS,
+  ASSIGNMENT_TYPE_LABELS,
+  formatAssignmentDueDate,
+} from "@/lib/assignment-labels";
+import {
+  buildParentWeeklyComment,
   calculateCompletionRate,
-  formatExamNet,
+  countOverdueAssignments,
 } from "@uyanik/shared";
-import type {
-  AppointmentRecord,
-  AssignmentPriority,
-  AssignmentStatus,
-  AssignmentType,
-  CoachStudentNoteRecord,
-  ResultExamType,
-} from "@uyanik/database";
+import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
 
 type ParentSummary = {
   totalAssignments: number;
   completedCount: number;
   pendingCount: number;
-  topicCompletionRate: number;
-  latestExamNet: number | null;
-  latestExamType: ResultExamType | null;
-  examTrend: "up" | "down" | "flat";
-  pinnedNotes?: CoachStudentNoteRecord[];
-  nextAppointment?: AppointmentRecord | null;
-  childDisplayName?: string;
-  studyStreakDays?: number;
   assignments: Array<{
     id: string;
     title: string;
@@ -45,6 +31,38 @@ type ParentSummary = {
     completed: boolean;
   }>;
 };
+
+type StatCardProps = {
+  label: string;
+  value: number | string;
+  icon: string;
+  tone?: "primary" | "success" | "warning" | "danger";
+};
+
+function StatCard({ label, value, icon, tone = "primary" }: StatCardProps) {
+  const toneClass =
+    tone === "success"
+      ? "text-success"
+      : tone === "warning"
+        ? "text-warning"
+        : tone === "danger"
+          ? "text-danger"
+          : "text-primary";
+
+  return (
+    <div className="kt-card">
+      <div className="kt-card-body flex items-center gap-4 p-5">
+        <span className={`flex size-12 items-center justify-center rounded-lg bg-muted ${toneClass}`}>
+          <i className={`ki-filled ${icon} text-xl`} />
+        </span>
+        <div>
+          <div className="text-2xl font-semibold text-mono">{value}</div>
+          <div className="text-sm text-muted-foreground">{label}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function ParentDashboard() {
   const [summary, setSummary] = useState<ParentSummary | null>(null);
@@ -67,188 +85,89 @@ export function ParentDashboard() {
   const completed = summary?.completedCount ?? 0;
   const pending = summary?.pendingCount ?? 0;
   const completionRate = calculateCompletionRate(total, completed);
+  const overdueCount = summary ? countOverdueAssignments(summary.assignments) : 0;
+  const weeklyComment = buildParentWeeklyComment(completionRate, overdueCount, pending);
 
   return (
-    <div className="stack rise" data-testid="parent-summary">
-      <h1 className="sr-only">Veli Dashboard</h1>
+    <div className="flex flex-col gap-5" data-testid="parent-summary">
+      <div>
+        <h1 className="text-xl font-semibold text-mono">Veli Dashboard</h1>
+        <p className="text-sm text-muted-foreground">Öğrencinizin ilerleme özeti</p>
+      </div>
+
       {!isLoading && summary ? (
-        <p className="sr-only">Tamamlanan: {completed}</p>
+        <p className="sr-only">
+          Tamamlanan: {completed}
+        </p>
       ) : null}
 
-      <div className="hero">
-        <div className="between" style={{ alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", fontWeight: 600, marginBottom: 6 }}>
-              Merhaba 👋
-            </div>
-            <h2 style={{ marginBottom: 7 }}>
-              Cocugunuz {summary?.childDisplayName?.split(" ")[0] ?? "ogrenci"}&apos;in gelisimi
-            </h2>
-            <p>Koc takibi · 11. Sinif Sayisal · Hedef YKS 2026</p>
-          </div>
-          <span className="badge" style={{ background: "rgba(255,255,255,.16)", color: "#fff", height: 26 }}>
-            <KiIcon name="ki-book" size={14} style={{ marginRight: 6 }} />
-            Veli Paneli
-          </span>
-        </div>
-      </div>
-
-      <Link
-        href="/parent/billing"
-        className="card card-pad"
-        style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit" }}
-      >
-        <span className="stat-icon tone-primary" style={{ width: 44, height: 44 }}>
-          <KiIcon name="ki-wallet" />
-        </span>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 14 }}>Abonelik</div>
-          <div className="muted" style={{ fontSize: 12.5 }}>Kocluk paketini sec, faturalari goruntule</div>
-        </div>
-        <KiIcon name="ki-right" size={16} style={{ color: "var(--faint)" }} />
-      </Link>
-
-      <div className="grid g-4">
-        <UkStatCard icon="ki-chart-pie-simple" tone="success" value={`${completionRate}%`} label="Bu hafta odev tamamlama" />
-        <UkStatCard icon="ki-notepad-edit" tone="warning" value={pending} label="Bekleyen odev" />
-        <UkStatCard
-          icon="ki-chart-simple"
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <StatCard label="Toplam Ödev" value={isLoading ? "—" : total} icon="ki-notepad-edit" />
+        <StatCard
+          label="Tamamlanan"
+          value={isLoading ? "—" : completed}
+          icon="ki-check-circle"
+          tone="success"
+        />
+        <StatCard
+          label="Bekleyen"
+          value={isLoading ? "—" : pending}
+          icon="ki-time"
+          tone="warning"
+        />
+        <StatCard
+          label="Tamamlama %"
+          value={isLoading ? "—" : `${completionRate}%`}
+          icon="ki-chart-pie-simple"
           tone="primary"
-          value={summary?.latestExamNet != null ? formatExamNet(summary.latestExamNet) : "—"}
-          label="Son deneme neti"
-        />
-        <UkStatCard
-          icon="ki-flame"
-          tone="danger"
-          value={summary?.studyStreakDays ?? 12}
-          label="Calisma serisi (gun)"
         />
       </div>
 
-      <div className="grid col-main">
-        <UkSection
-          title="Haftalik odevler"
-          sub={`${summary?.childDisplayName ?? "Ogrenci"} · bu hafta`}
-          action={
-            <UkBadge tone={completionRate >= 70 ? "success" : "warning"}>
-              {completed}/{total} tamam
-            </UkBadge>
-          }
-        >
-          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {isLoading ? (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Yukleniyor...
-              </p>
-            ) : !summary || summary.assignments.length === 0 ? (
-              <div style={{ padding: "16px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-                Bu hafta odev yok.
-              </div>
-            ) : (
-              summary.assignments.map((assignment) => {
-                const color = subjectColor(assignment.subject ?? "Genel");
-                return (
-                  <div key={assignment.id} className="lrow">
-                    <span
-                      className="lr-icon"
-                      style={{
-                        background: `color-mix(in srgb, ${color} 13%, transparent)`,
-                        color,
-                      }}
-                    >
-                      <KiIcon name="ki-notepad-edit" />
-                    </span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div className="lr-title">{assignment.title}</div>
-                      <div className="lr-meta">
-                        {assignment.subject ? (
-                          <span className="chip" style={{ height: 20, fontSize: 10.5 }}>
-                            <span className="swatch" style={{ background: color }} />
-                            {assignment.subject}
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
-                    {assignment.completed ? (
-                      <UkBadge tone="success">Bitti</UkBadge>
-                    ) : (
-                      <UkBadge tone="warning" dot>
-                        Bekliyor
-                      </UkBadge>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </UkSection>
-
-        <div className="stack">
-          <UkSection title="Koçtan notlar" sub="Onemli uyarilar">
-            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {isLoading ? (
-                <p className="muted" style={{ fontSize: 13 }}>
-                  Yukleniyor...
-                </p>
-              ) : !summary?.pinnedNotes?.length ? (
-                <p className="muted" style={{ fontSize: 13 }}>
-                  Henuz not yok.
-                </p>
-              ) : (
-                summary.pinnedNotes.map((note) => (
-                  <div key={note.id} className="lrow done">
-                    <span className="lr-icon" style={{ background: "var(--warning-soft)", color: "var(--warning)" }}>
-                      <KiIcon name="ki-message-text" size={18} />
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <div className="lr-title">{note.text}</div>
-                      <div className="lr-meta">
-                        <span className="d">{new Date(note.createdAt).toLocaleDateString("tr-TR")}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </UkSection>
-
-          <UkSection title="Yaklasan randevu">
-            <div className="card-body">
-              {isLoading ? (
-                <p className="muted" style={{ fontSize: 13 }}>
-                  Yukleniyor...
-                </p>
-              ) : !summary?.nextAppointment ? (
-                <p className="muted" style={{ fontSize: 13 }}>
-                  Onayli randevu yok.
-                </p>
-              ) : (
-                <div className="lrow">
-                  <span className="lr-icon" style={{ background: "var(--primary-soft)", color: "var(--primary-600)" }}>
-                    <KiIcon name="ki-calendar-tick" size={18} />
-                  </span>
-                  <div style={{ flex: 1 }}>
-                    <div className="lr-title">Koc gorusmesi</div>
-                    <div className="lr-meta">
-                      <span className="d">
-                        {summary.nextAppointment.day} {summary.nextAppointment.slot} ·{" "}
-                        {summary.nextAppointment.mode === "online" ? "Online" : "Yuz yuze"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </UkSection>
+      <div className="kt-card" data-testid="parent-weekly-comment">
+        <div className="kt-card-body p-5 flex flex-col gap-2">
+          <h3 className="text-base font-medium">Haftalik Yorum</h3>
+          <p className="text-sm text-muted-foreground">{isLoading ? "Yukleniyor..." : weeklyComment}</p>
         </div>
       </div>
 
-      <StudentResourcesCard
-        apiPath="/api/parent/sources"
-        title="Kaynak Takibi"
-        sub="Ogrencinin kitap ilerlemesi ve odev harici calisma kayitlari"
-        editable={false}
-      />
+      <div className="kt-card">
+        <div className="kt-card-body p-5 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-medium">Genel İlerleme</h3>
+            <span className="text-sm font-semibold text-primary">{completionRate}%</span>
+          </div>
+          <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${completionRate}%` }}
+            />
+          </div>
+          {summary && summary.assignments.length > 0 ? (
+            <ul className="flex flex-col gap-2 pt-2 text-sm">
+              {summary.assignments.slice(0, 5).map((assignment) => (
+                <li key={assignment.id} className="flex flex-col gap-0.5 border-b border-border pb-2 last:border-0">
+                  <span className="font-medium">{assignment.title}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {ASSIGNMENT_STATUS_LABELS[assignment.status]} ·{" "}
+                    {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]} ·{" "}
+                    {ASSIGNMENT_TYPE_LABELS[assignment.type]}
+                    {assignment.subject ? ` · ${assignment.subject}` : ""} ·{" "}
+                    {formatAssignmentDueDate(assignment.dueDate)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <div className="flex gap-2 pt-2">
+            <Link href="/parent/dashboard" className="kt-btn kt-btn-sm kt-btn-primary">
+              Rapor
+            </Link>
+            <Link href="/parent/dashboard" className="kt-btn kt-btn-sm kt-btn-light">
+              Mesaj
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

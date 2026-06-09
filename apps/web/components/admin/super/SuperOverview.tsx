@@ -48,7 +48,7 @@ export function SuperOverview() {
         title="Platform Genel Bakış"
         sub="Uyanık Koç — tüm kurumlar, koçlar ve abonelik geliri tek ekranda"
         actions={
-          <Link href="/yonetim/orgs" className="btn btn-primary">
+          <Link href="/admin/orgs" className="btn btn-primary">
             <Icon name="building" size={16} />
             Kurumları yönet
           </Link>
@@ -115,7 +115,7 @@ export function SuperOverview() {
             <b style={{ fontSize: 13.5 }}>{m.atRisk} lisans dikkat gerektiriyor</b>
             <div className="muted" style={{ fontSize: 12.5 }}>Süresi dolan, ödemesi geciken veya dondurulmuş lisanslar var.</div>
           </div>
-          <Link href="/yonetim/licenses" className="btn btn-sm btn-primary">
+          <Link href="/admin/licenses" className="btn btn-sm btn-primary">
             Lisans takibine git
             <Icon name="chevronRight" size={15} />
           </Link>
@@ -127,7 +127,7 @@ export function SuperOverview() {
           title="Yaklaşan yenilemeler"
           sub="Lisans bitiş tarihine göre"
           action={
-            <Link href="/yonetim/licenses" className="link-btn">
+            <Link href="/admin/licenses" className="link-btn">
               Tümü
             </Link>
           }

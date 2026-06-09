@@ -7,7 +7,6 @@ import { useState } from "react";
 
 import { Icon, StatCard } from "@/components/admin/AdminKit";
 import { useAdminStore } from "@/components/admin/AdminStore";
-import { InviteStudentDialog } from "@/components/admin/dialogs";
 import { getActiveOrg } from "@/components/admin/selectors";
 import { OrgSwitcher } from "./OrgSwitcher";
 import { UkAvatar } from "@/components/design/UkAvatar";
@@ -23,7 +22,6 @@ export function BranchStudents() {
   const [q, setQ] = useState("");
   const [branch, setBranch] = useState("all");
   const [page, setPage] = useState(0);
-  const [inviteOpen, setInviteOpen] = useState(false);
   if (!snapshot) return <div className="card card-pad muted">Yükleniyor…</div>;
 
   const o = getActiveOrg(snapshot, activeOrgId);
@@ -47,7 +45,7 @@ export function BranchStudents() {
             <button type="button" className="btn btn-light" onClick={() => { downloadCSV("ogrenciler.csv", [["Öğrenci", "Sınıf", "Şube", "Koç", "Net", "Devam"], ...students.map((s) => [s.name, s.grade, s.branch, s.coach, s.net, s.attend + "%"])]); toast("Liste indirildi", { icon: "ki-cloud-download" }); }}>
               <Icon name="download" size={16} />Dışa aktar
             </button>
-            <button type="button" className="btn btn-primary" onClick={() => setInviteOpen(true)}>
+            <button type="button" className="btn btn-primary" onClick={() => toast("Öğrenci ekleme akışı", { icon: "ki-plus" })}>
               <Icon name="plus" size={16} />Öğrenci ekle
             </button>
           </div>
@@ -92,7 +90,7 @@ export function BranchStudents() {
             </thead>
             <tbody>
               {shown.map((s) => (
-                <tr key={s.id} style={{ cursor: "pointer" }} onClick={() => router.push(`/yonetim/students/${s.id}`)}>
+                <tr key={s.id} style={{ cursor: "pointer" }} onClick={() => router.push(`/branch/students/${s.id}`)}>
                   <td>
                     <div className="name">
                       <UkAvatar name={s.name} size={34} />
@@ -120,13 +118,6 @@ export function BranchStudents() {
           </div>
         ) : null}
       </div>
-      {inviteOpen ? (
-        <InviteStudentDialog
-          orgId={o.id}
-          branches={o.branches.map((b) => ({ id: b.id, name: b.name }))}
-          onClose={() => setInviteOpen(false)}
-        />
-      ) : null}
     </div>
   );
 }

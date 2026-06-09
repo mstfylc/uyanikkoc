@@ -29,7 +29,6 @@ export const UK_ICON_PATHS = {
     '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
   clock: '<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/>',
   chevronRight: '<polyline points="9 18 15 12 9 6"/>',
-  chevronLeft: '<polyline points="15 18 9 12 15 6"/>',
   chevronDown: '<polyline points="6 9 12 15 18 9"/>',
   search: '<circle cx="11" cy="11" r="7"/><line x1="21" x2="16.65" y1="21" y2="16.65"/>',
   flame:
@@ -99,7 +98,6 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
   "ki-exit-right": "logout",
   "ki-entrance-right": "chevronRight",
   "ki-right": "chevronRight",
-  "ki-left": "chevronLeft",
   "ki-arrow-right": "chevronRight",
   "ki-arrow-up": "arrowUp",
   "ki-arrow-down": "arrowDown",
@@ -123,9 +121,7 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
   "ki-arrows-circle": "refresh",
   "ki-dollar": "banknote",
   "ki-teacher": "cap",
-  "ki-graduation": "cap",
   "ki-crown-2": "award",
-  "ki-gift": "heart",
 };
 
 export function resolveKiIcon(name: string): UkIconName {

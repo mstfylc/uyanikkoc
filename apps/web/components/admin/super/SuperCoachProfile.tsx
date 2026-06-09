@@ -21,7 +21,7 @@ export function SuperCoachProfile({ coachId }: { coachId: string }) {
   if (!c) {
     return (
       <div className="stack rise">
-        <Link href="/yonetim/coaches" className="link-btn">
+        <Link href="/admin/coaches" className="link-btn">
           <Icon name="chevronRight" size={15} style={{ transform: "rotate(180deg)" }} />
           Koçlara dön
         </Link>
@@ -39,7 +39,7 @@ export function SuperCoachProfile({ coachId }: { coachId: string }) {
 
   return (
     <div className="stack rise">
-      <Link href="/yonetim/coaches" className="link-btn" style={{ alignSelf: "flex-start" }}>
+      <Link href="/admin/coaches" className="link-btn" style={{ alignSelf: "flex-start" }}>
         <Icon name="chevronRight" size={15} style={{ transform: "rotate(180deg)" }} />
         Koçlara dön
       </Link>

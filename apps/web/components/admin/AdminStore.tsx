@@ -3,7 +3,16 @@
 // Prototip kaynağı: admin/admin-data.jsx (useAdmin + actions) + src/ui-actions.jsx (toast).
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import type { AdminAccess, AdminMutation, AdminSnapshot } from "@/lib/admin/types";
@@ -53,9 +62,7 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
         const data = (await res.json()) as AdminSnapshot;
         if (!alive) return;
         setSnapshot(data);
-        setActiveOrgIdState((cur) =>
-          cur && data.orgs.some((o) => o.id === cur) ? cur : data.activeOrgId,
-        );
+        setActiveOrgIdState((cur) => cur || data.activeOrgId);
       } catch (e) {
         if (alive) setError(e instanceof Error ? e.message : "load error");
       } finally {
@@ -81,21 +88,10 @@ export function AdminStoreProvider({ children }: { children: ReactNode }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(m),
     });
-    if (!res.ok) {
-      let msg = "İşlem başarısız";
-      try {
-        const body = (await res.json()) as { error?: string };
-        if (body.error) msg = body.error;
-      } catch {
-        msg = `İşlem başarısız (${res.status})`;
-      }
-      toast(msg, { icon: "ki-information-2", tone: "danger" });
-      throw new Error(msg);
-    }
+    if (!res.ok) throw new Error("mutate " + res.status);
     const data = (await res.json()) as AdminSnapshot;
     setSnapshot(data);
-    setActiveOrgIdState((cur) => (cur && data.orgs.some((o) => o.id === cur) ? cur : data.activeOrgId));
-  }, [toast]);
+  }, []);
 
   const value = useMemo<AdminStoreValue>(
     () => ({ snapshot, loading, error, activeOrgId, setActiveOrgId, setViewerAccess, mutate, toast }),

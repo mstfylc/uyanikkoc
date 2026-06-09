@@ -1,235 +1,188 @@
 "use client";
 
-import { KiIcon } from "@/components/design/KiIcon";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { UkBarChart } from "@/components/design/UkBarChart";
-import { CoachStudentsTable } from "@/components/coach/CoachStudentsTable";
-import { MotivationSendModal } from "@/components/coach/MotivationSendModal";
-import { UkBadge } from "@/components/design/UkBadge";
-import { UkPageHead } from "@/components/design/UkPageHead";
-import { UkSection } from "@/components/design/UkSection";
-import { UkStatCard } from "@/components/design/UkStatCard";
-import { buildCoachStudentRows } from "@/lib/design/coach-student-rows";
 import {
+  buildCoachSuggestion,
+  buildRulesBasedRiskBand,
   calculateCompletionRate,
-  isAssignmentOpen,
+  countOverdueAssignments,
+  RISK_BAND_LABELS,
 } from "@uyanik/shared";
-import type {
-  AssignmentPriority,
-  AssignmentStatus,
-  AssignmentType,
-  CoachRosterEntry,
-  ExamResultRecord,
-} from "@uyanik/database";
+import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
 
 type Assignment = {
   id: string;
   title: string;
-  studentId: string;
   type: AssignmentType;
   priority: AssignmentPriority;
   status: AssignmentStatus;
   dueDate: string | null;
   completed: boolean;
-  updatedAt: string;
+  createdAt: string;
+};
+
+type StatCardProps = {
+  label: string;
+  value: number | string;
+  icon: string;
+  tone?: "primary" | "success" | "warning" | "danger";
+};
+
+function StatCard({ label, value, icon, tone = "primary" }: StatCardProps) {
+  const toneClass =
+    tone === "success"
+      ? "text-success"
+      : tone === "warning"
+        ? "text-warning"
+        : tone === "danger"
+          ? "text-danger"
+          : "text-primary";
+
+  return (
+    <div className="kt-card">
+      <div className="kt-card-body flex items-center gap-4 p-5">
+        <span className={`flex size-12 items-center justify-center rounded-lg bg-muted ${toneClass}`}>
+          <i className={`ki-filled ${icon} text-xl`} />
+        </span>
+        <div>
+          <div className="text-2xl font-semibold text-mono">{value}</div>
+          <div className="text-sm text-muted-foreground">{label}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const RISK_BADGE_CLASS: Record<string, string> = {
+  excellent: "kt-badge-success",
+  normal: "kt-badge-primary",
+  attention: "kt-badge-warning",
+  critical: "kt-badge-danger",
 };
 
 export function CoachDashboard() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [students, setStudents] = useState<CoachRosterEntry[]>([]);
-  const [exams, setExams] = useState<ExamResultRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [motivationOpen, setMotivationOpen] = useState(false);
 
   useEffect(() => {
     async function load() {
-      const [assignmentsResponse, studentsResponse, examsResponse] = await Promise.all([
-        fetch("/api/coach/assignments", { credentials: "same-origin" }),
-        fetch("/api/coach/students", { credentials: "same-origin" }),
-        fetch("/api/coach/exams", { credentials: "same-origin" }),
-      ]);
-
-      if (assignmentsResponse.ok) {
-        const data = (await assignmentsResponse.json()) as { assignments: Assignment[] };
+      const response = await fetch("/api/coach/assignments", { credentials: "same-origin" });
+      if (response.ok) {
+        const data = (await response.json()) as { assignments: Assignment[] };
         setAssignments(data.assignments);
       }
-
-      if (studentsResponse.ok) {
-        const data = (await studentsResponse.json()) as { students: CoachRosterEntry[] };
-        setStudents(data.students);
-      }
-
-      if (examsResponse.ok) {
-        const data = (await examsResponse.json()) as { exams: ExamResultRecord[] };
-        setExams(data.exams);
-      }
-
       setIsLoading(false);
     }
 
     void load();
   }, []);
 
-  const studentRows = useMemo(
-    () => buildCoachStudentRows(students, assignments, exams),
-    [students, assignments, exams],
-  );
-
   const total = assignments.length;
   const completed = assignments.filter((item) => item.completed).length;
   const pending = total - completed;
   const completionRate = calculateCompletionRate(total, completed);
-  const atRisk = studentRows.filter((row) => row.risk === "attention" || row.risk === "critical").length;
-
-  const actionItems = assignments
-    .filter((item) => isAssignmentOpen(item))
-    .slice(0, 4);
-
-  const recentActivity = assignments
-    .slice()
-    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-    .slice(0, 5);
+  const overdueCount = countOverdueAssignments(assignments);
+  const riskBand = buildRulesBasedRiskBand(completionRate, overdueCount);
+  const suggestion = buildCoachSuggestion(completionRate, overdueCount, pending);
 
   return (
-    <>
-    <div className="stack rise" data-testid="coach-dashboard">
-      <UkPageHead title="Dashboard" sub="Ogrenci ilerlemesi, odev durumu ve kocluk aksiyonlari" />
-
-      <div className="grid g-4">
-        <UkStatCard icon="ki-people" tone="primary" value={students.length} label="Toplam ogrenci" />
-        <UkStatCard
-          icon="ki-chart-pie-simple"
-          tone="success"
-          value={`${completionRate}%`}
-          label="Ortalama tamamlama"
-        />
-        <UkStatCard icon="ki-information-2" tone="danger" value={atRisk} label="Risk altindaki ogrenci" />
-        <UkStatCard icon="ki-notepad-edit" tone="warning" value={pending} label="Bekleyen odev" />
+    <div className="flex flex-col gap-5">
+      <div>
+        <h1 className="text-xl font-semibold text-mono">Koç Dashboard</h1>
+        <p className="text-sm text-muted-foreground">Ödev ve öğrenci takibi</p>
       </div>
 
-      <Link
-        href="/coach/revenue"
-        className="card card-pad"
-        style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit" }}
-      >
-        <span className="stat-icon tone-primary" style={{ width: 44, height: 44 }}>
-          <KiIcon name="ki-dollar" />
-        </span>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 14 }}>Gelir & Tahsilat</div>
-          <div className="muted" style={{ fontSize: 12.5 }}>Abonelik geliri ve tahsilat durumu</div>
+      <div className="kt-card" data-testid="coach-risk-card">
+        <div className="kt-card-body p-5 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-base font-medium">Risk Ozeti</h3>
+            <span className={`kt-badge kt-badge-sm ${RISK_BADGE_CLASS[riskBand] ?? "kt-badge-light"}`}>
+              {RISK_BAND_LABELS[riskBand]}
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {isLoading
+              ? "Yukleniyor..."
+              : `Tamamlama %${completionRate} · Gecikmis: ${overdueCount} · Bekleyen: ${pending}`}
+          </p>
+          <p className="text-sm">{isLoading ? "" : suggestion}</p>
         </div>
-        <KiIcon name="ki-right" size={16} style={{ color: "var(--faint)" }} />
-      </Link>
-
-      <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
-        <button type="button" className="btn btn-primary btn-sm" onClick={() => setMotivationOpen(true)}>
-          <KiIcon name="ki-heart" size={16} />
-          Motivasyon gonder
-        </button>
       </div>
 
-      <div className="grid col-main">
-        <CoachStudentsTable rows={studentRows} isLoading={isLoading} />
-        <UkSection
-          title="Aksiyon gerektirenler"
-          sub="Onceliklendirilmis"
-          action={<UkBadge tone="danger">{actionItems.length}</UkBadge>}
-        >
-          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {actionItems.length === 0 ? (
-              <p className="muted" style={{ fontSize: 13, textAlign: "center", padding: "12px 0" }}>
-                Acil aksiyon yok
-              </p>
-            ) : (
-              actionItems.map((item) => (
-                <div key={item.id} className="lrow">
-                  <span className="lr-icon" style={{ background: "var(--warning-soft)", color: "var(--warning)" }}>
-                    <KiIcon name="ki-notepad-edit" />
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="lr-title">{item.title}</div>
-                    <div className="lr-meta">
-                      <UkBadge tone="warning">Bekliyor</UkBadge>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-            <Link href="/coach/assignments" className="btn btn-primary" style={{ width: "100%", marginTop: 2 }}>
-              <KiIcon name="ki-plus" />
-              Yeni odev ata
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <StatCard label="Toplam Ödev" value={isLoading ? "—" : total} icon="ki-notepad-edit" />
+        <StatCard
+          label="Tamamlanan"
+          value={isLoading ? "—" : completed}
+          icon="ki-check-circle"
+          tone="success"
+        />
+        <StatCard
+          label="Bekleyen"
+          value={isLoading ? "—" : pending}
+          icon="ki-time"
+          tone="warning"
+        />
+        <StatCard label="Öğrenci" value={1} icon="ki-people" tone="primary" />
+      </div>
+
+      <div className="kt-card">
+        <div className="kt-card-header flex items-center justify-between px-5 py-4 border-b border-border">
+          <h3 className="kt-card-title text-base font-medium">Son Ödevler</h3>
+          <div className="flex gap-2">
+            <Link href="/coach/assignments/create" className="kt-btn kt-btn-sm kt-btn-primary">
+              Ödev Ata
+            </Link>
+            <Link href="/coach/dashboard" className="kt-btn kt-btn-sm kt-btn-light">
+              Öğrenci Listesi
             </Link>
           </div>
-        </UkSection>
-      </div>
-
-      <div className="grid col-main">
-        <UkSection title="Haftalik sinif tamamlamasi" sub="Son 7 gun ortalamasi">
-          <div className="card-body">
-            <UkBarChart
-              data={[
-                { label: "Pzt", value: Math.max(completionRate - 8, 0) },
-                { label: "Sal", value: Math.max(completionRate - 4, 0) },
-                { label: "Car", value: Math.max(completionRate - 2, 0) },
-                { label: "Per", value: completionRate },
-                { label: "Cum", value: Math.min(completionRate + 3, 100) },
-                { label: "Cmt", value: Math.max(completionRate - 10, 0) },
-                { label: "Paz", value: Math.max(completionRate - 12, 0) },
-              ]}
-              max={100}
-              peakIdx={4}
-            />
-          </div>
-        </UkSection>
-
-        <UkSection title="Son aktivite" action={<Link href="/coach/assignments" className="link-btn">Tumu</Link>}>
-        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {recentActivity.length === 0 ? (
-            <p className="muted" style={{ fontSize: 13, padding: "12px 0" }}>
-              Henuz aktivite yok.
-            </p>
-          ) : (
-            recentActivity.map((item, index) => (
-              <div
-                key={item.id}
-                className="row"
-                style={{
-                  gap: 13,
-                  padding: "11px 4px",
-                  borderBottom: index < recentActivity.length - 1 ? "1px solid var(--border)" : "none",
-                  alignItems: "flex-start",
-                }}
-              >
-                <span
-                  className="lr-icon"
-                  style={{
-                    width: 36,
-                    height: 36,
-                    background: item.completed ? "var(--success-soft)" : "var(--primary-soft)",
-                    color: item.completed ? "var(--success)" : "var(--primary-600)",
-                  }}
-                >
-                  <KiIcon name={item.completed ? "ki-check-circle" : "ki-notepad-edit"} />
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, lineHeight: 1.4 }}>
-                    <b style={{ fontWeight: 700 }}>{item.title}</b>
-                  </div>
-                  <div style={{ fontSize: 11.5, color: "var(--faint)", marginTop: 2 }}>
-                    {new Date(item.updatedAt).toLocaleDateString("tr-TR")}
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
         </div>
-      </UkSection>
+        <div className="kt-card-body p-0">
+          <table className="kt-table kt-table-border w-full">
+            <thead>
+              <tr>
+                <th className="text-start ps-5">Başlık</th>
+                <th className="text-start">Durum</th>
+                <th className="text-start pe-5">Tarih</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={3} className="ps-5 py-4 text-muted-foreground">
+                    Yükleniyor...
+                  </td>
+                </tr>
+              ) : assignments.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="ps-5 py-4 text-muted-foreground">
+                    Henüz ödev yok. İlk ödevi oluşturun.
+                  </td>
+                </tr>
+              ) : (
+                assignments.slice(0, 5).map((assignment) => (
+                  <tr key={assignment.id}>
+                    <td className="ps-5">{assignment.title}</td>
+                    <td>
+                      <span
+                        className={`kt-badge kt-badge-sm ${assignment.completed ? "kt-badge-success" : "kt-badge-warning"}`}
+                      >
+                        {assignment.completed ? "Tamamlandı" : "Bekliyor"}
+                      </span>
+                    </td>
+                    <td className="pe-5 text-muted-foreground text-sm">
+                      {new Date(assignment.createdAt).toLocaleDateString("tr-TR")}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-    <MotivationSendModal open={motivationOpen} onClose={() => setMotivationOpen(false)} />
-    </>
   );
 }

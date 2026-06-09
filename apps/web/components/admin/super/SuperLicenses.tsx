@@ -44,7 +44,7 @@ export function SuperLicenses() {
   ];
 
   const open = (kind: "org" | "coach", id: string) =>
-    router.push(kind === "org" ? `/yonetim/orgs/${id}` : `/yonetim/coaches/${id}`);
+    router.push(kind === "org" ? `/admin/orgs/${id}` : `/admin/coaches/${id}`);
 
   return (
     <div className="stack rise">

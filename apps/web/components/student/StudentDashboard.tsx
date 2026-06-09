@@ -1,479 +1,192 @@
 "use client";
 
 import Link from "next/link";
-import { KiIcon } from "@/components/design/KiIcon";
-import { useSession } from "next-auth/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { UkSection } from "@/components/design/UkSection";
-import { UkSparkline } from "@/components/design/UkSparkline";
-import { UkStatCard } from "@/components/design/UkStatCard";
-import { UkBadge } from "@/components/design/UkBadge";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
+  ASSIGNMENT_STATUS_LABELS,
   ASSIGNMENT_TYPE_LABELS,
   formatAssignmentDueDate,
 } from "@/lib/assignment-labels";
 import {
   buildStudentPriorityAssignment,
   calculateCompletionRate,
-  describeExamTrend,
-  formatExamNet,
-  RESULT_EXAM_TYPE_LABELS,
 } from "@uyanik/shared";
-import type {
-  AssignmentPriority,
-  AssignmentStatus,
-  AssignmentType,
-  ExamResultRecord,
-  ExamTrendSummary,
-  MotivationSummary,
-  SubjectRecord,
-  TopicTrackingSummary,
-} from "@uyanik/database";
-
-const UPCOMING_EXAMS = [
-  { id: "up1", label: "TYT Genel Deneme", examType: "TYT", date: "2026-06-14", venue: "Okul" },
-  { id: "up2", label: "AYT Sayisal Deneme", examType: "AYT", date: "2026-06-21", venue: "Merkez" },
-  { id: "up3", label: "Brans Matematik", examType: "TYT", date: "2026-06-28", venue: "Online" },
-];
+import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
 
 type Assignment = {
   id: string;
   title: string;
+  description: string | null;
   type: AssignmentType;
   priority: AssignmentPriority;
   status: AssignmentStatus;
   subject: string | null;
   dueDate: string | null;
   completed: boolean;
+  createdAt: string;
 };
 
-const SUBJECT_COLORS: Record<string, string> = {
-  Matematik: "#534AB7",
-  Fizik: "#2F6BD6",
-  Kimya: "#0F6E56",
-  Biyoloji: "#3A9D6A",
-  Turkce: "#B26A12",
-  Tarih: "#A3582D",
+type StatCardProps = {
+  label: string;
+  value: number | string;
+  icon: string;
+  tone?: "primary" | "success" | "warning" | "danger";
 };
 
-function subjectColor(name: string): string {
-  return SUBJECT_COLORS[name] ?? "var(--primary)";
-}
+function StatCard({ label, value, icon, tone = "primary" }: StatCardProps) {
+  const toneClass =
+    tone === "success"
+      ? "text-success"
+      : tone === "warning"
+        ? "text-warning"
+        : tone === "danger"
+          ? "text-danger"
+          : "text-primary";
 
-function subjectProgress(subjects: SubjectRecord[]) {
-  return subjects.map((subject) => {
-    const total = subject.topics.length;
-    const completed = subject.topics.filter((topic) => topic.progress.completed).length;
-    const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-    return { name: subject.name, pct, completed, total };
-  });
+  return (
+    <div className="kt-card">
+      <div className="kt-card-body flex items-center gap-4 p-5">
+        <span className={`flex size-12 items-center justify-center rounded-lg bg-muted ${toneClass}`}>
+          <i className={`ki-filled ${icon} text-xl`} />
+        </span>
+        <div>
+          <div className="text-2xl font-semibold text-mono">{value}</div>
+          <div className="text-sm text-muted-foreground">{label}</div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function StudentDashboard() {
-  const { data: session } = useSession();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [subjects, setSubjects] = useState<SubjectRecord[]>([]);
-  const [topicSummary, setTopicSummary] = useState<TopicTrackingSummary | null>(null);
-  const [examSummary, setExamSummary] = useState<ExamTrendSummary | null>(null);
-  const [exams, setExams] = useState<ExamResultRecord[]>([]);
-  const [motivation, setMotivation] = useState<MotivationSummary | null>(null);
-  const [filter, setFilter] = useState<"pending" | "done" | "all">("pending");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [assignmentsResponse, topicsResponse, examsResponse, motivationResponse] = await Promise.all([
-        fetch("/api/student/assignments", { credentials: "same-origin" }),
-        fetch("/api/student/topics", { credentials: "same-origin" }),
-        fetch("/api/student/exams", { credentials: "same-origin" }),
-        fetch("/api/student/motivation", { credentials: "same-origin" }),
-      ]);
-
-      if (assignmentsResponse.ok) {
-        const data = (await assignmentsResponse.json()) as { assignments: Assignment[] };
+      const response = await fetch("/api/student/assignments", { credentials: "same-origin" });
+      if (response.ok) {
+        const data = (await response.json()) as { assignments: Assignment[] };
         setAssignments(data.assignments);
       }
-
-      if (topicsResponse.ok) {
-        const data = (await topicsResponse.json()) as {
-          subjects: SubjectRecord[];
-          summary: TopicTrackingSummary;
-        };
-        setSubjects(data.subjects);
-        setTopicSummary(data.summary);
-      }
-
-      if (examsResponse.ok) {
-        const data = (await examsResponse.json()) as {
-          exams: ExamResultRecord[];
-          summary: ExamTrendSummary;
-        };
-        setExams(data.exams);
-        setExamSummary(data.summary);
-      }
-
-      if (motivationResponse.ok) {
-        const data = (await motivationResponse.json()) as { motivation: MotivationSummary };
-        setMotivation(data.motivation);
-      }
-
       setIsLoading(false);
     }
 
     void load();
   }, []);
 
-  const displayName = session?.user?.name ?? session?.user?.email?.split("@")[0] ?? "Ogrenci";
-  const firstName = displayName.split(" ")[0] ?? displayName;
   const total = assignments.length;
   const completed = assignments.filter((item) => item.completed).length;
   const pending = total - completed;
   const completionRate = calculateCompletionRate(total, completed);
   const priorityAssignment = buildStudentPriorityAssignment(assignments);
-  const subjectRows = useMemo(() => subjectProgress(subjects), [subjects]);
-  const examTrendData = useMemo(
-    () =>
-      [...exams]
-        .sort((a, b) => new Date(a.takenAt).getTime() - new Date(b.takenAt).getTime())
-        .map((exam) => exam.totalNet),
-    [exams],
-  );
-
-  const shownAssignments = assignments.filter((item) => {
-    if (filter === "all") return true;
-    if (filter === "done") return item.completed;
-    return !item.completed;
-  });
 
   return (
-    <div className="stack rise" data-testid="student-dashboard">
-      <div className="ai-band">
-        <span className="ai-orb">
-          <KiIcon name="ki-technology-2 text-white text-xl" />
-        </span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="row" style={{ gap: 8 }}>
-            <b style={{ fontSize: 14 }}>AI Koc</b>
-            <span className="badge badge-primary badge-dot">Yakinda</span>
-          </div>
-          <div style={{ fontSize: 12.5, color: "var(--muted)", marginTop: 2 }}>
-            Kisisel yapay zeka kocun; zayif konularini analiz edip sana ozel program cikaracak.
-          </div>
+    <div className="flex flex-col gap-5">
+      <div>
+        <h1 className="text-xl font-semibold text-mono">Öğrenci Dashboard</h1>
+        <p className="text-sm text-muted-foreground">Ödevlerin ve ilerlemen</p>
+      </div>
+
+      <div
+        className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+        data-testid="ai-coach-band"
+      >
+        <div>
+          <p className="text-sm font-medium">AI Koç · Yakında</p>
+          <p className="text-xs text-muted-foreground">
+            Kişisel AI koç modülü hazırlanıyor — canlı yanıt şu an kapalı.
+          </p>
         </div>
-        <Link href="/student/ai-coach" className="btn btn-sm btn-light">
+        <Link href="/student/ai-coach" className="kt-btn kt-btn-sm kt-btn-light self-start sm:self-auto">
           Detay
         </Link>
       </div>
 
-      <Link
-        href="/student/billing"
-        className="card card-pad"
-        style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", color: "inherit" }}
-      >
-        <span className="stat-icon tone-primary" style={{ width: 44, height: 44 }}>
-          <KiIcon name="ki-wallet" />
-        </span>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700, fontSize: 14 }}>Abonelik</div>
-          <div className="muted" style={{ fontSize: 12.5 }}>Kocluk paketini sec, aboneligini yonet</div>
-        </div>
-        <KiIcon name="ki-right" size={16} style={{ color: "var(--faint)" }} />
-      </Link>
-
-      <div className="grid col-main">
-        <div className="hero">
-          <div className="between" style={{ alignItems: "flex-start", marginBottom: 20, gap: 16 }}>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div
-                style={{
-                  fontSize: 12.5,
-                  color: "rgba(255,255,255,.78)",
-                  fontWeight: 600,
-                  marginBottom: 6,
-                }}
-              >
-                Gunaydin
-              </div>
-              <h2 style={{ marginBottom: 7 }}>
-                {firstName}, bugun {pending} gorevin var
-              </h2>
-              <p>
-                Tamamlama <b style={{ color: "#fff" }}>%{completionRate}</b>
+      <div className="kt-card" data-testid="student-priority-card">
+        <div className="kt-card-body p-5 flex flex-col gap-2">
+          <h3 className="text-base font-medium">Bugunku Oncelik</h3>
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Yukleniyor...</p>
+          ) : priorityAssignment ? (
+            <>
+              <p className="text-sm font-medium">{priorityAssignment.title ?? "Odev"}</p>
+              <p className="text-xs text-muted-foreground">
+                {priorityAssignment.priority
+                  ? `Oncelik: ${ASSIGNMENT_PRIORITY_LABELS[priorityAssignment.priority as AssignmentPriority] ?? priorityAssignment.priority}`
+                  : null}
+                {priorityAssignment.dueDate
+                  ? ` · Son tarih: ${formatAssignmentDueDate(priorityAssignment.dueDate)}`
+                  : ""}
               </p>
-            </div>
-          </div>
-
-          <div className="glass" style={{ padding: 16, display: "flex", alignItems: "center", gap: 14 }}>
-            <span
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 12,
-                background: "rgba(255,255,255,.16)",
-                display: "grid",
-                placeItems: "center",
-                flexShrink: 0,
-              }}
-            >
-              <KiIcon name="ki-flag text-white text-xl" />
-            </span>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                  letterSpacing: ".05em",
-                  color: "rgba(255,255,255,.7)",
-                }}
-              >
-                Bugunun onceligi
-              </div>
-              <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 700,
-                  marginTop: 2,
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {priorityAssignment?.title ?? "Acik odev yok"}
-              </div>
-              {priorityAssignment?.dueDate ? (
-                <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.72)", marginTop: 2 }}>
-                  Son tarih {formatAssignmentDueDate(priorityAssignment.dueDate)}
-                </div>
-              ) : null}
-            </div>
-            <Link href="/student/assignments" className="btn btn-sm btn-white">
-              Basla
-              <KiIcon name="ki-arrow-right" />
-            </Link>
-          </div>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">Acik odev yok — harika!</p>
+          )}
         </div>
-
-        {motivation?.enabled ? (
-          <div className="card" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
-            <div className="card-pad" style={{ display: "flex", flexDirection: "column", gap: 18, flex: 1 }}>
-              <div className="between">
-                <div className="row" style={{ gap: 8 }}>
-                  <span className="stat-icon tone-warning" style={{ width: 38, height: 38 }}>
-                    <KiIcon name="ki-flame text-xl" />
-                  </span>
-                  <div style={{ fontSize: 13.5, fontWeight: 700 }}>Calisma Serisi</div>
-                </div>
-                <span className="badge badge-warning">
-                  <KiIcon name="ki-flash" />
-                  Aktif
-                </span>
-              </div>
-              <div className="row" style={{ alignItems: "flex-end", gap: 12 }}>
-                <div className="streak-num tnum" style={{ color: "var(--warning)" }}>
-                  {motivation.streakDays}
-                </div>
-                <div style={{ paddingBottom: 6 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700 }}>gun ust uste</div>
-                </div>
-              </div>
-              {motivation.badges.length > 0 ? (
-                <div className="row" style={{ flexWrap: "wrap", gap: 6 }}>
-                  {motivation.badges.map((badge) => (
-                    <span key={badge} className="badge badge-muted">
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </div>
-        ) : (
-          <div className="card">
-            <div className="card-pad muted" style={{ fontSize: 13 }}>
-              Motivasyon kapali.
-            </div>
-          </div>
-        )}
       </div>
 
-      <div className="grid g-4">
-        <UkStatCard icon="ki-check-circle" tone="success" value={completed} label="Tamamlanan odev" />
-        <UkStatCard icon="ki-notepad-edit" tone="warning" value={pending} label="Bekleyen gorev" />
-        <UkStatCard icon="ki-chart-pie-simple" tone="info" value={`${completionRate}%`} label="Tamamlama orani" />
-        <UkStatCard
-          icon="ki-book-open"
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <StatCard label="Toplam Ödev" value={isLoading ? "—" : total} icon="ki-notepad-edit" />
+        <StatCard
+          label="Tamamlanan"
+          value={isLoading ? "—" : completed}
+          icon="ki-check-circle"
+          tone="success"
+        />
+        <StatCard
+          label="Bekleyen"
+          value={isLoading ? "—" : pending}
+          icon="ki-time"
+          tone="warning"
+        />
+        <StatCard
+          label="Tamamlama %"
+          value={isLoading ? "—" : `${completionRate}%`}
+          icon="ki-chart-pie-simple"
           tone="primary"
-          value={topicSummary ? `${topicSummary.completedTopics}/${topicSummary.totalTopics}` : "—"}
-          label="Konu tamamlama"
         />
       </div>
 
-      <div className="grid col-main">
-        <UkSection
-          title="Odevlerim"
-          sub={`${pending} bekleyen gorev`}
-          action={
-            <div className="filters">
-              <button type="button" className={filter === "pending" ? "on" : ""} onClick={() => setFilter("pending")}>
-                Bekleyen
-              </button>
-              <button type="button" className={filter === "done" ? "on" : ""} onClick={() => setFilter("done")}>
-                Bitti
-              </button>
-              <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>
-                Tumu
-              </button>
-            </div>
-          }
-        >
-          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {isLoading ? (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Yukleniyor...
-              </p>
-            ) : shownAssignments.length === 0 ? (
-              <div style={{ padding: "26px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-                Bu gorunumde gorev yok
-              </div>
-            ) : (
-              shownAssignments.slice(0, 5).map((assignment) => (
-                <div key={assignment.id} className={`lrow${assignment.completed ? " done" : ""}`}>
-                  <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                    <KiIcon name="ki-notepad-edit" />
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="lr-title">{assignment.title}</div>
-                    <div className="lr-meta">
-                      {assignment.subject ? (
-                        <span className="chip" style={{ height: 22, fontSize: 11, padding: "0 8px" }}>
-                          <span className="swatch" style={{ background: subjectColor(assignment.subject) }} />
-                          {assignment.subject}
-                        </span>
-                      ) : null}
-                      <span className="d">{ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
-                      <span className="d row" style={{ gap: 4 }}>
-                        <KiIcon name="ki-time" size={14} style={{ color: "var(--faint)" }} />
-                        {formatAssignmentDueDate(assignment.dueDate)}
-                      </span>
-                    </div>
-                  </div>
-                  <span className={`badge badge-${assignment.completed ? "success" : "warning"}`}>
-                    {assignment.completed ? "Bitti" : ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        </UkSection>
-
-        <UkSection
-          title="Ders Ilerlemesi"
-          sub="Konu tamamlama oranlarin"
-          action={
-            <Link href="/student/topics" className="link-btn">
-              Detay
-              <KiIcon name="ki-arrow-right" />
-            </Link>
-          }
-        >
-          <div className="card-body subj">
-            {isLoading ? (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Yukleniyor...
-              </p>
-            ) : subjectRows.length === 0 ? (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Henuz konu yok.
-              </p>
-            ) : (
-              subjectRows.map((row) => (
-                <div className="subj-row" key={row.name}>
-                  <div className="between">
-                    <span className="sname">
-                      <span className="swatch" style={{ background: subjectColor(row.name) }} />
-                      {row.name}
-                    </span>
-                    <span className="spct tnum">{row.pct}%</span>
-                  </div>
-                  <div className="bar">
-                    <span style={{ width: `${row.pct}%`, background: subjectColor(row.name) }} />
+      <div className="kt-card">
+        <div className="kt-card-header flex items-center justify-between px-5 py-4 border-b border-border">
+          <h3 className="kt-card-title text-base font-medium">Ödevlerim</h3>
+          <Link href="/student/assignments" className="kt-btn kt-btn-sm kt-btn-light">
+            Tümünü Gör
+          </Link>
+        </div>
+        <div className="kt-card-body flex flex-col gap-3 p-5">
+          {isLoading ? (
+            <p className="text-muted-foreground text-sm">Yükleniyor...</p>
+          ) : assignments.length === 0 ? (
+            <p className="text-muted-foreground text-sm">Henüz atanmış ödev yok.</p>
+          ) : (
+            assignments.map((assignment) => (
+              <div
+                key={assignment.id}
+                className="flex flex-col gap-1 rounded-lg border border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <div className="font-medium text-sm">{assignment.title}</div>
+                  <div className="text-xs text-muted-foreground flex flex-wrap gap-x-2 gap-y-1 mt-1">
+                    <span>{ASSIGNMENT_STATUS_LABELS[assignment.status]}</span>
+                    <span>· {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}</span>
+                    <span>· {ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
+                    {assignment.subject ? <span>· {assignment.subject}</span> : null}
+                    <span>· {formatAssignmentDueDate(assignment.dueDate)}</span>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </UkSection>
-      </div>
-
-      <div className="grid col-main">
-        <UkSection title="Deneme Performansi" sub="Son deneme ozeti">
-          <div className="card-body">
-            {isLoading ? (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Yukleniyor...
-              </p>
-            ) : examSummary && examSummary.latestNet !== null ? (
-              <>
-                <div className="between" style={{ marginBottom: 12, gap: 16, flexWrap: "wrap" }}>
-                  <div>
-                    <div className="row" style={{ gap: 8, alignItems: "baseline" }}>
-                      <span className="tnum" style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-.02em" }}>
-                        {formatExamNet(examSummary.latestNet)}
-                      </span>
-                      <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>net</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: "var(--muted)" }}>
-                      {examSummary.examType ? RESULT_EXAM_TYPE_LABELS[examSummary.examType] : "Deneme"}
-                      {examSummary.examCount > 0 ? ` · ${examSummary.examCount} deneme` : ""}
-                    </div>
-                  </div>
-                  {examTrendData.length > 1 ? (
-                    <div style={{ flex: 1, minWidth: 180, maxWidth: 320 }}>
-                      <UkSparkline data={examTrendData} height={56} />
-                    </div>
-                  ) : null}
-                </div>
-                <p className="muted" style={{ fontSize: 12.5 }}>
-                  {describeExamTrend(examSummary.trend)}
-                  {examSummary.previousNet !== null ? ` · Onceki: ${formatExamNet(examSummary.previousNet)}` : ""}
-                </p>
-              </>
-            ) : (
-              <p className="muted" style={{ fontSize: 13 }}>
-                Henuz deneme sonucu yok.
-              </p>
-            )}
-          </div>
-        </UkSection>
-
-        <UkSection title="Yaklasan Denemeler" sub="Planlanan sinav ve denemeler">
-          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {UPCOMING_EXAMS.map((item) => (
-              <div key={item.id} className="lrow">
-                <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
-                  <KiIcon name="ki-calendar" />
+                <span
+                  className={`kt-badge kt-badge-sm self-start sm:self-auto ${assignment.completed ? "kt-badge-success" : "kt-badge-warning"}`}
+                >
+                  {assignment.completed ? "Tamamlandı" : "Bekliyor"}
                 </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="lr-title">{item.label}</div>
-                  <div className="lr-meta">
-                    <span className="d">
-                      {new Date(item.date).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })}
-                    </span>
-                    <span className="d">{item.venue}</span>
-                  </div>
-                </div>
-                <UkBadge tone="primary">{item.examType}</UkBadge>
               </div>
-            ))}
-            <Link href="/student/exams" className="link-btn" style={{ alignSelf: "flex-start", marginTop: 4 }}>
-              Tum denemeler
-              <KiIcon name="ki-arrow-right" />
-            </Link>
-          </div>
-        </UkSection>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

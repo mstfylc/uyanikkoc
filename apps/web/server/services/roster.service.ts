@@ -1,4 +1,6 @@
 import type { CoachRosterEntry } from "@uyanik/database";
+import { hash } from "bcryptjs";
+import { randomBytes } from "node:crypto";
 
 import { shouldUseDatabase } from "@/lib/data/env";
 import * as memoryRoster from "@/mocks/roster";
@@ -44,7 +46,12 @@ export async function addCoachStudent(
   input: { displayName: string; email: string },
 ): Promise<CoachRosterEntry> {
   if (shouldUseDatabase()) {
-    throw new Error("Add student is not supported in database mode yet");
+    const { rosterRepository } = await import("@uyanik/database");
+    const temporarySecret = randomBytes(24).toString("hex");
+    return rosterRepository.addCoachStudent(coachId, {
+      ...input,
+      passwordHash: await hash(temporarySecret, 10),
+    });
   }
 
   return memoryRoster.addCoachStudent(coachId, input);

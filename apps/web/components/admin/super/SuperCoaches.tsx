@@ -101,7 +101,7 @@ export function SuperCoaches() {
                 return (
                   <tr key={c.id}>
                     <td>
-                      <Link href={`/yonetim/coaches/${c.id}`} className="name" style={{ textDecoration: "none", color: "inherit" }}>
+                      <Link href={`/admin/coaches/${c.id}`} className="name" style={{ textDecoration: "none", color: "inherit" }}>
                         <UkAvatar name={c.name} size={34} />
                         <div>
                           <b>{c.name}{c.giftedDemoUntil ? <span className="badge badge-info" style={{ height: 18, fontSize: 9.5, marginLeft: 7 }}>Demo</span> : null}</b>
@@ -128,7 +128,7 @@ export function SuperCoaches() {
                             <button type="button" className="btn btn-light btn-sm" onClick={async () => { await mutate({ kind: "suspendCoach", coachId: c.id }); toast(c.name + " donduruldu", { icon: "ki-information-2", tone: "danger" }); }}>Dondur</button>
                           )
                         ) : null}
-                        <Link href={`/yonetim/coaches/${c.id}`} className="icon-btn" style={{ width: 32, height: 32 }} aria-label="Profil">
+                        <Link href={`/admin/coaches/${c.id}`} className="icon-btn" style={{ width: 32, height: 32 }} aria-label="Profil">
                           <Icon name="chevronRight" size={16} />
                         </Link>
                       </div>

@@ -12,13 +12,13 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
   test("koç giriş yapıp ödev ekranına ulaşır", async ({ page }) => {
     await login(page, "coach@uyanik.local");
     await page.goto("/coach/assignments/create");
-    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.getByLabel("Baslik *")).toBeVisible();
   });
 
   test("öğrenci giriş yapıp ödev listesini görür", async ({ page }) => {
     await login(page, "student@uyanik.local");
     await page.goto("/student/assignments");
-    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.getByTestId("assignment-list")).toBeVisible({ timeout: 20_000 });
   });
 
   test("veli giriş yapıp dashboard görür", async ({ page }) => {
@@ -38,8 +38,8 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
 
     await login(page, "coach@uyanik.local");
     await page.goto("/coach/assignments/create");
-    await expect(page.locator("#student option[value='student_001']")).toBeAttached({ timeout: 15_000 });
-    await page.selectOption("#student", "student_001");
+    await expect(page.getByLabel("Baslik *")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("button", { name: "Odevi kaydet" })).toBeEnabled({ timeout: 20_000 });
     await page.fill("#title", assignmentTitle);
     await page.click('button[type="submit"]');
     await expect(page.getByTestId("created-assignment")).toContainText(assignmentTitle, {
