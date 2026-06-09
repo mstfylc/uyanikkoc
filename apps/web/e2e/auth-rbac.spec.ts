@@ -1,11 +1,15 @@
 import { expect, test } from "@playwright/test";
 
 async function login(page: import("@playwright/test").Page, email: string) {
-  await page.goto("/login");
+  await page.goto("/login", { waitUntil: "domcontentloaded" });
+  await page.waitForTimeout(3000);
   await page.fill('[name="email"]', email);
   await page.fill('[name="password"]', "uyanik123");
   await page.click('[type="submit"]');
-  await page.waitForURL(/\/(coach|student|parent|yonetim)\/dashboard/, { timeout: 45_000 });
+  await page.waitForURL(/\/(coach|student|parent|yonetim)\/dashboard/, {
+    timeout: 45_000,
+    waitUntil: "domcontentloaded",
+  });
 }
 
 test.describe("Auth ve RBAC iskeleti", () => {

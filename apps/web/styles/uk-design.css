@@ -564,6 +564,41 @@ button { font-family: inherit; cursor: pointer; }
 .dots i.on { background: var(--warning-soft); color: var(--warning); }
 .dots i.today { background: var(--warning); color: #fff; box-shadow: 0 4px 10px -2px color-mix(in srgb, var(--warning) 50%, transparent); }
 
+/* achievement medals */
+.medal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 14px; }
+.medal { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 9px; padding: 16px 10px 14px; border-radius: 17px; border: 1px solid var(--border); background: var(--surface); transition: transform .16s, box-shadow .16s, border-color .16s; }
+.medal.earned:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+.medal .m-ic { position: relative; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.medal.locked { opacity: 1; }
+.medal.locked .m-ic { background: var(--surface-3); color: var(--faint); }
+.medal .m-ic .m-lock { position: absolute; right: -2px; bottom: -2px; width: 22px; height: 22px; border-radius: 50%; background: var(--surface); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted); }
+.medal .m-ic .m-check { position: absolute; right: -3px; bottom: -3px; width: 22px; height: 22px; border-radius: 50%; background: var(--success); color: #fff; display: flex; align-items: center; justify-content: center; border: 2.5px solid var(--surface); }
+.medal .m-name { font-size: 12.5px; font-weight: 800; letter-spacing: -.01em; line-height: 1.2; }
+.medal.locked .m-name { color: var(--text-2); }
+.medal .m-desc { font-size: 10.8px; color: var(--muted); line-height: 1.35; }
+
+/* coach dashboard triage */
+.triage-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.triage-card { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.triage-head { display: flex; align-items: center; gap: 11px; padding: 15px 16px 12px; border-bottom: 1px solid var(--border); }
+.triage-head .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; }
+.triage-head .tx { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.triage-head .tx b { font-size: 13.5px; font-weight: 800; letter-spacing: -.01em; }
+.triage-head .tx span { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+.triage-body { display: flex; flex-direction: column; padding: 7px; gap: 2px; flex: 1; }
+.triage-row { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: none; background: none; border-radius: 11px; text-align: left; transition: background .14s; }
+button.triage-row { cursor: pointer; }
+button.triage-row:hover { background: var(--surface-2); }
+.triage-row .dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.triage-row .ic2 { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; }
+.triage-row .info { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.triage-row .info b { font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.triage-row .info span { font-size: 11px; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.triage-empty { padding: 20px 12px; text-align: center; font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.triage-foot { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 11px; border-top: 1px solid var(--border); background: none; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--text-2); cursor: pointer; transition: background .14s; }
+.triage-foot:hover { background: var(--surface-2); }
+.triage-foot.accent { color: var(--primary-600); }
+
 /* ai band */
 .ai-band {
   display: flex; align-items: center; gap: 16px;

@@ -16,6 +16,17 @@ import { daysLeft, fmtShort, tl } from "@/lib/admin/format";
 
 export function SuperOverview() {
   const { snapshot } = useAdminStore();
+  if (!snapshot) {
+    return (
+      <div className="stack rise">
+        <UkPageHead
+          title="Platform Genel BakÄ±ÅŸ"
+          sub="UyanÄ±k KoÃ§ â€” tÃ¼m kurumlar, koÃ§lar ve abonelik geliri tek ekranda"
+        />
+        <div className="card card-pad muted">Yukleniyor...</div>
+      </div>
+    );
+  }
   if (!snapshot) return <div className="card card-pad muted">Yükleniyor…</div>;
 
   const m = platformMetrics(snapshot.orgs, snapshot.coaches);
