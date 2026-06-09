@@ -67,6 +67,7 @@ const YONETIM_ADMIN_NAV: UkNavItem[] = [
   { href: "/yonetim/orgs", label: "Kurumlar & Franchise", icon: "ki-office-bag" },
   { href: "/yonetim/branches", label: "Subeler", icon: "ki-flag" },
   { href: "/yonetim/licenses", label: "Lisans Takibi", icon: "ki-shield-tick" },
+  { href: "/yonetim/leads", label: "Demo & Uyelikler", icon: "ki-clipboard" },
   { href: "/yonetim/license", label: "Lisans & Kapasite", icon: "ki-chart-pie-simple" },
   { href: "/yonetim/coaches", label: "Koclar", icon: "ki-people" },
   { href: "/yonetim/students", label: "Ogrenciler", icon: "ki-teacher" },

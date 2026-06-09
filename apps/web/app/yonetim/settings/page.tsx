@@ -1,5 +1,5 @@
-import { BranchSettings } from "@/components/admin/branch/BranchSettings";
+import { YonetimSettingsContent } from "./YonetimSettingsContent";
 
 export default function YonetimSettingsPage() {
-  return <BranchSettings />;
+  return <YonetimSettingsContent />;
 }

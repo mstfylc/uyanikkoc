@@ -18,6 +18,12 @@ import type {
   CampaignType,
   CoachFeedback,
   CoachTask,
+  DemoRequest,
+  DemoRequestKind,
+  DemoRequestStatus,
+  Integration,
+  IntegrationId,
+  IntegrationPatch,
   LicenseNote,
   LicenseSubjectKind,
   ModuleKey,
@@ -30,6 +36,7 @@ import type {
   OrgInvite,
   OrgNotificationPrefs,
   SoloCoach,
+  Signup,
   StudentSubscription,
   SupportTicket,
   SystemNote,
@@ -453,6 +460,105 @@ function seedCampaigns(): Campaign[] {
   ];
 }
 
+function seedDemoRequests(): DemoRequest[] {
+  return [
+    {
+      id: "lead-1001",
+      name: "Final Akademi",
+      kind: "org",
+      email: "info@finalakademi.com",
+      phone: "0532 410 88 12",
+      city: "Istanbul",
+      planId: "pro",
+      source: "Web sitesi",
+      note: "YKS grubu icin 120 ogrencilik demo istedi.",
+      requestedAt: NOW - 2 * 3_600_000,
+      status: "new",
+      scheduledAt: null,
+      notes: [],
+    },
+    {
+      id: "lead-1002",
+      name: "Mehmet Aksoy",
+      kind: "coach",
+      email: "mehmet@kocluk.com",
+      phone: "0542 220 14 90",
+      city: "Izmir",
+      planId: "c-pro",
+      source: "Instagram",
+      note: "Bireysel koc, veli raporlari ve odev takibiyle ilgileniyor.",
+      requestedAt: NOW - 18 * 3_600_000,
+      status: "contacted",
+      scheduledAt: NOW + 2 * DAY,
+      notes: [{ id: "lead-note-1", author: "Destek Ekibi", text: "Telefonla ulasildi, demo randevusu istiyor.", date: NOW - 12 * 3_600_000 }],
+    },
+    {
+      id: "lead-1003",
+      name: "Kuzey Kurs Merkezi",
+      kind: "org",
+      email: "yonetim@kuzeykurs.com",
+      phone: "0533 612 70 45",
+      city: "Ankara",
+      planId: "franchise",
+      source: "Google reklam",
+      note: "Uc subeli kullanim icin fiyat ve onboarding soruldu.",
+      requestedAt: NOW - 3 * DAY,
+      status: "scheduled",
+      scheduledAt: NOW + 5 * DAY,
+      notes: [],
+    },
+    {
+      id: "lead-1004",
+      name: "Derya Soylu",
+      kind: "coach",
+      email: "derya@koc.com",
+      phone: "0535 904 21 33",
+      city: "Bursa",
+      planId: "c-baslangic",
+      source: "Referans",
+      note: "15 ogrencilik baslangic paketiyle deneme yapmak istiyor.",
+      requestedAt: NOW - 8 * DAY,
+      status: "converted",
+      scheduledAt: NOW - 4 * DAY,
+      notes: [{ id: "lead-note-2", author: "Platform Ekibi", text: "Pro yerine Baslangic ile basladi.", date: NOW - 4 * DAY }],
+    },
+    {
+      id: "lead-1005",
+      name: "Ada Egitim",
+      kind: "org",
+      email: "ada@egitim.com",
+      phone: "0536 277 50 18",
+      city: "Antalya",
+      planId: "baslangic",
+      source: "Jotform",
+      note: "Butce nedeniyle sonraki doneme erteledi.",
+      requestedAt: NOW - 11 * DAY,
+      status: "lost",
+      scheduledAt: null,
+      notes: [{ id: "lead-note-3", author: "Destek Ekibi", text: "Kayip nedeni: Butce bu donem uygun degil.", date: NOW - 9 * DAY }],
+    },
+  ];
+}
+
+function seedSignups(): Signup[] {
+  return [
+    { id: "sgn-1001", name: "Final Akademi", kind: "org", city: "Istanbul", planId: "pro", cycle: "annual", amount: 142800, method: "Kredi karti", at: NOW - 1 * DAY, type: "new" },
+    { id: "sgn-1002", name: "Derya Soylu", kind: "coach", city: "Bursa", planId: "c-baslangic", cycle: "monthly", amount: 499, method: "Kredi karti", at: NOW - 4 * DAY, type: "trial" },
+    { id: "sgn-1003", name: "Kampus Koc", kind: "org", city: "Istanbul", planId: "franchise", cycle: "annual", amount: 298800, method: "Havale / EFT", at: NOW - 8 * DAY, type: "renewal" },
+    { id: "sgn-1004", name: "Selin Yilmaz", kind: "coach", city: "Istanbul", planId: "c-pro", cycle: "annual", amount: 9990, method: "Mastercard", at: NOW - 12 * DAY, type: "upgrade" },
+    { id: "sgn-1005", name: "Pusula Kocluk", kind: "org", city: "Bursa", planId: "baslangic", cycle: "monthly", amount: 4900, method: "Kredi karti", at: NOW - 18 * DAY, type: "new" },
+  ];
+}
+
+function seedIntegrations(): Integration[] {
+  return [
+    { id: "meta", name: "Meta Reklam", desc: "Instagram ve Facebook Lead Ads formlarindan gelen basvurular.", icon: "bolt", tone: "#1877f2", connected: true, account: "Uyanik Koc Lead Ads", formName: "YKS Demo Talep Formu", leadCount: 42, lastSync: NOW - 45 * 60_000 },
+    { id: "google", name: "Google Reklam", desc: "Google Ads lead form extension basvurulari.", icon: "search", tone: "#16a34a", connected: false, account: "", formName: "", leadCount: 0, lastSync: null },
+    { id: "jotform", name: "Jotform", desc: "Kurum basvuru ve davet formlarini panele aktar.", icon: "clipboard", tone: "#f97316", connected: true, account: "jotform: bagli", formName: "Kurum Demo Basvuru", leadCount: 18, lastSync: NOW - 2 * 3_600_000 },
+    { id: "webhook", name: "Web Formu", desc: "Kendi web sitendeki form icin genel webhook.", icon: "link", tone: "#534ab7", connected: true, account: "webhook", formName: "Genel form", webhookUrl: "https://www.uyanikkoc.com/hooks/leads/demo", leadCount: 27, lastSync: NOW - 20 * 60_000 },
+  ];
+}
+
 const SUBSCRIPTION_TEMPLATES: Omit<StudentSubscription, "id" | "orgId" | "branchId">[] = [
   { studentName: "Elif Yıldız", parentName: "Ayşe Yıldız", planId: "plus", cycle: "annual", status: "paid", nextDueDays: 279, amount: 22990 },
   { studentName: "Mert Demir", parentName: "Hakan Demir", planId: "standart", cycle: "monthly", status: "paid", nextDueDays: 12, amount: 1499 },
@@ -493,6 +599,9 @@ type Store = {
   licenseNotes: LicenseNote[];
   campaigns: Campaign[];
   campaignGrants: CampaignGrant[];
+  demoRequests: DemoRequest[];
+  signups: Signup[];
+  integrations: Integration[];
 };
 
 const globalForAdmin = globalThis as unknown as { __ukAdminStore?: Store };
@@ -514,6 +623,9 @@ function freshStore(): Store {
     licenseNotes: [],
     campaigns: seedCampaigns(),
     campaignGrants: [],
+    demoRequests: seedDemoRequests(),
+    signups: seedSignups(),
+    integrations: seedIntegrations(),
   };
 }
 
@@ -544,6 +656,9 @@ export function getMockSnapshot(ctx: AdminSnapshotContext = {}): AdminSnapshot {
     licenseNotes: s.licenseNotes,
     campaigns: s.campaigns,
     campaignGrants: s.campaignGrants,
+    demoRequests: s.demoRequests,
+    signups: s.signups,
+    integrations: s.integrations,
     viewerAccess: "full",
     activeOrgId,
     myCoachId: ctx.coachId ?? activeOrgCoachId,
@@ -567,6 +682,9 @@ export function loadMockSnapshot(snapshot: AdminSnapshot): void {
     licenseNotes: structuredClone(snapshot.licenseNotes),
     campaigns: structuredClone(snapshot.campaigns),
     campaignGrants: structuredClone(snapshot.campaignGrants),
+    demoRequests: structuredClone(snapshot.demoRequests ?? seedDemoRequests()),
+    signups: structuredClone(snapshot.signups ?? seedSignups()),
+    integrations: structuredClone(snapshot.integrations ?? seedIntegrations()),
   };
 }
 
@@ -922,6 +1040,91 @@ export function mockGrantCampaign(
     redeemed: false,
   });
   campaign.redemptions += 1;
+}
+
+// ---- demo talepleri + basvuru kaynaklari ----
+export function mockAddDemoRequest(data: {
+  name: string;
+  requestKind: DemoRequestKind;
+  email: string;
+  phone: string;
+  city: string;
+  planId: DemoRequest["planId"];
+  source: string;
+  note: string;
+}): void {
+  store().demoRequests.unshift({
+    id: "lead-" + Math.floor(1000 + Math.random() * 8999),
+    name: data.name,
+    kind: data.requestKind,
+    email: data.email,
+    phone: data.phone,
+    city: data.city,
+    planId: data.planId,
+    source: data.source,
+    note: data.note,
+    requestedAt: Date.now(),
+    status: "new",
+    scheduledAt: null,
+    notes: [],
+  });
+}
+
+export function mockSetDemoStatus(requestId: string, status: DemoRequestStatus): void {
+  const request = store().demoRequests.find((item) => item.id === requestId);
+  if (request) request.status = status;
+}
+
+export function mockSetDemoSchedule(requestId: string, scheduledAt: number | null): void {
+  const request = store().demoRequests.find((item) => item.id === requestId);
+  if (!request) return;
+  request.scheduledAt = scheduledAt;
+  if (scheduledAt && request.status === "new") request.status = "contacted";
+}
+
+export function mockAddDemoNote(requestId: string, text: string, author: string): void {
+  const request = store().demoRequests.find((item) => item.id === requestId);
+  if (!request) return;
+  request.notes.unshift({
+    id: "lead-note-" + Math.floor(1000 + Math.random() * 8999),
+    author,
+    text,
+    date: Date.now(),
+  });
+}
+
+export function mockDeleteDemoNote(requestId: string, noteId: string): void {
+  const request = store().demoRequests.find((item) => item.id === requestId);
+  if (request) request.notes = request.notes.filter((note) => note.id !== noteId);
+}
+
+export function mockDeleteDemoRequest(requestId: string): void {
+  const s = store();
+  s.demoRequests = s.demoRequests.filter((item) => item.id !== requestId);
+}
+
+export function mockConnectIntegration(integrationId: IntegrationId, account: string, formName: string): void {
+  const integration = store().integrations.find((item) => item.id === integrationId);
+  if (!integration) return;
+  integration.connected = true;
+  integration.account = account;
+  integration.formName = formName;
+  integration.lastSync = Date.now();
+}
+
+export function mockSetIntegration(integrationId: IntegrationId, patch: IntegrationPatch): void {
+  const integration = store().integrations.find((item) => item.id === integrationId);
+  if (!integration) return;
+  Object.assign(integration, patch);
+}
+
+export function mockDisconnectIntegration(integrationId: IntegrationId): void {
+  const integration = store().integrations.find((item) => item.id === integrationId);
+  if (!integration || integration.id === "webhook") return;
+  integration.connected = false;
+  integration.account = "";
+  integration.formName = "";
+  integration.lastSync = null;
 }
 
 // ---- şube yönetimi (zip-16 v2) ----

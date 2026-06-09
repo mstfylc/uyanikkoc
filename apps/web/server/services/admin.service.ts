@@ -191,6 +191,42 @@ export async function applyAdminMutation(
     case "grantCampaign":
       memory.mockGrantCampaign(m.campaignId, m.subjectKind, m.subjectId);
       break;
+    case "addDemoRequest":
+      memory.mockAddDemoRequest({
+        name: m.name,
+        requestKind: m.requestKind,
+        email: m.email,
+        phone: m.phone,
+        city: m.city,
+        planId: m.planId,
+        source: m.source,
+        note: m.note,
+      });
+      break;
+    case "setDemoStatus":
+      memory.mockSetDemoStatus(m.requestId, m.status);
+      break;
+    case "setDemoSchedule":
+      memory.mockSetDemoSchedule(m.requestId, m.scheduledAt);
+      break;
+    case "addDemoNote":
+      memory.mockAddDemoNote(m.requestId, m.text, m.author);
+      break;
+    case "deleteDemoNote":
+      memory.mockDeleteDemoNote(m.requestId, m.noteId);
+      break;
+    case "deleteDemoRequest":
+      memory.mockDeleteDemoRequest(m.requestId);
+      break;
+    case "setIntegration":
+      memory.mockSetIntegration(m.integrationId, m.patch);
+      break;
+    case "connectIntegration":
+      memory.mockConnectIntegration(m.integrationId, m.account, m.formName);
+      break;
+    case "disconnectIntegration":
+      memory.mockDisconnectIntegration(m.integrationId);
+      break;
     case "setActiveOrg":
       // Aktif kurum oturum bağlamıdır; memory store'da kalıcı tutulmaz (UI tarafında).
       break;

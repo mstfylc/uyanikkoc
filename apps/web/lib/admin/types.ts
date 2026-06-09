@@ -199,6 +199,65 @@ export type CampaignGrant = {
   redeemed: boolean;
 };
 
+export type DemoRequestStatus = "new" | "contacted" | "scheduled" | "converted" | "lost";
+export type DemoRequestKind = "org" | "coach";
+
+export type DemoRequestNote = {
+  id: string;
+  author: string;
+  text: string;
+  date: number;
+};
+
+export type DemoRequest = {
+  id: string;
+  name: string;
+  kind: DemoRequestKind;
+  email: string;
+  phone: string;
+  city: string;
+  planId: OrgPlanId | CoachPlanId;
+  source: string;
+  note: string;
+  requestedAt: number;
+  status: DemoRequestStatus;
+  scheduledAt: number | null;
+  notes: DemoRequestNote[];
+};
+
+export type SignupType = "new" | "renewal" | "upgrade" | "trial";
+
+export type Signup = {
+  id: string;
+  name: string;
+  kind: DemoRequestKind;
+  city: string;
+  planId: OrgPlanId | CoachPlanId;
+  cycle: BillingCycle;
+  amount: number;
+  method: string;
+  at: number;
+  type: SignupType;
+};
+
+export type IntegrationId = "meta" | "google" | "jotform" | "webhook";
+
+export type Integration = {
+  id: IntegrationId;
+  name: string;
+  desc: string;
+  icon: string;
+  tone: string;
+  connected: boolean;
+  account: string;
+  formName: string;
+  webhookUrl?: string;
+  leadCount: number;
+  lastSync: number | null;
+};
+
+export type IntegrationPatch = Partial<Pick<Integration, "connected" | "account" | "formName" | "webhookUrl" | "leadCount" | "lastSync">>;
+
 export type OrgInvoice = {
   id: string;
   orgId: string;
@@ -326,6 +385,9 @@ export type AdminSnapshot = {
   licenseNotes: LicenseNote[];
   campaigns: Campaign[];
   campaignGrants: CampaignGrant[];
+  demoRequests: DemoRequest[];
+  signups: Signup[];
+  integrations: Integration[];
   orgInvites: OrgInvite[];
   /** Demo: oturum açan süper admin kullanıcısının erişim seviyesi. */
   viewerAccess: AdminAccess;
@@ -417,6 +479,26 @@ export type AdminMutation =
   | { kind: "setCampaignStatus"; campaignId: string; status: CampaignStatus }
   | { kind: "deleteCampaign"; campaignId: string }
   | { kind: "grantCampaign"; campaignId: string; subjectKind: LicenseSubjectKind; subjectId: string }
+  // demo talepleri + basvuru kaynaklari
+  | {
+      kind: "addDemoRequest";
+      name: string;
+      requestKind: DemoRequestKind;
+      email: string;
+      phone: string;
+      city: string;
+      planId: OrgPlanId | CoachPlanId;
+      source: string;
+      note: string;
+    }
+  | { kind: "setDemoStatus"; requestId: string; status: DemoRequestStatus }
+  | { kind: "setDemoSchedule"; requestId: string; scheduledAt: number | null }
+  | { kind: "addDemoNote"; requestId: string; text: string; author: string }
+  | { kind: "deleteDemoNote"; requestId: string; noteId: string }
+  | { kind: "deleteDemoRequest"; requestId: string }
+  | { kind: "setIntegration"; integrationId: IntegrationId; patch: IntegrationPatch }
+  | { kind: "connectIntegration"; integrationId: IntegrationId; account: string; formName: string }
+  | { kind: "disconnectIntegration"; integrationId: IntegrationId }
   // şube yönetimi (zip-16 v2)
   | { kind: "addBranch"; orgId: string; name: string; city: string }
   | {

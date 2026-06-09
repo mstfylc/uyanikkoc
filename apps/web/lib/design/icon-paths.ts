@@ -10,6 +10,8 @@ export const UK_ICON_PATHS = {
     '<path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="12.5" y="7" width="3" height="10" rx="1"/><rect x="18" y="13" width="3" height="4" rx="1"/>',
   message:
     '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  phone:
+    '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.9.67 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.32 1.85.54 2.81.67A2 2 0 0 1 22 16.92z"/>',
   trend:
     '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
   calendar:
@@ -54,6 +56,10 @@ export const UK_ICON_PATHS = {
     '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
   flag: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',
   card: '<rect width="20" height="14" x="2" y="5" rx="2.5"/><line x1="2" x2="22" y1="10" y2="10"/><line x1="6" x2="9" y1="15" y2="15"/>',
+  trash:
+    '<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>',
+  link:
+    '<path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.43"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.33-1.33"/>',
   lock: '<rect width="16" height="11" x="4" y="11" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
   download:
     '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>',
@@ -82,6 +88,7 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
   "ki-chart-line-up": "trend",
   "ki-chart-pie-simple": "pie",
   "ki-notepad-edit": "clipboard",
+  "ki-clipboard": "clipboard",
   "ki-notepad": "notebook",
   "ki-notebook": "notebook",
   "ki-star": "star",
@@ -96,6 +103,7 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
   "ki-notification-on": "bell",
   "ki-magnifier": "search",
   "ki-exit-right": "logout",
+  "ki-exit-down": "download",
   "ki-entrance-right": "chevronRight",
   "ki-right": "chevronRight",
   "ki-arrow-right": "chevronRight",
@@ -115,8 +123,11 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
   "ki-wallet": "card",
   "ki-lock": "lock",
   "ki-cloud-download": "download",
+  "ki-trash": "trash",
   "ki-receipt-square": "receipt",
   "ki-shield-tick": "shield",
+  "ki-shield-cross": "shield",
+  "ki-phone": "phone",
   "ki-office-bag": "building",
   "ki-arrows-circle": "refresh",
   "ki-dollar": "banknote",
