@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 
 import { useAuth } from "@/lib/auth";
@@ -17,6 +18,7 @@ type SubListScreenProps = {
 
 export function SubListScreen({ title, endpoint, rootKey, itemLabel, metaLabel, suffix = "" }: SubListScreenProps) {
   const { token } = useAuth();
+  const insets = useSafeAreaInsets();
   const [items, setItems] = useState<Record<string, unknown>[]>([]);
 
   useEffect(() => {
@@ -40,14 +42,17 @@ export function SubListScreen({ title, endpoint, rootKey, itemLabel, metaLabel, 
   return (
     <>
       <Stack.Screen options={{ title }} />
-      <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.root}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + ukSpace.xl }]}
+      >
         {items.length === 0 ? (
           <Text style={styles.empty}>Kayit bulunamadi.</Text>
         ) : (
           items.map((item, index) => (
             <View key={String(item.id ?? index)} style={styles.card}>
-              <Text style={styles.cardTitle}>{String(item[itemLabel] ?? "Kayit")}</Text>
-              <Text style={styles.cardMeta}>
+              <Text style={styles.cardTitle} numberOfLines={1}>{String(item[itemLabel] ?? "Kayit")}</Text>
+              <Text style={styles.cardMeta} numberOfLines={2}>
                 {String(item[metaLabel] ?? "")}
                 {suffix}
               </Text>
@@ -61,7 +66,7 @@ export function SubListScreen({ title, endpoint, rootKey, itemLabel, metaLabel, 
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: ukColors.bg },
-  content: { padding: ukSpace.lg, paddingBottom: 40 },
+  content: { padding: ukSpace.lg },
   empty: { color: ukColors.muted, fontWeight: "600" },
   card: {
     backgroundColor: ukColors.surface,

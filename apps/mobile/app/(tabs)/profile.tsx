@@ -1,7 +1,8 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { MIcon } from "@/components/MIcon";
+import { ScreenScroll } from "@/components/ScreenScroll";
 import { useAuth } from "@/lib/auth";
 import { ukColors, ukRadius, ukSpace } from "@/lib/theme";
 
@@ -10,12 +11,12 @@ export default function ProfileTab() {
   const { user, logout } = useAuth();
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+    <ScreenScroll>
       <View style={styles.hero}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{(user?.email ?? "UK").slice(0, 2).toUpperCase()}</Text>
         </View>
-        <Text style={styles.name}>{user?.email ?? "Ogrenci"}</Text>
+        <Text style={styles.name} numberOfLines={1}>{user?.email ?? "Ogrenci"}</Text>
         <Text style={styles.sub}>Ogrenci hesabi</Text>
       </View>
 
@@ -27,7 +28,7 @@ export default function ProfileTab() {
         ["motivation", "Motivasyon"],
       ].map(([route, label]) => (
         <Pressable key={route} style={styles.row} onPress={() => router.push(`/sub/${route}` as never)}>
-          <Text style={styles.rowText}>{label}</Text>
+          <Text style={styles.rowText} numberOfLines={1}>{label}</Text>
           <MIcon name="chevronRight" size={18} color={ukColors.faint} />
         </Pressable>
       ))}
@@ -41,14 +42,13 @@ export default function ProfileTab() {
         <MIcon name="logout" size={18} color={ukColors.danger} />
         <Text style={styles.logoutText}>Cikis Yap</Text>
       </Pressable>
-    </ScrollView>
+    </ScreenScroll>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: ukColors.bg },
-  content: { padding: ukSpace.lg, paddingBottom: 40 },
   hero: {
+    alignSelf: "stretch",
     alignItems: "center",
     backgroundColor: ukColors.surface,
     borderRadius: ukRadius.lg,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     borderColor: ukColors.border,
     marginBottom: 10,
   },
-  rowText: { fontSize: 14, fontWeight: "700", color: ukColors.text },
+  rowText: { flex: 1, minWidth: 0, fontSize: 14, fontWeight: "700", color: ukColors.text },
   logout: { marginTop: ukSpace.md, justifyContent: "flex-start", gap: 10 },
   logoutText: { color: ukColors.danger, fontWeight: "800" },
 });
