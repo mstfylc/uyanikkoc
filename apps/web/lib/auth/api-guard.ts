@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { assertProductionMemoryPolicy } from "@/lib/data/env";
 import { verifyMobileToken } from "@/lib/auth/mobile-token";
 
-import { auth } from "../../auth";
+import { auth } from "@/auth";
 import type { SessionRoleSnapshot } from "../rbac";
 
 export type ApiAuthContext = {

@@ -2,7 +2,11 @@ import type { AppRole } from "@uyanik/tokens";
 import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { assertProductionAuthEnv, assertProductionMemoryPolicy } from "./lib/data/env";
 import { getUnauthorizedRedirect, isPublicPath } from "./lib/rbac";
+
+assertProductionMemoryPolicy();
+assertProductionAuthEnv();
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

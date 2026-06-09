@@ -21,6 +21,10 @@ function mapDemoUser(user: DemoUser): AuthUserRecord {
 export async function resolveUserByEmail(email: string): Promise<AuthUserRecord | null> {
   if (!shouldUseDatabase()) {
     assertProductionMemoryPolicy();
+    if (process.env.NODE_ENV === "production") {
+      return null;
+    }
+
     const user = demoUsers.find((demoUser) => demoUser.email === email);
     return user ? mapDemoUser(user) : null;
   }

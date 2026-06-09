@@ -5,8 +5,11 @@ import Credentials from "next-auth/providers/credentials";
 
 import { sanitizeAuthEnvForVercel } from "./lib/auth/runtime-env";
 import { resolveUserByEmail } from "./lib/auth/resolve-user";
+import { assertProductionAuthEnv, assertProductionMemoryPolicy } from "./lib/data/env";
 
 sanitizeAuthEnvForVercel();
+assertProductionMemoryPolicy();
+assertProductionAuthEnv();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,

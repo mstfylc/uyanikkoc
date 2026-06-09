@@ -1,7 +1,12 @@
 import { compareSync } from "bcryptjs";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DEMO_PASSWORD, DEMO_PASSWORD_HASH, demoUsers } from "@/lib/auth/demo-users";
+import { resolveUserByEmail } from "@/lib/auth/resolve-user";
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe("demo auth users", () => {
   it("demo password hash uyanik123 ile eşleşir", () => {
@@ -20,5 +25,13 @@ describe("demo auth users", () => {
       expect(user?.role).toBe("ORG_ADMIN");
       expect(compareSync(DEMO_PASSWORD, user!.passwordHash)).toBe(true);
     }
+  });
+
+  it("production ortaminda demo fallback kapaliyken demo hesabi reddeder", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "false");
+    vi.stubEnv("DATABASE_URL", "");
+
+    await expect(resolveUserByEmail("admin@uyanik.local")).resolves.toBeNull();
   });
 });

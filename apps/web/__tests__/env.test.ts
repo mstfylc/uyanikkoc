@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  assertProductionAuthEnv,
   assertProductionMemoryPolicy,
   shouldUseDatabase,
   useMemoryStore,
@@ -11,56 +12,96 @@ afterEach(() => {
 });
 
 describe("useMemoryStore", () => {
-  it("varsayılan olarak bellek modunu açar", () => {
+  it("defaults to memory mode in development", () => {
+    vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "");
     expect(useMemoryStore()).toBe(true);
   });
 
-  it("false veya 0 ile bellek modunu kapatır", () => {
+  it("turns memory mode off with false or 0", () => {
+    vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "false");
     expect(useMemoryStore()).toBe(false);
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "0");
     expect(useMemoryStore()).toBe(false);
   });
+
+  it("forces memory mode off in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "true");
+    expect(useMemoryStore()).toBe(false);
+  });
 });
 
 describe("shouldUseDatabase", () => {
-  it("DATABASE_URL varken ve memory kapalıyken true döner", () => {
+  it("returns true when DATABASE_URL exists and memory is off", () => {
+    vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("DATABASE_URL", "postgresql://localhost/uyanik");
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "false");
     expect(shouldUseDatabase()).toBe(true);
   });
 
-  it("memory açıkken false döner", () => {
+  it("returns false in development when memory is on", () => {
+    vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("DATABASE_URL", "postgresql://localhost/uyanik");
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "true");
     expect(shouldUseDatabase()).toBe(false);
   });
+
+  it("uses database in production even if the demo flag is mistakenly true", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("DATABASE_URL", "postgresql://localhost/uyanik");
+    vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "true");
+    expect(shouldUseDatabase()).toBe(true);
+  });
 });
 
 describe("assertProductionMemoryPolicy", () => {
-  it("development ortamında hata fırlatmaz", () => {
+  it("does not throw in development", () => {
     vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "true");
     expect(() => assertProductionMemoryPolicy()).not.toThrow();
   });
 
-  it("production + memory açıkken hata fırlatır", () => {
+  it("throws in production when memory is enabled", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "true");
     expect(() => assertProductionMemoryPolicy()).toThrow(/DEMO_AUTH_ALLOW_IN_MEMORY must be false/);
   });
 
-  it("production + memory kapalıyken hata fırlatmaz", () => {
+  it("does not throw in production when memory is disabled", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "false");
     expect(() => assertProductionMemoryPolicy()).not.toThrow();
   });
 
-  it("Vercel demo deploy'da production + memory açıkken hata fırlatmaz", () => {
+  it("throws in Vercel production when memory is enabled", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "true");
     vi.stubEnv("VERCEL", "1");
-    expect(() => assertProductionMemoryPolicy()).not.toThrow();
+    expect(() => assertProductionMemoryPolicy()).toThrow(/DEMO_AUTH_ALLOW_IN_MEMORY must be false/);
+  });
+});
+
+describe("assertProductionAuthEnv", () => {
+  it("does not require a secret in development", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("AUTH_SECRET", "");
+    vi.stubEnv("NEXTAUTH_SECRET", "");
+    expect(() => assertProductionAuthEnv()).not.toThrow();
+  });
+
+  it("requires AUTH_SECRET or NEXTAUTH_SECRET in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("AUTH_SECRET", "");
+    vi.stubEnv("NEXTAUTH_SECRET", "");
+    expect(() => assertProductionAuthEnv()).toThrow(/AUTH_SECRET or NEXTAUTH_SECRET is required/);
+  });
+
+  it("does not throw in production when a secret exists", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("AUTH_SECRET", "test-secret");
+    vi.stubEnv("NEXTAUTH_SECRET", "");
+    expect(() => assertProductionAuthEnv()).not.toThrow();
   });
 });
