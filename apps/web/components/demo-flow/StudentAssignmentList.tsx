@@ -65,42 +65,53 @@ export function StudentAssignmentList() {
   }
 
   if (isLoading) {
-    return <p>Yukleniyor...</p>;
+    return <p className="muted">Yukleniyor...</p>;
   }
 
   if (error) {
-    return <p role="alert">{error}</p>;
+    return (
+      <p role="alert" className="badge badge-danger" style={{ width: "fit-content" }}>
+        {error}
+      </p>
+    );
   }
 
   if (assignments.length === 0) {
-    return <p data-testid="empty-assignments">Henuz odev yok.</p>;
+    return (
+      <p data-testid="empty-assignments" className="muted">
+        Henuz odev yok.
+      </p>
+    );
   }
 
   return (
-    <ul data-testid="assignment-list" className="flex flex-col gap-3">
+    <ul data-testid="assignment-list" className="stack" style={{ gap: 10, listStyle: "none", padding: 0, margin: 0 }}>
       {assignments.map((assignment) => {
         const open = isAssignmentOpen(assignment);
 
         return (
           <li
             key={assignment.id}
-            className="rounded-lg border border-border px-4 py-3 flex flex-col gap-2"
+            className={`lrow ${open ? "" : "done"}`}
+            style={{ alignItems: "center" }}
           >
-            <div className="font-medium">{assignment.title}</div>
-            <div className="text-sm text-muted-foreground flex flex-wrap gap-x-3 gap-y-1">
-              <span>Durum: {ASSIGNMENT_STATUS_LABELS[assignment.status]}</span>
-              <span>Oncelik: {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}</span>
-              <span>Tur: {ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
-              {assignment.subject ? <span>Ders: {assignment.subject}</span> : null}
-              <span>Son tarih: {formatAssignmentDueDate(assignment.dueDate)}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <b className="lr-title" style={{ fontSize: 13.5 }}>{assignment.title}</b>
+              <div className="muted" style={{ display: "flex", flexWrap: "wrap", gap: "4px 10px", fontSize: 12, marginTop: 5 }}>
+                <span>Durum: {ASSIGNMENT_STATUS_LABELS[assignment.status]}</span>
+                <span>Oncelik: {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}</span>
+                <span>Tur: {ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
+                {assignment.subject ? <span>Ders: {assignment.subject}</span> : null}
+                <span>Son tarih: {formatAssignmentDueDate(assignment.dueDate)}</span>
+              </div>
             </div>
             {open ? (
-              <button type="button" onClick={() => void handleComplete(assignment.id)}>
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => void handleComplete(assignment.id)}>
                 Tamamla
               </button>
             ) : (
-              <span data-testid={`completed-${assignment.id}`} className="text-success text-sm">
-                (Tamamlandi)
+              <span data-testid={`completed-${assignment.id}`} className="badge badge-success" style={{ height: 24, flexShrink: 0 }}>
+                Tamamlandi
               </span>
             )}
           </li>

@@ -1,34 +1,32 @@
+import { KiIcon } from "@/components/design/KiIcon";
+import { UkPageHead } from "@/components/design/UkPageHead";
+
 export default function StudentAiCoachPage() {
   return (
-    <div className="flex flex-col gap-5" data-testid="ai-coach-coming-soon">
-      <div>
-        <h1 className="text-xl font-semibold text-mono">AI Koç Yakında</h1>
-        <p className="text-sm text-muted-foreground">
-          Kişisel AI koç desteği alpha sürümünde hazırlanıyor.
-        </p>
-      </div>
+    <div className="stack rise" data-testid="ai-coach-coming-soon">
+      <UkPageHead title="AI Koç Yakında" sub="Kişisel AI koç desteği alpha sürümünde hazırlanıyor" />
 
-      <div className="kt-card">
-        <div className="kt-card-body p-5 flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <i className="ki-filled ki-technology-2 text-xl" />
+      <div className="card">
+        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="row" style={{ gap: 13, alignItems: "flex-start" }}>
+            <span className="stat-icon tone-primary" style={{ width: 48, height: 48, flexShrink: 0 }}>
+              <KiIcon name="ki-technology-2" size={22} />
             </span>
             <div>
-              <h2 className="text-base font-medium">Yakında burada</h2>
-              <p className="text-sm text-muted-foreground">
+              <b style={{ fontSize: 15 }}>Yakında burada</b>
+              <p className="muted" style={{ fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>
                 Ödev planlama, motivasyon ve çalışma önerileri için AI koç modülü geliştiriliyor.
               </p>
             </div>
           </div>
 
-          <ul className="text-sm text-muted-foreground list-disc ps-5 flex flex-col gap-1">
+          <ul className="muted" style={{ display: "flex", flexDirection: "column", gap: 6, paddingLeft: 18, fontSize: 13 }}>
             <li>Ödev ve hedef takibi için akıllı öneriler</li>
             <li>Haftalık çalışma planı özeti</li>
             <li>Koçunuzla uyumlu rehberlik (canlı AI henüz kapalı)</li>
           </ul>
 
-          <p className="text-xs text-muted-foreground">
+          <p className="muted" style={{ fontSize: 12 }}>
             Canlı AI yanıtları şu an devre dışı. Özellik açıldığında bu sayfadan erişilebilecek.
           </p>
         </div>

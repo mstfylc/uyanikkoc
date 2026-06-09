@@ -6,7 +6,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center text-muted-foreground">
+        <div className="muted" style={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>
           Giriş yükleniyor...
         </div>
       }

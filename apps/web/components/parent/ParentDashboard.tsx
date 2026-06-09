@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { KiIcon } from "@/components/design/KiIcon";
+import { UkPageHead } from "@/components/design/UkPageHead";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_STATUS_LABELS,
@@ -36,28 +38,21 @@ type StatCardProps = {
   label: string;
   value: number | string;
   icon: string;
-  tone?: "primary" | "success" | "warning" | "danger";
+  tone?: "primary" | "success" | "warning" | "danger" | "info";
 };
 
 function StatCard({ label, value, icon, tone = "primary" }: StatCardProps) {
-  const toneClass =
-    tone === "success"
-      ? "text-success"
-      : tone === "warning"
-        ? "text-warning"
-        : tone === "danger"
-          ? "text-danger"
-          : "text-primary";
-
   return (
-    <div className="kt-card">
-      <div className="kt-card-body flex items-center gap-4 p-5">
-        <span className={`flex size-12 items-center justify-center rounded-lg bg-muted ${toneClass}`}>
-          <i className={`ki-filled ${icon} text-xl`} />
-        </span>
+    <div className="card stat">
+      <div className="card-pad">
+        <div className="stat-top">
+          <span className={`stat-icon tone-${tone}`}>
+            <KiIcon name={icon} size={22} />
+          </span>
+        </div>
         <div>
-          <div className="text-2xl font-semibold text-mono">{value}</div>
-          <div className="text-sm text-muted-foreground">{label}</div>
+          <div className="stat-value tnum">{value}</div>
+          <div className="stat-label">{label}</div>
         </div>
       </div>
     </div>
@@ -89,11 +84,8 @@ export function ParentDashboard() {
   const weeklyComment = buildParentWeeklyComment(completionRate, overdueCount, pending);
 
   return (
-    <div className="flex flex-col gap-5" data-testid="parent-summary">
-      <div>
-        <h1 className="text-xl font-semibold text-mono">Veli Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Öğrencinizin ilerleme özeti</p>
-      </div>
+    <div className="stack rise" data-testid="parent-summary">
+      <UkPageHead title="Veli Dashboard" sub="Öğrencinizin ödev, deneme ve ilerleme özeti" />
 
       {!isLoading && summary ? (
         <p className="sr-only">
@@ -101,7 +93,7 @@ export function ParentDashboard() {
         </p>
       ) : null}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+      <div className="grid g-4">
         <StatCard label="Toplam Ödev" value={isLoading ? "—" : total} icon="ki-notepad-edit" />
         <StatCard
           label="Tamamlanan"
@@ -123,46 +115,55 @@ export function ParentDashboard() {
         />
       </div>
 
-      <div className="kt-card" data-testid="parent-weekly-comment">
-        <div className="kt-card-body p-5 flex flex-col gap-2">
-          <h3 className="text-base font-medium">Haftalik Yorum</h3>
-          <p className="text-sm text-muted-foreground">{isLoading ? "Yukleniyor..." : weeklyComment}</p>
+      <div className="card" data-testid="parent-weekly-comment">
+        <div className="card-head">
+          <div>
+            <h3>Haftalık Yorum</h3>
+            <p className="sub">Bu haftanın kısa gelişim yorumu</p>
+          </div>
+        </div>
+        <div className="card-body">
+          <p className="muted" style={{ fontSize: 13.5, lineHeight: 1.55 }}>{isLoading ? "Yükleniyor..." : weeklyComment}</p>
         </div>
       </div>
 
-      <div className="kt-card">
-        <div className="kt-card-body p-5 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-medium">Genel İlerleme</h3>
-            <span className="text-sm font-semibold text-primary">{completionRate}%</span>
+      <div className="card">
+        <div className="card-head">
+          <div>
+            <h3>Genel İlerleme</h3>
+            <p className="sub">Son ödevlerden hesaplanan tamamlanma oranı</p>
           </div>
-          <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full rounded-full bg-primary transition-all"
-              style={{ width: `${completionRate}%` }}
-            />
+          <span className="badge badge-primary" style={{ height: 26 }}>%{completionRate}</span>
+        </div>
+        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="meter-bar">
+            <span style={{ width: `${completionRate}%` }} />
           </div>
           {summary && summary.assignments.length > 0 ? (
-            <ul className="flex flex-col gap-2 pt-2 text-sm">
+            <div className="stack" style={{ gap: 8 }}>
               {summary.assignments.slice(0, 5).map((assignment) => (
-                <li key={assignment.id} className="flex flex-col gap-0.5 border-b border-border pb-2 last:border-0">
-                  <span className="font-medium">{assignment.title}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {ASSIGNMENT_STATUS_LABELS[assignment.status]} ·{" "}
-                    {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]} ·{" "}
+                <div key={assignment.id} className="lrow">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <b style={{ fontSize: 13.5 }}>{assignment.title}</b>
+                    <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+                    {ASSIGNMENT_STATUS_LABELS[assignment.status]} · {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]} ·{" "}
                     {ASSIGNMENT_TYPE_LABELS[assignment.type]}
                     {assignment.subject ? ` · ${assignment.subject}` : ""} ·{" "}
                     {formatAssignmentDueDate(assignment.dueDate)}
+                    </div>
+                  </div>
+                  <span className={`badge badge-${assignment.completed ? "success" : "warning"}`} style={{ height: 24, flexShrink: 0 }}>
+                    {assignment.completed ? "Tamamlandı" : "Bekliyor"}
                   </span>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           ) : null}
-          <div className="flex gap-2 pt-2">
-            <Link href="/parent/dashboard" className="kt-btn kt-btn-sm kt-btn-primary">
+          <div className="row" style={{ gap: 8 }}>
+            <Link href="/parent/reports" className="btn btn-primary btn-sm">
               Rapor
             </Link>
-            <Link href="/parent/dashboard" className="kt-btn kt-btn-sm kt-btn-light">
+            <Link href="/parent/messages" className="btn btn-light btn-sm">
               Mesaj
             </Link>
           </div>

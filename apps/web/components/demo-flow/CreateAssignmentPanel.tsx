@@ -174,9 +174,9 @@ export function CreateAssignmentPanel() {
   }
 
   return (
-    <section className="flex flex-col gap-4">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
+    <section className="stack">
+      <form onSubmit={handleSubmit} className="stack" style={{ gap: 14 }}>
+        <div className="field">
           <label htmlFor="title">Baslik *</label>
           <input
             id="title"
@@ -186,11 +186,11 @@ export function CreateAssignmentPanel() {
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Matematik tekrar odevi"
-            className="w-full rounded-md border border-border px-3 py-2"
+            className="input"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="field">
           <label htmlFor="description">Aciklama</label>
           <textarea
             id="description"
@@ -199,18 +199,18 @@ export function CreateAssignmentPanel() {
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Odev detaylari..."
-            className="w-full rounded-md border border-border px-3 py-2"
+            className="textarea"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="field">
           <label htmlFor="type">Tur</label>
           <select
             id="type"
             name="type"
             value={type}
             onChange={(event) => setType(event.target.value as AssignmentType)}
-            className="w-full rounded-md border border-border px-3 py-2"
+            className="select"
           >
             {TYPE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -220,14 +220,14 @@ export function CreateAssignmentPanel() {
           </select>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="field">
           <label htmlFor="priority">Oncelik</label>
           <select
             id="priority"
             name="priority"
             value={priority}
             onChange={(event) => setPriority(event.target.value as AssignmentPriority)}
-            className="w-full rounded-md border border-border px-3 py-2"
+            className="select"
           >
             {PRIORITY_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -237,14 +237,14 @@ export function CreateAssignmentPanel() {
           </select>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="field">
           <label htmlFor="subject">Ders</label>
           <select
             id="subject"
             name="subject"
             value={subject}
             onChange={(event) => setSubject(event.target.value)}
-            className="w-full rounded-md border border-border px-3 py-2"
+            className="select"
           >
             <option value="">Seciniz</option>
             {SUBJECT_OPTIONS.map((option) => (
@@ -255,7 +255,7 @@ export function CreateAssignmentPanel() {
           </select>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="field">
           <label htmlFor="dueDate">Son tarih</label>
           <input
             id="dueDate"
@@ -263,21 +263,22 @@ export function CreateAssignmentPanel() {
             type="date"
             value={dueDate}
             onChange={(event) => setDueDate(event.target.value)}
-            className="w-full rounded-md border border-border px-3 py-2"
+            className="input"
           />
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting || isLoadingStudents || students.length === 0}
-          className="kt-btn kt-btn-primary w-full sm:w-auto"
+          className="btn btn-primary"
+          style={{ width: "fit-content" }}
         >
           {isSubmitting ? "Kaydediliyor..." : isLoadingStudents ? "Ogrenciler yukleniyor..." : "Odevi kaydet"}
         </button>
       </form>
 
       {error ? (
-        <p role="alert" className="text-danger text-sm">
+        <p role="alert" className="badge badge-danger" style={{ width: "fit-content" }}>
           {error}
         </p>
       ) : null}
@@ -285,33 +286,35 @@ export function CreateAssignmentPanel() {
       {created ? (
         <div
           data-testid="created-assignment"
-          className="rounded-lg border border-border bg-muted/30 p-4 flex flex-col gap-2"
+          className="card"
         >
-          <p className="font-medium">Olusturuldu: {created.title}</p>
-          <dl className="grid grid-cols-1 gap-1 text-sm">
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <b>Olusturuldu: {created.title}</b>
+          <dl className="stack" style={{ gap: 6, fontSize: 13, margin: 0 }}>
             <div>
-              <dt className="text-muted-foreground inline">Tur: </dt>
-              <dd className="inline">{TYPE_LABELS[created.type]}</dd>
+              <dt className="muted" style={{ display: "inline" }}>Tur: </dt>
+              <dd style={{ display: "inline", margin: 0 }}>{TYPE_LABELS[created.type]}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground inline">Oncelik: </dt>
-              <dd className="inline">{PRIORITY_LABELS[created.priority]}</dd>
+              <dt className="muted" style={{ display: "inline" }}>Oncelik: </dt>
+              <dd style={{ display: "inline", margin: 0 }}>{PRIORITY_LABELS[created.priority]}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground inline">Ders: </dt>
-              <dd className="inline">{created.subject ?? "Belirtilmedi"}</dd>
+              <dt className="muted" style={{ display: "inline" }}>Ders: </dt>
+              <dd style={{ display: "inline", margin: 0 }}>{created.subject ?? "Belirtilmedi"}</dd>
             </div>
             <div>
-              <dt className="text-muted-foreground inline">Son tarih: </dt>
-              <dd className="inline">{formatDueDate(created.dueDate)}</dd>
+              <dt className="muted" style={{ display: "inline" }}>Son tarih: </dt>
+              <dd style={{ display: "inline", margin: 0 }}>{formatDueDate(created.dueDate)}</dd>
             </div>
             {created.description ? (
               <div>
-                <dt className="text-muted-foreground">Aciklama: </dt>
-                <dd>{created.description}</dd>
+                <dt className="muted">Aciklama: </dt>
+                <dd style={{ margin: 0 }}>{created.description}</dd>
               </div>
             ) : null}
           </dl>
+          </div>
         </div>
       ) : null}
     </section>
