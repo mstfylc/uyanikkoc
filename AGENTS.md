@@ -27,6 +27,8 @@ Codex / Cursor agent'ları bu repoda çalışırken aşağıdaki kurallara uyar.
 - Mock/memory veri yalnızca `apps/web/mocks/` veya `apps/web/fixtures/` altında
 - Test/typecheck geçmeden commit atma
 - Generated dosyalar commit etme: `.next`, `.turbo`, `node_modules`, `*.tsbuildinfo`
+- Tüm tasarım teslimleri ve handoff paketlemesi `HANDOFF_CONTRACT.md`'ye uyar.
+  Kod üretimi de aynı sözleşmedeki bölüm 3, 4 ve 5'e uyar. Uymayan teslim reddedilir.
 
 ## Mobil çalışma kuralları (`apps/mobile`)
 
