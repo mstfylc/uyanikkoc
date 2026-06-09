@@ -98,6 +98,23 @@ export async function markNotificationRead(
   return mapNotification(notification);
 }
 
+export async function markAllNotificationsRead(filter: { studentId?: string; parentId?: string }): Promise<number> {
+  if (!filter.studentId && !filter.parentId) {
+    return 0;
+  }
+
+  const result = await prisma.notification.updateMany({
+    where: {
+      studentId: filter.studentId,
+      parentId: filter.parentId,
+      read: false,
+    },
+    data: { read: true },
+  });
+
+  return result.count;
+}
+
 export function countUnread(notifications: NotificationRecord[]): number {
   return notifications.filter((item) => !item.read).length;
 }

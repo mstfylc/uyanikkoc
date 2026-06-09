@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DEMO_STUDENT_ID } from "@/mocks/assignments";
 import { DEMO_COACH_ID } from "@/mocks/messages";
@@ -13,6 +13,8 @@ import {
 
 afterEach(() => {
   resetNotificationsForTests();
+  vi.resetModules();
+  vi.clearAllMocks();
 });
 
 describe("notifications mock store", () => {
@@ -39,5 +41,27 @@ describe("notifications mock store", () => {
     const marked = markAllRead({ coachId: DEMO_COACH_ID });
     expect(marked).toBeGreaterThan(0);
     expect(countUnread(listForCoach(DEMO_COACH_ID))).toBe(0);
+  });
+});
+
+describe("notification service database branch", () => {
+  it("marks all student notifications via repository", async () => {
+    const markAllNotificationsRead = vi.fn().mockResolvedValue(3);
+    vi.doMock("@/lib/data/env", () => ({ shouldUseDatabase: () => true }));
+    vi.doMock("@uyanik/database", () => ({ notificationRepository: { markAllNotificationsRead } }));
+
+    const { markAllStudentNotificationsRead } = await import("@/server/services/notification.service");
+    await expect(markAllStudentNotificationsRead("student_001")).resolves.toBe(3);
+    expect(markAllNotificationsRead).toHaveBeenCalledWith({ studentId: "student_001" });
+  });
+
+  it("marks all parent notifications via repository", async () => {
+    const markAllNotificationsRead = vi.fn().mockResolvedValue(2);
+    vi.doMock("@/lib/data/env", () => ({ shouldUseDatabase: () => true }));
+    vi.doMock("@uyanik/database", () => ({ notificationRepository: { markAllNotificationsRead } }));
+
+    const { markAllParentNotificationsRead } = await import("@/server/services/notification.service");
+    await expect(markAllParentNotificationsRead("parent_001")).resolves.toBe(2);
+    expect(markAllNotificationsRead).toHaveBeenCalledWith({ parentId: "parent_001" });
   });
 });

@@ -84,14 +84,16 @@ export async function markCoachNotificationRead(
 
 export async function markAllStudentNotificationsRead(studentId: string): Promise<number> {
   if (shouldUseDatabase()) {
-    return 0;
+    const { notificationRepository } = await import("@uyanik/database");
+    return notificationRepository.markAllNotificationsRead({ studentId });
   }
   return memoryNotifications.markAllRead({ studentId });
 }
 
 export async function markAllParentNotificationsRead(parentId: string): Promise<number> {
   if (shouldUseDatabase()) {
-    return 0;
+    const { notificationRepository } = await import("@uyanik/database");
+    return notificationRepository.markAllNotificationsRead({ parentId });
   }
   return memoryNotifications.markAllRead({ parentId });
 }
