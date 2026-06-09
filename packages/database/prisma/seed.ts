@@ -257,9 +257,10 @@ async function main() {
   await seedExamResults();
   await seedFaz2Skeletons();
   await seedBillingPlans();
+  await seedLicenses();
 
   console.log(
-    "Seed completed: demo org, branch, users, profiles, assignment, topics, exams, notifications, messages, templates, billing plans",
+    "Seed completed: demo org, branch, users, profiles, assignment, topics, exams, notifications, messages, templates, billing plans, licenses",
   );
 }
 
@@ -317,6 +318,63 @@ async function seedBillingPlans() {
 
   for (const plan of plans) {
     await prisma.billingPlan.upsert({ where: { id: plan.id }, update: plan, create: plan });
+  }
+}
+
+async function seedLicenses() {
+  const now = new Date();
+  const inOneYear = new Date(now);
+  inOneYear.setFullYear(inOneYear.getFullYear() + 1);
+  const expiredAt = new Date(now);
+  expiredAt.setDate(expiredAt.getDate() - 7);
+  const canceledAt = new Date(now);
+  canceledAt.setDate(canceledAt.getDate() - 2);
+
+  const licenses = [
+    {
+      id: "license_demo_coach_active",
+      ownerType: "coach" as const,
+      ownerId: "coach_001",
+      planId: "plus",
+      status: "active" as const,
+      expiresAt: inOneYear,
+      canceledAt: null,
+    },
+    {
+      id: "license_demo_org_active",
+      ownerType: "organization" as const,
+      ownerId: DEMO_ORG_ID,
+      planId: "vip",
+      status: "active" as const,
+      expiresAt: inOneYear,
+      canceledAt: null,
+    },
+    {
+      id: "license_fixture_coach_canceled",
+      ownerType: "coach" as const,
+      ownerId: "coach_canceled_fixture",
+      planId: "standart",
+      status: "canceled" as const,
+      expiresAt: inOneYear,
+      canceledAt,
+    },
+    {
+      id: "license_fixture_org_expired",
+      ownerType: "organization" as const,
+      ownerId: "org_expired_fixture",
+      planId: "standart",
+      status: "active" as const,
+      expiresAt: expiredAt,
+      canceledAt: null,
+    },
+  ];
+
+  for (const license of licenses) {
+    await prisma.license.upsert({
+      where: { id: license.id },
+      update: license,
+      create: license,
+    });
   }
 }
 

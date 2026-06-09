@@ -484,6 +484,11 @@ enum SubscriptionStatus {
   canceled
 }
 
+enum LicenseOwnerType {
+  coach
+  organization
+}
+
 enum InvoiceStatus {
   paid
   pending
@@ -506,8 +511,26 @@ model BillingPlan {
   sortOrder     Int            @default(0)
   active        Boolean        @default(true)
   subscriptions Subscription[]
+  licenses      License[]
 
   @@map("billing_plans")
+}
+
+model License {
+  id         String             @id @default(cuid())
+  ownerType  LicenseOwnerType
+  ownerId    String
+  planId     String
+  status     SubscriptionStatus @default(trialing)
+  startedAt  DateTime           @default(now())
+  expiresAt  DateTime?
+  canceledAt DateTime?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  plan       BillingPlan         @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([ownerType, ownerId])
+  @@map("licenses")
 }
 
 model PaymentMethod {

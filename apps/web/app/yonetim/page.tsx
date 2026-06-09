@@ -1,4 +1,4 @@
-import { YonetimDashboardContent } from "./dashboard/page";
+import { YonetimDashboardContent } from "./dashboard/YonetimDashboardContent";
 
 export default function YonetimIndexPage() {
   return <YonetimDashboardContent />;
