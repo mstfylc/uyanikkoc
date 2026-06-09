@@ -66,8 +66,8 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
     await login(page, "coach@uyanik.local");
     await page.goto("/coach/topics");
     await expect(page.getByRole("heading", { name: "Konu Takibi" })).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText("Yillik Konu Takip Cizelgesi")).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText("SUTUN TOPLAMI")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("button", { name: /Tekrar/ })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Sütun toplamı")).toBeVisible({ timeout: 20_000 });
     await page.getByRole("button", { name: "Liste" }).click();
     await expect(page.getByRole("columnheader", { name: "Kaynaklar" })).toBeVisible({ timeout: 20_000 });
   });
