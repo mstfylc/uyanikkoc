@@ -42,9 +42,28 @@ Mevcut planlar SABİT enum (`OrgPlanId`, `CoachPlanId`, `StudentPlanId` — `lib
 | Öğrenci Paketleri (Kurum) | Yeni entity + CRUD | Yüksek / şema |
 | Öğrenci Paketleri (Koç) | Yeni entity + CRUD | Yüksek / şema |
 
+## 4. Boşlukların uygulanması (tamam — entegre, şema dahil)
+
+Onaylanan "hepsini uygula" kararıyla 4 ekran eklendi. Admin paneli memory-store
+(`@/mocks/admin`) tabanlı olduğundan veri modeli **AdminSnapshot + memory store**
+katmanında genişletildi (Prisma değil — kardeş özelliklerle tutarlı).
+
+**Veri katmanı:**
+- `lib/admin/types.ts`: `StudentPackage` + `PackageCycle/PackageOwnerKind`; `OrgPlan/CoachPlan.id` genişletildi; `AdminSnapshot`'a `orgPlans/coachPlans/studentPackages`; 9 yeni `AdminMutation` (plan + paket CRUD).
+- `mocks/admin.ts`: Store alanları + seed (`ORG_PLANS/COACH_PLANS` + `defaultStudentPackages`) + `mock*` CRUD + `orgPlanInUse/coachPlanInUse`.
+- `server/services/admin.service.ts`: 9 mutasyon case'i.
+- `lib/admin/mutation-scope.ts`: lisans türleri yalnız süper admin; paketler sahip-scoped (kurum kendi org'u, koç kendi id'si).
+
+**Ekranlar + route'lar:**
+- **Lisans Türleri** → `SuperPlans.tsx` · `/yonetim/plans` (süper admin nav).
+- **Öğrenci Paketleri** → `StudentPackages.tsx` (KurumPackages/CoachPackages) · `/yonetim/packages` + `/coach/packages`.
+- **SuperReports** → `SuperReports.tsx` · `/yonetim/reports` artık rol'e göre (admin→SuperReports, branch→BranchReports).
+
+**Doğrulama:** typecheck ✓ · lint ✓ · unit 96/96 (7 yeni) ✓ · prod build derleme+tip ✓
+(page-data toplama, sandbox'ta üretim env guard'ı nedeniyle koşmuyor — kodla ilgisiz).
+4 ekran dev'de status 200 render edildi (görsel doğrulandı).
+
 ## Durum
 
-- Token/CSS parite: **tamam** (drift'in kök nedeni — kapandı).
-- 25/29 ekran yapısal olarak hizalı.
-- 4 boşluk = tasarımın `plans-packages.jsx` + `sa-reports.jsx` yüzeyleri. 3'ü düzenlenebilir
-  veri-modeli (şema) gerektiriyor → uygulama scope'u kullanıcı onayına bırakıldı.
+- Token/CSS parite: **tamam**. 29/29 ekran hizalı (4 boşluk uygulandı).
+- **Aşama 2 (yönetim paneli) tamam.** Sıradaki: Aşama 3 (mobil).

@@ -23,6 +23,7 @@ import { SubscriberNotes } from "./SubscriberNotes";
 import { UkSection } from "@/components/design/UkSection";
 import { fmtShort, tl } from "@/lib/admin/format";
 import { moduleName, ORG_PLANS } from "@/lib/admin/pricing";
+import type { OrgPlanId } from "@/lib/admin/types";
 
 export function SuperOrgDetail({ orgId }: { orgId: string }) {
   const { snapshot, mutate, toast } = useAdminStore();
@@ -211,7 +212,7 @@ export function SuperOrgDetail({ orgId }: { orgId: string }) {
                     className={`lic-plan${sel ? " sel" : ""}`}
                     onClick={() => {
                       if (!sel && editable) {
-                        void mutate({ kind: "changeOrgPlan", orgId: o.id, planId: pl.id });
+                        void mutate({ kind: "changeOrgPlan", orgId: o.id, planId: pl.id as OrgPlanId });
                         toast(pl.name + " planına geçildi", { icon: "ki-check-circle" });
                       }
                     }}

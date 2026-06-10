@@ -273,7 +273,8 @@ export type OrgPlanId = "baslangic" | "pro" | "franchise";
 export type CoachPlanId = "c-baslangic" | "c-pro" | "c-sinirsiz";
 
 export type OrgPlan = {
-  id: OrgPlanId;
+  // Seed planlar OrgPlanId; süper admin özel plan ekleyebildiği için katalog id'si genişletildi.
+  id: OrgPlanId | string;
   name: string;
   color: string;
   monthly: number;
@@ -286,7 +287,7 @@ export type OrgPlan = {
 };
 
 export type CoachPlan = {
-  id: CoachPlanId;
+  id: CoachPlanId | string;
   name: string;
   color: string;
   monthly: number;
@@ -296,6 +297,22 @@ export type CoachPlan = {
   features: string[];
   modules: ModuleKey[];
   popular?: boolean;
+};
+
+// ---- Öğrenci paketleri (kurum / bireysel koç → öğrencisine sattığı koçluk paketi) ----
+export type PackageOwnerKind = "org" | "coach";
+export type PackageCycle = "monthly" | "term" | "annual" | "once";
+
+export type StudentPackage = {
+  id: string;
+  ownerKind: PackageOwnerKind;
+  ownerId: string;
+  name: string;
+  price: number;
+  cycle: PackageCycle;
+  color: string;
+  popular: boolean;
+  features: string[];
 };
 
 // Kurumun koçuna atadığı görev.
@@ -389,6 +406,11 @@ export type AdminSnapshot = {
   signups: Signup[];
   integrations: Integration[];
   orgInvites: OrgInvite[];
+  /** Süper admin lisans türleri kataloğu (kurum + bireysel koç planları). */
+  orgPlans: OrgPlan[];
+  coachPlans: CoachPlan[];
+  /** Kurum/koç → öğrencisine sattığı koçluk paketleri (sahip-bazlı). */
+  studentPackages: StudentPackage[];
   /** Demo: oturum açan süper admin kullanıcısının erişim seviyesi. */
   viewerAccess: AdminAccess;
   activeOrgId: string;
@@ -543,4 +565,15 @@ export type AdminMutation =
       parentEmail: string;
       branchId?: string;
     }
+  // ---- Lisans türleri (süper admin) ----
+  | { kind: "addOrgPlan"; data: Omit<OrgPlan, "id"> }
+  | { kind: "updateOrgPlan"; planId: string; patch: Partial<Omit<OrgPlan, "id">> }
+  | { kind: "deleteOrgPlan"; planId: string }
+  | { kind: "addCoachPlan"; data: Omit<CoachPlan, "id"> }
+  | { kind: "updateCoachPlan"; planId: string; patch: Partial<Omit<CoachPlan, "id">> }
+  | { kind: "deleteCoachPlan"; planId: string }
+  // ---- Öğrenci paketleri (kurum / bireysel koç) ----
+  | { kind: "addStudentPackage"; ownerKind: PackageOwnerKind; ownerId: string; data: Omit<StudentPackage, "id" | "ownerKind" | "ownerId"> }
+  | { kind: "updateStudentPackage"; packageId: string; patch: Partial<Omit<StudentPackage, "id" | "ownerKind" | "ownerId">> }
+  | { kind: "deleteStudentPackage"; packageId: string }
   | { kind: "resetDemo" };
