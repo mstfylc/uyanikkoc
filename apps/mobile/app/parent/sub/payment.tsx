@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { MIcon } from "@/components/MIcon";
@@ -37,7 +37,7 @@ export default function ParentPayment() {
               <Text style={{ fontSize: 14, fontWeight: "700", color: ukColors.text }}>•••• •••• •••• {b.card.last4}</Text>
               <Text style={{ fontSize: 12, color: ukColors.muted, fontWeight: "600", marginTop: 2 }}>Son kullanma {b.card.exp}</Text>
             </View>
-            <Pressable style={st.lightBtn}><Text style={st.lightBtnText}>Değiştir</Text></Pressable>
+            <Pressable style={st.lightBtn} onPress={() => Alert.alert("Kart değiştir", "Güvenli ödeme sayfasına yönlendirileceksiniz. Bu özellik yakında uygulamada aktif olacak.")}><Text style={st.lightBtnText}>Değiştir</Text></Pressable>
           </Card>
         </View>
       </View>

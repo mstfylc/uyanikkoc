@@ -1,15 +1,22 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { MIcon } from "@/components/MIcon";
 import { Badge, Card, SectionHead } from "@/components/parent-ui";
-import { C_STATUS, cStudent } from "@/lib/coach-data";
+import { Chips, Sheet, SheetField } from "@/components/Sheet";
+import { C_STATUS, cStudent, type CoachOdev } from "@/lib/coach-data";
 import { subjectColor, ukColors, ukSpace } from "@/lib/theme";
+
+const SUBJECTS = ["Matematik", "Geometri", "Fizik", "Kimya", "Biyoloji", "Türkçe", "Tarih"] as const;
+const ODEV_TYPES = ["soru", "test", "konu", "video"] as const;
 
 export default function CoachStudentDetail() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const s = cStudent(typeof id === "string" ? id : "");
+  const [extraOdev, setExtraOdev] = useState<CoachOdev[]>([]);
+  const [assignOpen, setAssignOpen] = useState(false);
 
   if (!s) {
     return (
@@ -21,8 +28,9 @@ export default function CoachStudentDetail() {
   }
 
   const meta = C_STATUS[s.status];
-  const pending = s.odev.filter((o) => o.status === "pending");
-  const submitted = s.odev.filter((o) => o.status === "submitted");
+  const allOdev = [...extraOdev, ...s.odev];
+  const pending = allOdev.filter((o) => o.status === "pending");
+  const submitted = allOdev.filter((o) => o.status === "submitted");
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: ukColors.bg }} contentContainerStyle={{ paddingTop: 8, paddingBottom: 28 }}>
@@ -52,7 +60,7 @@ export default function CoachStudentDetail() {
       <View style={{ flexDirection: "row", gap: 10, paddingHorizontal: ukSpace.lg, marginTop: 12 }}>
         <Pressable style={act.btn} onPress={() => router.push("/coach/messages")}><MIcon name="message" size={17} color={ukColors.primary600} /><Text style={act.btnText}>Mesaj</Text></Pressable>
         <Pressable style={act.btn} onPress={() => router.push("/coach/program")}><MIcon name="calendar" size={17} color={ukColors.primary600} /><Text style={act.btnText}>Randevu</Text></Pressable>
-        <Pressable style={[act.btn, { backgroundColor: ukColors.primary }]}><MIcon name="plus" size={17} color="#fff" /><Text style={[act.btnText, { color: "#fff" }]}>Ödev ata</Text></Pressable>
+        <Pressable style={[act.btn, { backgroundColor: ukColors.primary }]} onPress={() => setAssignOpen(true)}><MIcon name="plus" size={17} color="#fff" /><Text style={[act.btnText, { color: "#fff" }]}>Ödev ata</Text></Pressable>
       </View>
 
       {submitted.length > 0 ? (
@@ -101,9 +109,73 @@ export default function CoachStudentDetail() {
           </View>
         </View>
       ) : null}
+
+      <AssignSheet
+        open={assignOpen}
+        studentName={s.name}
+        onClose={() => setAssignOpen(false)}
+        onAssign={(o) => {
+          setExtraOdev((prev) => [o, ...prev]);
+          Alert.alert("Ödev atandı", `${s.name} öğrencisine "${o.topic}" atandı.`);
+        }}
+      />
     </ScrollView>
   );
 }
+
+function AssignSheet({ open, studentName, onClose, onAssign }: { open: boolean; studentName: string; onClose: () => void; onAssign: (o: CoachOdev) => void }) {
+  const [subject, setSubject] = useState<(typeof SUBJECTS)[number]>("Matematik");
+  const [type, setType] = useState<(typeof ODEV_TYPES)[number]>("soru");
+  const [topic, setTopic] = useState("");
+  const [count, setCount] = useState("20");
+  const [due, setDue] = useState("2026-06-10");
+  const ok = topic.trim().length > 1;
+
+  const save = () => {
+    if (!ok) return;
+    onAssign({
+      id: `new-${Date.now()}`,
+      subject,
+      topic: topic.trim(),
+      types: [type],
+      count: type === "konu" || type === "video" ? undefined : Number(count) || undefined,
+      source: "Koç ataması",
+      due,
+      status: "pending",
+    });
+    setTopic("");
+    onClose();
+  };
+
+  return (
+    <Sheet
+      open={open}
+      title="Ödev ata"
+      sub={`${studentName} için yeni ödev`}
+      onClose={onClose}
+      footer={
+        <Pressable style={[sheetBtn.primary, !ok && { opacity: 0.5 }]} disabled={!ok} onPress={save}>
+          <MIcon name="check" size={17} color="#fff" />
+          <Text style={sheetBtn.primaryText}>Ödevi ata</Text>
+        </Pressable>
+      }
+    >
+      <SheetField label="Ders"><Chips options={SUBJECTS} value={subject} onChange={setSubject} /></SheetField>
+      <SheetField label="Tür"><Chips options={ODEV_TYPES} value={type} onChange={setType} /></SheetField>
+      <SheetField label="Konu / başlık"><TextInput style={sheetBtn.input} value={topic} onChangeText={setTopic} placeholder="Örn. Türev — 40 soru" placeholderTextColor={ukColors.faint} /></SheetField>
+      {type !== "konu" && type !== "video" ? (
+        <SheetField label="Soru sayısı"><TextInput style={sheetBtn.input} value={count} onChangeText={setCount} keyboardType="number-pad" /></SheetField>
+      ) : null}
+      <SheetField label="Son tarih"><TextInput style={sheetBtn.input} value={due} onChangeText={setDue} placeholder="YYYY-AA-GG" placeholderTextColor={ukColors.faint} /></SheetField>
+    </Sheet>
+  );
+}
+
+const sheetBtn = StyleSheet.create({
+  input: { height: 46, borderRadius: 13, borderColor: ukColors.border, borderWidth: 1, paddingHorizontal: 14, fontSize: 14, color: ukColors.text, backgroundColor: ukColors.bg },
+  primary: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 50, borderRadius: 15, backgroundColor: ukColors.primary },
+  primaryText: { color: "#fff", fontSize: 14.5, fontWeight: "700" },
+});
 
 function odevIc(subject: string) {
   return { width: 36, height: 36, borderRadius: 11, backgroundColor: subjectColor(subject) + "22", alignItems: "center" as const, justifyContent: "center" as const };
