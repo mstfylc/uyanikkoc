@@ -77,10 +77,18 @@ export const ukColors = {
   infoSoft: palette.light.infoSoft,
   bg: palette.light.bg,
   surface: palette.light.surface,
+  surface2: palette.light.surface2,
+  surface3: palette.light.surface3,
   border: palette.light.border,
+  borderStrong: palette.light.borderStrong,
   text: palette.light.text,
+  text2: palette.light.text2,
   muted: palette.light.muted,
   faint: palette.light.faint,
+  primary300: palette.light.primary300,
+  primary700: palette.light.primary700,
+  ring: palette.light.ring,
+  onPrimary: palette.light.onPrimary,
 } as const;
 
 export const ukSubjectColors: Record<string, string> = {

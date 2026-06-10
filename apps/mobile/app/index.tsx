@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { ukColors } from "@/lib/theme";
 
 export default function IndexScreen() {
-  const { isLoading, token } = useAuth();
+  const { isLoading, token, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -17,6 +17,13 @@ export default function IndexScreen() {
 
   if (!token) {
     return <Redirect href="/login" />;
+  }
+
+  if (user?.role === "parent") {
+    return <Redirect href="/parent" />;
+  }
+  if (user?.role === "coach") {
+    return <Redirect href="/coach" />;
   }
 
   return <Redirect href="/(tabs)" />;

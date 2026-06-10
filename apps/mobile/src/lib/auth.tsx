@@ -5,10 +5,12 @@ import { apiFetch } from "./api";
 
 const TOKEN_KEY = "uyanik_mobile_token";
 
+export type MobileRole = "student" | "parent" | "coach";
+
 export type MobileUser = {
   id: string;
   email: string;
-  role: "student";
+  role: MobileRole;
   studentId: string | null;
 };
 
