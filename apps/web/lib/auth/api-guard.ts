@@ -2,7 +2,7 @@ import type { AppRole } from "@uyanik/tokens";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { assertProductionMemoryPolicy } from "@/lib/data/env";
-import { verifyMobileToken } from "@/lib/auth/mobile-token";
+import { verifyCurrentMobileToken } from "@/lib/auth/mobile-token";
 
 import { auth } from "@/auth";
 import type { SessionRoleSnapshot } from "../rbac";
@@ -27,7 +27,7 @@ async function sessionFromBearer(req: NextRequest): Promise<SessionRoleSnapshot 
     return null;
   }
 
-  const payload = await verifyMobileToken(token);
+  const payload = await verifyCurrentMobileToken(token);
   if (!payload) {
     return null;
   }

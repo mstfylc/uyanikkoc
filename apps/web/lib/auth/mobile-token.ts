@@ -1,5 +1,8 @@
 import type { AppRole } from "@uyanik/tokens";
+import { dbRoleToAppRole } from "@uyanik/tokens";
 import { SignJWT, jwtVerify } from "jose";
+
+import { shouldUseDatabase } from "@/lib/data/env";
 
 export type MobileAuthPayload = {
   sub: string;
@@ -60,4 +63,36 @@ export async function verifyMobileToken(token: string): Promise<MobileAuthPayloa
   } catch {
     return null;
   }
+}
+
+export async function verifyCurrentMobileToken(token: string): Promise<MobileAuthPayload | null> {
+  const payload = await verifyMobileToken(token);
+  if (!payload) {
+    return null;
+  }
+
+  if (!shouldUseDatabase()) {
+    return payload;
+  }
+
+  const { authRepository } = await import("@uyanik/database");
+  const user = await authRepository.findUserById(payload.sub);
+  if (!user) {
+    return null;
+  }
+
+  const role = dbRoleToAppRole[user.role];
+  if (
+    role !== payload.role ||
+    user.email !== payload.email ||
+    user.organizationId !== payload.organizationId ||
+    user.branchId !== payload.branchId ||
+    (user.studentId ?? null) !== payload.studentId ||
+    (user.coachId ?? null) !== payload.coachId ||
+    (user.parentId ?? null) !== payload.parentId
+  ) {
+    return null;
+  }
+
+  return payload;
 }

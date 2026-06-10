@@ -28,6 +28,33 @@ export async function findUserByEmail(email: string): Promise<AuthUserRecord | n
   };
 }
 
+export async function findUserById(id: string): Promise<AuthUserRecord | null> {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      studentProfile: true,
+      coachProfile: true,
+      parentProfile: true,
+    },
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  return {
+    id: user.id,
+    email: user.email,
+    passwordHash: user.passwordHash,
+    role: user.role,
+    organizationId: user.organizationId,
+    branchId: user.branchId,
+    studentId: user.studentProfile?.id ?? null,
+    coachId: user.coachProfile?.id ?? null,
+    parentId: user.parentProfile?.id ?? null,
+  };
+}
+
 export async function createPasswordResetToken(input: {
   email: string;
   tokenHash: string;
