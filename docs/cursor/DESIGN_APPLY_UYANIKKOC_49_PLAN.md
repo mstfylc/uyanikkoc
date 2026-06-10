@@ -39,5 +39,17 @@ Canlı: appointments, messages, motivation, resources, topics → **eksik: `supp
 ## Durum
 
 - Token paritesi: **tamam** (drift kapandı, dark eklendi).
-- Öğrenci yüzeyi büyük ölçüde hizalı (1 sub eksik).
-- Veli + Koç rolleri eksik → büyük inşa, scope onayı bekliyor.
+- Öğrenci yüzeyi büyük ölçüde hizalı (+ `destek` sub eklendi).
+- **Veli rolü: tamam** (5 tab + ödeme/mesaj/randevu sub).
+- **Koç rolü: tamam** (5 tab: Bugün/Öğrenciler/Mesajlar/Program/Profil + sub: öğrenci detay, sohbet, duyuru, görevler, deneme atama).
+- Mobil auth backend veli/koç rollerine açıldı (login + /me).
+
+### Düzeltilen kırık akışlar (detaylı test)
+1. `/api/admin/mutate` allowlist paket CRUD'u branch/koç için engelliyordu → açıldı (e2e 200).
+2. Mobil login öğrenci-dışını reddediyordu → student/parent/coach açıldı.
+3. Mobil `/me` öğrenci-dışını reddediyordu → açıldı.
+
+### Bilinen stub'lar (tasarım-parite, no-op)
+- Veli: yeni randevu, kart değiştir, plan değiştir, destek talebi.
+- Koç: ödev ata, yeni deneme ata, öğrenci-detay randevu.
+Gerçek-API bağlama follow-up (mobil ekranlar tasarım gibi mock veriyle çalışır).
