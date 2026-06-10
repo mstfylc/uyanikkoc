@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "next dev -p 3010",
-    "prebuild": "node scripts/check-metronic.mjs",
+    "prebuild": "node scripts/check-metronic.mjs && node scripts/gen-tokens-css.mjs --check",
     "build": "pnpm --filter @uyanik/database generate && node ../../node_modules/next/dist/bin/next build",
+    "tokens:gen": "node scripts/gen-tokens-css.mjs",
+    "tokens:check": "node scripts/gen-tokens-css.mjs --check",
     "start": "next start -p 3010",
     "typecheck": "tsc --noEmit",
     "lint": "eslint app auth.ts components e2e hooks lib middleware.ts mocks types __tests__ --max-warnings 0",
