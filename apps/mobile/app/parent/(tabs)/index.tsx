@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { MIcon } from "@/components/MIcon";
 import { Card, ChildSwitcher, POdevCard, SectionHead } from "@/components/parent-ui";
+import { Sheet } from "@/components/Sheet";
 import { useParent } from "@/lib/parent-context";
 import { P_PARENT } from "@/lib/parent-data";
 import { ukColors, ukRadius, ukSpace } from "@/lib/theme";
@@ -27,6 +29,7 @@ const TONES = {
 export default function ParentHome() {
   const router = useRouter();
   const { child } = useParent();
+  const [notifOpen, setNotifOpen] = useState(false);
   const pending = child.odev.filter((o) => o.status !== "done");
   const doneCount = child.odev.length - pending.length;
   const pct = child.odev.length ? Math.round((doneCount / child.odev.length) * 100) : 0;
@@ -39,8 +42,27 @@ export default function ParentHome() {
           <Text style={st.hi}>Merhaba,</Text>
           <Text style={st.name}>{P_PARENT.name}</Text>
         </View>
-        <Pressable style={st.iconBtn}><MIcon name="bell" size={20} color={ukColors.text} /></Pressable>
+        <Pressable style={st.iconBtn} onPress={() => setNotifOpen(true)}><MIcon name="bell" size={20} color={ukColors.text} /></Pressable>
       </View>
+
+      <Sheet open={notifOpen} title="Bildirimler" sub={child.name} onClose={() => setNotifOpen(false)}>
+        {[
+          child.reports.some((r) => r.status === "yeni") ? { ic: "shield", tone: ukColors.primary600, t: "Yeni gelişim raporu", d: "Koçun haftalık değerlendirmesi hazır" } : null,
+          pending.length > 0 ? { ic: "clock", tone: ukColors.warning, t: `${pending.length} bekleyen ödev`, d: `${child.name.split(" ")[0]} bu hafta ${pending.length} ödev tamamlamalı` } : null,
+          child.exams[0] ? { ic: "chart", tone: ukColors.success, t: "Son deneme sonucu", d: `${child.exams[0].name} · net ${child.exams[0].net}` } : null,
+        ].filter(Boolean).map((n, i) => {
+          const item = n as { ic: string; tone: string; t: string; d: string };
+          return (
+            <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+              <View style={[st.notifIc, { backgroundColor: item.tone + "22" }]}><MIcon name={item.ic} size={16} color={item.tone} /></View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 13.5, fontWeight: "700", color: ukColors.text }}>{item.t}</Text>
+                <Text style={{ fontSize: 12, color: ukColors.muted, fontWeight: "600", marginTop: 1 }}>{item.d}</Text>
+              </View>
+            </View>
+          );
+        })}
+      </Sheet>
 
       <View style={{ marginTop: 4 }}><ChildSwitcher /></View>
 
@@ -130,4 +152,5 @@ const st = StyleSheet.create({
   qaLabel: { fontSize: 12, fontWeight: "700", color: ukColors.text, marginTop: 7 },
   more: { fontSize: 12.5, fontWeight: "700", color: ukColors.primary600 },
   more2: { fontSize: 12.5, fontWeight: "600", color: ukColors.muted, marginTop: 2 },
+  notifIc: { width: 32, height: 32, borderRadius: 10, alignItems: "center", justifyContent: "center" },
 });

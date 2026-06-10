@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 
 import { MIcon } from "@/components/MIcon";
 import { Badge, Card, SectionHead } from "@/components/parent-ui";
+import { Sheet } from "@/components/Sheet";
 import { C_ACTIVITY, C_APPTS, C_COACH, C_REVIEWS, C_STUDENTS, C_THREADS, C_TODAY } from "@/lib/coach-data";
 import { ukColors, ukRadius, ukSpace } from "@/lib/theme";
 
@@ -15,6 +16,7 @@ const QUICK = [
 
 export default function CoachToday() {
   const router = useRouter();
+  const [notifOpen, setNotifOpen] = useState(false);
   const [reviews, setReviews] = useState(C_REVIEWS);
   const todayAppts = C_APPTS.filter((a) => a.day === C_TODAY);
   const active = C_STUDENTS.filter((s) => s.status !== "new");
@@ -30,8 +32,24 @@ export default function CoachToday() {
           <Text style={st.hi}>Günaydın,</Text>
           <Text style={st.name}>{C_COACH.name}</Text>
         </View>
-        <Pressable style={st.iconBtn}><MIcon name="bell" size={20} color={ukColors.text} /></Pressable>
+        <Pressable style={st.iconBtn} onPress={() => setNotifOpen(true)}><MIcon name="bell" size={20} color={ukColors.text} /></Pressable>
       </View>
+
+      <Sheet open={notifOpen} title="Bildirimler" sub="Son hareketler" onClose={() => setNotifOpen(false)}>
+        {C_ACTIVITY.map((a, i) => {
+          const tone: Record<string, string> = { success: ukColors.success, primary: ukColors.primary600, warning: ukColors.warning, danger: ukColors.danger, info: ukColors.info };
+          return (
+            <View key={i} style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+              <View style={[st.actIc, { backgroundColor: (tone[a.tone] ?? ukColors.muted) + "22" }]}><MIcon name={a.icon} size={16} color={tone[a.tone] ?? ukColors.muted} /></View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 13.5, fontWeight: "700", color: ukColors.text }}>{a.who}</Text>
+                <Text style={{ fontSize: 12, color: ukColors.muted, fontWeight: "600", marginTop: 1 }}>{a.what}</Text>
+              </View>
+              <Text style={{ fontSize: 11, color: ukColors.faint, fontWeight: "600" }}>{a.time}</Text>
+            </View>
+          );
+        })}
+      </Sheet>
 
       <View style={{ paddingHorizontal: ukSpace.lg, marginTop: 4 }}>
         <View style={st.hero}>
