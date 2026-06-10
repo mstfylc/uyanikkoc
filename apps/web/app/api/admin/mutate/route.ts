@@ -33,6 +33,10 @@ const BRANCH_ALLOWED: AdminMutation["kind"][] = [
   "inviteOrgCoach",
   "inviteStudent",
   "resetDemo",
+  // Öğrenci paketleri: kurum kendi org'una (ince scope mutation-scope.ts'te zorlanır).
+  "addStudentPackage",
+  "updateStudentPackage",
+  "deleteStudentPackage",
 ];
 
 const COACH_ALLOWED: AdminMutation["kind"][] = [
@@ -41,6 +45,10 @@ const COACH_ALLOWED: AdminMutation["kind"][] = [
   "setCoachAutoRenew",
   "renewCoachPlan",
   "cancelCoach",
+  // Öğrenci paketleri: koç kendi sahipliğine (ince scope mutation-scope.ts'te zorlanır).
+  "addStudentPackage",
+  "updateStudentPackage",
+  "deleteStudentPackage",
 ];
 
 export const POST = withApiAuth(["admin", "branch", "coach"], async (req, { session }) => {
