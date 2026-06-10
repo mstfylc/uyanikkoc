@@ -1,0 +1,34 @@
+{
+  "$schema_note": "Uyanık Koç spacing/radius/shadow/z-index token'ları. Kaynak: src/styles.css (:root). Tüm ölçüler semantik isimle; çıplak px yerine bu referanslar kullanılır.",
+  "version": "1.0",
+  "modified": "2026-06-10",
+  "spacing": {
+    "$note": "Bileşenlerde gap/padding için kullanılan ölçek (px). grid varsayılan gap=18.",
+    "0": "0px", "1": "3px", "2": "6px", "3": "9px", "4": "12px", "5": "14px",
+    "6": "16px", "7": "18px", "8": "20px", "9": "22px", "10": "24px", "12": "30px", "16": "40px"
+  },
+  "radius": {
+    "sm": { "value": "9px", "source": "--r-sm" },
+    "md": { "value": "13px", "source": "--r-md" },
+    "lg": { "value": "18px", "source": "--r-lg" },
+    "xl": { "value": "24px", "source": "--r-xl" },
+    "pill": { "value": "999px", "source": "badge/chip" }
+  },
+  "shadow": {
+    "sm": { "value": "0 1px 2px rgba(24,26,40,.05), 0 1px 3px rgba(24,26,40,.04)", "source": "--shadow-sm" },
+    "md": { "value": "0 2px 6px rgba(24,26,40,.06), 0 8px 24px rgba(24,26,40,.06)", "source": "--shadow-md" },
+    "lg": { "value": "0 12px 40px rgba(24,26,40,.12)", "source": "--shadow-lg" },
+    "primary": { "value": "0 10px 30px -8px var(--primary-glow)", "source": "--shadow-primary" }
+  },
+  "zIndex": {
+    "topbar": { "value": 20, "source": ".topbar" },
+    "sidebar": { "value": 30, "source": ".sidebar" },
+    "popover": { "value": 60, "source": "appt/popover" },
+    "modal": { "value": 100, "source": ".modal-overlay" }
+  },
+  "layout": {
+    "sidebarWidth": { "value": "264px", "source": "--sidebar-w" },
+    "headerHeight": { "value": "70px", "source": "--header-h" },
+    "gridGap": { "value": "18px", "source": ".grid" }
+  }
+}
