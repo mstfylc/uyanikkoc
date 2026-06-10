@@ -4,7 +4,7 @@ import { requireAuth } from "@/lib/auth/api-guard";
 import { verifyMobileToken } from "@/lib/auth/mobile-token";
 
 export async function GET(req: NextRequest) {
-  const authResult = await requireAuth(req, ["student"]);
+  const authResult = await requireAuth(req, ["student", "parent", "coach"]);
   if (authResult instanceof NextResponse) {
     return authResult;
   }

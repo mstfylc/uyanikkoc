@@ -290,6 +290,33 @@ export async function applyAdminMutation(
         branchId: m.branchId,
       });
       break;
+    case "addOrgPlan":
+      memory.mockAddOrgPlan(m.data);
+      break;
+    case "updateOrgPlan":
+      memory.mockUpdateOrgPlan(m.planId, m.patch);
+      break;
+    case "deleteOrgPlan":
+      memory.mockDeleteOrgPlan(m.planId);
+      break;
+    case "addCoachPlan":
+      memory.mockAddCoachPlan(m.data);
+      break;
+    case "updateCoachPlan":
+      memory.mockUpdateCoachPlan(m.planId, m.patch);
+      break;
+    case "deleteCoachPlan":
+      memory.mockDeleteCoachPlan(m.planId);
+      break;
+    case "addStudentPackage":
+      memory.mockAddStudentPackage(m.ownerKind, m.ownerId, m.data);
+      break;
+    case "updateStudentPackage":
+      memory.mockUpdateStudentPackage(m.packageId, m.patch);
+      break;
+    case "deleteStudentPackage":
+      memory.mockDeleteStudentPackage(m.packageId);
+      break;
     case "resetDemo":
       memory.resetMockStore();
       break;

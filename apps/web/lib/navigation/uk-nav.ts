@@ -35,6 +35,7 @@ const COACH_NAV: UkNavItem[] = [
   { href: "/coach/reports", label: "Raporlar", icon: "ki-chart-line-up" },
   { href: "/coach/revenue", label: "Gelir & Tahsilat", icon: "ki-dollar" },
   { href: "/coach/license", label: "Lisansim", icon: "ki-shield-tick" },
+  { href: "/coach/packages", label: "Ogrenci Paketleri", icon: "ki-wallet" },
   { href: "/coach/invoices", label: "Faturalar", icon: "ki-receipt-square" },
 ];
 
@@ -55,6 +56,7 @@ const YONETIM_BRANCH_NAV: UkNavItem[] = [
   { href: "/yonetim/branches", label: "Subeler", icon: "ki-office-bag" },
   { href: "/yonetim/license", label: "Lisans & Kapasite", icon: "ki-shield-tick" },
   { href: "/yonetim/revenue", label: "Gelir & Tahsilat", icon: "ki-dollar" },
+  { href: "/yonetim/packages", label: "Ogrenci Paketleri", icon: "ki-wallet" },
   { href: "/yonetim/reports", label: "Raporlar", icon: "ki-chart-line-up" },
   { href: "/yonetim/managers", label: "Yoneticiler", icon: "ki-crown-2" },
   { href: "/yonetim/settings", label: "Ayarlar", icon: "ki-setting-2" },
@@ -67,6 +69,7 @@ const YONETIM_ADMIN_NAV: UkNavItem[] = [
   { href: "/yonetim/orgs", label: "Kurumlar & Franchise", icon: "ki-office-bag" },
   { href: "/yonetim/branches", label: "Subeler", icon: "ki-flag" },
   { href: "/yonetim/licenses", label: "Lisans Takibi", icon: "ki-shield-tick" },
+  { href: "/yonetim/plans", label: "Lisans Turleri", icon: "ki-shield-cross" },
   { href: "/yonetim/leads", label: "Demo & Uyelikler", icon: "ki-clipboard" },
   { href: "/yonetim/license", label: "Lisans & Kapasite", icon: "ki-chart-pie-simple" },
   { href: "/yonetim/coaches", label: "Koclar", icon: "ki-people" },

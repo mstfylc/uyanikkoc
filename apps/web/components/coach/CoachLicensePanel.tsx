@@ -370,7 +370,7 @@ export function CoachLicensePanel() {
                           type="button"
                           className={`btn ${pl.popular ? "btn-primary" : "btn-outline"}`}
                           style={{ width: "100%" }}
-                          onClick={() => setCheckout({ planId: pl.id, cycle: planCycle })}
+                          onClick={() => setCheckout({ planId: pl.id as CoachPlanId, cycle: planCycle })}
                         >
                           {pl.name} Seç<Icon name="chevronRight" size={16} />
                         </button>

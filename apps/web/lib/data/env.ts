@@ -16,6 +16,12 @@ export function assertProductionMemoryPolicy(): void {
     return;
   }
 
+  // `next build` (page-data toplama) NODE_ENV=production ile çalışır ama gerçek
+  // runtime değildir; build fazında guard'ı atla — runtime'da yine zorlanır.
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    return;
+  }
+
   const flag = process.env.DEMO_AUTH_ALLOW_IN_MEMORY;
   if (flag === "true" || flag === "1") {
     throw new Error(

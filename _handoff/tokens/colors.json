@@ -1,0 +1,85 @@
+{
+  "$schema_note": "Uyanık Koç tasarım sistemi renk token'ları. Tek doğruluk kaynağı: src/styles.css (:root ve [data-theme=dark]).",
+  "brand_note": "Sözleşme başlığındaki lacivert/turuncu eski; gerçek token mor #534AB7 (src/styles.css:8). HANDOFF_CONTRACT.md marka satırı güncellenmeli.",
+  "scale_note": "Ankraj adımlar kaynaktan birebir: 50=primary-soft, 300=primary-300, 500=primary(DEFAULT), 600=primary-600, 700=primary-700. Ara adımlar (100/200/400/800/900) bu ankrajlardan türetildi (derived:true).",
+  "version": "1.0",
+  "modified": "2026-06-10",
+  "light": {
+    "primary": {
+      "50":  { "value": "#EEEDF9", "source": "--primary-soft" },
+      "100": { "value": "#E0DDF3", "derived": true },
+      "200": { "value": "#C3BDE8", "derived": true },
+      "300": { "value": "#8E87D6", "source": "--primary-300" },
+      "400": { "value": "#6F66C7", "derived": true },
+      "500": { "value": "#534AB7", "source": "--primary" },
+      "600": { "value": "#463DA6", "source": "--primary-600" },
+      "700": { "value": "#3A3290", "source": "--primary-700" },
+      "800": { "value": "#2C2670", "derived": true },
+      "900": { "value": "#1F1B50", "derived": true },
+      "glow": { "value": "rgba(83,74,183,0.28)", "source": "--primary-glow" }
+    },
+    "semantic": {
+      "success":      { "value": "#0F6E56", "source": "--success" },
+      "success-soft": { "value": "#E4F1EC", "source": "--success-soft" },
+      "warning":      { "value": "#B26A12", "source": "--warning" },
+      "warning-soft": { "value": "#FAEFDE", "source": "--warning-soft" },
+      "danger":       { "value": "#A32D2D", "source": "--danger" },
+      "danger-soft":  { "value": "#F8E8E8", "source": "--danger-soft" },
+      "info":         { "value": "#2F6BD6", "source": "--info" },
+      "info-soft":    { "value": "#E6EEFA", "source": "--info-soft" }
+    },
+    "surface": {
+      "bg":        { "value": "#F4F5FA", "source": "--bg" },
+      "surface":   { "value": "#FFFFFF", "source": "--surface" },
+      "surface-2": { "value": "#FAFAFD", "source": "--surface-2" },
+      "surface-3": { "value": "#F3F4F9", "source": "--surface-3" }
+    },
+    "border": {
+      "border":        { "value": "#E8E9F2", "source": "--border" },
+      "border-strong": { "value": "#DCDEEA", "source": "--border-strong" }
+    },
+    "text": {
+      "text":   { "value": "#181A24", "source": "--text" },
+      "text-2": { "value": "#45485A", "source": "--text-2" },
+      "muted":  { "value": "#6B6F85", "source": "--muted" },
+      "faint":  { "value": "#A2A6B8", "source": "--faint" }
+    },
+    "ring": { "value": "rgba(83,74,183,0.16)", "source": "--ring" }
+  },
+  "dark": {
+    "primary": {
+      "300": { "value": "#A39CF0", "source": "--primary-300" },
+      "500": { "value": "#8079E6", "source": "--primary" },
+      "600": { "value": "#6E66D6", "source": "--primary-600" },
+      "700": { "value": "#5E56C4", "source": "--primary-700" },
+      "soft": { "value": "#232238", "source": "--primary-soft" }
+    },
+    "semantic": {
+      "success":      { "value": "#34D399", "source": "--success" },
+      "success-soft": { "value": "#14271F", "source": "--success-soft" },
+      "warning":      { "value": "#F0B45E", "source": "--warning" },
+      "warning-soft": { "value": "#2A2113", "source": "--warning-soft" },
+      "danger":       { "value": "#F87171", "source": "--danger" },
+      "danger-soft":  { "value": "#2C1818", "source": "--danger-soft" },
+      "info":         { "value": "#6BA0F0", "source": "--info" },
+      "info-soft":    { "value": "#141E2E", "source": "--info-soft" }
+    },
+    "surface": {
+      "bg":        { "value": "#0B0E18", "source": "--bg" },
+      "surface":   { "value": "#181C2B", "source": "--surface" },
+      "surface-2": { "value": "#1F2435", "source": "--surface-2" },
+      "surface-3": { "value": "#282E43", "source": "--surface-3" }
+    },
+    "border": {
+      "border":        { "value": "#2E3450", "source": "--border" },
+      "border-strong": { "value": "#3C4366", "source": "--border-strong" }
+    },
+    "text": {
+      "text":   { "value": "#F3F4FB", "source": "--text" },
+      "text-2": { "value": "#C9CDDF", "source": "--text-2" },
+      "muted":  { "value": "#969BB4", "source": "--muted" },
+      "faint":  { "value": "#6E7391", "source": "--faint" }
+    },
+    "ring": { "value": "rgba(128,121,230,0.22)", "source": "--ring" }
+  }
+}

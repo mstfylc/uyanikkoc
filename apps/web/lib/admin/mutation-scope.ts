@@ -69,6 +69,24 @@ export function assertMutationAllowed(
       }
       return null;
     }
+    if (m.kind === "addStudentPackage" || m.kind === "updateStudentPackage" || m.kind === "deleteStudentPackage") {
+      const snapshot = memory.getMockSnapshot(ctx);
+      const soloId = resolveSoloCoachId(ctx.coachId, snapshot.coaches);
+      if (!soloId) {
+        return "forbidden coach scope";
+      }
+      if (m.kind === "addStudentPackage") {
+        if (m.ownerKind !== "coach" || m.ownerId !== soloId) {
+          return "forbidden package scope";
+        }
+      } else {
+        const pkg = snapshot.studentPackages.find((p) => p.id === m.packageId);
+        if (!pkg || pkg.ownerKind !== "coach" || pkg.ownerId !== soloId) {
+          return "forbidden package scope";
+        }
+      }
+      return null;
+    }
     return "forbidden mutation for coach role";
   }
 
@@ -118,6 +136,33 @@ export function assertMutationAllowed(
     const org = snapshot.orgs.find((o) => o.id === orgId);
     if (!org?.branches.some((b) => b.id === m.branchId)) {
       return "forbidden branch scope";
+    }
+  }
+
+  // Lisans türleri kataloğu yalnız süper admin (role === "admin") yetkisindedir.
+  if (
+    m.kind === "addOrgPlan" ||
+    m.kind === "updateOrgPlan" ||
+    m.kind === "deleteOrgPlan" ||
+    m.kind === "addCoachPlan" ||
+    m.kind === "updateCoachPlan" ||
+    m.kind === "deleteCoachPlan"
+  ) {
+    return "forbidden plan mutation for branch role";
+  }
+
+  // Öğrenci paketleri kurumun kendi sahipliğiyle sınırlı.
+  if (m.kind === "addStudentPackage" || m.kind === "updateStudentPackage" || m.kind === "deleteStudentPackage") {
+    const snapshot = memory.getMockSnapshot(ctx);
+    if (m.kind === "addStudentPackage") {
+      if (m.ownerKind !== "org" || m.ownerId !== orgId) {
+        return "forbidden package scope";
+      }
+    } else {
+      const pkg = snapshot.studentPackages.find((p) => p.id === m.packageId);
+      if (!pkg || pkg.ownerKind !== "org" || pkg.ownerId !== orgId) {
+        return "forbidden package scope";
+      }
     }
   }
 

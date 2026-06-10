@@ -1,5 +1,22 @@
 # Tasarım ↔ Kod Eşleştirme Raporu
 
+## v5 — Token tek doğruluk kaynağı (drift'i önleyen pipeline)
+
+**Kanonik kaynak:** `uyanikkoc-web-source-v5` (`tokens.json` = `src/styles.css` :root/dark, birebir doğrulanmış).
+
+- Canonical token'lar repoya alındı: **`apps/web/styles/uk-tokens.json`** (v5.0.0, 27 renk + gölge/yarıçap/yerleşim/font).
+- `apps/web/styles/uk-design.css` `:root` + `[data-theme=dark]` blokları artık **bu dosyadan üretilir**
+  (`scripts/gen-tokens-css.mjs`, `@tokens:start/@tokens:end` işaretleri arası). Elle düzenlenmez.
+- `prebuild` adımına **`--check`** eklendi → token bloğu kaynaktan saparsa build kırılır (drift bir daha geçemez).
+- Komutlar: `pnpm --filter @uyanik/web tokens:gen` (üret), `tokens:check` (doğrula).
+- Bu turda kapatılan canlı drift'ler: light `--muted` (#767A90→#6B6F85) ve dark
+  surface/border/text-2/muted/faint (8 değer, v5 "karanlık mod kontrastı ayrıştırma").
+  Sonuç: canlı CSS = tokens.json (69 token, 0 fark).
+
+**Tasarım güncellendiğinde:** yeni `tokens.json`'u `uk-tokens.json`'a koy → `tokens:gen` → commit. CSS elle dokunulmaz.
+
+---
+
 Kaynak: `design_handoff_uyanik_koc/` (Claude design handoff)
 
 **Son güncelleme:** Alpha sonrası tur — bilinçli eksiklerin tamamı kapatıldı.

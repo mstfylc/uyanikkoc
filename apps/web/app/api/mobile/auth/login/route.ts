@@ -24,8 +24,8 @@ export async function POST(req: Request) {
   }
 
   const role = dbRoleToAppRole[user.role];
-  if (role !== "student") {
-    return NextResponse.json({ error: "Mobile app currently supports student accounts only" }, { status: 403 });
+  if (role !== "student" && role !== "parent" && role !== "coach") {
+    return NextResponse.json({ error: "Mobile app supports student, parent and coach accounts only" }, { status: 403 });
   }
 
   const token = await signMobileToken({

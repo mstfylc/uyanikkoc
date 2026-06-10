@@ -3,7 +3,7 @@
 // apps/web/mocks/admin.ts
 // Prototip kaynağı: admin/admin-data.jsx (seedOrgs, seedCoaches, seedOrgInvoices, store + actions).
 
-import { modulesFromPlan, orgPlanById, coachPlanById } from "@/lib/admin/pricing";
+import { modulesFromPlan, orgPlanById, coachPlanById, ORG_PLANS, COACH_PLANS } from "@/lib/admin/pricing";
 import { resolveActiveOrgId, resolveOrgCoachId, type AdminSnapshotContext } from "@/lib/admin/snapshot-context";
 import { orgCoaches, seedCoachFeedback } from "@/lib/admin/derive";
 import { DEMO_BRANCH_ID, DEMO_ORG_ID } from "@/lib/auth/demo-users";
@@ -31,10 +31,14 @@ import type {
   OrgInvoice,
   OrgManager,
   OrgManagerRole,
+  OrgPlan,
   OrgPlanId,
   OrgBilling,
   OrgInvite,
   OrgNotificationPrefs,
+  CoachPlan,
+  PackageOwnerKind,
+  StudentPackage,
   SoloCoach,
   Signup,
   StudentSubscription,
@@ -602,15 +606,42 @@ type Store = {
   demoRequests: DemoRequest[];
   signups: Signup[];
   integrations: Integration[];
+  orgPlans: OrgPlan[];
+  coachPlans: CoachPlan[];
+  studentPackages: StudentPackage[];
 };
 
 const globalForAdmin = globalThis as unknown as { __ukAdminStore?: Store };
 
+// Sahip (kurum/koç) için varsayılan öğrenci paketleri — admin-data.jsx defaultStudentPackages.
+function defaultStudentPackages(ownerKind: PackageOwnerKind, ownerId: string): StudentPackage[] {
+  const base: Omit<StudentPackage, "id" | "ownerKind" | "ownerId">[] =
+    ownerKind === "org"
+      ? [
+          { name: "Aylık Koçluk", price: 1500, cycle: "monthly", color: "var(--primary)", popular: false, features: ["Haftalık birebir görüşme", "Deneme analizi", "Ödev & konu takibi", "Veli bilgilendirme"] },
+          { name: "Dönemlik Paket", price: 7500, cycle: "term", color: "var(--success)", popular: true, features: ["Aylık paketteki her şey", "Sınırsız deneme", "Aylık veli raporu", "Öncelikli destek"] },
+          { name: "Yoğun Hazırlık", price: 2800, cycle: "monthly", color: "var(--warning)", popular: false, features: ["Haftada 2 birebir görüşme", "Bireysel çalışma programı", "AI çalışma önerileri", "7/24 mesaj desteği"] },
+        ]
+      : [
+          { name: "Standart Koçluk", price: 1200, cycle: "monthly", color: "var(--primary)", popular: false, features: ["Haftalık birebir görüşme", "Ödev & konu takibi", "Deneme analizi"] },
+          { name: "Premium Koçluk", price: 2000, cycle: "monthly", color: "var(--warning)", popular: true, features: ["Standart'taki her şey", "Haftada 2 görüşme", "Bireysel program", "Sınırsız mesaj desteği"] },
+        ];
+  return base.map((p, i) => ({ id: `${ownerKind}-${ownerId}-p${i + 1}`, ownerKind, ownerId, ...p }));
+}
+
+function seedStudentPackages(orgs: Org[], coaches: SoloCoach[]): StudentPackage[] {
+  const list: StudentPackage[] = [];
+  for (const o of orgs) list.push(...defaultStudentPackages("org", o.id));
+  for (const c of coaches) list.push(...defaultStudentPackages("coach", c.id));
+  return list;
+}
+
 function freshStore(): Store {
   const orgs = withManagers(seedOrgs());
+  const coaches = seedCoaches();
   return {
     orgs,
-    coaches: seedCoaches(),
+    coaches,
     studentSubscriptions: seedStudentSubscriptions(orgs),
     orgInvites: [],
     orgInvoices: seedOrgInvoices(orgs),
@@ -626,6 +657,9 @@ function freshStore(): Store {
     demoRequests: seedDemoRequests(),
     signups: seedSignups(),
     integrations: seedIntegrations(),
+    orgPlans: ORG_PLANS.map((p) => ({ ...p })),
+    coachPlans: COACH_PLANS.map((p) => ({ ...p })),
+    studentPackages: seedStudentPackages(orgs, coaches),
   };
 }
 
@@ -659,6 +693,9 @@ export function getMockSnapshot(ctx: AdminSnapshotContext = {}): AdminSnapshot {
     demoRequests: s.demoRequests,
     signups: s.signups,
     integrations: s.integrations,
+    orgPlans: s.orgPlans,
+    coachPlans: s.coachPlans,
+    studentPackages: s.studentPackages,
     viewerAccess: "full",
     activeOrgId,
     myCoachId: ctx.coachId ?? activeOrgCoachId,
@@ -685,6 +722,11 @@ export function loadMockSnapshot(snapshot: AdminSnapshot): void {
     demoRequests: structuredClone(snapshot.demoRequests ?? seedDemoRequests()),
     signups: structuredClone(snapshot.signups ?? seedSignups()),
     integrations: structuredClone(snapshot.integrations ?? seedIntegrations()),
+    orgPlans: structuredClone(snapshot.orgPlans ?? ORG_PLANS.map((p) => ({ ...p }))),
+    coachPlans: structuredClone(snapshot.coachPlans ?? COACH_PLANS.map((p) => ({ ...p }))),
+    studentPackages: structuredClone(
+      snapshot.studentPackages ?? seedStudentPackages(snapshot.orgs, snapshot.coaches),
+    ),
   };
 }
 
@@ -1365,4 +1407,79 @@ export function mockInviteStudent(
     createdAt: Date.now(),
     status: "pending",
   });
+}
+
+// ---- Lisans türleri (süper admin) ----
+function genId(prefix: string): string {
+  return prefix + "-" + Math.floor(1000 + Math.random() * 8999);
+}
+
+export function orgPlanInUse(planId: string): boolean {
+  const s = store();
+  return s.orgs.some((o) => o.planId === planId) || s.demoRequests.some((d) => d.kind === "org" && d.planId === planId);
+}
+export function coachPlanInUse(planId: string): boolean {
+  const s = store();
+  return s.coaches.some((c) => c.planId === planId) || s.demoRequests.some((d) => d.kind === "coach" && d.planId === planId);
+}
+
+export function mockAddOrgPlan(data: Omit<OrgPlan, "id">): void {
+  store().orgPlans.push({ id: genId("op"), ...data });
+}
+export function mockUpdateOrgPlan(planId: string, patch: Partial<Omit<OrgPlan, "id">>): void {
+  const p = store().orgPlans.find((x) => x.id === planId);
+  if (p) Object.assign(p, patch);
+}
+export function mockDeleteOrgPlan(planId: string): boolean {
+  if (orgPlanInUse(planId)) return false;
+  const s = store();
+  s.orgPlans = s.orgPlans.filter((p) => p.id !== planId);
+  return true;
+}
+
+export function mockAddCoachPlan(data: Omit<CoachPlan, "id">): void {
+  store().coachPlans.push({ id: genId("cp"), ...data });
+}
+export function mockUpdateCoachPlan(planId: string, patch: Partial<Omit<CoachPlan, "id">>): void {
+  const p = store().coachPlans.find((x) => x.id === planId);
+  if (p) Object.assign(p, patch);
+}
+export function mockDeleteCoachPlan(planId: string): boolean {
+  if (coachPlanInUse(planId)) return false;
+  const s = store();
+  s.coachPlans = s.coachPlans.filter((p) => p.id !== planId);
+  return true;
+}
+
+// ---- Öğrenci paketleri (kurum / bireysel koç) ----
+function cleanFeatures(features: string[] | undefined, fallback: string[]): string[] {
+  if (!features) return fallback;
+  return features.map((f) => (f || "").trim()).filter(Boolean);
+}
+
+export function mockAddStudentPackage(
+  ownerKind: PackageOwnerKind,
+  ownerId: string,
+  data: Omit<StudentPackage, "id" | "ownerKind" | "ownerId">,
+): void {
+  store().studentPackages.push({
+    id: genId(`${ownerKind}-${ownerId}-p`),
+    ownerKind,
+    ownerId,
+    ...data,
+    features: cleanFeatures(data.features, []),
+  });
+}
+export function mockUpdateStudentPackage(
+  packageId: string,
+  patch: Partial<Omit<StudentPackage, "id" | "ownerKind" | "ownerId">>,
+): void {
+  const p = store().studentPackages.find((x) => x.id === packageId);
+  if (!p) return;
+  const features = patch.features ? cleanFeatures(patch.features, p.features) : p.features;
+  Object.assign(p, patch, { features });
+}
+export function mockDeleteStudentPackage(packageId: string): void {
+  const s = store();
+  s.studentPackages = s.studentPackages.filter((p) => p.id !== packageId);
 }

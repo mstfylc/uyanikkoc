@@ -1,0 +1,92 @@
+{
+  "package": "Uyanık Koç — Web Uygulaması (öğrenci+koç+veli) — Pilot Handoff",
+  "status": "delivered",
+  "status_note": "Token'lar + tüm component spec'leri + 27 ekranın desktop.png+mobile.png görselleri + scope/inventory/manifest tamam. Ekranlar uygulanmış tasarım kodundan (apps/web) bellek modunda render edilip yakalandı. 'included' yalnızca _handoff/ içindeki gerçek dosyaları sayar.",
+  "generated_at": "2026-06-10T12:00:00+03:00",
+  "version": "0.2",
+  "brand": { "primary": "#534AB7" },
+  "brand_note": "Sözleşme başlığındaki lacivert/turuncu eski; gerçek token mor #534AB7 (src/styles.css:8 / packages tokens). HANDOFF_CONTRACT.md marka satırı güncellenmeli.",
+  "mapping_ref": "HANDOFF_CONTRACT.md",
+  "source_of_truth": {
+    "canonical_html": "Uyanık Koç - Dashboard Redesign.html",
+    "canonical_proof": "Bu oturumdaki tüm yeni özellikler (Okul Sınavları, online deneme+yetki, konu-store, ExamHistoryList, ödev takvim/günlük, vb.) bu dosyaya eklendi → en güncel sürüm.",
+    "tokens_from": "src/styles.css (:root, [data-theme=dark])",
+    "screens_from": "apps/web (uygulanmış tasarım kodu, Next.js). Bellek modu (DEMO_AUTH_ALLOW_IN_MEMORY=true), demo hesaplar (student/coach/parent@uyanik.local). Desktop=1440px, mobile=390px gerçek breakpoint, fullPage."
+  },
+  "screen_deviations": [
+    {
+      "screen": "koc-online-denemeler",
+      "status": "yakalanmadı",
+      "reason": "Uygulanmış tasarım kodunda (apps/web) ayrı rota yok; online deneme işlevi /coach/exams içinde + API (api/coach/online-exams, api/student/online-exams). uk-nav.ts koç menüsünde tek 'Denemeler' (/coach/exams) var. Ekran uydurulmadı; koç denemeleri 'koc-denemeler' (/coach/exams) altında yakalandı."
+    }
+  ],
+  "included": [
+    { "path": "manifest.json", "type": "manifest", "version": "0.2", "modified": "2026-06-10" },
+    { "path": "tokens/colors.json", "type": "token", "version": "1.0", "modified": "2026-06-10" },
+    { "path": "tokens/typography.json", "type": "token", "version": "1.0", "modified": "2026-06-10" },
+    { "path": "tokens/spacing.json", "type": "token", "version": "1.0", "modified": "2026-06-10" },
+    { "path": "components/Button.spec.md", "type": "component", "version": "1.0", "modified": "2026-06-10" },
+    { "path": "components/StatCard.spec.md", "type": "component", "version": "1.0", "modified": "2026-06-10" },
+    { "path": "components/Badge.spec.md", "type": "component", "version": "1.0", "modified": "2026-06-10" },
+    { "path": "components/Components-Extra.spec.md", "type": "component", "version": "1.0", "modified": "2026-06-10", "note": "Avatar, Section, Tabs, Meter, Donut, Sparkline, Bar, Modal, Field, Select, Switch, OdevCard, Chip — tek dosyada (atla kararı)" }
+  ],
+  "screens": {
+    "$note": "Her ekran: screens/<ad>/desktop.png (1440px) + mobile.png (390px). 27 ekran × 2 = 54 dosya.",
+    "method": "apps/web bellek modunda çalıştırıldı; Playwright (Chromium) ile her rol login → her rota fullPage yakalama. desktop=1440px, mobile=390px.",
+    "ogrenci": [
+      { "name": "ogrenci-dashboard", "route": "/student/dashboard", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-calisma-programi", "route": "/student/schedule", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-konu-takibi", "route": "/student/topics", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-denemeler", "route": "/student/exams", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-odevlerim", "route": "/student/assignments", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-randevular", "route": "/student/appointments", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-testlerim", "route": "/student/tests", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-motivasyon", "route": "/student/motivation", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-mesajlar", "route": "/student/messages", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-ayarlar", "route": "/student/settings", "files": ["desktop.png", "mobile.png"] },
+      { "name": "ogrenci-abonelik", "route": "/student/billing", "files": ["desktop.png", "mobile.png"] }
+    ],
+    "koc": [
+      { "name": "koc-dashboard", "route": "/coach/dashboard", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-ogrencilerim", "route": "/coach/students", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-konu-takibi", "route": "/coach/topics", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-yillik-cizelge", "route": "/coach/topics/annual", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-odev-gorev", "route": "/coach/assignments", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-denemeler", "route": "/coach/exams", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-randevular", "route": "/coach/appointments", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-envanter-testler", "route": "/coach/tests", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-raporlar", "route": "/coach/reports", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-gelir-tahsilat", "route": "/coach/revenue", "files": ["desktop.png", "mobile.png"] },
+      { "name": "koc-mesajlar", "route": "/coach/messages", "files": ["desktop.png", "mobile.png"] }
+    ],
+    "veli": [
+      { "name": "veli-genel-bakis", "route": "/parent/dashboard", "files": ["desktop.png", "mobile.png"] },
+      { "name": "veli-deneme-sonuclari", "route": "/parent/exams", "files": ["desktop.png", "mobile.png"] },
+      { "name": "veli-gelisim-raporlari", "route": "/parent/reports", "files": ["desktop.png", "mobile.png"] },
+      { "name": "veli-randevular", "route": "/parent/appointments", "files": ["desktop.png", "mobile.png"] },
+      { "name": "veli-mesajlar", "route": "/parent/messages", "files": ["desktop.png", "mobile.png"] }
+    ]
+  },
+  "file_count": {
+    "docs_tokens_components": 8,
+    "screen_pngs": 54,
+    "total": 62,
+    "$proof": "8 (manifest+3 token+4 component) + 54 (27 ekran × 2 png) = 62"
+  },
+  "included_count": 62,
+  "pending": {
+    "$note": "Sıradaki turda üretilecek; henüz dosyaya yazılmadı, bu yüzden 'included' sayısına dahil DEĞİL.",
+    "components": [],
+    "assets": ["icons/ (icons.jsx SVG'leri optimize)", "images/ (kullanılan görseller)"]
+  },
+  "excluded": [
+    { "path": "tanitim-sitesi/", "reason": "ayrı pazarlama ürünü, kapsam dışı" },
+    { "path": "Uyanık Koç - Yönetim Paneli.html / admin/", "reason": "ayrı ürün (yönetim paneli); bu pilot web uygulamasıdır" },
+    { "path": "Uyanık Koç — Web Uygulaması v4/", "reason": "eski kopya (v4 anlık görüntü)" },
+    { "path": "Uyanık Koç — Web Güncellemeleri v2/", "reason": "eski kopya (v2)" },
+    { "path": "Uyanık Koç — Öğrenci+Veli Uygulaması v1/", "reason": "eski versiyon (v1)" },
+    { "path": "Uyanık Koç — Öğrenci+Veli+Koç Uygulaması v2/", "reason": "eski kopya (v2)" },
+    { "path": "design_handoff_uyanik_koc/", "reason": "önceki handoff denemesi, süperseded" },
+    { "path": "indir/", "reason": "eski indirme paketleri / önceki sürümler" }
+  ]
+}
