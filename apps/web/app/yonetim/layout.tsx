@@ -34,7 +34,7 @@ export default async function YonetimLayout({ children }: { children: React.Reac
   }
 
   return (
-    <Suspense fallback={<div className="card card-pad muted" style={{ margin: 24 }}>Yukleniyor...</div>}>
+    <Suspense fallback={<div className="card card-pad muted" style={{ margin: 24 }}>Yükleniyor...</div>}>
       <YonetimShell>{children}</YonetimShell>
     </Suspense>
   );

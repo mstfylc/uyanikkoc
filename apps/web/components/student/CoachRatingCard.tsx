@@ -50,7 +50,7 @@ export function CoachRatingCard() {
 
   return (
     <UkSection
-      title="Kocunu Degerlendir"
+      title="Koçunu Değerlendir"
       sub="Goruslerin kocunun gelisimine yardimci olur"
       action={
         rating && !editing ? <UkBadge tone="success">Gonderildi</UkBadge> : null
@@ -59,7 +59,7 @@ export function CoachRatingCard() {
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 13 }}>
         {!coachId ? (
           <p className="muted" style={{ fontSize: 13 }}>
-            Atanmis koc bulunamadi.
+            Atanmış koç bulunamadı.
           </p>
         ) : rating && !editing ? (
           <>
@@ -110,7 +110,7 @@ export function CoachRatingCard() {
                 rows={3}
                 value={comment}
                 onChange={(event) => setComment(event.target.value)}
-                placeholder="Kocunla ilgili gorus ve onerilerini yaz..."
+                placeholder="Koçunla ilgili görüş ve önerilerini yaz..."
               />
             </div>
             <div className="row" style={{ gap: 8 }}>

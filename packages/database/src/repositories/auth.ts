@@ -2,8 +2,9 @@ import { prisma } from "../client";
 import type { AuthUserRecord } from "../types";
 
 export async function findUserByEmail(email: string): Promise<AuthUserRecord | null> {
+  const normalizedEmail = email.trim().toLowerCase();
   const user = await prisma.user.findUnique({
-    where: { email },
+    where: { email: normalizedEmail },
     include: {
       studentProfile: true,
       coachProfile: true,
@@ -106,4 +107,56 @@ export async function resetPasswordWithToken(input: {
   ]);
 
   return true;
+}
+
+export async function updateUserPasswordById(input: {
+  userId: string;
+  passwordHash: string;
+}): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { id: input.userId },
+    select: { id: true },
+  });
+
+  if (!user) {
+    return false;
+  }
+
+  await prisma.user.update({
+    where: { id: input.userId },
+    data: { passwordHash: input.passwordHash },
+  });
+
+  return true;
+}
+
+export async function updateUserEmailById(input: {
+  userId: string;
+  email: string;
+}): Promise<"updated" | "not_found" | "email_taken"> {
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const user = await prisma.user.findUnique({
+    where: { id: input.userId },
+    select: { id: true },
+  });
+
+  if (!user) {
+    return "not_found";
+  }
+
+  const existing = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+    select: { id: true },
+  });
+
+  if (existing && existing.id !== input.userId) {
+    return "email_taken";
+  }
+
+  await prisma.user.update({
+    where: { id: input.userId },
+    data: { email: normalizedEmail },
+  });
+
+  return "updated";
 }

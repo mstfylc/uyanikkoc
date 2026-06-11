@@ -21,14 +21,14 @@ type ProfilePanelProps = {
 };
 
 const ROLE_LABELS: Record<ProfilePanelProps["role"], string> = {
-  student: "Ogrenci",
-  coach: "Koc",
+  student: "Öğrenci",
+  coach: "Koç",
   parent: "Veli",
 };
 
 const ROLE_SUB: Record<ProfilePanelProps["role"], string> = {
   student: "11. Sinif · Sayisal",
-  coach: "YKS & LGS Kocu",
+  coach: "YKS & LGS Koçu",
   parent: "Veli · Elif'in annesi",
 };
 
@@ -43,7 +43,7 @@ const ROLE_STATS: Record<ProfilePanelProps["role"], Array<{ icon: string; text: 
   coach: [
     { icon: "ki-people", text: "18 ogrenci" },
     { icon: "ki-chart-simple", text: "%74 ort. tamamlama" },
-    { icon: "ki-calendar", text: "Uye: Eyl 2024" },
+    { icon: "ki-calendar", text: "Üye: Eyl 2024" },
   ],
   student: [
     { icon: "ki-book", text: "11. Sinif · Sayisal" },
@@ -51,9 +51,9 @@ const ROLE_STATS: Record<ProfilePanelProps["role"], Array<{ icon: string; text: 
     { icon: "ki-flame", text: "12 gun seri" },
   ],
   parent: [
-    { icon: "ki-profile-circle", text: "Elif Yildiz · Ogrenci" },
+    { icon: "ki-profile-circle", text: "Elif Yildiz · Öğrenci" },
     { icon: "ki-chart-simple", text: "Son deneme: 78 net" },
-    { icon: "ki-calendar-tick", text: "3 yaklasan randevu" },
+    { icon: "ki-calendar-tick", text: "3 yaklaşan randevu" },
   ],
 };
 
@@ -71,7 +71,7 @@ function ProfileToast({ message }: { message: string | null }) {
         <div className="fw7" style={{ fontSize: 13.5 }}>
           {message}
         </div>
-        <div className="muted fz12">Hesap bilgileri guncellendi</div>
+        <div className="muted fz12">Hesap bilgileri güncellendi</div>
       </div>
     </div>
   );
@@ -186,14 +186,14 @@ export function ProfilePanel({ role }: ProfilePanelProps) {
               </div>
               {role === "student" ? (
                 <div className="field">
-                  <label className="label">Koc</label>
+                  <label className="label">Koç</label>
                   <input className="input" value="Dilek Emen" disabled />
                 </div>
               ) : null}
             </div>
           </UkSection>
 
-          <UkSection title="Hazir ikonlar" sub="Profil avatarini sec">
+          <UkSection title="Hazır ikonlar" sub="Profil avatarını seç">
             <div className="card-body">
               <div className="grid g-4" style={{ gap: 10 }}>
                 {PROFILE_AVATAR_ICONS.map((icon) => (
@@ -246,7 +246,7 @@ export function ProfilePanel({ role }: ProfilePanelProps) {
                 onClick={() => void signOut({ callbackUrl: "/login" })}
               >
                 <KiIcon name="ki-exit-right" size={17} />
-                Cikis Yap
+                Çıkış Yap
               </button>
             </div>
           </UkSection>

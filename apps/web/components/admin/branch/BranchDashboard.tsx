@@ -53,7 +53,7 @@ export function BranchDashboard() {
               {dl < 0 ? `${-dl} gün önce sona erdi.` : `${dl} gün kaldı.`} {o.status === "trial" ? "Kesintisiz devam için planınızı etkinleştirin." : "Kesinti yaşamamak için yenileyin."}
             </div>
           </div>
-          <Link href="/branch/license" className="btn btn-sm btn-primary">Lisansı yönet<Icon name="chevronRight" size={15} /></Link>
+          <Link href="/yonetim/license" className="btn btn-sm btn-primary">Lisansı yönet<Icon name="chevronRight" size={15} /></Link>
         </div>
       ) : null}
 
@@ -70,7 +70,7 @@ export function BranchDashboard() {
             <UkSparkline data={trend} width={640} height={120} color={o.tone} />
           </div>
         </UkSection>
-        <UkSection title="Lisans kullanımı" action={<Link href="/branch/license" className="link-btn">Detay</Link>}>
+        <UkSection title="Lisans kullanımı" action={<Link href="/yonetim/license" className="link-btn">Detay</Link>}>
           <div className="card-body" style={{ gap: 16, display: "flex", flexDirection: "column" }}>
             <Meter icon="cap" label="Öğrenci koltuğu" used={o.seats.used} total={o.seats.total} />
             <Meter icon="users" label="Koç" used={o.coaches.used} total={o.coaches.total} />
@@ -85,7 +85,7 @@ export function BranchDashboard() {
 
       <div className="grid col-main">
         {o.type === "franchise" ? (
-          <UkSection title="Şube karşılaştırması" sub="Aylık tahsilat" action={<Link href="/branch/branches" className="link-btn">Şubeler</Link>}>
+          <UkSection title="Şube karşılaştırması" sub="Aylık tahsilat" action={<Link href="/yonetim/branches" className="link-btn">Şubeler</Link>}>
             <div className="card-body">
               <RankBars items={o.branches.map((b) => ({ l: b.name, v: b.collect }))} fmt={(v) => tl(v)} color={o.tone} />
             </div>
@@ -97,10 +97,10 @@ export function BranchDashboard() {
             </div>
           </UkSection>
         )}
-        <UkSection title="Öne çıkan koçlar" action={<Link href="/branch/coaches" className="link-btn">Tümü</Link>}>
+        <UkSection title="Öne çıkan koçlar" action={<Link href="/yonetim/coaches" className="link-btn">Tümü</Link>}>
           <div className="card-body" style={{ padding: 0 }}>
             {coaches.slice(0, 5).map((c) => (
-              <Link key={c.id} href={`/branch/coaches/${c.id}`} className="list-row" style={{ textDecoration: "none", color: "inherit" }}>
+              <Link key={c.id} href={`/yonetim/coaches/${c.id}`} className="list-row" style={{ textDecoration: "none", color: "inherit" }}>
                 <UkAvatar name={c.name} size={36} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <b style={{ fontSize: 13.5, display: "block" }}>{c.name}</b>

@@ -5,6 +5,7 @@ import { orgCoaches } from "@/lib/admin/derive";
 import { modulesFromPlan, orgPlanById } from "@/lib/admin/pricing";
 import { assertMutationAllowed } from "@/lib/admin/mutation-scope";
 import type { Org } from "@/lib/admin/types";
+import { applyAdminMutation } from "@/server/services/admin.service";
 import { getMockSnapshot, findTask, loadMockSnapshot, resetMockStore } from "@/mocks/admin";
 
 const demoOrg: Org = {
@@ -42,6 +43,24 @@ describe("admin mutation scope", () => {
     ).toBe("forbidden org scope");
   });
 
+  it("branch yalnizca kendi kurumundaki ogrenciyi cikarabilir", () => {
+    expect(
+      assertMutationAllowed(
+        { kind: "removeOrgStudent", orgId: DEMO_ORG_ID, studentId: `${DEMO_ORG_ID}-s0` },
+        { organizationId: DEMO_ORG_ID, role: "branch" },
+        "branch",
+      ),
+    ).toBeNull();
+
+    expect(
+      assertMutationAllowed(
+        { kind: "removeOrgStudent", orgId: "akademi-yildiz", studentId: "akademi-yildiz-s0" },
+        { organizationId: DEMO_ORG_ID, role: "branch" },
+        "branch",
+      ),
+    ).toBe("forbidden org scope");
+  });
+
   it("coach yalnizca kendi gorevini tamamlayabilir", () => {
     getMockSnapshot({ organizationId: DEMO_ORG_ID, coachId: DEMO_COACH_ID, role: "coach" });
     const coachId = orgCoaches(demoOrg)[0]?.id ?? "";
@@ -72,5 +91,30 @@ describe("admin mutation scope", () => {
     loadMockSnapshot(renamed);
     expect(getMockSnapshot({}).orgs[0]?.name).toBe("Kalici Demo Kurum");
     resetMockStore();
+  });
+
+  it("branch yeni koc davetini kurum sayacina yansitir", async () => {
+    resetMockStore();
+    const before = getMockSnapshot({ organizationId: DEMO_ORG_ID, role: "branch" });
+    const beforeOrg = before.orgs.find((org) => org.id === DEMO_ORG_ID)!;
+    const beforeCoaches = beforeOrg.coaches.used;
+    const beforeBranchCoaches = beforeOrg.branches[0]!.coaches;
+
+    const after = await applyAdminMutation(
+      {
+        kind: "inviteOrgCoach",
+        orgId: DEMO_ORG_ID,
+        name: "Yeni Koc",
+        email: "yeni.koc@example.com",
+        branchId: beforeOrg.branches[0]!.id,
+      },
+      { organizationId: DEMO_ORG_ID, role: "branch" },
+      "branch",
+    );
+    const afterOrg = after.orgs.find((org) => org.id === DEMO_ORG_ID)!;
+
+    expect(afterOrg.coaches.used).toBe(beforeCoaches + 1);
+    expect(afterOrg.branches[0]!.coaches).toBe(beforeBranchCoaches + 1);
+    expect(after.orgInvites[0]).toMatchObject({ kind: "coach", email: "yeni.koc@example.com" });
   });
 });

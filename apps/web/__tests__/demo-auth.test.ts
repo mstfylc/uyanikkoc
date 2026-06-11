@@ -13,18 +13,29 @@ describe("demo auth users", () => {
     expect(compareSync(DEMO_PASSWORD, DEMO_PASSWORD_HASH)).toBe(true);
   });
 
-  it("student@uyanik.local demo listesinde vardır", () => {
-    const student = demoUsers.find((user) => user.email === "student@uyanik.local");
-    expect(student).toBeDefined();
-    expect(compareSync(DEMO_PASSWORD, student!.passwordHash)).toBe(true);
+  it("kaldirilan local demo hesaplari listede yoktur", () => {
+    for (const email of ["admin@uyanik.local", "coach@uyanik.local", "student@uyanik.local", "parent@uyanik.local"]) {
+      expect(demoUsers.some((entry) => entry.email === email)).toBe(false);
+    }
   });
 
-  it("super admin demo hesaplari vardir", () => {
-    for (const email of ["admin@uyanik.local", "superadmin@uyanik.local"]) {
-      const user = demoUsers.find((entry) => entry.email === email);
-      expect(user?.role).toBe("ORG_ADMIN");
-      expect(compareSync(DEMO_PASSWORD, user!.passwordHash)).toBe(true);
-    }
+  it("super admin demo hesabi vardir", () => {
+    const user = demoUsers.find((entry) => entry.email === "superadmin@uyanik.local");
+    expect(user?.role).toBe("ORG_ADMIN");
+    expect(compareSync(DEMO_PASSWORD, user!.passwordHash)).toBe(true);
+  });
+
+  it("kampus koc kurum yoneticisi demo hesabi vardir", async () => {
+    const user = demoUsers.find((entry) => entry.email === "incisel@kampuskoc.com");
+    expect(user?.role).toBe("BRANCH_MANAGER");
+    expect(user?.organizationId).toBe("akademi-yildiz");
+    expect(compareSync(DEMO_PASSWORD, user!.passwordHash)).toBe(true);
+
+    await expect(resolveUserByEmail(" INCiSEL@KAMPUSKOC.COM ")).resolves.toMatchObject({
+      email: "incisel@kampuskoc.com",
+      role: "BRANCH_MANAGER",
+      organizationId: "akademi-yildiz",
+    });
   });
 
   it("production ortaminda demo fallback kapaliyken demo hesabi reddeder", async () => {

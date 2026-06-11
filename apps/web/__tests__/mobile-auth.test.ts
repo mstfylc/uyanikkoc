@@ -23,7 +23,7 @@ describe("mobile-auth: OTP (memory mode)", () => {
     expect(res.accessToken).toBeTruthy();
     expect(res.refreshToken).toBeTruthy();
     expect(res.user.role).toBe("student");
-    expect(res.user.avatarInitials).toBe("EY");
+    expect(res.user.avatarInitials).toBe("KD");
     spy.mockRestore();
   });
 
@@ -41,7 +41,7 @@ describe("mobile-auth: OTP (memory mode)", () => {
 
 describe("mobile-auth: email login + refresh rotation", () => {
   it("logs in a demo user and rotates the refresh token", async () => {
-    const res = await loginEmail("student@uyanik.local", "uyanik123");
+    const res = await loginEmail("student2@uyanik.local", "uyanik123");
     expect(res.user.role).toBe("student");
     expect(res.accessToken).toBeTruthy();
 
@@ -54,6 +54,6 @@ describe("mobile-auth: email login + refresh rotation", () => {
   });
 
   it("rejects wrong credentials", async () => {
-    await expect(loginEmail("student@uyanik.local", "wrong")).rejects.toMatchObject({ code: "invalid_credentials" });
+    await expect(loginEmail("student2@uyanik.local", "wrong")).rejects.toMatchObject({ code: "invalid_credentials" });
   });
 });

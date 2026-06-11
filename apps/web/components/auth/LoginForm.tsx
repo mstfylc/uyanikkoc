@@ -7,20 +7,14 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
-type DemoRole = "student" | "coach" | "parent" | "admin" | "branch";
+type DemoRole = "admin" | "branch";
 
 const DEMO_BY_ROLE: Record<DemoRole, { email: string; password: string; label: string }> = {
-  student: { email: "student@uyanik.local", password: "uyanik123", label: "Ogrenci" },
-  coach: { email: "coach@uyanik.local", password: "uyanik123", label: "Koc" },
-  parent: { email: "parent@uyanik.local", password: "uyanik123", label: "Veli" },
-  admin: { email: "admin@uyanik.local", password: "uyanik123", label: "Super Admin" },
+  admin: { email: "superadmin@uyanik.local", password: "uyanik123", label: "Super Admin" },
   branch: { email: "branch@uyanik.local", password: "uyanik123", label: "Kurum" },
 };
 
 const DEMO_ROLE_ICON: Record<DemoRole, string> = {
-  student: "ki-book",
-  coach: "ki-people",
-  parent: "ki-heart",
   admin: "ki-shield-tick",
   branch: "ki-office-bag",
 };
@@ -28,7 +22,7 @@ const DEMO_ROLE_ICON: Record<DemoRole, string> = {
 const DEMO_LOGIN_ENABLED = process.env.NODE_ENV !== "production";
 
 function resolveDemoRole(nextPath: string, roleParam: string | null): DemoRole {
-  return yonetimLoginRoleHint(nextPath, roleParam) ?? "student";
+  return yonetimLoginRoleHint(nextPath, roleParam) === "admin" ? "admin" : "branch";
 }
 
 export function LoginForm() {
@@ -73,7 +67,7 @@ export function LoginForm() {
     setIsSubmitting(false);
 
     if (!result || result.error || result.ok === false) {
-      setError("E-posta veya sifre hatali.");
+      setError("E-posta veya şifre hatalı.");
       return;
     }
 
@@ -93,7 +87,7 @@ export function LoginForm() {
     setResetUrl(null);
     const resetEmail = email.trim();
     if (!resetEmail) {
-      setError("Sifre sifirlama icin e-posta adresini gir.");
+      setError("Şifre sıfırlama için e-posta adresini gir.");
       return;
     }
 
@@ -113,11 +107,11 @@ export function LoginForm() {
     };
 
     if (!response.ok) {
-      setError(data.error ?? "Sifre sifirlama talebi olusturulamadi.");
+      setError(data.error ?? "Şifre sıfırlama talebi oluşturulamadı.");
       return;
     }
 
-    setResetMessage(data.message ?? "Sifre sifirlama talebi olusturuldu.");
+    setResetMessage(data.message ?? "Şifre sıfırlama talebi oluşturuldu.");
     setResetUrl(data.resetUrl ?? null);
   }
 
@@ -134,8 +128,8 @@ export function LoginForm() {
               <KiIcon name="ki-flash text-white text-xl" size={27} />
             </span>
             <div className="auth-brand-text">
-              <b>Uyanik Koc</b>
-              <span>Akilli kocluk platformu</span>
+              <b>Uyanık Koç</b>
+              <span>Akıllı koçluk platformu</span>
             </div>
           </div>
 
@@ -143,7 +137,7 @@ export function LoginForm() {
             <div className="auth-pcard auth-pcard-main">
               <div className="ap-head">
                 <div>
-                  <div className="ap-kicker">Deneme net gelisimi</div>
+                  <div className="ap-kicker">Deneme net gelişimi</div>
                   <div className="ap-val">
                     147,5<span> net</span>
                   </div>
@@ -181,8 +175,8 @@ export function LoginForm() {
                 <KiIcon name="ki-flame" size={17} />
               </span>
               <div className="ap-chip-text">
-                <b>12 gun seri</b>
-                <span>Bugunun odevleri tamam</span>
+                <b>12 gün seri</b>
+                <span>Bugünün ödevleri tamam</span>
               </div>
             </div>
           </div>
@@ -191,17 +185,17 @@ export function LoginForm() {
             <h2>
               Hedefe giden yolu
               <br />
-              birlikte planlayalim.
+              birlikte planlayalım.
             </h2>
             <p>
-              Koc, ogrenci ve veliyi tek ekranda bulusturan; deneme analizleri, konu takibi ve soru
-              hedefleriyle calisan kocluk sistemi.
+              Koç, öğrenci ve veliyi tek ekranda buluşturan; deneme analizleri, konu takibi ve soru
+              hedefleriyle çalışan koçluk sistemi.
             </p>
             <div className="auth-stats">
               {[
-                ["18", "Aktif ogrenci"],
+                ["18", "Aktif öğrenci"],
                 ["%74", "Ort. tamamlama"],
-                ["+53", "Net gelisimi"],
+                ["+53", "Net gelişimi"],
               ].map(([value, label]) => (
                 <div className="auth-stat" key={label}>
                   <div className="tnum auth-stat-v">{value}</div>
@@ -216,9 +210,9 @@ export function LoginForm() {
       <div className="auth-form-side">
         <form className="auth-card" onSubmit={handleSubmit}>
           <div style={{ marginBottom: 22 }}>
-            <h1 style={{ fontSize: 23, fontWeight: 800, letterSpacing: "-.02em" }}>Tekrar hos geldin 👋</h1>
+            <h1 style={{ fontSize: 23, fontWeight: 800, letterSpacing: "-.02em" }}>Tekrar hoş geldin</h1>
             <p className="muted" style={{ fontSize: 13.5, marginTop: 4 }}>
-              Devam etmek icin giris yap
+              Devam etmek için giriş yap
             </p>
           </div>
 
@@ -231,21 +225,21 @@ export function LoginForm() {
                 <KiIcon name="ki-shield-tick" size={14} />
               </span>
               <div style={{ flex: 1, fontSize: 12.5, lineHeight: 1.5 }}>
-                <b>Yonetim paneli girisi.</b>{" "}
+                <b>Yönetim paneli girişi.</b>{" "}
                 {yonetimHint === "admin"
                   ? DEMO_LOGIN_ENABLED
-                    ? "Super Admin hesabi secildi (admin@uyanik.local)."
-                    : "Super Admin hesabinla giris yap."
+                    ? "Super Admin hesabı seçildi (superadmin@uyanik.local)."
+                    : "Super Admin hesabınla giriş yap."
                   : DEMO_LOGIN_ENABLED
-                    ? "Kurum yoneticisi hesabi secildi (branch@uyanik.local)."
-                    : "Kurum yoneticisi hesabinla giris yap."}
+                    ? "Kurum yöneticisi hesabı seçildi (branch@uyanik.local)."
+                    : "Kurum yöneticisi hesabınla giriş yap."}
               </div>
             </div>
           ) : null}
 
           {DEMO_LOGIN_ENABLED ? (
             <div className="seg" style={{ width: "100%", marginBottom: 18, flexWrap: "wrap" }}>
-              {(["student", "coach", "parent", "admin", "branch"] as DemoRole[]).map((role) => (
+              {(["admin", "branch"] as DemoRole[]).map((role) => (
                 <button
                   key={role}
                   type="button"
@@ -279,7 +273,7 @@ export function LoginForm() {
 
           <div className="field" style={{ marginBottom: 14 }}>
             <label className="label" htmlFor="password">
-              Sifre
+              Şifre
             </label>
             <input
               id="password"
@@ -311,7 +305,7 @@ export function LoginForm() {
               <span className={`chk sm${remember ? " done" : ""}`}>
                 <KiIcon name="ki-check text-xs" />
               </span>
-              Beni hatirla
+              Beni hatırla
             </button>
             <button
               type="button"
@@ -319,7 +313,7 @@ export function LoginForm() {
               onClick={requestReset}
               disabled={isResetSubmitting}
             >
-              {isResetSubmitting ? "Gonderiliyor..." : "Sifremi unuttum"}
+              {isResetSubmitting ? "Gönderiliyor..." : "Şifremi unuttum"}
             </button>
           </div>
 
@@ -336,7 +330,7 @@ export function LoginForm() {
                 <>
                   {" "}
                   <a href={resetUrl} className="link-btn">
-                    Sifreyi yenile
+                    Şifreyi yenile
                   </a>
                 </>
               ) : null}
@@ -345,13 +339,13 @@ export function LoginForm() {
 
           <button type="submit" className="btn btn-primary" style={{ width: "100%", height: 46 }} disabled={isSubmitting}>
             <KiIcon name="ki-entrance-right" />
-            {isSubmitting ? "Giris yapiliyor..." : "Giris Yap"}
+            {isSubmitting ? "Giriş yapılıyor..." : "Giriş Yap"}
           </button>
 
           <div className="muted" style={{ fontSize: 12, textAlign: "center", marginTop: 20 }}>
-            Hesabin yok mu?{" "}
+            Hesabın yok mu?{" "}
             <a href="/register" className="link-btn" style={{ display: "inline" }}>
-              Uye ol
+              Üye ol
             </a>
           </div>
         </form>

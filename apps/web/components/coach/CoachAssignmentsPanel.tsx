@@ -111,8 +111,8 @@ export function CoachAssignmentsPanel() {
   return (
     <div className="stack rise" data-testid="coach-assignments-panel">
       <UkPageHead
-        title="Odev & Gorev"
-        sub="Atadigin odevler, kaynaklar ve ogrenci sonuclari"
+        title="Ödev & Görev"
+        sub="Atadığın ödevler, kaynaklar ve öğrenci sonuçları"
         actions={
           <div className="row" style={{ gap: 8 }}>
             <select
@@ -121,7 +121,7 @@ export function CoachAssignmentsPanel() {
               value={studentFilter}
               onChange={(event) => setStudentFilter(event.target.value)}
             >
-              <option value="all">Tum ogrenciler</option>
+              <option value="all">Tüm öğrenciler</option>
               {students.map((student) => (
                 <option key={student.studentId} value={student.studentId}>
                   {student.displayName}
@@ -130,7 +130,7 @@ export function CoachAssignmentsPanel() {
             </select>
             <Link href="/coach/assignments/create" className="btn btn-primary btn-sm">
               <KiIcon name="ki-plus" size={16} />
-              Yeni odev
+              Yeni ödev
             </Link>
           </div>
         }
@@ -155,19 +155,19 @@ export function CoachAssignmentsPanel() {
       </div>
 
       <div className="grid g-4">
-        <UkStatCard icon="ki-notepad-edit" tone="primary" value={total} label="Atanan odev" />
+        <UkStatCard icon="ki-notepad-edit" tone="primary" value={total} label="Atanan ödev" />
         <UkStatCard icon="ki-flag" tone="success" value={`${rate}%`} label="Tamamlanma" />
         <UkStatCard icon="ki-chart-simple" tone="info" value={completed} label="Sonuc girilen" />
         <UkStatCard icon="ki-information-2" tone="danger" value={overdue} label="Gecikmis" />
       </div>
 
       <UkSection
-        title="Atanan Odevler"
+        title="Atanan Ödevler"
         sub={`${shown.length} gorev`}
         action={
           <div className="filters">
             {[
-              ["all", "Tumu"],
+              ["all", "Tümü"],
               ["pending", "Bekleyen"],
               ["done", "Tamamlanan"],
               ["result", "Sonuclu"],
@@ -187,15 +187,15 @@ export function CoachAssignmentsPanel() {
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : shown.length === 0 ? (
             <div style={{ padding: "26px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-              Bu gorunumde odev yok.{" "}
+              Bu görünümde ödev yok.{" "}
               <Link href="/coach/topics" style={{ color: "var(--primary-600)", fontWeight: 700 }}>
                 Konu Takibi
               </Link>{" "}
-              sayfasindan odev atayabilirsiniz.
+              sayfasından ödev atayabilirsiniz.
             </div>
           ) : (
             shown.map((assignment) => {
@@ -256,13 +256,13 @@ export function CoachAssignmentsPanel() {
 
       {studentFilter === "all" ? (
         <div className="card card-pad" style={{ textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-          Kaynak takibi ve odev harici calismalari gormek icin yukaridan bir ogrenci sec.
+          Kaynak takibi ve ödev harici çalışmaları görmek için yukarıdan bir öğrenci seç.
         </div>
       ) : (
         <StudentResourcesCard
           apiPath={`/api/coach/students/${studentFilter}/sources`}
           title="Kaynak Takibi"
-          sub="Ogrencinin kitap durumu, ilerlemesi ve odev harici calismalari"
+          sub="Öğrencinin kitap durumu, ilerlemesi ve ödev harici çalışmaları"
           editable
         />
       )}

@@ -113,8 +113,8 @@ export function Sidebar({ role }: SidebarProps) {
           <KiIcon name="ki-flash" size={18} className="text-white" />
         </span>
         <span className="logo-text">
-          <b>Uyanik Koc</b>
-          <span>Akilli kocluk</span>
+          <b>Uyanık Koç</b>
+          <span>Akıllı koçluk</span>
         </span>
       </div>
 

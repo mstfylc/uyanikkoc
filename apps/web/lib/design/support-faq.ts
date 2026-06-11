@@ -8,7 +8,7 @@ export type SupportFaqItem = {
 
 export const SUPPORT_FAQ_CATEGORIES: Record<SupportFaqCategory, string> = {
   genel: "Genel",
-  odev: "Odev & Program",
+  odev: "Ödev & Program",
   deneme: "Denemeler",
   hesap: "Hesap",
   teknik: "Teknik",
@@ -18,97 +18,97 @@ export const SUPPORT_FAQ: Record<"student" | "coach" | "parent", SupportFaqItem[
   coach: [
     {
       category: "deneme",
-      question: "Deneme sonucu Excel'ini nasil ice aktaririm?",
+      question: "Deneme sonucu Excel'ini nasıl içe aktarırım?",
       answer:
-        "Denemeler sayfasinda sag ustteki Deneme Ice Aktar butonuna basin. CSV formatinda toplu sonuc yukleyebilir veya Excel dosyanizi CSV olarak kaydedip yukleyebilirsiniz.",
+        "Denemeler sayfasında sağ üstteki Deneme İçe Aktar butonuna basın. CSV formatında toplu sonuç yükleyebilir veya Excel dosyanızı CSV olarak kaydedip yükleyebilirsiniz.",
     },
     {
       category: "odev",
-      question: "Ogrenciye nasil odev atarim?",
+      question: "Öğrenciye nasıl ödev atarım?",
       answer:
-        "Konu Takibi sayfasinda ogrenciyi secin, Odev Ata ile ders ve konu secin. Odev & Gorev sayfasindan da yeni odev olusturabilirsiniz.",
+        "Konu Takibi sayfasında öğrenciyi seçin, Ödev Ata ile ders ve konu seçin. Ödev & Görev sayfasından da yeni ödev oluşturabilirsiniz.",
     },
     {
       category: "genel",
-      question: "Mufredattaki konulari degistirebilir miyim?",
+      question: "Müfredattaki konuları değiştirebilir miyim?",
       answer:
-        "Ayarlar > Mufredat & Konu Gruplari sekmesinden ders, grup ve konulari duzenleyebilirsiniz.",
+        "Ayarlar > Müfredat & Konu Grupları sekmesinden ders, grup ve konuları düzenleyebilirsiniz.",
     },
     {
       category: "genel",
-      question: "Randevu limitini nasil ayarlarim?",
+      question: "Randevu limitini nasıl ayarlarım?",
       answer:
-        "Randevular > Musait Saatlerim sekmesinde haftalik randevu limitini ve online/yuz yuze izinlerini belirleyebilirsiniz.",
+        "Randevular > Müsait Saatlerim sekmesinde haftalık randevu limitini ve online/yüz yüze izinlerini belirleyebilirsiniz.",
     },
     {
       category: "deneme",
-      question: "Deneme olusturma ve kayit takibi nasil calisir?",
+      question: "Deneme oluşturma ve kayıt takibi nasıl çalışır?",
       answer:
-        "Denemeler sayfasinda Deneme Olustur ile tarih ve tur belirleyin. Kayitli ogrenci sayisi ve odeme/paket durumu tabloda gorunur.",
+        "Denemeler sayfasında Deneme Oluştur ile tarih ve tür belirleyin. Kayıtlı öğrenci sayısı ve ödeme/paket durumu tabloda görünür.",
     },
   ],
   student: [
     {
       category: "odev",
-      question: "Odevimin sonucunu nasil girerim?",
+      question: "Ödevimin sonucunu nasıl girerim?",
       answer:
-        "Odevlerim sayfasinda ilgili odevde Sonuc Gir butonuna basin, dogru/yanlis/bos sayilarini girin. Net otomatik hesaplanir.",
+        "Ödevlerim sayfasında ilgili ödevde Sonuç Gir butonuna basın, doğru/yanlış/boş sayılarını girin. Net otomatik hesaplanır.",
     },
     {
       category: "genel",
-      question: "Kocumdan nasil randevu alirim?",
+      question: "Koçumdan nasıl randevu alırım?",
       answer:
-        "Randevular sayfasinda Randevu Iste butonuna basin, online veya yuz yuze secin ve musait bir saat secin.",
+        "Randevular sayfasında Randevu İste butonuna basın, online veya yüz yüze seçin ve müsait bir saat seçin.",
     },
     {
       category: "odev",
-      question: "Elimdeki kaynaklari nasil eklerim?",
+      question: "Elimdeki kaynakları nasıl eklerim?",
       answer:
-        "Odevlerim sayfasinin altindaki Kaynaklarim alanina sahip oldugunuz kitaplari ekleyin.",
+        "Ödevlerim sayfasının altındaki Kaynaklarım alanına sahip olduğunuz kitapları ekleyin.",
     },
     {
       category: "deneme",
-      question: "Deneme analizimi nerede gorurum?",
+      question: "Deneme analizimi nerede görürüm?",
       answer:
-        "Denemeler sayfasinda Analiz sekmesine gecin. Net dagilimi ve oncelikli konular orada listelenir.",
+        "Denemeler sayfasında Analiz sekmesine geçin. Net dağılımı ve öncelikli konular orada listelenir.",
     },
     {
       category: "deneme",
-      question: "Denemeye nasil kayit olurum?",
+      question: "Denemeye nasıl kayıt olurum?",
       answer:
-        "Denemeler sayfasinda Denemeye kayit ol butonuna basin. Uyelik paketiniz kapsaminda veya odeme ile kayit yapabilirsiniz.",
+        "Denemeler sayfasında Denemeye kayıt ol butonuna basın. Üyelik paketiniz kapsamında veya ödeme ile kayıt yapabilirsiniz.",
     },
   ],
   parent: [
     {
       category: "odev",
-      question: "Cocugumun odev durumunu nasil takip ederim?",
+      question: "Çocuğumun ödev durumunu nasıl takip ederim?",
       answer:
-        "Genel Bakis sayfasinda haftalik odev listesi ve tamamlama oranini gorebilirsiniz.",
+        "Genel Bakış sayfasında haftalık ödev listesi ve tamamlama oranını görebilirsiniz.",
     },
     {
       category: "deneme",
-      question: "Deneme sonuclarini nerede gorurum?",
+      question: "Deneme sonuçlarını nerede görürüm?",
       answer:
-        "Deneme Sonuclari sayfasinda cocugunuzun son deneme netlerini ve ders bazli dagilimini inceleyebilirsiniz.",
+        "Deneme Sonuçları sayfasında çocuğunuzun son deneme netlerini ve ders bazlı dağılımını inceleyebilirsiniz.",
     },
     {
       category: "genel",
-      question: "Koc ile nasil iletisime gecerim?",
+      question: "Koç ile nasıl iletişime geçerim?",
       answer:
-        "Mesajlar sayfasindan kocunuzla yazisma baslatabilirsiniz.",
+        "Mesajlar sayfasından koçunuzla yazışma başlatabilirsiniz.",
     },
     {
       category: "genel",
-      question: "Randevu talebi nasil olusturulur?",
+      question: "Randevu talebi nasıl oluşturulur?",
       answer:
-        "Randevular sayfasindan onayli gorusmeleri gorebilirsiniz. Yeni talep icin ogrenci hesabi uzerinden randevu istenebilir.",
+        "Randevular sayfasından onaylı görüşmeleri görebilirsiniz. Yeni talep için öğrenci hesabı üzerinden randevu istenebilir.",
     },
     {
       category: "hesap",
-      question: "Deneme uyeligini veli olarak yonetebilir miyim?",
+      question: "Deneme üyeliğini veli olarak yönetebilir miyim?",
       answer:
-        "Ayarlar > Abonelik sekmesinden deneme uyelik paketini goruntuleyebilir ve guncelleyebilirsiniz.",
+        "Ayarlar > Abonelik sekmesinden deneme üyelik paketini görüntüleyebilir ve güncelleyebilirsiniz.",
     },
   ],
 };

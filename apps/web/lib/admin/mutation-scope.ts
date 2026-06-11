@@ -20,14 +20,27 @@ export function mutationOrgId(m: AdminMutation): string | null {
     case "inviteOrgManager":
     case "removeOrgManager":
     case "setOrgManagerRole":
+    case "setOrgManagerPerms":
+    case "toggleOrgManagerPerm":
     case "addBranch":
     case "updateBranch":
+    case "setBranchStatus":
+    case "toggleBranchStatus":
+    case "removeBranch":
     case "updateOrgBilling":
     case "updateOrgNotifications":
     case "requestDataExport":
     case "cancelOrgSubscription":
     case "inviteOrgCoach":
     case "inviteStudent":
+    case "removeOrgStudent":
+    case "restoreOrgStudent":
+    case "setOrgStudentPassive":
+    case "createOrgCampaign":
+    case "updateOrgCampaign":
+    case "setOrgCampaignStatus":
+    case "deleteOrgCampaign":
+    case "toggleOrgCampaignBranch":
       return m.orgId;
     default:
       return null;
@@ -113,10 +126,34 @@ export function assertMutationAllowed(
     }
   }
 
-  if (m.kind === "updateBranch") {
+  if (m.kind === "updateBranch" || m.kind === "setBranchStatus" || m.kind === "toggleBranchStatus" || m.kind === "removeBranch") {
     const snapshot = memory.getMockSnapshot(ctx);
     const org = snapshot.orgs.find((o) => o.id === orgId);
     if (!org?.branches.some((b) => b.id === m.branchId)) {
+      return "forbidden branch scope";
+    }
+  }
+
+  if (m.kind === "removeOrgStudent" || m.kind === "restoreOrgStudent" || m.kind === "setOrgStudentPassive") {
+    const snapshot = memory.getMockSnapshot(ctx);
+    const org = snapshot.orgs.find((o) => o.id === orgId);
+    if (!org || !m.studentId.startsWith(`${orgId}-s`)) {
+      return "forbidden student scope";
+    }
+  }
+
+  if (
+    m.kind === "updateOrgCampaign" ||
+    m.kind === "setOrgCampaignStatus" ||
+    m.kind === "deleteOrgCampaign" ||
+    m.kind === "toggleOrgCampaignBranch"
+  ) {
+    const snapshot = memory.getMockSnapshot(ctx);
+    const org = snapshot.orgs.find((o) => o.id === orgId);
+    if (!snapshot.orgCampaigns.some((campaign) => campaign.orgId === orgId && campaign.id === m.campaignId)) {
+      return "forbidden campaign scope";
+    }
+    if (m.kind === "toggleOrgCampaignBranch" && !org?.branches.some((branch) => branch.id === m.branchId)) {
       return "forbidden branch scope";
     }
   }

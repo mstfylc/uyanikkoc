@@ -32,26 +32,26 @@ export const NOTIF_CHANNELS: Array<{ key: NotificationChannelKey; label: string;
 
 export const NOTIF_CATS: Record<"student" | "coach" | "parent", NotificationCategory[]> = {
   student: [
-    { key: "odev", icon: "ki-notepad-edit", tone: "primary", title: "Odev hatirlatmalari", desc: "Yeni odev, yaklasan ve geciken teslimler" },
-    { key: "deneme", icon: "ki-chart-simple", tone: "info", title: "Deneme sonuclari", desc: "Sonuc yayinlandiginda ve analiz hazir oldugunda" },
-    { key: "randevu", icon: "ki-calendar", tone: "warning", title: "Randevu hatirlatmalari", desc: "Koc gorusmelerinden once hatirlatma" },
-    { key: "mesaj", icon: "ki-message-text", tone: "info", title: "Mesajlar", desc: "Kocundan gelen yeni mesajlar" },
-    { key: "motivasyon", icon: "ki-flame", tone: "danger", title: "Motivasyon & seri", desc: "Calisma serisi, rozetler ve gunluk hatirlatma" },
+    { key: "odev", icon: "ki-notepad-edit", tone: "primary", title: "Ödev hatırlatmaları", desc: "Yeni ödev, yaklaşan ve geciken teslimler" },
+    { key: "deneme", icon: "ki-chart-simple", tone: "info", title: "Deneme sonuçları", desc: "Sonuç yayınlandığında ve analiz hazır olduğunda" },
+    { key: "randevu", icon: "ki-calendar", tone: "warning", title: "Randevu hatırlatmaları", desc: "Koç görüşmelerinden önce hatırlatma" },
+    { key: "mesaj", icon: "ki-message-text", tone: "info", title: "Mesajlar", desc: "Koçundan gelen yeni mesajlar" },
+    { key: "motivasyon", icon: "ki-flame", tone: "danger", title: "Motivasyon & seri", desc: "Çalışma serisi, rozetler ve günlük hatırlatma" },
   ],
   coach: [
-    { key: "odev", icon: "ki-notepad-edit", tone: "primary", title: "Odev & gorev", desc: "Ogrenci odevi tamamladiginda veya geciktiğinde" },
-    { key: "risk", icon: "ki-information-2", tone: "danger", title: "Risk uyarilari", desc: "Ogrenci aktivitesi dustugunde erken uyari" },
-    { key: "deneme", icon: "ki-chart-simple", tone: "info", title: "Deneme sonuclari", desc: "Ice aktarilan denemeler ve sinif ortalamasi" },
+    { key: "odev", icon: "ki-notepad-edit", tone: "primary", title: "Ödev & görev", desc: "Öğrenci ödevi tamamladığında veya geciktiğinde" },
+    { key: "risk", icon: "ki-information-2", tone: "danger", title: "Risk uyarıları", desc: "Öğrenci aktivitesi düştüğünde erken uyarı" },
+    { key: "deneme", icon: "ki-chart-simple", tone: "info", title: "Deneme sonuçları", desc: "İçe aktarılan denemeler ve sınıf ortalaması" },
     { key: "randevu", icon: "ki-calendar", tone: "warning", title: "Randevu talepleri", desc: "Yeni randevu istekleri ve hatirlatmalar" },
-    { key: "mesaj", icon: "ki-message-text", tone: "info", title: "Mesajlar", desc: "Ogrenci ve velilerden gelen mesajlar" },
+    { key: "mesaj", icon: "ki-message-text", tone: "info", title: "Mesajlar", desc: "Öğrenci ve velilerden gelen mesajlar" },
     { key: "tahsilat", icon: "ki-dollar", tone: "success", title: "Tahsilat & gelir", desc: "Odeme alindiginda ve geciken tahsilatlarda" },
   ],
   parent: [
-    { key: "deneme", icon: "ki-chart-simple", tone: "info", title: "Deneme sonuclari", desc: "Cocugunuzun deneme sonuclari yayinlandiginda" },
-    { key: "ozet", icon: "ki-chart-line-up", tone: "success", title: "Haftalik rapor", desc: "Gelisim ozeti ve tamamlama oranlari" },
-    { key: "randevu", icon: "ki-calendar", tone: "warning", title: "Veli gorusmeleri", desc: "Kocla planlanan gorusme hatirlatmalari" },
+    { key: "deneme", icon: "ki-chart-simple", tone: "info", title: "Deneme sonuçları", desc: "Çocuğunuzun deneme sonuçları yayınlandığında" },
+    { key: "ozet", icon: "ki-chart-line-up", tone: "success", title: "Haftalık rapor", desc: "Gelişim özeti ve tamamlama oranları" },
+    { key: "randevu", icon: "ki-calendar", tone: "warning", title: "Veli görüşmeleri", desc: "Koçla planlanan görüşme hatırlatmaları" },
     { key: "mesaj", icon: "ki-message-text", tone: "info", title: "Mesajlar", desc: "Koçtan gelen mesaj ve duyurular" },
-    { key: "odeme", icon: "ki-wallet", tone: "primary", title: "Odeme & abonelik", desc: "Yenileme, fatura ve odeme hatirlatmalari" },
+    { key: "odeme", icon: "ki-wallet", tone: "primary", title: "Ödeme & abonelik", desc: "Yenileme, fatura ve ödeme hatırlatmaları" },
   ],
 };
 

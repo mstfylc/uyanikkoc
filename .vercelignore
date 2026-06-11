@@ -4,3 +4,10 @@ node_modules/
 .next/
 .turbo/
 *.log
+dist/
+apps/mobile/android/
+apps/mobile/ios/
+apps/mobile/.expo/
+apps/mobile/.gradle/
+apps/mobile/build/
+apps/mobile/app/build/

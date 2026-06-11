@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 const REASON_COPY: Record<string, string> = {
-  missing_owner: "Hesabiniz icin lisans sahibi bilgisi bulunamadi.",
-  not_found: "Hesabiniza bagli aktif bir lisans bulunamadi.",
+  missing_owner: "Hesabınız için lisans sahibi bilgisi bulunamadı.",
+  not_found: "Hesabınıza bağlı aktif bir lisans bulunamadı.",
   inactive_status: "Lisansiniz aktif durumda degil.",
   expired: "Lisans sureniz dolmus.",
   role_not_licensed: "Bu rol icin yonetim lisansi tanimli degil.",
@@ -22,7 +22,7 @@ export default async function LicenseAccessDeniedPage({
       <section className="auth-form-side" style={{ minHeight: "100vh" }}>
         <div className="auth-card stack" style={{ gap: 16, maxWidth: 460 }}>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Lisans erisimi yok</h1>
+            <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Lisans erişimi yok</h1>
             <p className="muted" style={{ fontSize: 14, lineHeight: 1.6 }}>
               {body} Yonetim alanina devam etmek icin lisans durumunu kontrol edin veya yetkili hesapla giris yapin.
             </p>

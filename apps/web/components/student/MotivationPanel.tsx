@@ -10,17 +10,17 @@ import { CoachRatingCard } from "@/components/student/CoachRatingCard";
 const targetRankKey = "uk_target_rank";
 
 const achievements = [
-  { id: "streak-7", name: "7 Gun Seri", desc: "7 gun ust uste calisma", icon: "ki-flame", color: "#f59e0b" },
-  { id: "streak-14", name: "14 Gun Seri", desc: "2 hafta kesintisiz calisma", icon: "ki-flash", color: "#f97316" },
+  { id: "streak-7", name: "7 Gün Seri", desc: "7 gün üst üste çalışma", icon: "ki-flame", color: "#f59e0b" },
+  { id: "streak-14", name: "14 Gün Seri", desc: "2 hafta kesintisiz çalışma", icon: "ki-flash", color: "#f97316" },
   { id: "topics-10", name: "10 Konu", desc: "10 konu tamamla", icon: "ki-book-open", color: "#5b51c9" },
   { id: "topics-25", name: "25 Konu", desc: "25 konu tamamla", icon: "ki-book-square", color: "#2f80ed" },
-  { id: "exam-up", name: "Net Artisi", desc: "Denemede gelisim goster", icon: "ki-chart-line-up", color: "#10a37f" },
+  { id: "exam-up", name: "Net Artışı", desc: "Denemede gelişim göster", icon: "ki-chart-line-up", color: "#10a37f" },
   { id: "deneme-3", name: "3 Deneme", desc: "3 deneme coz", icon: "ki-notepad-edit", color: "#b7791f" },
-  { id: "homework", name: "Odev Ustasi", desc: "Haftalik odevleri bitir", icon: "ki-check-circle", color: "#14b8a6" },
-  { id: "focus", name: "Odak", desc: "5 gun program takibi", icon: "ki-target", color: "#8b5cf6" },
-  { id: "schedule", name: "Program", desc: "Duzenli calisma blogu", icon: "ki-calendar", color: "#0ea5e9" },
-  { id: "star", name: "Yildiz", desc: "Kocundan olumlu geri bildirim", icon: "ki-star", color: "#eab308" },
-  { id: "coach-note", name: "Koc Notu", desc: "Gunluk motivasyon oku", icon: "ki-message-text", color: "#ec4899" },
+  { id: "homework", name: "Ödev Ustası", desc: "Haftalık ödevleri bitir", icon: "ki-check-circle", color: "#14b8a6" },
+  { id: "focus", name: "Odak", desc: "5 gün program takibi", icon: "ki-target", color: "#8b5cf6" },
+  { id: "schedule", name: "Program", desc: "Düzenli çalışma bloğu", icon: "ki-calendar", color: "#0ea5e9" },
+  { id: "star", name: "Yıldız", desc: "Koçundan olumlu geri bildirim", icon: "ki-star", color: "#eab308" },
+  { id: "coach-note", name: "Koç Notu", desc: "Günlük motivasyon oku", icon: "ki-message-text", color: "#ec4899" },
   { id: "perfect-week", name: "Mukemmel Hafta", desc: "Haftalik hedefe ulas", icon: "ki-medal-star", color: "#22c55e" },
 ];
 
@@ -246,7 +246,7 @@ export function MotivationPanel() {
   }
 
   if (isLoading) {
-    return <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>;
+    return <p className="muted" style={{ fontSize: 13 }}>Yükleniyor...</p>;
   }
 
   if (!motivation?.enabled) {
@@ -254,7 +254,7 @@ export function MotivationPanel() {
       <div className="stack rise" data-testid="motivation-disabled">
         <PageHead
           title="Motivasyon"
-          sub="Motivasyon ozellikleri kapali."
+          sub="Motivasyon özellikleri kapalı."
           actions={
             <button type="button" disabled={isSaving} className="btn btn-primary btn-sm" onClick={() => void toggleEnabled(true)}>
               Motivasyonu ac
@@ -287,13 +287,13 @@ export function MotivationPanel() {
             <div>
               <div className="row" style={{ gap: 8 }}>
                 <KiIcon name="ki-flame" size={22} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>Calisma Serisi</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,.85)" }}>Çalışma Serisi</span>
               </div>
               <div className="row" style={{ alignItems: "flex-end", gap: 12, marginTop: 14 }}>
                 <div style={{ fontSize: 60, fontWeight: 800, letterSpacing: "-.03em", lineHeight: 1 }} className="tnum">{motivation.streakDays}</div>
                 <div style={{ paddingBottom: 8 }}>
-                  <div style={{ fontSize: 16, fontWeight: 700 }}>gun ust uste</div>
-                  <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.75)" }}>Rekorun: 21 gun</div>
+                  <div style={{ fontSize: 16, fontWeight: 700 }}>gün üst üste</div>
+                  <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.75)" }}>Rekorun: 21 gün</div>
                 </div>
               </div>
             </div>
@@ -309,7 +309,7 @@ export function MotivationPanel() {
 
         <Section title="Hedefe Kalan" sub="YKS 2026">
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16, alignItems: "center", textAlign: "center" }}>
-            <Ring value={Math.round(((90 - daysLeft) / 90) * 100)} size={148} stroke={13} color="var(--primary)" label={daysLeft} sub="gun kaldi" big />
+            <Ring value={Math.round(((90 - daysLeft) / 90) * 100)} size={148} stroke={13} color="var(--primary)" label={daysLeft} sub="gün kaldı" big />
             <div>
               <div style={{ fontSize: 13.5, fontWeight: 700 }}>20 Haz 2026 · Cumartesi</div>
               <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>TYT oturumu 10:15'te basliyor</div>
@@ -339,7 +339,7 @@ export function MotivationPanel() {
       <Section
         title="Rozetlerin"
         sub={`${earnedCount}/${achievements.length} kazanildi`}
-        action={<button type="button" className="link-btn">Tumu<KiIcon name="ki-arrow-right" size={14} /></button>}
+        action={<button type="button" className="link-btn">Tümü<KiIcon name="ki-arrow-right" size={14} /></button>}
       >
         <div className="card-body">
           <div className="medal-grid">
@@ -381,9 +381,9 @@ export function MotivationPanel() {
           </span>
           <div>
             <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-.01em" }}>
-              "{dailyNote ?? "Bugun attigin kucuk adim, sinav gunu en buyuk farkin olacak."}"
+              "{dailyNote ?? "Bugün attığın küçük adım, sınav günü en büyük farkın olacak."}"
             </div>
-            <div className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>Kocundan motivasyon mesaji</div>
+            <div className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>Koçundan motivasyon mesajı</div>
           </div>
         </div>
       </div>

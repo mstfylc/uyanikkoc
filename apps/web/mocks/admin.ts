@@ -5,8 +5,9 @@
 
 import { modulesFromPlan, orgPlanById, coachPlanById } from "@/lib/admin/pricing";
 import { resolveActiveOrgId, resolveOrgCoachId, type AdminSnapshotContext } from "@/lib/admin/snapshot-context";
-import { orgCoaches, seedCoachFeedback } from "@/lib/admin/derive";
-import { DEMO_BRANCH_ID, DEMO_ORG_ID } from "@/lib/auth/demo-users";
+import { orgCoaches, orgStudents, seedCoachFeedback } from "@/lib/admin/derive";
+import { KURUM_PERMS } from "@/lib/admin/types";
+import { DEMO_BRANCH_ID, DEMO_ORG_ID, KAMPUS_KOC_BRANCH_ID, KAMPUS_KOC_ORG_ID } from "@/lib/auth/demo-users";
 import type {
   AdminAccess,
   AdminSnapshot,
@@ -24,6 +25,7 @@ import type {
   Integration,
   IntegrationId,
   IntegrationPatch,
+  KurumPermKey,
   LicenseNote,
   LicenseSubjectKind,
   ModuleKey,
@@ -31,6 +33,7 @@ import type {
   OrgInvoice,
   OrgManager,
   OrgManagerRole,
+  OrgCampaign,
   OrgPlanId,
   OrgBilling,
   OrgInvite,
@@ -69,9 +72,9 @@ function seedOrgs(): Omit<Org, "managers">[] {
   return [
     {
       id: DEMO_ORG_ID,
-      name: "Uyanik Demo Kurum",
+      name: "Uyan?k Demo Kurum",
       type: "kurum",
-      city: "Istanbul",
+      city: "?stanbul",
       planId: "baslangic",
       status: "active",
       cycle: "monthly",
@@ -81,24 +84,24 @@ function seedOrgs(): Omit<Org, "managers">[] {
       seats: { used: 2, total: 50 },
       coaches: { used: 1, total: 5 },
       modules: modulesFromPlan(orgPlanById("baslangic").modules),
-      owner: { name: "Demo Yonetici", email: "branch@uyanik.local", phone: "0532 000 00 01" },
+      owner: { name: "Demo Y?netici", email: "branch@uyanik.local", phone: "0532 000 00 01" },
       tone: "#6366f1",
       branches: [
         {
           id: DEMO_BRANCH_ID,
-          name: "Demo Sube",
-          city: "Istanbul",
+          name: "Demo Şube",
+          city: "?stanbul",
           students: 2,
           coaches: 1,
           collect: 9800,
           status: "active",
         },
       ],
-      billing: orgBilling("Istanbul"),
+      billing: orgBilling("?stanbul"),
       notifications: orgNotifications(),
     },
     {
-      id: "akademi-yildiz", name: "Kampüs Koç", type: "franchise", city: "İstanbul",
+      id: KAMPUS_KOC_ORG_ID, name: "Kampüs Koç", type: "franchise", city: "İstanbul",
       planId: "franchise", status: "active", cycle: "annual",
       startedAt: NOW - 430 * DAY, renewsAt: NOW + 214 * DAY, feeMonthly: 24900,
       seats: { used: 312, total: 400 }, coaches: { used: 26, total: 32 },
@@ -106,89 +109,12 @@ function seedOrgs(): Omit<Org, "managers">[] {
       owner: { name: "İncisel Emen", email: "incisel@kampuskoc.com", phone: "0532 410 88 12" },
       tone: "#5b6cff",
       branches: [
-        { id: "ay-kadikoy", name: "Kadıköy Şubesi", city: "İstanbul", students: 98, coaches: 8, collect: 186000, status: "active" },
+        { id: KAMPUS_KOC_BRANCH_ID, name: "Kadıköy Şubesi", city: "İstanbul", students: 98, coaches: 8, collect: 186000, status: "active" },
         { id: "ay-besiktas", name: "Beşiktaş Şubesi", city: "İstanbul", students: 84, coaches: 7, collect: 159000, status: "active" },
         { id: "ay-atasehir", name: "Ataşehir Şubesi", city: "İstanbul", students: 76, coaches: 6, collect: 142000, status: "active" },
         { id: "ay-bakirkoy", name: "Bakırköy Şubesi", city: "İstanbul", students: 54, coaches: 5, collect: 101000, status: "active" },
       ],
       billing: orgBilling("İstanbul"),
-      notifications: orgNotifications(),
-    },
-    {
-      id: "zirve-egitim", name: "Zirve Eğitim Kurumları", type: "franchise", city: "İzmir",
-      planId: "franchise", status: "active", cycle: "annual",
-      startedAt: NOW - 280 * DAY, renewsAt: NOW + 85 * DAY, feeMonthly: 19900,
-      seats: { used: 188, total: 250 }, coaches: { used: 17, total: 24 },
-      modules: modulesFromPlan(["denemeAnaliz", "raporlar", "mesajlasma", "randevu", "veliPaneli", "onlineDeneme"]),
-      owner: { name: "Gülşen Tunç", email: "gulsen@zirveegitim.com", phone: "0542 220 14 90" },
-      tone: "#10b981",
-      branches: [
-        { id: "ze-bornova", name: "Bornova Şubesi", city: "İzmir", students: 72, coaches: 7, collect: 138000, status: "active" },
-        { id: "ze-karsiyaka", name: "Karşıyaka Şubesi", city: "İzmir", students: 64, coaches: 6, collect: 121000, status: "active" },
-        { id: "ze-buca", name: "Buca Şubesi", city: "İzmir", students: 52, coaches: 4, collect: 98000, status: "active" },
-      ],
-      billing: orgBilling("İzmir"),
-      notifications: orgNotifications(),
-    },
-    {
-      id: "hedef-akademi", name: "Hedef Akademi", type: "franchise", city: "Antalya",
-      planId: "franchise", status: "expiring", cycle: "annual",
-      startedAt: NOW - 354 * DAY, renewsAt: NOW + 11 * DAY, feeMonthly: 22900,
-      seats: { used: 244, total: 300 }, coaches: { used: 22, total: 30 },
-      modules: modulesFromPlan(orgPlanById("franchise").modules),
-      owner: { name: "Okan Demirtaş", email: "okan@hedefakademi.com", phone: "0533 612 70 45" },
-      tone: "#f59e0b",
-      branches: [
-        { id: "ha-muratpasa", name: "Muratpaşa Şubesi", city: "Antalya", students: 56, coaches: 5, collect: 105000, status: "active" },
-        { id: "ha-konyaalti", name: "Konyaaltı Şubesi", city: "Antalya", students: 48, coaches: 4, collect: 92000, status: "active" },
-        { id: "ha-kepez", name: "Kepez Şubesi", city: "Antalya", students: 44, coaches: 4, collect: 84000, status: "active" },
-        { id: "ha-alanya", name: "Alanya Şubesi", city: "Antalya", students: 38, coaches: 3, collect: 72000, status: "active" },
-        { id: "ha-manavgat", name: "Manavgat Şubesi", city: "Antalya", students: 32, coaches: 3, collect: 61000, status: "active" },
-        { id: "ha-adana", name: "Adana Seyhan Şubesi", city: "Adana", students: 26, coaches: 3, collect: 49000, status: "active" },
-      ],
-      billing: orgBilling("Antalya"),
-      notifications: orgNotifications(),
-    },
-    {
-      id: "doga-rehberlik", name: "Doğa Rehberlik Merkezi", type: "kurum", city: "Ankara",
-      planId: "pro", status: "active", cycle: "annual",
-      startedAt: NOW - 190 * DAY, renewsAt: NOW + 175 * DAY, feeMonthly: 11900,
-      seats: { used: 118, total: 150 }, coaches: { used: 11, total: 12 },
-      modules: modulesFromPlan(orgPlanById("pro").modules),
-      owner: { name: "Elif Şahin", email: "elif@dogarehberlik.com", phone: "0535 904 21 33" },
-      tone: "#0ea5e9",
-      branches: [
-        { id: "dr-merkez", name: "Çankaya Merkez", city: "Ankara", students: 118, coaches: 11, collect: 224000, status: "active" },
-      ],
-      billing: orgBilling("Ankara"),
-      notifications: orgNotifications(),
-    },
-    {
-      id: "pusula-kocluk", name: "Pusula Koçluk", type: "kurum", city: "Bursa",
-      planId: "baslangic", status: "trial", cycle: "monthly",
-      startedAt: NOW - 8 * DAY, renewsAt: NOW + 6 * DAY, feeMonthly: 4900,
-      seats: { used: 28, total: 50 }, coaches: { used: 4, total: 5 },
-      modules: modulesFromPlan(orgPlanById("baslangic").modules),
-      owner: { name: "Caner Yıldırım", email: "caner@pusulakocluk.com", phone: "0543 318 65 20" },
-      tone: "#8b5cf6",
-      branches: [
-        { id: "pk-merkez", name: "Nilüfer Merkez", city: "Bursa", students: 28, coaches: 4, collect: 52000, status: "active" },
-      ],
-      billing: orgBilling("Bursa"),
-      notifications: orgNotifications(),
-    },
-    {
-      id: "mavi-deniz", name: "Mavi Deniz Eğitim", type: "kurum", city: "Eskişehir",
-      planId: "pro", status: "overdue", cycle: "monthly",
-      startedAt: NOW - 410 * DAY, renewsAt: NOW - 4 * DAY, feeMonthly: 11900,
-      seats: { used: 96, total: 150 }, coaches: { used: 9, total: 12 },
-      modules: modulesFromPlan(orgPlanById("pro").modules),
-      owner: { name: "Sibel Kara", email: "sibel@mavideniz.com", phone: "0536 277 50 18" },
-      tone: "#ef4444",
-      branches: [
-        { id: "md-merkez", name: "Tepebaşı Merkez", city: "Eskişehir", students: 96, coaches: 9, collect: 181000, status: "active" },
-      ],
-      billing: orgBilling("Eskişehir"),
       notifications: orgNotifications(),
     },
   ];
@@ -283,7 +209,7 @@ function seedOrgInvoices(orgs: Org[]): OrgInvoice[] {
 }
 
 // Aktif kurum (kurum yöneticisi oturumu) + onun ilk koçu (kuruma bağlı koç oturumu).
-const ACTIVE_ORG_ID = "akademi-yildiz";
+const ACTIVE_ORG_ID = KAMPUS_KOC_ORG_ID;
 
 function seedTasks(orgs: Org[]): CoachTask[] {
   const now = Date.now();
@@ -350,6 +276,20 @@ function seedFeedback(orgs: Org[]): CoachFeedback[] {
 }
 
 // Owner → yönetici listesi (her kuruma owner + aktif kuruma ek bir yönetici).
+function defaultManagerPerms(role: OrgManagerRole): KurumPermKey[] {
+  return role === "owner" ? [...KURUM_PERMS] : ["dashboard", "branches", "coaches", "students", "assignments", "reports"];
+}
+
+function normalizeManagerPerms(org: Org): Org {
+  return {
+    ...org,
+    managers: org.managers.map((manager) => ({
+      ...manager,
+      perms: manager.perms?.length ? manager.perms.filter((perm): perm is KurumPermKey => KURUM_PERMS.includes(perm as KurumPermKey)) : defaultManagerPerms(manager.role),
+    })),
+  };
+}
+
 function withManagers(orgs: Omit<Org, "managers">[]): Org[] {
   return orgs.map((o) => {
     const managers: OrgManager[] = [
@@ -358,6 +298,7 @@ function withManagers(orgs: Omit<Org, "managers">[]): Org[] {
         name: o.owner.name,
         email: o.owner.email,
         role: "owner",
+        perms: defaultManagerPerms("owner"),
         addedAt: o.startedAt,
         status: "active",
       },
@@ -365,9 +306,10 @@ function withManagers(orgs: Omit<Org, "managers">[]): Org[] {
     if (o.id === ACTIVE_ORG_ID || o.id === DEMO_ORG_ID) {
       managers.push({
         id: o.id + "-mgr-2",
-        name: o.id === DEMO_ORG_ID ? "Demo Yonetici" : "Derya Soylu",
+        name: o.id === DEMO_ORG_ID ? "Demo Y?netici" : "Derya Soylu",
         email: o.id === DEMO_ORG_ID ? "branch@uyanik.local" : "derya@kampuskoc.com",
         role: "manager",
+        perms: defaultManagerPerms("manager"),
         addedAt: NOW - 120 * DAY,
         status: "active",
       });
@@ -378,6 +320,7 @@ function withManagers(orgs: Omit<Org, "managers">[]): Org[] {
         name: "Kerem Aksoy",
         email: "kerem@kampuskoc.com",
         role: "manager",
+        perms: defaultManagerPerms("manager"),
         addedAt: NOW - 12 * DAY,
         status: "invited",
       });
@@ -405,15 +348,15 @@ function seedTickets(): SupportTicket[] {
   const day = 86_400_000;
   return [
     {
-      id: "DST-2041", org: "Hedef Akademi", subj: "Lisans yenileme faturası ulaşmadı", priority: "Yüksek", tone: "danger", time: "2 saat önce", status: "open",
+      id: "DST-2041", org: "Kampüs Koç", subj: "Lisans yenileme faturası ulaşmadı", priority: "Yüksek", tone: "danger", time: "2 saat önce", status: "open",
       messages: [
-        { id: "m1", author: "Okan Demirtaş", role: "user", text: "Bu ayın lisans faturası e-postama ulaşmadı, muhasebe için PDF rica ediyorum.", date: NOW - 2 * h },
+        { id: "m1", author: "İncisel Emen", role: "user", text: "Bu ayın lisans faturası e-postama ulaşmadı, muhasebe için PDF rica ediyorum.", date: NOW - 2 * h },
       ],
     },
     {
-      id: "DST-2038", org: "Doğa Rehberlik", subj: "Yeni şube ekleme talebi", priority: "Orta", tone: "warning", time: "5 saat önce", status: "open",
+      id: "DST-2038", org: "Kampüs Koç", subj: "Yeni şube ekleme talebi", priority: "Orta", tone: "warning", time: "5 saat önce", status: "open",
       messages: [
-        { id: "m1", author: "Elif Şahin", role: "user", text: "Çankaya dışında ikinci bir şube açıyoruz, panele nasıl ekleriz?", date: NOW - 5 * h },
+        { id: "m1", author: "Derya Soylu", role: "user", text: "Kadıköy dışında yeni bir şube açıyoruz, panele nasıl ekleriz?", date: NOW - 5 * h },
       ],
     },
     {
@@ -424,10 +367,10 @@ function seedTickets(): SupportTicket[] {
       ],
     },
     {
-      id: "DST-2029", org: "Zirve Eğitim", subj: "AI Koç modülü etkinleştirme", priority: "Orta", tone: "warning", time: "2 gün önce", status: "resolved",
+      id: "DST-2029", org: "Uyan?k Demo Kurum", subj: "Demo kurum hesap kontrolü", priority: "Orta", tone: "warning", time: "2 gün önce", status: "resolved",
       messages: [
-        { id: "m1", author: "Gülşen Tunç", role: "user", text: "AI Koç modülünü denemek istiyoruz.", date: NOW - 2 * day },
-        { id: "m2", author: "Selim Baş", role: "agent", text: "Franchise paketine geçişinizle birlikte AI Koç aktif edildi. İyi çalışmalar!", date: NOW - 1.5 * day },
+        { id: "m1", author: "Demo Y?netici", role: "user", text: "Kurum yöneticisi hesabı ve demo kullanıcılarını kontrol eder misiniz?", date: NOW - 2 * day },
+        { id: "m2", author: "Selim Baş", role: "agent", text: "Demo kurum hesapları kontrol edildi, aktif görünüyor. İyi çalışmalar!", date: NOW - 1.5 * day },
       ],
     },
   ];
@@ -464,14 +407,14 @@ function seedDemoRequests(): DemoRequest[] {
   return [
     {
       id: "lead-1001",
-      name: "Final Akademi",
+      name: "Kampüs Koç",
       kind: "org",
-      email: "info@finalakademi.com",
+      email: "incisel@kampuskoc.com",
       phone: "0532 410 88 12",
-      city: "Istanbul",
-      planId: "pro",
+      city: "?stanbul",
+      planId: "franchise",
       source: "Web sitesi",
-      note: "YKS grubu icin 120 ogrencilik demo istedi.",
+      note: "Franchise kurum hesaplarının canlıya taşınması istendi.",
       requestedAt: NOW - 2 * 3_600_000,
       status: "new",
       scheduledAt: null,
@@ -486,7 +429,7 @@ function seedDemoRequests(): DemoRequest[] {
       city: "Izmir",
       planId: "c-pro",
       source: "Instagram",
-      note: "Bireysel koc, veli raporlari ve odev takibiyle ilgileniyor.",
+      note: "Bireysel ko?, veli raporlar? ve ?dev takibiyle ilgileniyor.",
       requestedAt: NOW - 18 * 3_600_000,
       status: "contacted",
       scheduledAt: NOW + 2 * DAY,
@@ -494,68 +437,36 @@ function seedDemoRequests(): DemoRequest[] {
     },
     {
       id: "lead-1003",
-      name: "Kuzey Kurs Merkezi",
+      name: "Uyan?k Demo Kurum",
       kind: "org",
-      email: "yonetim@kuzeykurs.com",
-      phone: "0533 612 70 45",
-      city: "Ankara",
-      planId: "franchise",
+      email: "branch@uyanik.local",
+      phone: "0532 000 00 01",
+      city: "?stanbul",
+      planId: "baslangic",
       source: "Google reklam",
-      note: "Uc subeli kullanim icin fiyat ve onboarding soruldu.",
+      note: "Demo kurum hesabı için onboarding kontrolü istendi.",
       requestedAt: NOW - 3 * DAY,
       status: "scheduled",
       scheduledAt: NOW + 5 * DAY,
       notes: [],
-    },
-    {
-      id: "lead-1004",
-      name: "Derya Soylu",
-      kind: "coach",
-      email: "derya@koc.com",
-      phone: "0535 904 21 33",
-      city: "Bursa",
-      planId: "c-baslangic",
-      source: "Referans",
-      note: "15 ogrencilik baslangic paketiyle deneme yapmak istiyor.",
-      requestedAt: NOW - 8 * DAY,
-      status: "converted",
-      scheduledAt: NOW - 4 * DAY,
-      notes: [{ id: "lead-note-2", author: "Platform Ekibi", text: "Pro yerine Baslangic ile basladi.", date: NOW - 4 * DAY }],
-    },
-    {
-      id: "lead-1005",
-      name: "Ada Egitim",
-      kind: "org",
-      email: "ada@egitim.com",
-      phone: "0536 277 50 18",
-      city: "Antalya",
-      planId: "baslangic",
-      source: "Jotform",
-      note: "Butce nedeniyle sonraki doneme erteledi.",
-      requestedAt: NOW - 11 * DAY,
-      status: "lost",
-      scheduledAt: null,
-      notes: [{ id: "lead-note-3", author: "Destek Ekibi", text: "Kayip nedeni: Butce bu donem uygun degil.", date: NOW - 9 * DAY }],
     },
   ];
 }
 
 function seedSignups(): Signup[] {
   return [
-    { id: "sgn-1001", name: "Final Akademi", kind: "org", city: "Istanbul", planId: "pro", cycle: "annual", amount: 142800, method: "Kredi karti", at: NOW - 1 * DAY, type: "new" },
-    { id: "sgn-1002", name: "Derya Soylu", kind: "coach", city: "Bursa", planId: "c-baslangic", cycle: "monthly", amount: 499, method: "Kredi karti", at: NOW - 4 * DAY, type: "trial" },
-    { id: "sgn-1003", name: "Kampus Koc", kind: "org", city: "Istanbul", planId: "franchise", cycle: "annual", amount: 298800, method: "Havale / EFT", at: NOW - 8 * DAY, type: "renewal" },
-    { id: "sgn-1004", name: "Selin Yilmaz", kind: "coach", city: "Istanbul", planId: "c-pro", cycle: "annual", amount: 9990, method: "Mastercard", at: NOW - 12 * DAY, type: "upgrade" },
-    { id: "sgn-1005", name: "Pusula Kocluk", kind: "org", city: "Bursa", planId: "baslangic", cycle: "monthly", amount: 4900, method: "Kredi karti", at: NOW - 18 * DAY, type: "new" },
+    { id: "sgn-1001", name: "Kamp?s Ko?", kind: "org", city: "?stanbul", planId: "franchise", cycle: "annual", amount: 298800, method: "Havale / EFT", at: NOW - 8 * DAY, type: "renewal" },
+    { id: "sgn-1002", name: "Uyan?k Demo Kurum", kind: "org", city: "?stanbul", planId: "baslangic", cycle: "monthly", amount: 4900, method: "Demo", at: NOW - 18 * DAY, type: "new" },
+    { id: "sgn-1003", name: "Selin Y?lmaz", kind: "coach", city: "?stanbul", planId: "c-pro", cycle: "annual", amount: 9990, method: "Mastercard", at: NOW - 12 * DAY, type: "upgrade" },
   ];
 }
 
 function seedIntegrations(): Integration[] {
   return [
-    { id: "meta", name: "Meta Reklam", desc: "Instagram ve Facebook Lead Ads formlarindan gelen basvurular.", icon: "bolt", tone: "#1877f2", connected: true, account: "Uyanik Koc Lead Ads", formName: "YKS Demo Talep Formu", leadCount: 42, lastSync: NOW - 45 * 60_000 },
-    { id: "google", name: "Google Reklam", desc: "Google Ads lead form extension basvurulari.", icon: "search", tone: "#16a34a", connected: false, account: "", formName: "", leadCount: 0, lastSync: null },
-    { id: "jotform", name: "Jotform", desc: "Kurum basvuru ve davet formlarini panele aktar.", icon: "clipboard", tone: "#f97316", connected: true, account: "jotform: bagli", formName: "Kurum Demo Basvuru", leadCount: 18, lastSync: NOW - 2 * 3_600_000 },
-    { id: "webhook", name: "Web Formu", desc: "Kendi web sitendeki form icin genel webhook.", icon: "link", tone: "#534ab7", connected: true, account: "webhook", formName: "Genel form", webhookUrl: "https://www.uyanikkoc.com/hooks/leads/demo", leadCount: 27, lastSync: NOW - 20 * 60_000 },
+    { id: "meta", name: "Meta Reklam", desc: "Instagram ve Facebook Lead Ads formlar?ndan gelen ba?vurular.", icon: "bolt", tone: "#1877f2", connected: true, account: "Uyan?k Ko? Lead Ads", formName: "YKS Demo Talep Formu", leadCount: 42, lastSync: NOW - 45 * 60_000 },
+    { id: "google", name: "Google Reklam", desc: "Google Ads lead form extension ba?vurular?.", icon: "search", tone: "#16a34a", connected: false, account: "", formName: "", leadCount: 0, lastSync: null },
+    { id: "jotform", name: "Jotform", desc: "Kurum ba?vuru ve davet formlar?n? panele aktar.", icon: "clipboard", tone: "#f97316", connected: true, account: "jotform: ba?l?", formName: "Kurum Demo Ba?vuru", leadCount: 18, lastSync: NOW - 2 * 3_600_000 },
+    { id: "webhook", name: "Web Formu", desc: "Kendi web sitendeki form i?in genel webhook.", icon: "link", tone: "#534ab7", connected: true, account: "webhook", formName: "Genel form", webhookUrl: "https://www.uyanikkoc.com/hooks/leads/demo", leadCount: 27, lastSync: NOW - 20 * 60_000 },
   ];
 }
 
@@ -593,11 +504,14 @@ type Store = {
   tasks: CoachTask[];
   feedback: CoachFeedback[];
   removedCoachIds: string[];
+  removedStudentIds: string[];
+  passiveStudentIds: string[];
   team: AdminTeamMember[];
   tickets: SupportTicket[];
   systemNotes: SystemNote[];
   licenseNotes: LicenseNote[];
   campaigns: Campaign[];
+  orgCampaigns: OrgCampaign[];
   campaignGrants: CampaignGrant[];
   demoRequests: DemoRequest[];
   signups: Signup[];
@@ -605,6 +519,8 @@ type Store = {
 };
 
 const globalForAdmin = globalThis as unknown as { __ukAdminStore?: Store };
+
+const ALLOWED_ORG_IDS = new Set([DEMO_ORG_ID, ACTIVE_ORG_ID]);
 
 function freshStore(): Store {
   const orgs = withManagers(seedOrgs());
@@ -617,11 +533,14 @@ function freshStore(): Store {
     tasks: seedTasks(orgs),
     feedback: seedFeedback(orgs),
     removedCoachIds: [],
+    removedStudentIds: [],
+    passiveStudentIds: [],
     team: seedTeam(),
     tickets: seedTickets(),
     systemNotes: seedSystemNotes(),
     licenseNotes: [],
     campaigns: seedCampaigns(),
+    orgCampaigns: [],
     campaignGrants: [],
     demoRequests: seedDemoRequests(),
     signups: seedSignups(),
@@ -634,6 +553,78 @@ function store(): Store {
     globalForAdmin.__ukAdminStore = freshStore();
   }
   return globalForAdmin.__ukAdminStore;
+}
+
+function normalizeLegacyText(value: string): string {
+  return value
+    .replaceAll("Uyanik Demo Kurum", "Uyanık Demo Kurum")
+    .replaceAll("Uyanik Demo Org", "Uyanık Demo Kurum")
+    .replaceAll("Uyanik Demo Branch", "Uyanık Demo Şube")
+    .replaceAll("Uyanik Koc", "Uyanık Koç")
+    .replaceAll("Kampus Koc", "Kampüs Koç")
+    .replaceAll("Demo Sube", "Demo Şube")
+    .replaceAll("Demo Yonetici", "Demo Yönetici")
+    .replaceAll("Istanbul", "İstanbul")
+    .replaceAll("Bireysel koc", "Bireysel koç")
+    .replaceAll("veli raporlari", "veli raporları")
+    .replaceAll("odev takibi", "ödev takibi")
+    .replaceAll("formlarindan gelen basvurular", "formlarından gelen başvurular")
+    .replaceAll("basvurulari", "başvuruları")
+    .replaceAll("basvuru", "başvuru")
+    .replaceAll("bagli", "bağlı");
+}
+
+function normalizeLegacySnapshotText(value: unknown): void {
+  if (!value || typeof value !== "object") return;
+  if (value instanceof Date) return;
+  if (Array.isArray(value)) {
+    value.forEach(normalizeLegacySnapshotText);
+    return;
+  }
+
+  for (const [key, entry] of Object.entries(value)) {
+    const target = value as Record<string, unknown>;
+    if (typeof entry === "string") {
+      target[key] = normalizeLegacyText(entry);
+    } else {
+      normalizeLegacySnapshotText(entry);
+    }
+  }
+}
+
+export function pruneMockStoreToAllowedOrgs(): void {
+  const s = store();
+  normalizeLegacySnapshotText(s);
+  s.passiveStudentIds ??= [];
+  s.orgCampaigns ??= [];
+  s.orgs = s.orgs.map(normalizeManagerPerms);
+  s.orgs = s.orgs.filter((org) => ALLOWED_ORG_IDS.has(org.id));
+
+  const allowedOrgNames = new Set(s.orgs.map((org) => org.name));
+  allowedOrgNames.add("Kamp?s Ko?");
+  const allowedBranchIds = new Set(s.orgs.flatMap((org) => org.branches.map((branch) => branch.id)));
+
+  s.studentSubscriptions = s.studentSubscriptions.filter(
+    (sub) => ALLOWED_ORG_IDS.has(sub.orgId) && allowedBranchIds.has(sub.branchId),
+  );
+  s.orgInvites = s.orgInvites.filter((invite) => ALLOWED_ORG_IDS.has(invite.orgId));
+  s.orgInvoices = s.orgInvoices.filter((invoice) => ALLOWED_ORG_IDS.has(invoice.orgId));
+  s.tasks = s.tasks.filter((task) => ALLOWED_ORG_IDS.has(task.orgId));
+  s.feedback = s.feedback.filter((item) => ALLOWED_ORG_IDS.has(item.orgId));
+  s.removedStudentIds = s.removedStudentIds.filter((id) => [...ALLOWED_ORG_IDS].some((orgId) => id.startsWith(`${orgId}-s`)));
+  s.passiveStudentIds = s.passiveStudentIds.filter((id) => [...ALLOWED_ORG_IDS].some((orgId) => id.startsWith(`${orgId}-s`)));
+  s.licenseNotes = s.licenseNotes.filter(
+    (note) => note.subjectKind !== "org" || ALLOWED_ORG_IDS.has(note.subjectId),
+  );
+  s.orgCampaigns = s.orgCampaigns.filter((campaign) => ALLOWED_ORG_IDS.has(campaign.orgId));
+  s.campaignGrants = s.campaignGrants.filter(
+    (grant) => grant.subjectKind !== "org" || ALLOWED_ORG_IDS.has(grant.subjectId),
+  );
+  s.tickets = s.tickets.filter((ticket) => !ticket.org || ticket.org.includes("(koç)") || allowedOrgNames.has(ticket.org));
+  s.demoRequests = s.demoRequests.filter(
+    (request) => request.kind !== "org" || allowedOrgNames.has(request.name) || request.email === "branch@uyanik.local",
+  );
+  s.signups = s.signups.filter((signup) => signup.kind !== "org" || allowedOrgNames.has(signup.name));
 }
 
 export function getMockSnapshot(ctx: AdminSnapshotContext = {}): AdminSnapshot {
@@ -650,11 +641,14 @@ export function getMockSnapshot(ctx: AdminSnapshotContext = {}): AdminSnapshot {
     tasks: s.tasks,
     feedback: s.feedback,
     removedCoachIds: s.removedCoachIds,
+    removedStudentIds: s.removedStudentIds,
+    passiveStudentIds: s.passiveStudentIds,
     team: s.team,
     tickets: s.tickets,
     systemNotes: s.systemNotes,
     licenseNotes: s.licenseNotes,
     campaigns: s.campaigns,
+    orgCampaigns: s.orgCampaigns,
     campaignGrants: s.campaignGrants,
     demoRequests: s.demoRequests,
     signups: s.signups,
@@ -668,7 +662,7 @@ export function getMockSnapshot(ctx: AdminSnapshotContext = {}): AdminSnapshot {
 
 export function loadMockSnapshot(snapshot: AdminSnapshot): void {
   globalForAdmin.__ukAdminStore = {
-    orgs: structuredClone(snapshot.orgs),
+    orgs: structuredClone(snapshot.orgs).map(normalizeManagerPerms),
     coaches: structuredClone(snapshot.coaches),
     studentSubscriptions: structuredClone(snapshot.studentSubscriptions),
     orgInvites: structuredClone(snapshot.orgInvites),
@@ -676,11 +670,14 @@ export function loadMockSnapshot(snapshot: AdminSnapshot): void {
     tasks: structuredClone(snapshot.tasks),
     feedback: structuredClone(snapshot.feedback),
     removedCoachIds: structuredClone(snapshot.removedCoachIds),
+    removedStudentIds: structuredClone(snapshot.removedStudentIds ?? []),
+    passiveStudentIds: structuredClone(snapshot.passiveStudentIds ?? []),
     team: structuredClone(snapshot.team),
     tickets: structuredClone(snapshot.tickets),
     systemNotes: structuredClone(snapshot.systemNotes),
     licenseNotes: structuredClone(snapshot.licenseNotes),
     campaigns: structuredClone(snapshot.campaigns),
+    orgCampaigns: structuredClone(snapshot.orgCampaigns ?? []),
     campaignGrants: structuredClone(snapshot.campaignGrants),
     demoRequests: structuredClone(snapshot.demoRequests ?? seedDemoRequests()),
     signups: structuredClone(snapshot.signups ?? seedSignups()),
@@ -814,6 +811,51 @@ export function mockRestoreOrgCoach(coachId: string): void {
   s.removedCoachIds = s.removedCoachIds.filter((id) => id !== coachId);
 }
 
+export function mockRemoveOrgStudent(orgId: string, studentId: string): void {
+  const s = store();
+  const o = findOrg(orgId);
+  if (!o || s.removedStudentIds.includes(studentId)) return;
+  const student = orgStudents(o).find((item) => item.id === studentId);
+  s.removedStudentIds.push(studentId);
+  s.passiveStudentIds = s.passiveStudentIds.filter((id) => id !== studentId);
+  if (o.seats.used > 0) {
+    o.seats = { ...o.seats, used: o.seats.used - 1 };
+  }
+  const branch = student ? o.branches.find((b) => b.name === student.branch) : o.branches[0];
+  if (branch && branch.students > 0) {
+    branch.students -= 1;
+  }
+}
+
+export function mockRestoreOrgStudent(orgId: string, studentId: string): void {
+  const s = store();
+  const o = findOrg(orgId);
+  if (!o || !s.removedStudentIds.includes(studentId)) return;
+  s.removedStudentIds = s.removedStudentIds.filter((id) => id !== studentId);
+  if (o.seats.used < o.seats.total) {
+    o.seats = { ...o.seats, used: o.seats.used + 1 };
+  }
+  const branch = o.branches[0];
+  if (branch) {
+    branch.students += 1;
+  }
+}
+
+export function mockSetOrgStudentPassive(orgId: string, studentId: string, passive: boolean): void {
+  const s = store();
+  const o = findOrg(orgId);
+  if (!o || s.removedStudentIds.includes(studentId) || !studentId.startsWith(`${orgId}-s`)) return;
+  if (passive) {
+    if (!s.passiveStudentIds.includes(studentId)) s.passiveStudentIds.push(studentId);
+  } else {
+    s.passiveStudentIds = s.passiveStudentIds.filter((id) => id !== studentId);
+  }
+}
+
+export function isStudentPassive(studentId: string): boolean {
+  return store().passiveStudentIds.includes(studentId);
+}
+
 // ---- detaylı lisans yenileme ----
 function extendFrom(base: number, months: number): number {
   const from = Math.max(Date.now(), base);
@@ -856,6 +898,7 @@ export function mockInviteOrgManager(
       name: data.name,
       email: data.email,
       role: data.role,
+      perms: defaultManagerPerms(data.role),
       addedAt: Date.now(),
       status: "invited",
     },
@@ -871,7 +914,33 @@ export function mockRemoveOrgManager(orgId: string, managerId: string): void {
 export function mockSetOrgManagerRole(orgId: string, managerId: string, role: OrgManagerRole): void {
   const o = findOrg(orgId);
   if (!o) return;
-  o.managers = o.managers.map((m) => (m.id === managerId ? { ...m, role } : m));
+  o.managers = o.managers.map((m) => (m.id === managerId ? { ...m, role, perms: defaultManagerPerms(role) } : m));
+}
+
+export function managerPerms(manager: OrgManager): KurumPermKey[] {
+  return manager.perms?.length ? manager.perms : defaultManagerPerms(manager.role);
+}
+
+export function managerCan(manager: OrgManager, perm: KurumPermKey): boolean {
+  return managerPerms(manager).includes(perm);
+}
+
+export function mockSetOrgManagerPerms(orgId: string, managerId: string, perms: KurumPermKey[]): void {
+  const o = findOrg(orgId);
+  if (!o) return;
+  const normalized = [...new Set(perms)].filter((perm): perm is KurumPermKey => KURUM_PERMS.includes(perm as KurumPermKey));
+  o.managers = o.managers.map((m) => (m.id === managerId ? { ...m, perms: normalized } : m));
+}
+
+export function mockToggleOrgManagerPerm(orgId: string, managerId: string, perm: KurumPermKey): void {
+  const o = findOrg(orgId);
+  if (!o || !KURUM_PERMS.includes(perm)) return;
+  const manager = o.managers.find((m) => m.id === managerId);
+  if (!manager) return;
+  const current = new Set(managerPerms(manager));
+  if (current.has(perm)) current.delete(perm);
+  else current.add(perm);
+  mockSetOrgManagerPerms(orgId, managerId, [...current]);
 }
 
 // ---- süper admin ekip & erişim ----
@@ -1042,7 +1111,87 @@ export function mockGrantCampaign(
   campaign.redemptions += 1;
 }
 
-// ---- demo talepleri + basvuru kaynaklari ----
+export function listOrgCampaigns(orgId: string): OrgCampaign[] {
+  return store().orgCampaigns.filter((campaign) => campaign.orgId === orgId);
+}
+
+export function mockCreateOrgCampaign(data: {
+  orgId: string;
+  name: string;
+  code: string;
+  type: CampaignType;
+  value: number;
+  startsAt: number;
+  endsAt: number;
+  maxRedemptions: number;
+  note: string;
+}): void {
+  if (!findOrg(data.orgId)) return;
+  const now = Date.now();
+  store().orgCampaigns.unshift({
+    id: `ocmp-${Math.floor(1000 + Math.random() * 8999)}`,
+    orgId: data.orgId,
+    name: data.name.trim(),
+    code: data.code.trim().toUpperCase(),
+    type: data.type,
+    value: data.value,
+    status: data.startsAt > now ? "scheduled" : "active",
+    startsAt: data.startsAt,
+    endsAt: data.endsAt,
+    redemptions: 0,
+    maxRedemptions: data.maxRedemptions,
+    excludedBranchIds: [],
+    note: data.note.trim(),
+  });
+}
+
+export function mockUpdateOrgCampaign(
+  orgId: string,
+  campaignId: string,
+  patch: Partial<Pick<OrgCampaign, "name" | "code" | "type" | "value" | "startsAt" | "endsAt" | "maxRedemptions" | "note">>,
+): void {
+  const campaign = store().orgCampaigns.find((item) => item.orgId === orgId && item.id === campaignId);
+  if (!campaign) return;
+  if (patch.name != null) campaign.name = patch.name.trim();
+  if (patch.code != null) campaign.code = patch.code.trim().toUpperCase();
+  if (patch.type != null) campaign.type = patch.type;
+  if (patch.value != null) campaign.value = patch.value;
+  if (patch.startsAt != null) campaign.startsAt = patch.startsAt;
+  if (patch.endsAt != null) campaign.endsAt = patch.endsAt;
+  if (patch.maxRedemptions != null) campaign.maxRedemptions = patch.maxRedemptions;
+  if (patch.note != null) campaign.note = patch.note.trim();
+}
+
+export function mockSetOrgCampaignStatus(orgId: string, campaignId: string, status: CampaignStatus): void {
+  const campaign = store().orgCampaigns.find((item) => item.orgId === orgId && item.id === campaignId);
+  if (campaign) campaign.status = status;
+}
+
+export function mockDeleteOrgCampaign(orgId: string, campaignId: string): void {
+  const s = store();
+  s.orgCampaigns = s.orgCampaigns.filter((campaign) => campaign.orgId !== orgId || campaign.id !== campaignId);
+}
+
+export function mockToggleOrgCampaignBranch(orgId: string, campaignId: string, branchId: string): void {
+  const org = findOrg(orgId);
+  const campaign = store().orgCampaigns.find((item) => item.orgId === orgId && item.id === campaignId);
+  if (!org?.branches.some((branch) => branch.id === branchId) || !campaign) return;
+  const excluded = new Set(campaign.excludedBranchIds);
+  if (excluded.has(branchId)) excluded.delete(branchId);
+  else excluded.add(branchId);
+  campaign.excludedBranchIds = [...excluded];
+}
+
+export function orgCampaignValidInBranch(orgId: string, campaignId: string, branchId: string): boolean {
+  const campaign = store().orgCampaigns.find((item) => item.orgId === orgId && item.id === campaignId);
+  if (!campaign || campaign.status !== "active") return false;
+  const now = Date.now();
+  if (campaign.startsAt > now || campaign.endsAt < now) return false;
+  if (campaign.maxRedemptions > 0 && campaign.redemptions >= campaign.maxRedemptions) return false;
+  return !campaign.excludedBranchIds.includes(branchId);
+}
+
+// ---- demo talepleri + ba?vuru kaynaklar? ----
 export function mockAddDemoRequest(data: {
   name: string;
   requestKind: DemoRequestKind;
@@ -1172,6 +1321,35 @@ export function mockUpdateBranch(
         }
       : b,
   );
+}
+
+export function mockSetBranchStatus(orgId: string, branchId: string, status: Org["branches"][0]["status"]): void {
+  mockUpdateBranch(orgId, branchId, { status });
+}
+
+export function mockToggleBranchStatus(orgId: string, branchId: string): void {
+  const o = findOrg(orgId);
+  const branch = o?.branches.find((b) => b.id === branchId);
+  if (!branch) return;
+  branch.status = branch.status === "active" ? "suspended" : "active";
+}
+
+export function mockRemoveBranch(orgId: string, branchId: string): void {
+  const o = findOrg(orgId);
+  if (!o || o.branches.length <= 1) return;
+  const branch = o.branches.find((b) => b.id === branchId);
+  if (!branch) return;
+  o.branches = o.branches.filter((b) => b.id !== branchId);
+  o.seats = { used: Math.max(0, o.seats.used - branch.students), total: o.seats.total };
+  o.coaches = { used: Math.max(0, o.coaches.used - branch.coaches), total: o.coaches.total };
+  store().studentSubscriptions = store().studentSubscriptions.filter((sub) => sub.branchId !== branchId);
+  store().orgInvites = store().orgInvites.filter((invite) => invite.branchId !== branchId);
+  store().orgCampaigns.forEach((campaign) => {
+    campaign.excludedBranchIds = campaign.excludedBranchIds.filter((id) => id !== branchId);
+  });
+  if (o.branches.length === 1 && o.type === "franchise") {
+    o.type = "kurum";
+  }
 }
 
 export function mockSendPaymentReminder(subscriptionId: string): void {
@@ -1330,6 +1508,13 @@ export function mockInviteOrgCoach(
 ): void {
   const o = findOrg(orgId);
   if (!o) return;
+  if (o.coaches.used < o.coaches.total) {
+    o.coaches = { used: o.coaches.used + 1, total: o.coaches.total };
+    const branch = data.branchId
+      ? o.branches.find((b) => b.id === data.branchId)
+      : o.branches[0];
+    if (branch) branch.coaches += 1;
+  }
   store().orgInvites.unshift({
     id: "inv-" + Math.floor(1000 + Math.random() * 8999),
     orgId,

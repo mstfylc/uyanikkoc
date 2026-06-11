@@ -12,21 +12,21 @@ const STUDENT_NAV: UkNavItem[] = [
   { href: "/student/schedule", label: "Calisma Programi", icon: "ki-calendar" },
   { href: "/student/topics", label: "Konu Takibi", icon: "ki-book-open" },
   { href: "/student/exams", label: "Denemeler", icon: "ki-chart-simple" },
-  { href: "/student/assignments", label: "Odevlerim", icon: "ki-notepad-edit" },
+  { href: "/student/assignments", label: "Ödevlerim", icon: "ki-notepad-edit" },
   { href: "/student/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/student/appointments", label: "Randevular", icon: "ki-calendar-tick" },
   { href: "/student/tests", label: "Testlerim", icon: "ki-star" },
-  { href: "/student/ai-coach", label: "AI Koc", icon: "ki-technology-2", tag: "Yakinda" },
+  { href: "/student/ai-coach", label: "AI Koç", icon: "ki-technology-2", tag: "Yakında" },
   { href: "/student/motivation", label: "Motivasyon", icon: "ki-flame" },
   { href: "/student/billing", label: "Abonelik", icon: "ki-wallet" },
 ];
 
 const COACH_NAV: UkNavItem[] = [
   { href: "/coach/dashboard", label: "Dashboard", icon: "ki-element-11" },
-  { href: "/coach/students", label: "Ogrencilerim", icon: "ki-people" },
+  { href: "/coach/students", label: "Öğrencilerim", icon: "ki-people" },
   { href: "/coach/topics", label: "Konu Takibi", icon: "ki-book-open" },
   { href: "/coach/topics/annual", label: "Yillik Cizelge", icon: "ki-notebook", tag: "Yeni" },
-  { href: "/coach/assignments", label: "Odev & Gorev", icon: "ki-notepad-edit" },
+  { href: "/coach/assignments", label: "Ödev & Görev", icon: "ki-notepad-edit" },
   { href: "/coach/exams", label: "Denemeler", icon: "ki-chart-simple" },
   { href: "/coach/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/coach/appointments", label: "Randevular", icon: "ki-calendar-tick" },
@@ -50,13 +50,13 @@ const PARENT_NAV: UkNavItem[] = [
 
 const YONETIM_BRANCH_NAV: UkNavItem[] = [
   { href: "/yonetim/dashboard", label: "Dashboard", icon: "ki-element-11" },
-  { href: "/yonetim/coaches", label: "Koclar", icon: "ki-people" },
-  { href: "/yonetim/students", label: "Ogrenciler", icon: "ki-teacher" },
-  { href: "/yonetim/branches", label: "Subeler", icon: "ki-office-bag" },
+  { href: "/yonetim/coaches", label: "Koçlar", icon: "ki-people" },
+  { href: "/yonetim/students", label: "Öğrenciler", icon: "ki-teacher" },
+  { href: "/yonetim/branches", label: "Şubeler", icon: "ki-office-bag" },
   { href: "/yonetim/license", label: "Lisans & Kapasite", icon: "ki-shield-tick" },
   { href: "/yonetim/revenue", label: "Gelir & Tahsilat", icon: "ki-dollar" },
   { href: "/yonetim/reports", label: "Raporlar", icon: "ki-chart-line-up" },
-  { href: "/yonetim/managers", label: "Yoneticiler", icon: "ki-crown-2" },
+  { href: "/yonetim/managers", label: "Yöneticiler", icon: "ki-crown-2" },
   { href: "/yonetim/settings", label: "Ayarlar", icon: "ki-setting-2" },
 ];
 
@@ -65,13 +65,13 @@ const YONETIM_BRANCH_NAV: UkNavItem[] = [
 const YONETIM_ADMIN_NAV: UkNavItem[] = [
   { href: "/yonetim/dashboard", label: "Genel Bakis", icon: "ki-element-11" },
   { href: "/yonetim/orgs", label: "Kurumlar & Franchise", icon: "ki-office-bag" },
-  { href: "/yonetim/branches", label: "Subeler", icon: "ki-flag" },
+  { href: "/yonetim/branches", label: "Şubeler", icon: "ki-flag" },
   { href: "/yonetim/licenses", label: "Lisans Takibi", icon: "ki-shield-tick" },
-  { href: "/yonetim/leads", label: "Demo & Uyelikler", icon: "ki-clipboard" },
+  { href: "/yonetim/leads", label: "Demo & Üyelikler", icon: "ki-clipboard" },
   { href: "/yonetim/license", label: "Lisans & Kapasite", icon: "ki-chart-pie-simple" },
-  { href: "/yonetim/coaches", label: "Koclar", icon: "ki-people" },
-  { href: "/yonetim/students", label: "Ogrenciler", icon: "ki-teacher" },
-  { href: "/yonetim/managers", label: "Yoneticiler", icon: "ki-crown-2" },
+  { href: "/yonetim/coaches", label: "Koçlar", icon: "ki-people" },
+  { href: "/yonetim/students", label: "Öğrenciler", icon: "ki-teacher" },
+  { href: "/yonetim/managers", label: "Yöneticiler", icon: "ki-crown-2" },
   { href: "/yonetim/revenue", label: "Gelir & Faturalama", icon: "ki-dollar" },
   { href: "/yonetim/reports", label: "Raporlar", icon: "ki-chart-line-up" },
   { href: "/yonetim/campaigns", label: "Kampanyalar", icon: "ki-flash" },
@@ -81,8 +81,8 @@ const YONETIM_ADMIN_NAV: UkNavItem[] = [
 ];
 
 export const UK_ROLE_CRUMB: Record<AppRole, string> = {
-  student: "Ogrenci Paneli",
-  coach: "Koc Paneli",
+  student: "Öğrenci Paneli",
+  coach: "Koç Paneli",
   parent: "Veli Paneli",
   branch: "Kurum Paneli",
   admin: "Super Admin",

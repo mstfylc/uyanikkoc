@@ -74,15 +74,15 @@ describe("RBAC path erişim kontrolü", () => {
 
   it("yonetim hedefi icin login role ipucu ekler", () => {
     expect(getUnauthorizedRedirect("/yonetim", null)).toBe(
-      "/login?next=%2Fyonetim%2Fdashboard&role=admin",
+      "/login?next=%2Fyonetim%2Fdashboard",
     );
     expect(getUnauthorizedRedirect("/yonetim/orgs", null)).toBe(
-      "/login?next=%2Fyonetim%2Forgs&role=admin",
+      "/login?next=%2Fyonetim%2Forgs",
     );
     expect(getUnauthorizedRedirect("/yonetim/students", null)).toBe(
-      "/login?next=%2Fyonetim%2Fstudents&role=branch",
+      "/login?next=%2Fyonetim%2Fstudents",
     );
-    expect(yonetimLoginRoleHint("/yonetim/dashboard")).toBe("admin");
+    expect(yonetimLoginRoleHint("/yonetim/dashboard")).toBe("branch");
     expect(loginHrefForPath("/yonetim/orgs", "admin")).toBe(
       "/login?next=%2Fyonetim%2Forgs&role=admin",
     );

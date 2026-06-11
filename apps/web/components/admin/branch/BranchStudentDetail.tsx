@@ -27,7 +27,7 @@ export function BranchStudentDetail({ studentId }: { studentId: string }) {
   if (!student) {
     return (
       <div className="stack rise">
-        <Link href="/branch/students" className="link-btn">
+        <Link href="/yonetim/students" className="link-btn">
           <Icon name="chevronRight" size={15} style={{ transform: "rotate(180deg)" }} />Öğrencilere dön
         </Link>
         <div className="empty-state">
@@ -49,7 +49,7 @@ export function BranchStudentDetail({ studentId }: { studentId: string }) {
 
   return (
     <div className="stack rise">
-      <Link href="/branch/students" className="link-btn" style={{ alignSelf: "flex-start" }}>
+      <Link href="/yonetim/students" className="link-btn" style={{ alignSelf: "flex-start" }}>
         <Icon name="chevronRight" size={15} style={{ transform: "rotate(180deg)" }} />Öğrencilere dön
       </Link>
 

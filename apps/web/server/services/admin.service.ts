@@ -21,6 +21,8 @@ async function loadDbAdminState(): Promise<void> {
   const snapshot = await adminStateRepository.getAdminState();
   if (snapshot) {
     memory.loadMockSnapshot(snapshot as AdminSnapshot);
+    memory.pruneMockStoreToAllowedOrgs();
+    await adminStateRepository.saveAdminState(memory.getMockSnapshot({}));
     return;
   }
 
@@ -130,6 +132,15 @@ export async function applyAdminMutation(
     case "restoreOrgCoach":
       memory.mockRestoreOrgCoach(m.coachId);
       break;
+    case "removeOrgStudent":
+      memory.mockRemoveOrgStudent(m.orgId, m.studentId);
+      break;
+    case "restoreOrgStudent":
+      memory.mockRestoreOrgStudent(m.orgId, m.studentId);
+      break;
+    case "setOrgStudentPassive":
+      memory.mockSetOrgStudentPassive(m.orgId, m.studentId, m.passive);
+      break;
     case "inviteOrgManager":
       memory.mockInviteOrgManager(m.orgId, { name: m.name, email: m.email, role: m.role });
       break;
@@ -138,6 +149,12 @@ export async function applyAdminMutation(
       break;
     case "setOrgManagerRole":
       memory.mockSetOrgManagerRole(m.orgId, m.managerId, m.role);
+      break;
+    case "setOrgManagerPerms":
+      memory.mockSetOrgManagerPerms(m.orgId, m.managerId, m.perms);
+      break;
+    case "toggleOrgManagerPerm":
+      memory.mockToggleOrgManagerPerm(m.orgId, m.managerId, m.perm);
       break;
     case "inviteAdminMember":
       memory.mockInviteAdminMember({ name: m.name, email: m.email, access: m.access });
@@ -191,6 +208,31 @@ export async function applyAdminMutation(
     case "grantCampaign":
       memory.mockGrantCampaign(m.campaignId, m.subjectKind, m.subjectId);
       break;
+    case "createOrgCampaign":
+      memory.mockCreateOrgCampaign({
+        orgId: m.orgId,
+        name: m.name,
+        code: m.code,
+        type: m.type,
+        value: m.value,
+        startsAt: m.startsAt,
+        endsAt: m.endsAt,
+        maxRedemptions: m.maxRedemptions,
+        note: m.note,
+      });
+      break;
+    case "updateOrgCampaign":
+      memory.mockUpdateOrgCampaign(m.orgId, m.campaignId, m.patch);
+      break;
+    case "setOrgCampaignStatus":
+      memory.mockSetOrgCampaignStatus(m.orgId, m.campaignId, m.status);
+      break;
+    case "deleteOrgCampaign":
+      memory.mockDeleteOrgCampaign(m.orgId, m.campaignId);
+      break;
+    case "toggleOrgCampaignBranch":
+      memory.mockToggleOrgCampaignBranch(m.orgId, m.campaignId, m.branchId);
+      break;
     case "addDemoRequest":
       memory.mockAddDemoRequest({
         name: m.name,
@@ -239,6 +281,15 @@ export async function applyAdminMutation(
         city: m.city,
         status: m.status,
       });
+      break;
+    case "setBranchStatus":
+      memory.mockSetBranchStatus(m.orgId, m.branchId, m.status);
+      break;
+    case "toggleBranchStatus":
+      memory.mockToggleBranchStatus(m.orgId, m.branchId);
+      break;
+    case "removeBranch":
+      memory.mockRemoveBranch(m.orgId, m.branchId);
       break;
     case "sendPaymentReminder":
       memory.mockSendPaymentReminder(m.subscriptionId);

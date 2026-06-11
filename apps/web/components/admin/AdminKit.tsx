@@ -10,7 +10,7 @@ import { UkIcon } from "@/components/design/UkIcon";
 import type { UkIconName } from "@/lib/design/icon-paths";
 import { daysLeft, fmtShort, tl } from "@/lib/admin/format";
 import { MODULES, orgPlanById, statusMeta } from "@/lib/admin/pricing";
-import type { LicenseStatus, ModuleFlags, ModuleKey, Org } from "@/lib/admin/types";
+import type { BranchStatus, LicenseStatus, ModuleFlags, ModuleKey, Org } from "@/lib/admin/types";
 
 /* ---- Icon: prototipteki <Icon name="cap"/> ile birebir (UkIcon sarmalayıcı) ---- */
 export function Icon({
@@ -102,7 +102,7 @@ export function AdminTabs({
 }
 
 /* ---- durum rozeti ---- */
-export function StatusBadge({ status, sm }: { status: LicenseStatus; sm?: boolean }) {
+export function StatusBadge({ status, sm }: { status: LicenseStatus | BranchStatus; sm?: boolean }) {
   const m = statusMeta(status);
   return (
     <span className={`badge badge-${m.tone}`} style={sm ? { height: 21, fontSize: 11 } : undefined}>

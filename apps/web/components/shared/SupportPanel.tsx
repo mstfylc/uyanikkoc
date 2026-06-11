@@ -111,7 +111,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
       </div>
 
       <div className="grid col-main">
-        <UkSection title="Sik Sorulan Sorular" sub="En cok merak edilenler">
+        <UkSection title="Sık Sorulan Sorular" sub="En çok merak edilenler">
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <input
               className="input"
@@ -128,7 +128,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
                 className={`type-chip${faqCategory === "all" ? " on" : ""}`}
                 onClick={() => setFaqCategory("all")}
               >
-                Tumu
+                Tümü
               </button>
               {(Object.entries(SUPPORT_FAQ_CATEGORIES) as Array<[SupportFaqCategory, string]>).map(([key, label]) => (
                 <button
@@ -142,7 +142,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
               ))}
             </div>
             {filteredFaq.length === 0 ? (
-              <p className="muted" style={{ fontSize: 13 }}>Eslesen soru bulunamadi.</p>
+              <p className="muted" style={{ fontSize: 13 }}>Eşleşen soru bulunamadı.</p>
             ) : (
               filteredFaq.map((item, index) => {
               const active = openFaq === index;
@@ -205,7 +205,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
                 rows={4}
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                placeholder="Yasadigin sorunu veya onerini detaylica yaz..."
+                placeholder="Yaşadığın sorunu veya önerini detaylıca yaz..."
               />
             </div>
             <button
@@ -214,7 +214,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
               className="btn btn-primary w-fit"
             >
               <KiIcon name={sent ? "ki-check" : "ki-send"} size={16} />
-              {isSubmitting ? "Gonderiliyor..." : sent ? "Talebin alindi" : "Gonder"}
+              {isSubmitting ? "Gönderiliyor..." : sent ? "Talebin alındı" : "Gönder"}
             </button>
             {sent ? (
               <UkBadge tone="success">En gec 24 saat icinde donus yapilacak</UkBadge>
@@ -226,11 +226,11 @@ export function SupportPanel({ role }: SupportPanelProps) {
         </UkSection>
       </div>
 
-      <UkSection title="Taleplerim" sub={`${tickets.length} kayit`}>
+      <UkSection title="Taleplerim" sub={`${tickets.length} kayıt`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : tickets.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
@@ -246,7 +246,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
                   <div className="lr-title">{SUPPORT_CATEGORIES[ticket.category]}</div>
                   <div className="lr-meta">
                     <span className="d">{ticket.message}</span>
-                    {ticket.reply ? <span className="d">Yanit: {ticket.reply}</span> : null}
+                    {ticket.reply ? <span className="d">Yanıt: {ticket.reply}</span> : null}
                     <span className="d">{new Date(ticket.createdAt).toLocaleDateString("tr-TR")}</span>
                   </div>
                 </div>
@@ -259,7 +259,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
                         : "success"
                   }
                 >
-                  {ticket.status === "open" ? "Acik" : ticket.status === "answered" ? "Yanitlandi" : "Kapali"}
+                  {ticket.status === "open" ? "Açık" : ticket.status === "answered" ? "Yanıtlandı" : "Kapalı"}
                 </UkBadge>
               </div>
             ))

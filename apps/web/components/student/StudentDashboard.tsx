@@ -194,7 +194,7 @@ function PriorityGlass({
           <div style={{ minWidth: 0 }}>
             <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,.76)" }}>Bugunun onceligi</p>
             <b style={{ display: "block", fontSize: 15.5, marginTop: 2 }}>
-              {isLoading ? "Yukleniyor..." : assignment?.title ?? "Acil odev yok"}
+              {isLoading ? "Yükleniyor..." : assignment?.title ?? "Acil ödev yok"}
             </b>
             <p style={{ marginTop: 4, fontSize: 12.5, color: "rgba(255,255,255,.76)" }}>
               {assignment
@@ -304,28 +304,28 @@ function Assignments({
 
   return (
     <Section
-      title="Odevlerim"
+      title="Ödevlerim"
       sub={`${pending} bekleyen gorev`}
       action={
         <div className="filters">
           <button type="button" className={filter === "open" ? "on" : ""} onClick={() => setFilter("open")}>Bekleyen</button>
           <button type="button" className={filter === "done" ? "on" : ""} onClick={() => setFilter("done")}>Bitti</button>
-          <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>Tumu</button>
+          <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>Tümü</button>
         </div>
       }
     >
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {isLoading ? (
-          <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>
+          <p className="muted" style={{ fontSize: 13 }}>Yükleniyor...</p>
         ) : filtered.length === 0 ? (
-          <p className="muted" style={{ fontSize: 13 }}>Bu filtrede odev yok.</p>
+          <p className="muted" style={{ fontSize: 13 }}>Bu filtrede ödev yok.</p>
         ) : (
           filtered.slice(0, 5).map((assignment) => (
             <AssignmentRow key={assignment.id} assignment={assignment} onComplete={onComplete} />
           ))
         )}
         <Link href="/student/assignments" className="link-btn" style={{ alignSelf: "flex-start", marginTop: 2 }}>
-          Tumunu Gor <KiIcon name="ki-arrow-right" size={14} />
+          Tümünu Gor <KiIcon name="ki-arrow-right" size={14} />
         </Link>
       </div>
     </Section>
@@ -412,7 +412,7 @@ function UpcomingExams() {
           </div>
         ))}
         <Link href="/student/exams" className="btn btn-primary btn-sm" style={{ alignSelf: "flex-start", marginTop: 4 }}>
-          Denemeye kayit ol
+          Denemeye kayıt ol
         </Link>
       </div>
     </Section>
@@ -427,8 +427,8 @@ function AiBand() {
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <h3 style={{ fontSize: 16, margin: 0 }}>AI Koc</h3>
-          <Badge tone="warning">Yakinda</Badge>
+          <h3 style={{ fontSize: 16, margin: 0 }}>AI Koç</h3>
+          <Badge tone="warning">Yakında</Badge>
         </div>
         <p className="muted" style={{ fontSize: 13, marginTop: 4 }}>
           Kisisel yapay zeka kocun; zayif konularini analiz edip sana ozel program cikaracak.
@@ -451,7 +451,7 @@ export function StudentDashboard() {
     setError(null);
     const response = await fetch("/api/student/assignments", { credentials: "same-origin" });
     if (!response.ok) {
-      setError("Odev listesi yuklenemedi.");
+      setError("Ödev listesi yüklenemedi.");
       setIsLoading(false);
       return;
     }
@@ -473,7 +473,7 @@ export function StudentDashboard() {
     });
 
     if (!response.ok) {
-      setError("Odev tamamlanamadi.");
+      setError("Ödev tamamlanamadı.");
       return;
     }
 
@@ -496,7 +496,7 @@ export function StudentDashboard() {
             <div>
               <h2>Gunaydin</h2>
               <p style={{ marginTop: 6 }}>Bugun {totals.pending} gorevin var. Hedefin net, ritmin guclu.</p>
-              <p style={{ marginTop: 10 }}>YKS hazirlik · Kocun Dilek Emen</p>
+              <p style={{ marginTop: 10 }}>YKS hazirlik · Koçun Dilek Emen</p>
             </div>
             <Badge tone="muted" icon="ki-award">12. sinif</Badge>
           </div>
@@ -513,7 +513,7 @@ export function StudentDashboard() {
 
       <div className="grid g-4">
         <StatCard label="Bu hafta calisma" value="18s" icon="ki-time" tone="info" delta="+3s" />
-        <StatCard label="Tamamlanan odev" value={isLoading ? "-" : totals.completed} icon="ki-check-circle" tone="success" delta="+2" />
+        <StatCard label="Tamamlanan ödev" value={isLoading ? "-" : totals.completed} icon="ki-check-circle" tone="success" delta="+2" />
         <StatCard label="Bekleyen gorev" value={isLoading ? "-" : totals.pending} icon="ki-notepad-edit" tone="warning" delta="1 gecikmis" deltaDir="down" />
         <StatCard label="Haftalik tamamlama" value={isLoading ? "-" : `${totals.completionRate}%`} icon="ki-chart-pie-simple" tone="primary" delta="+8%" />
       </div>

@@ -239,7 +239,7 @@ export function StudentTopicPanel() {
 
       {isLoading ? (
         <p className="muted" style={{ fontSize: 13 }}>
-          Yukleniyor...
+          Yükleniyor...
         </p>
       ) : subjects.length === 0 ? (
         <UkSection title="Konu alani yok">

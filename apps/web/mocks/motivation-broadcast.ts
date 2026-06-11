@@ -21,7 +21,7 @@ function seedIfEmpty(): void {
       id: `mm_${seq++}`,
       studentId: "student_001",
       coachId: "coach_001",
-      body: "Bugun hedefimiz net: once paragraf, sonra turev. Kucuk ama tam odakli iki blok yeter.",
+      body: "Bugün hedefimiz net: önce paragraf, sonra türev. Küçük ama tam odaklı iki blok yeter.",
       createdAt: timestamp,
     },
     {
@@ -49,7 +49,7 @@ export async function sendToStudents(
       body,
       createdAt: timestamp,
     });
-    pushStudentNotification(studentId, "Kocundan motivasyon", body);
+    pushStudentNotification(studentId, "Koçundan motivasyon", body);
   }
   return studentIds.length;
 }

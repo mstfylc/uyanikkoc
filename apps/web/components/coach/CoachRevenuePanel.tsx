@@ -115,7 +115,7 @@ export function CoachRevenuePanel() {
           </div>
         </UkSection>
 
-        <UkSection title="Platform Aboneligi" sub="Subenin Uyanik Koc kullanim plani">
+        <UkSection title="Platform Aboneliği" sub="Şubenin Uyanık Koç kullanım planı">
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 13 }}>
             <div className="plat-plan">
               <UkBadge tone="info">Kurumsal</UkBadge>

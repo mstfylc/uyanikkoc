@@ -50,9 +50,9 @@ function emptyTracker(sources: string[]): StudentSourceTracker {
 function relTime(value: number | null): string | null {
   if (!value) return null;
   const days = Math.floor((Date.now() - value) / 86_400_000);
-  if (days <= 0) return "bugun";
+  if (days <= 0) return "bugün";
   if (days === 1) return "dun";
-  if (days < 7) return `${days} gun once`;
+  if (days < 7) return `${days} gün önce`;
   if (days < 30) return `${Math.floor(days / 7)} hafta once`;
   return `${Math.floor(days / 30)} ay once`;
 }
@@ -71,7 +71,7 @@ export function StudentResourcesCard({
   defaultExam = "Tumu",
   editable = true,
   title = "Kaynaklarim",
-  sub = "Elindeki kitaplari katalogdan sec - kocun odev atarken bunlardan secebilir",
+  sub = "Elindeki kitapları katalogdan seç - koçun ödev atarken bunlardan seçebilir",
 }: StudentResourcesCardProps) {
   const [sources, setSources] = useState<string[]>([]);
   const [tracker, setTracker] = useState<StudentSourceTracker>(emptyTracker([]));
@@ -198,7 +198,7 @@ export function StudentResourcesCard({
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 13 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : tracker.items.length === 0 ? (
             <button
@@ -210,14 +210,14 @@ export function StudentResourcesCard({
               style={{ padding: "26px 24px" }}
             >
               <KiIcon name="ki-book-open" size={26} style={{ color: "var(--faint)" }} />
-              <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-2)" }}>Henuz kaynak yok</div>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-2)" }}>Henüz kaynak yok</div>
               <div className="muted" style={{ fontSize: 12 }}>
                 {editable ? (
                   <>
                     Bilinen yayinevi kitaplarini <b style={{ color: "var(--primary-600)" }}>katalogdan</b> ekle
                   </>
                 ) : (
-                  "Henuz kaynak eklenmedi."
+                  "Henüz kaynak eklenmedi."
                 )}
               </div>
             </button>
@@ -260,13 +260,13 @@ export function StudentResourcesCard({
           {editable ? (
             <div>
               <div className="muted" style={{ fontSize: 11.5, fontWeight: 600, marginBottom: 6 }}>
-                Listede yoksa - ozel kaynagini yaz:
+                Listede yoksa - özel kaynağını yaz:
               </div>
               <div className="add-topic">
                 <KiIcon name="ki-plus" size={14} style={{ color: "var(--faint)", flexShrink: 0 }} />
                 <input
                   className="add-topic-input"
-                  placeholder="Ozel kaynak / fotokopi / ogretmen notu... (Enter)"
+                  placeholder="Özel kaynak / fotokopi / öğretmen notu... (Enter)"
                   value={customValue}
                   onChange={(event) => setCustomValue(event.target.value)}
                   onKeyDown={(event) => {
@@ -323,9 +323,9 @@ function SelfStudyFeed({
     >
       <div className="row" style={{ gap: 8, fontSize: 12.5, fontWeight: 800 }}>
         <KiIcon name="ki-flash-circle" size={14} style={{ color: "var(--info)" }} />
-        Odev harici calisma
+        Ödev harici çalışma
         <span className="muted" style={{ fontWeight: 600 }}>
-          son {records.length} kayit
+          son {records.length} kayıt
         </span>
       </div>
       {records.map((record) => (
@@ -398,7 +398,7 @@ function SourceTrackerRow({
               </UkBadge>
               {activity.soru > 0 ? <span className="d">{activity.soru.toLocaleString("tr-TR")} soru</span> : null}
               {activity.acc != null ? <span className="d">%{activity.acc} dogru</span> : null}
-              {activity.selfCount > 0 ? <span className="d">odev harici {activity.selfSoru || activity.selfCount}</span> : null}
+              {activity.selfCount > 0 ? <span className="d">ödev harici {activity.selfSoru || activity.selfCount}</span> : null}
               {lastUsed ? <span className="d">{lastUsed}</span> : null}
             </span>
           </span>
@@ -456,7 +456,7 @@ function SourceTrackerRow({
 
           <div>
             <div className="muted" style={{ fontSize: 11.5, fontWeight: 800, marginBottom: 7, textTransform: "uppercase" }}>
-              Odev harici calisma
+              Ödev harici çalışma
             </div>
             <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
               <input

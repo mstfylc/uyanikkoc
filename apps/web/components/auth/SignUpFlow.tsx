@@ -37,8 +37,8 @@ export function SignUpFlow() {
               <KiIcon name="ki-flash text-white text-xl" />
             </span>
             <div className="logo-text">
-              <b style={{ fontSize: 19, color: "#fff" }}>Uyanik Koc</b>
-              <span style={{ color: "rgba(255,255,255,.7)" }}>Hesap olustur</span>
+              <b style={{ fontSize: 19, color: "#fff" }}>Uyanık Koç</b>
+              <span style={{ color: "rgba(255,255,255,.7)" }}>Hesap oluştur</span>
             </div>
           </div>
           <div style={{ marginTop: "auto" }}>
@@ -46,7 +46,7 @@ export function SignUpFlow() {
               Dakikalar icinde basla.
             </h2>
             <p style={{ fontSize: 14.5, color: "rgba(255,255,255,.8)", marginTop: 14, maxWidth: 420, lineHeight: 1.6 }}>
-              Ogrenci veya bireysel koc olarak kayit ol. Demo ortamda kod dogrulama herhangi 6 hane ile calisir.
+              Öğrenci veya bireysel koç olarak kayıt ol. Demo ortamda kod doğrulama herhangi 6 hane ile çalışır.
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ export function SignUpFlow() {
                     style={{ flex: 1, justifyContent: "center" }}
                     onClick={() => setRole(item)}
                   >
-                    {item === "student" ? "Ogrenci" : "Bireysel Koc"}
+                    {item === "student" ? "Öğrenci" : "Bireysel Koç"}
                   </button>
                 ))}
               </div>
@@ -92,7 +92,7 @@ export function SignUpFlow() {
                 <input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} required />
               </div>
               <div className="field" style={{ marginBottom: 16 }}>
-                <label className="label">Sifre</label>
+                <label className="label">Şifre</label>
                 <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required />
               </div>
               <div className="row" style={{ gap: 10 }}>
@@ -104,7 +104,7 @@ export function SignUpFlow() {
 
           {step === "plan" ? (
             <>
-              <h1 style={{ fontSize: 23, fontWeight: 800, marginBottom: 16 }}>Koc plani sec</h1>
+              <h1 style={{ fontSize: 23, fontWeight: 800, marginBottom: 16 }}>Koç planı seç</h1>
               <div className="stack" style={{ gap: 10, marginBottom: 16 }}>
                 {[
                   { id: "starter", name: "Baslangic", price: "990 TL/ay" },
@@ -131,7 +131,7 @@ export function SignUpFlow() {
 
           {step === "verify" ? (
             <>
-              <h1 style={{ fontSize: 23, fontWeight: 800, marginBottom: 8 }}>Kod dogrulama</h1>
+              <h1 style={{ fontSize: 23, fontWeight: 800, marginBottom: 8 }}>Kod doğrulama</h1>
               <p className="muted" style={{ fontSize: 13, marginBottom: 16 }}>{email || phone} adresine kod gonderildi (demo).</p>
               <input
                 className="input tnum"
@@ -162,19 +162,19 @@ export function SignUpFlow() {
               <span className="stat-icon tone-success" style={{ width: 56, height: 56, margin: "0 auto 14px" }}>
                 <KiIcon name="ki-check" size={28} />
               </span>
-              <h1 style={{ fontSize: 23, fontWeight: 800 }}>Hesabin hazir</h1>
+              <h1 style={{ fontSize: 23, fontWeight: 800 }}>Hesabın hazır</h1>
               <p className="muted" style={{ fontSize: 13.5, margin: "8px 0 18px" }}>
-                Demo ortamda kayit tamamlandi. Giris yaparak devam edebilirsin.
+                Demo ortamda kayıt tamamlandı. Giriş yaparak devam edebilirsin.
               </p>
               <Link href="/login" className="btn btn-primary" style={{ width: "100%", height: 46, display: "inline-flex", justifyContent: "center" }}>
-                Giris yap
+                Giriş yap
               </Link>
             </div>
           ) : null}
 
           {step !== "done" ? (
             <div className="muted" style={{ fontSize: 12, textAlign: "center", marginTop: 20 }}>
-              Zaten hesabin var mi? <Link href="/login" className="link-btn">Giris yap</Link>
+              Zaten hesabın var mı? <Link href="/login" className="link-btn">Giriş yap</Link>
             </div>
           ) : null}
         </div>

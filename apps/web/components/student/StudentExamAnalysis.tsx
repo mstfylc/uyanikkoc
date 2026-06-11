@@ -26,9 +26,9 @@ function buildProjection(totalNet: number) {
   const curRank = Math.round(Math.max(5000, 80000 - totalNet * 600));
   return [
     { label: "Mevcut", puan: curPuan, rank: curRank, gain: 0 },
-    { label: "1. Oncelik", puan: +(curPuan + 22).toFixed(2), rank: Math.round(curRank * 0.74), gain: 22 },
-    { label: "2. Oncelik", puan: +(curPuan + 36).toFixed(2), rank: Math.round(curRank * 0.55), gain: 36 },
-    { label: "3. Oncelik", puan: +(curPuan + 49).toFixed(2), rank: Math.round(curRank * 0.4), gain: 49 },
+    { label: "1. Öncelik", puan: +(curPuan + 22).toFixed(2), rank: Math.round(curRank * 0.74), gain: 22 },
+    { label: "2. Öncelik", puan: +(curPuan + 36).toFixed(2), rank: Math.round(curRank * 0.55), gain: 36 },
+    { label: "3. Öncelik", puan: +(curPuan + 49).toFixed(2), rank: Math.round(curRank * 0.4), gain: 49 },
   ];
 }
 
@@ -102,7 +102,7 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
                 <div style={{ fontSize: 13, color: "rgba(255,255,255,.85)", marginTop: 4 }}>
                   {trendDelta != null && trendDelta >= 0
                     ? `Son ${trendNets.length} denemede +${formatExamNet(trendDelta)} net gelisim`
-                    : "Trend verisi icin birden fazla deneme gerekir"}
+                    : "Trend verisi için birden fazla deneme gerekir"}
                 </div>
               </div>
               <div className="row" style={{ gap: 10 }}>
@@ -206,7 +206,7 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
         </div>
       </UkSection>
 
-      <UkSection title="Puan & siralama projeksiyonu" sub="Oncelikli calisma senaryolari">
+      <UkSection title="Puan & sıralama projeksiyonu" sub="Öncelikli çalışma senaryoları">
         <div className="card-body" style={{ padding: 0 }}>
           <table className="tbl">
             <thead>
@@ -232,7 +232,7 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
       </UkSection>
 
       {priorityTopics.length > 0 ? (
-        <UkSection title="Oncelikli konular" sub="Zayif derslerden turetilen calisma listesi">
+        <UkSection title="Öncelikli konular" sub="Zayıf derslerden türetilen çalışma listesi">
           <div className="card-body" style={{ padding: 0 }}>
             <table className="tbl">
               <thead>

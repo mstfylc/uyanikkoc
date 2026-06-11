@@ -14,6 +14,7 @@ import { generateRefreshToken, hashRefreshToken, refreshExpiry, signAccess } fro
 import { shouldUseDatabase } from "@/lib/data/env";
 import { resolveUserByEmail } from "@/lib/auth/resolve-user";
 import { accessSecret, otpPepper, toApiUser, findDemoUserById, demoStudentRecord, type ApiUser } from "@/server/auth/mobile-tokens";
+import { sendSms, SmsError } from "@/server/services/sms.service";
 import type { AuthUserRecord } from "@uyanik/database";
 
 export class MobileAuthError extends Error {
@@ -77,11 +78,6 @@ function assertMemoryMode(): void {
   }
 }
 
-async function sendSms(phoneE164: string, text: string): Promise<void> {
-  // Bellek modu: gerçek SMS göndermeden dev log. Prod'da SmsSender (Netgsm/Twilio) takılır.
-  console.info(`[mobile-auth] SMS → ${phoneE164}: ${text}`);
-}
-
 function issueTokens(record: AuthUserRecord, phone?: string): AuthResult {
   const apiUser = toApiUser(record, phone);
   const accessToken = signAccess({ sub: record.id, role: apiUser.role }, accessSecret());
@@ -106,7 +102,15 @@ export async function requestOtp(phoneRaw: string): Promise<{ resendInMs: number
 
   const code = generateOtp();
   otpStore.set(phone, { codeHash: hashOtp(code, otpPepper()), attempts: 0, consumedAt: null, expiresAt: otpExpiry(), createdAt: new Date() });
-  await sendSms(phone, `Uyanık Koç giriş kodun: ${code}`);
+  try {
+    await sendSms(phone, `Uyanık Koç giriş kodun: ${code}`);
+  } catch (error) {
+    otpStore.delete(phone);
+    if (error instanceof SmsError) {
+      throw new MobileAuthError(502, "SMS gonderilemedi", "sms_failed", { reason: error.code });
+    }
+    throw error;
+  }
   return { resendInMs: OTP_RESEND_MS };
 }
 

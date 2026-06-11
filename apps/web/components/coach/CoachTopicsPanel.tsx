@@ -271,7 +271,7 @@ export function CoachTopicsPanel() {
     <div className="stack rise" data-testid="coach-topics-panel">
       <UkPageHead
         title="Konu Takibi"
-        sub="Ogrencinin ders bazinda konu ilerlemesi, cozulen soru ve net gelisimi"
+        sub="Öğrencinin ders bazında konu ilerlemesi, çözülen soru ve net gelişimi"
         actions={
           <div className="row" style={{ gap: 10 }}>
             <div className="field" style={{ minWidth: 200, marginBottom: 0 }}>
@@ -293,7 +293,7 @@ export function CoachTopicsPanel() {
               onClick={() => setOdevModal({ open: true, subject: null, topic: null })}
             >
               <KiIcon name="ki-plus" />
-              Odev Ata
+              Ödev Ata
             </button>
           </div>
         }
@@ -342,7 +342,7 @@ export function CoachTopicsPanel() {
             icon="ki-chart-line-up-2"
             tone="warning"
             value={`+${totalGain}`}
-            label={examTrack === "LGS" ? "Net gelisimi (LGS)" : "Net gelisimi (TYT+AYT)"}
+            label={examTrack === "LGS" ? "Net gelişimi (LGS)" : "Net gelişimi (TYT+AYT)"}
           />
         </div>
       ) : null}
@@ -421,7 +421,7 @@ export function CoachTopicsPanel() {
       <div className="grid col-main">
         <UkSection
           title="Haftalik Soru Hedefi"
-          sub="Ogrencin icin ders bazinda hedef belirle"
+          sub="Öğrencin için ders bazında hedef belirle"
           action={
             <button type="button" className="btn btn-primary btn-sm" onClick={saveTargets} disabled={isSavingTargets}>
               <KiIcon name={savedTick ? "ki-check" : "ki-target"} size={15} />
@@ -607,7 +607,7 @@ export function CoachTopicsPanel() {
                     onClick={() => setOdevModal({ open: true, subject: topic.subj, topic: topic.n })}
                   >
                     <KiIcon name="ki-plus" size={15} />
-                    Odev ata
+                    Ödev ata
                   </button>
                 </div>
               );
@@ -689,7 +689,7 @@ export function CoachTopicsPanel() {
           <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 4 }}>
             {isLoading ? (
               <p className="muted" style={{ fontSize: 13, padding: 8 }}>
-                Yukleniyor...
+                Yükleniyor...
               </p>
             ) : (
               perSubj.map((subject) => {
@@ -736,7 +736,7 @@ export function CoachTopicsPanel() {
                   style={{ height: 24, fontSize: 11 }}
                   onClick={() => setKaynakFilter("all")}
                 >
-                  Tumu
+                  Tümü
                 </button>
                 {activeKaynakList.map((source) => (
                   <button
@@ -831,7 +831,7 @@ export function CoachTopicsPanel() {
         </div>
       )}
 
-      <UkSection title="Ogrenci notlari" sub={`${notes.length} not`}>
+      <UkSection title="Öğrenci notları" sub={`${notes.length} not`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <form onSubmit={handleAddNote} className="stack" style={{ gap: 10 }}>
             <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
@@ -924,7 +924,7 @@ export function CoachTopicsPanel() {
         open={odevModal.open}
         onClose={() => setOdevModal({ open: false, subject: null, topic: null })}
         studentId={studentId}
-        studentName={selectedStudent?.displayName ?? "Ogrenci"}
+        studentName={selectedStudent?.displayName ?? "Öğrenci"}
         curriculum={curriculum}
         initialSubject={odevModal.subject}
         initialTopic={odevModal.topic}
@@ -938,7 +938,7 @@ export function CoachTopicsPanel() {
       <CoachSchoolScheduleModal
         open={schedModal}
         onClose={() => setSchedModal(false)}
-        studentName={selectedStudent?.displayName ?? "Ogrenci"}
+        studentName={selectedStudent?.displayName ?? "Öğrenci"}
         schedule={schedule}
       />
 
@@ -952,7 +952,7 @@ export function CoachTopicsPanel() {
                 <KiIcon name="ki-check-circle" size={18} />
               </span>
               <div>
-                <b style={{ fontSize: 13.5, fontWeight: 700 }}>Odev atandi</b>
+                <b style={{ fontSize: 13.5, fontWeight: 700 }}>Ödev atandi</b>
                 <div className="muted" style={{ fontSize: 12 }}>
                   {assignedToast.konu} konu · {assignedToast.soru} soru{" "}
                   {selectedStudent?.displayName.split(" ")[0]}&apos;e gonderildi

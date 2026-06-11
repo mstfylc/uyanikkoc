@@ -9,12 +9,12 @@ const ROSTER_BY_COACH: Record<string, CoachRosterEntry[]> = {
   coach_001: [
     {
       studentId: DEMO_STUDENT_ID,
-      displayName: "Demo Ogrenci",
+      displayName: "Demo Öğrenci",
       email: "student@uyanik.local",
     },
     {
       studentId: DEMO_STUDENT_002_ID,
-      displayName: "Demo Ogrenci 2",
+      displayName: "Demo Öğrenci 2",
       email: "student2@uyanik.local",
     },
   ],

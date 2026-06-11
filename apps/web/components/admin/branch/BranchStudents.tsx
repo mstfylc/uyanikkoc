@@ -5,27 +5,30 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { Icon, StatCard } from "@/components/admin/AdminKit";
+import { ConfirmModal, Icon, StatCard } from "@/components/admin/AdminKit";
 import { useAdminStore } from "@/components/admin/AdminStore";
-import { getActiveOrg } from "@/components/admin/selectors";
+import { getActiveOrg, visibleOrgStudents } from "@/components/admin/selectors";
+import { InviteStudentDialog } from "@/components/admin/dialogs";
 import { OrgSwitcher } from "./OrgSwitcher";
 import { UkAvatar } from "@/components/design/UkAvatar";
 import { UkPageHead } from "@/components/design/UkPageHead";
-import { orgStudents } from "@/lib/admin/derive";
+import type { OrgStudent } from "@/lib/admin/derive";
 import { downloadCSV } from "@/lib/admin/csv";
 
 const PER = 12;
 
 export function BranchStudents() {
-  const { snapshot, activeOrgId, toast } = useAdminStore();
+  const { snapshot, activeOrgId, mutate, toast } = useAdminStore();
   const router = useRouter();
   const [q, setQ] = useState("");
   const [branch, setBranch] = useState("all");
   const [page, setPage] = useState(0);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [removeFor, setRemoveFor] = useState<OrgStudent | null>(null);
   if (!snapshot) return <div className="card card-pad muted">Yükleniyor…</div>;
 
   const o = getActiveOrg(snapshot, activeOrgId);
-  const students = orgStudents(o);
+  const students = visibleOrgStudents(snapshot, o);
   const branchName = o.branches.find((b) => b.id === branch)?.name;
   const filtered = students.filter(
     (s) => (branch === "all" || s.branch === branchName) && s.name.toLowerCase().includes(q.toLowerCase()),
@@ -45,7 +48,7 @@ export function BranchStudents() {
             <button type="button" className="btn btn-light" onClick={() => { downloadCSV("ogrenciler.csv", [["Öğrenci", "Sınıf", "Şube", "Koç", "Net", "Devam"], ...students.map((s) => [s.name, s.grade, s.branch, s.coach, s.net, s.attend + "%"])]); toast("Liste indirildi", { icon: "ki-cloud-download" }); }}>
               <Icon name="download" size={16} />Dışa aktar
             </button>
-            <button type="button" className="btn btn-primary" onClick={() => toast("Öğrenci ekleme akışı", { icon: "ki-plus" })}>
+            <button type="button" className="btn btn-primary" onClick={() => setInviteOpen(true)}>
               <Icon name="plus" size={16} />Öğrenci ekle
             </button>
           </div>
@@ -90,7 +93,7 @@ export function BranchStudents() {
             </thead>
             <tbody>
               {shown.map((s) => (
-                <tr key={s.id} style={{ cursor: "pointer" }} onClick={() => router.push(`/branch/students/${s.id}`)}>
+                <tr key={s.id} style={{ cursor: "pointer" }} onClick={() => router.push(`/yonetim/students/${s.id}`)}>
                   <td>
                     <div className="name">
                       <UkAvatar name={s.name} size={34} />
@@ -102,7 +105,21 @@ export function BranchStudents() {
                   <td><span style={{ fontSize: 12.5 }}>{s.coach}</span></td>
                   <td><span className="tnum" style={{ fontWeight: 700 }}>{s.net}</span></td>
                   <td><span className="tnum" style={{ color: s.attend < 80 ? "var(--warning)" : "var(--text-2)" }}>%{s.attend}</span></td>
-                  <td style={{ textAlign: "right" }}><Icon name="chevronRight" size={16} style={{ color: "var(--faint)" }} /></td>
+                  <td style={{ textAlign: "right" }}>
+                    <button
+                      type="button"
+                      className="icon-btn"
+                      style={{ width: 32, height: 32, color: "var(--danger)", marginRight: 6 }}
+                      title="Öğrenciyi çıkar"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setRemoveFor(s);
+                      }}
+                    >
+                      <Icon name="logout" size={16} />
+                    </button>
+                    <Icon name="chevronRight" size={16} style={{ color: "var(--faint)" }} />
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -118,6 +135,21 @@ export function BranchStudents() {
           </div>
         ) : null}
       </div>
+      {inviteOpen ? <InviteStudentDialog orgId={o.id} branches={o.branches} onClose={() => setInviteOpen(false)} /> : null}
+      <ConfirmModal
+        open={!!removeFor}
+        title="Öğrenciyi sistemden çıkar?"
+        tone="danger"
+        body={`${removeFor?.name} kurum öğrenci listesinden çıkarılacak. Koltuk ve şube sayacı güncellenecek.`}
+        confirmLabel="Çıkar"
+        onConfirm={async () => {
+          if (removeFor) {
+            await mutate({ kind: "removeOrgStudent", orgId: o.id, studentId: removeFor.id });
+            toast(removeFor.name + " sistemden çıkarıldı", { icon: "ki-information-2", tone: "danger" });
+          }
+        }}
+        onClose={() => setRemoveFor(null)}
+      />
     </div>
   );
 }

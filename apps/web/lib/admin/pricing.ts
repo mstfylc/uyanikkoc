@@ -2,6 +2,7 @@
 // Prototip kaynağı: admin/admin-data.jsx (MODULES, ORG_PLANS, COACH_PLANS, STATUS).
 
 import type {
+  BranchStatus,
   CoachPlan,
   CoachPlanId,
   LicenseStatus,
@@ -171,6 +172,14 @@ const STATUS_META: Record<LicenseStatus, { label: string; tone: StatusTone }> = 
   canceled: { label: "İptal edildi", tone: "danger" },
 };
 
-export function statusMeta(status: LicenseStatus): { label: string; tone: StatusTone } {
-  return STATUS_META[status] ?? STATUS_META.active;
+const BRANCH_STATUS_META: Record<BranchStatus, { label: string; tone: StatusTone }> = {
+  active: STATUS_META.active,
+  warning: { label: "Uyarı", tone: "warning" },
+  suspended: STATUS_META.suspended,
+};
+
+export function statusMeta(status: LicenseStatus | BranchStatus): { label: string; tone: StatusTone } {
+  return status in BRANCH_STATUS_META
+    ? BRANCH_STATUS_META[status as BranchStatus]
+    : STATUS_META[status as LicenseStatus] ?? STATUS_META.active;
 }

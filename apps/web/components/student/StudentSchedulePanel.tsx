@@ -178,8 +178,8 @@ export function StudentSchedulePanel() {
   return (
     <div className="stack rise" data-testid="student-schedule-panel">
       <UkPageHead
-        title="Calisma Programi"
-        sub={`${examProfile.label} · gunluk plan`}
+        title="Çalışma Programı"
+        sub={`${examProfile.label} · günlük plan`}
         actions={
           <button type="button" className="btn btn-primary btn-sm" onClick={() => setBlockModalOpen(true)}>
             <KiIcon name="ki-plus" />
@@ -193,13 +193,13 @@ export function StudentSchedulePanel() {
         <UkStatCard icon="ki-check-circle" tone="success" value={countWeeklyDone(studyPlan)} label="Tamamlanan blok" />
       </div>
 
-      <UkSection title="Haftalik tamamlama" sub="Gun bazinda plan ilerlemesi">
+      <UkSection title="Haftalık tamamlama" sub="Gün bazında plan ilerlemesi">
         <div className="card-body">
           <UkBarChart data={weeklyChart} max={100} />
         </div>
       </UkSection>
 
-      <UkSection title="Gunluk calisma plani" sub="Bugun icin onerilen bloklar">
+      <UkSection title="Günlük çalışma planı" sub="Bugün için önerilen bloklar">
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div className="filters" style={{ flexWrap: "wrap" }}>
             {STUDY_DAYS.map((day) => (
@@ -210,18 +210,18 @@ export function StudentSchedulePanel() {
                 onClick={() => setActiveDay(day)}
               >
                 {day}
-                {day === TODAY_LABEL ? " · bugun" : ""}
+                {day === TODAY_LABEL ? " · bugün" : ""}
               </button>
             ))}
           </div>
 
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : dayBlocks.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Bu gun icin planlanmis calisma blogu yok.
+              Bugün için planlanmış çalışma bloğu yok.
             </p>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -286,7 +286,7 @@ export function StudentSchedulePanel() {
           <div>
             <div style={{ fontSize: 14, fontWeight: 700 }}>Okula gidiyorum</div>
             <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
-              Okul programini goster ve duzenle
+              Okul programını göster ve düzenle
             </div>
           </div>
           <button
@@ -301,13 +301,13 @@ export function StudentSchedulePanel() {
       </div>
 
       {!schedule?.attendsSchool ? (
-        <UkSection title="Okul programi">
+        <UkSection title="Okul programı">
           <div className="card-body muted" style={{ fontSize: 13 }}>
-            Okula gitmiyorsan program duzenlenmez.
+            Okula gitmiyorsan program düzenlenmez.
           </div>
         </UkSection>
       ) : (
-        <UkSection title="Okul ders programi" sub="Pzt-Cum, 8 ders saati">
+        <UkSection title="Okul ders programı" sub="Pzt-Cum, 8 ders saati">
           <div className="card-body" style={{ overflowX: "auto" }}>
             <table className="tbl">
               <thead>
@@ -366,9 +366,9 @@ export function StudentSchedulePanel() {
               <div className="modal-panel" style={{ maxWidth: 480 }} onClick={(event) => event.stopPropagation()}>
                 <div className="modal-head">
                   <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 800 }}>Calisma blogu ekle</h3>
+                    <h3 style={{ fontSize: 16, fontWeight: 800 }}>Çalışma bloğu ekle</h3>
                     <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
-                      Haftalik planina yeni blok ekle
+                      Haftalık planına yeni blok ekle
                     </div>
                   </div>
                   <button
@@ -385,7 +385,7 @@ export function StudentSchedulePanel() {
                   <div className="grid g-2">
                     <div className="field">
                       <label className="label" htmlFor="block-day">
-                        Gun
+                        Gün
                       </label>
                       <select
                         id="block-day"

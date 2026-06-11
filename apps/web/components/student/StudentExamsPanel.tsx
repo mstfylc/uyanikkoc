@@ -43,7 +43,7 @@ export function StudentExamsPanel() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [tab, setTab] = useState<ExamTab>("results");
   const [manualOpen, setManualOpen] = useState(false);
-  const [kayitOpen, setKayitOpen] = useState(false);
+  const [kayıtOpen, setKayitOpen] = useState(false);
   const [onlineExams, setOnlineExams] = useState<OnlineExamRecord[]>([]);
   const [optikExam, setOptikExam] = useState<OnlineExamRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,7 +96,7 @@ export function StudentExamsPanel() {
     <div className="stack rise" data-testid="student-exams-panel">
       <UkPageHead
         title="Denemeler"
-        sub="Deneme sonuclarin ve performans trendi"
+        sub="Deneme sonuçların ve performans trendi"
         actions={
           <div className="row" style={{ gap: 8 }}>
             <button type="button" className="btn btn-light btn-sm" onClick={() => setKayitOpen(true)}>
@@ -160,7 +160,7 @@ export function StudentExamsPanel() {
           >
             <KiIcon name="ki-notepad" size={18} style={{ color: "var(--primary-600)", flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
-              <b style={{ fontSize: 13.5 }}>Online deneme nasil calisir?</b>
+              <b style={{ fontSize: 13.5 }}>Online deneme nasıl çalışır?</b>
               <div className="muted" style={{ fontSize: 12.5 }}>
                 Deneme kitapcigin kargoyla gelir. Cozdukten sonra optik formu buradan online doldur, netin aninda
                 hesaplansin.
@@ -171,11 +171,11 @@ export function StudentExamsPanel() {
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {onlineLoading ? (
                 <p className="muted" style={{ fontSize: 13 }}>
-                  Yukleniyor...
+                  Yükleniyor...
                 </p>
               ) : onlineExams.length === 0 ? (
                 <p className="muted" style={{ fontSize: 13 }}>
-                  Online deneme bulunamadi.
+                  Online deneme bulunamadı.
                 </p>
               ) : (
                 onlineExams.map((exam) => (
@@ -229,11 +229,11 @@ export function StudentExamsPanel() {
           ) : null}
 
           <div className="grid col-main">
-            <UkSection title="Deneme listesi" sub={`${exams.length} kayit`}>
+            <UkSection title="Deneme listesi" sub={`${exams.length} kayıt`}>
               <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {isLoading ? (
                   <p className="muted" style={{ fontSize: 13 }}>
-                    Yukleniyor...
+                    Yükleniyor...
                   </p>
                 ) : exams.length === 0 ? (
                   <p className="muted" style={{ fontSize: 13 }}>
@@ -350,7 +350,7 @@ export function StudentExamsPanel() {
       />
 
       <DenemeKayitModal
-        open={kayitOpen}
+        open={kayıtOpen}
         onClose={() => setKayitOpen(false)}
         onGoOnline={() => setTab("online")}
       />

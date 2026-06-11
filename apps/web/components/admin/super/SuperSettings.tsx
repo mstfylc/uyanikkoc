@@ -68,7 +68,7 @@ function IntegrationModal({ item, onClose }: { item: Integration; onClose: () =>
     await mutate({
       kind: "connectIntegration",
       integrationId: item.id,
-      account: isJotform ? "jotform: bagli" : account,
+      account: isJotform ? "jotform: bağlı" : account,
       formName,
     });
     toast(`${item.name} baglandi`, { icon: "ki-check-circle", tone: "success" });
@@ -85,7 +85,7 @@ function IntegrationModal({ item, onClose }: { item: Integration; onClose: () =>
           <span className="as-ic"><Icon name="bolt" size={18} /></span>
           <div style={{ flex: 1 }}>
             <b style={{ fontSize: 13 }}>Form alanlari</b>
-            <div className="muted" style={{ fontSize: 12, lineHeight: 1.5 }}>ad, email, telefon, tip, plan ve not alanlari Demo & Uyelikler sayfasina yeni talep olarak duser.</div>
+            <div className="muted" style={{ fontSize: 12, lineHeight: 1.5 }}>ad, e-posta, telefon, tip, plan ve not alanları Demo & Üyelikler sayfasına yeni talep olarak düşer.</div>
           </div>
         </div>
       </Modal>
@@ -115,7 +115,7 @@ function IntegrationModal({ item, onClose }: { item: Integration; onClose: () =>
       <Field label="Baglanacak form"><input className="input" value={formName} onChange={(e) => setFormName(e.target.value)} /></Field>
       <div className="alert-strip">
         <span className="as-ic"><Icon name="bolt" size={18} /></span>
-        <div style={{ flex: 1 }}><b style={{ fontSize: 13 }}>Otomatik aktarim</b><div className="muted" style={{ fontSize: 12 }}>Bu formdan gelen basvurular Demo & Uyelikler sayfasina duser.</div></div>
+        <div style={{ flex: 1 }}><b style={{ fontSize: 13 }}>Otomatik aktarım</b><div className="muted" style={{ fontSize: 12 }}>Bu formdan gelen başvurular Demo & Üyelikler sayfasına düşer.</div></div>
       </div>
     </Modal>
   );
@@ -142,7 +142,7 @@ function IntegrationCard({ item, editable, onManage, onDisconnect }: { item: Int
             <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Bagli form</span><b style={{ fontSize: 12.5 }}>{item.formName || "-"}</b></div>
             <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Hesap</span><b style={{ fontSize: 12.5 }}>{item.account || "-"}</b></div>
             <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Son senkron</span><b className="tnum" style={{ fontSize: 12.5 }}>{timeAgo(item.lastSync)}</b></div>
-            <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Gelen basvuru</span><b className="tnum" style={{ fontSize: 13, color: "var(--primary-600)" }}>{item.leadCount}</b></div>
+            <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Gelen başvuru</span><b className="tnum" style={{ fontSize: 13, color: "var(--primary-600)" }}>{item.leadCount}</b></div>
           </div>
         ) : null}
         {editable ? (
@@ -168,7 +168,7 @@ export function SuperSettings() {
   const [manage, setManage] = useState<Integration | null>(null);
   const [disconnect, setDisconnect] = useState<Integration | null>(null);
 
-  if (!snapshot) return <div className="card card-pad muted">Yukleniyor...</div>;
+  if (!snapshot) return <div className="card card-pad muted">Yükleniyor...</div>;
 
   const editable = snapshot.viewerAccess === "full";
   const fulls = snapshot.team.filter((member) => member.access === "full").length;
@@ -179,7 +179,7 @@ export function SuperSettings() {
 
   return (
     <div className="stack rise">
-      <UkPageHead title="Ayarlar" sub="Panel erisimi, roller ve basvuru kaynagi entegrasyonlari" />
+      <UkPageHead title="Ayarlar" sub="Panel erişimi, roller ve başvuru kaynağı entegrasyonları" />
 
       {!editable ? (
         <div className="alert-strip">
@@ -202,8 +202,8 @@ export function SuperSettings() {
           </div>
           <div className="card">
             <div className="card-head">
-              <div><h3>Super admin erisimi</h3><p className="sub">Panele erisebilecek kullanicilari ve rollerini yonetin</p></div>
-              {editable ? <button type="button" className="btn btn-primary btn-sm" onClick={() => setInviteOpen(true)}><KiIcon name="ki-plus" />Kullanici davet et</button> : null}
+              <div><h3>Super admin erişimi</h3><p className="sub">Panele erişebilecek kullanıcıları ve rollerini yönetin</p></div>
+              {editable ? <button type="button" className="btn btn-primary btn-sm" onClick={() => setInviteOpen(true)}><KiIcon name="ki-plus" />Kullanıcı davet et</button> : null}
             </div>
             <div className="card-body" style={{ padding: 0 }}>
               {snapshot.team.map((member) => (
@@ -221,7 +221,7 @@ export function SuperSettings() {
                   ) : (
                     <span className={`badge badge-${ACCESS_META[member.access].tone}`} style={{ height: 24 }}><Icon name={ACCESS_META[member.access].icon} size={12} />{ACCESS_META[member.access].label}</span>
                   )}
-                  {editable ? <button type="button" className="icon-btn" style={{ width: 34, height: 34 }} onClick={() => void mutate({ kind: "removeAdminMember", memberId: member.id }).then(() => toast("Kullanici kaldirildi", { icon: "ki-trash", tone: "warning" }))}><Icon name="plus" size={16} style={{ transform: "rotate(45deg)" }} /></button> : null}
+                  {editable ? <button type="button" className="icon-btn" style={{ width: 34, height: 34 }} onClick={() => void mutate({ kind: "removeAdminMember", memberId: member.id }).then(() => toast("Kullanıcı kaldırıldı", { icon: "ki-trash", tone: "warning" }))}><Icon name="plus" size={16} style={{ transform: "rotate(45deg)" }} /></button> : null}
                 </div>
               ))}
             </div>
@@ -242,12 +242,12 @@ export function SuperSettings() {
         <div className="stack">
           <div className="grid g-3">
             <StatCard icon="bolt" tone="primary" value={`${connected}/${snapshot.integrations.length}`} label="Bagli kaynak" />
-            <StatCard icon="users" tone="success" value={totalLeads} label="Toplam gelen basvuru" />
+            <StatCard icon="users" tone="success" value={totalLeads} label="Toplam gelen başvuru" />
             <StatCard icon="refresh" tone="info" value={snapshot.integrations.length - connected} label="Baglanabilir kaynak" />
           </div>
           <div className="alert-strip">
             <span className="as-ic"><Icon name="bell" size={16} /></span>
-            <div style={{ flex: 1 }}><b style={{ fontSize: 13.5 }}>Basvurular tek yerde</b><div className="muted" style={{ fontSize: 12 }}>Bagli kaynaklardan gelen tum basvurular Demo & Uyelikler sayfasinda demo talebi olarak listelenir.</div></div>
+            <div style={{ flex: 1 }}><b style={{ fontSize: 13.5 }}>Başvurular tek yerde</b><div className="muted" style={{ fontSize: 12 }}>Bağlı kaynaklardan gelen tüm başvurular Demo & Üyelikler sayfasında demo talebi olarak listelenir.</div></div>
           </div>
           <div className="grid g-2">
             {snapshot.integrations.map((item) => <IntegrationCard key={item.id} item={item} editable={editable} onManage={setManage} onDisconnect={setDisconnect} />)}
@@ -268,7 +268,7 @@ export function SuperSettings() {
         open={!!disconnect}
         title="Baglantiyi kes?"
         tone="danger"
-        body={disconnect ? `${disconnect.name} baglantisi kesilecek; bu kaynaktan yeni basvuru aktarimi duracak.` : ""}
+        body={disconnect ? `${disconnect.name} bağlantısı kesilecek; bu kaynaktan yeni başvuru aktarımı duracak.` : ""}
         confirmLabel="Baglantiyi kes"
         onConfirm={() => { if (disconnect) void mutate({ kind: "disconnectIntegration", integrationId: disconnect.id }).then(() => toast("Baglanti kesildi", { icon: "ki-shield-cross", tone: "warning" })); }}
         onClose={() => setDisconnect(null)}

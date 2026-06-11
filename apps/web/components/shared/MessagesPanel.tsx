@@ -180,7 +180,7 @@ export function MessagesPanel({
       {enableGroupTabs ? (
         <div className="seg" style={{ width: "fit-content" }}>
           <button type="button" className={threadFilter === "all" ? "on" : ""} onClick={() => setThreadFilter("all")}>
-            Tumu
+            Tümü
           </button>
           <button type="button" className={threadFilter === "dm" ? "on" : ""} onClick={() => setThreadFilter("dm")}>
             Birebir
@@ -193,7 +193,7 @@ export function MessagesPanel({
 
       {isLoading ? (
         <p className="muted" style={{ fontSize: 13 }}>
-          Yukleniyor...
+          Yükleniyor...
         </p>
       ) : threads.length === 0 ? (
         <p className="muted" style={{ fontSize: 13 }}>
@@ -281,7 +281,7 @@ export function MessagesPanel({
                             }}
                           >
                             {message.senderRole === "COACH"
-                              ? "Koc"
+                              ? "Koç"
                               : message.senderRole === "PARENT"
                                 ? "Veli"
                                 : "Ogrenci"}
@@ -337,7 +337,7 @@ export function MessagesPanel({
                   placeholder={
                     activeThread?.kind === "group"
                       ? `${activeThread.title} grubuna yaz...`
-                      : `${activeThread?.title ?? "Kisi"}'a mesaj yaz...`
+                      : `${activeThread?.title ?? "Kişi"}'a mesaj yaz...`
                   }
                 />
                 <button

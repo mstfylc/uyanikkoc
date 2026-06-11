@@ -1,7 +1,7 @@
 // Snapshot türevli istemci seçicileri. apps/web/components/admin/selectors.ts
 "use client";
 
-import { orgCoaches, type OrgCoach } from "@/lib/admin/derive";
+import { orgCoaches, orgStudents, type OrgCoach, type OrgStudent } from "@/lib/admin/derive";
 import { daysLeft } from "@/lib/admin/format";
 import { coachPlanById, orgPlanById, statusMeta } from "@/lib/admin/pricing";
 import type {
@@ -21,6 +21,13 @@ export function getActiveOrg(snapshot: AdminSnapshot, activeOrgId: string): Org 
 export function visibleOrgCoaches(snapshot: AdminSnapshot, org: Org): OrgCoach[] {
   const removed = new Set(snapshot.removedCoachIds);
   return orgCoaches(org).filter((c) => !removed.has(c.id));
+}
+
+export function visibleOrgStudents(snapshot: AdminSnapshot, org: Org): OrgStudent[] {
+  return orgStudents(org, {
+    removedStudentIds: snapshot.removedStudentIds,
+    passiveStudentIds: snapshot.passiveStudentIds,
+  });
 }
 
 export function allOrgCoaches(org: Org): OrgCoach[] {

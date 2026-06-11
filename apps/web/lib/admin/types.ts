@@ -10,6 +10,8 @@ export type LicenseStatus =
   | "suspended"
   | "canceled";
 
+export type BranchStatus = "active" | "warning" | "suspended";
+
 export type OrgType = "franchise" | "kurum";
 export type BillingCycle = "monthly" | "annual";
 
@@ -61,7 +63,7 @@ export type Branch = {
   students: number;
   coaches: number;
   collect: number;
-  status: LicenseStatus;
+  status: BranchStatus;
 };
 
 export type OrgOwner = { name: string; email: string; phone: string };
@@ -95,11 +97,25 @@ export type OrgInvite = {
 
 // Kuruma atanmış yönetici kullanıcı (tek kuruma birden fazla yönetici olabilir).
 export type OrgManagerRole = "owner" | "manager";
+export const KURUM_PERMS = [
+  "dashboard",
+  "branches",
+  "coaches",
+  "students",
+  "assignments",
+  "billing",
+  "reports",
+  "settings",
+] as const;
+export type KurumPermKey = (typeof KURUM_PERMS)[number];
+
 export type OrgManager = {
   id: string;
   name: string;
   email: string;
   role: OrgManagerRole;
+  perms?: KurumPermKey[];
+  branchId?: string;
   addedAt: number;
   status: "active" | "invited";
 };
@@ -197,6 +213,22 @@ export type CampaignGrant = {
   subjectName: string;
   grantedAt: number;
   redeemed: boolean;
+};
+
+export type OrgCampaign = {
+  id: string;
+  orgId: string;
+  name: string;
+  code: string;
+  type: CampaignType;
+  value: number;
+  status: CampaignStatus;
+  startsAt: number;
+  endsAt: number;
+  redemptions: number;
+  maxRedemptions: number;
+  excludedBranchIds: string[];
+  note: string;
 };
 
 export type DemoRequestStatus = "new" | "contacted" | "scheduled" | "converted" | "lost";
@@ -379,11 +411,14 @@ export type AdminSnapshot = {
   tasks: CoachTask[];
   feedback: CoachFeedback[];
   removedCoachIds: string[];
+  removedStudentIds: string[];
+  passiveStudentIds: string[];
   team: AdminTeamMember[];
   tickets: SupportTicket[];
   systemNotes: SystemNote[];
   licenseNotes: LicenseNote[];
   campaigns: Campaign[];
+  orgCampaigns: OrgCampaign[];
   campaignGrants: CampaignGrant[];
   demoRequests: DemoRequest[];
   signups: Signup[];
@@ -446,10 +481,15 @@ export type AdminMutation =
   | { kind: "deleteTask"; taskId: string }
   | { kind: "removeOrgCoach"; coachId: string }
   | { kind: "restoreOrgCoach"; coachId: string }
+  | { kind: "removeOrgStudent"; orgId: string; studentId: string }
+  | { kind: "restoreOrgStudent"; orgId: string; studentId: string }
+  | { kind: "setOrgStudentPassive"; orgId: string; studentId: string; passive: boolean }
   // kurum yöneticileri (çoklu)
   | { kind: "inviteOrgManager"; orgId: string; name: string; email: string; role: OrgManagerRole }
   | { kind: "removeOrgManager"; orgId: string; managerId: string }
   | { kind: "setOrgManagerRole"; orgId: string; managerId: string; role: OrgManagerRole }
+  | { kind: "setOrgManagerPerms"; orgId: string; managerId: string; perms: KurumPermKey[] }
+  | { kind: "toggleOrgManagerPerm"; orgId: string; managerId: string; perm: KurumPermKey }
   // süper admin ekip & erişim
   | { kind: "inviteAdminMember"; name: string; email: string; access: AdminAccess }
   | { kind: "removeAdminMember"; memberId: string }
@@ -479,6 +519,32 @@ export type AdminMutation =
   | { kind: "setCampaignStatus"; campaignId: string; status: CampaignStatus }
   | { kind: "deleteCampaign"; campaignId: string }
   | { kind: "grantCampaign"; campaignId: string; subjectKind: LicenseSubjectKind; subjectId: string }
+  | {
+      kind: "createOrgCampaign";
+      orgId: string;
+      name: string;
+      code: string;
+      type: CampaignType;
+      value: number;
+      startsAt: number;
+      endsAt: number;
+      maxRedemptions: number;
+      note: string;
+    }
+  | {
+      kind: "updateOrgCampaign";
+      orgId: string;
+      campaignId: string;
+      patch: Partial<
+        Pick<
+          OrgCampaign,
+          "name" | "code" | "type" | "value" | "startsAt" | "endsAt" | "maxRedemptions" | "note"
+        >
+      >;
+    }
+  | { kind: "setOrgCampaignStatus"; orgId: string; campaignId: string; status: CampaignStatus }
+  | { kind: "deleteOrgCampaign"; orgId: string; campaignId: string }
+  | { kind: "toggleOrgCampaignBranch"; orgId: string; campaignId: string; branchId: string }
   // demo talepleri + basvuru kaynaklari
   | {
       kind: "addDemoRequest";
@@ -507,8 +573,11 @@ export type AdminMutation =
       branchId: string;
       name?: string;
       city?: string;
-      status?: LicenseStatus;
+      status?: BranchStatus;
     }
+  | { kind: "setBranchStatus"; orgId: string; branchId: string; status: BranchStatus }
+  | { kind: "toggleBranchStatus"; orgId: string; branchId: string }
+  | { kind: "removeBranch"; orgId: string; branchId: string }
   | { kind: "sendPaymentReminder"; subscriptionId: string }
   // bireysel koç lisans (zip-16 v2)
   | { kind: "buyCoachPlan"; coachId: string; planId: CoachPlanId; cycle: BillingCycle }

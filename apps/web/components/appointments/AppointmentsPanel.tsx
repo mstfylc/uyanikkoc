@@ -60,7 +60,7 @@ function ApptRow({
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="lr-title">
-          {coachView ? appointment.studentName : "Koc gorusmesi"}{" "}
+          {coachView ? appointment.studentName : "Koç görüşmesi"}{" "}
           <span className="muted" style={{ fontWeight: 500 }}>
             · {appointment.day} {appointment.slot}
           </span>
@@ -138,7 +138,7 @@ function StudentAppointmentsView() {
 
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
-      setError(data.error ?? "Randevu olusturulamadi.");
+      setError(data.error ?? "Randevu oluşturulamadı.");
       return;
     }
 
@@ -154,7 +154,7 @@ function StudentAppointmentsView() {
     <>
       <UkPageHead
         title="Randevular"
-        sub="Kocunla online veya yuz yuze gorusme planla"
+        sub="Koçunla online veya yüz yüze görüşme planla"
         actions={
           <button
             type="button"
@@ -177,12 +177,12 @@ function StudentAppointmentsView() {
             </span>
             <div style={{ flex: 1, minWidth: 200 }}>
               <div style={{ fontSize: 14, fontWeight: 700 }}>
-                {limit === 0 ? "Sinirsiz randevu hakkin var" : `Bu hafta ${used}/${limit} randevu kullandin`}
+                {limit === 0 ? "Sınırsız randevu hakkın var" : `Bu hafta ${used}/${limit} randevu kullandın`}
               </div>
               <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
                 {canRequest
-                  ? "Kocunun musait saatlerinden secim yapabilirsin."
-                  : "Haftalik randevu hakkin doldu."}
+                  ? "Koçunun müsait saatlerinden seçim yapabilirsin."
+                  : "Haftalık randevu hakkın doldu."}
               </div>
             </div>
           </div>
@@ -199,11 +199,11 @@ function StudentAppointmentsView() {
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : appointments.length === 0 ? (
             <div style={{ padding: "20px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-              Henuz randevu talebin yok.
+              Henüz randevu talebin yok.
             </div>
           ) : (
             appointments.map((item) => <ApptRow key={item.id} appointment={item} />)
@@ -315,7 +315,7 @@ function CoachAvailability({
 
   return (
     <>
-      <UkSection title="Randevu Ayarlari" sub="Ogrenci taleplerini bu kurallara gore sinirla">
+      <UkSection title="Randevu Ayarları" sub="Öğrenci taleplerini bu kurallara göre sınırla">
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <div className="between" style={{ padding: "10px 0" }}>
             <div className="row" style={{ gap: 12 }}>
@@ -325,7 +325,7 @@ function CoachAvailability({
               <div>
                 <div style={{ fontSize: 13.5, fontWeight: 700 }}>Online randevu</div>
                 <div className="muted" style={{ fontSize: 12 }}>
-                  Ogrenciler online gorusme isteyebilir
+                  Öğrenciler online görüşme isteyebilir
                 </div>
               </div>
             </div>
@@ -345,9 +345,9 @@ function CoachAvailability({
                 <KiIcon name="ki-people" size={18} />
               </span>
               <div>
-                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Yuz yuze randevu</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Yüz yüze randevu</div>
                 <div className="muted" style={{ fontSize: 12 }}>
-                  Ogrenciler yuz yuze gorusme isteyebilir
+                  Öğrenciler yüz yüze görüşme isteyebilir
                 </div>
               </div>
             </div>
@@ -355,7 +355,7 @@ function CoachAvailability({
               type="button"
               className={`switch${settings.allowInPerson ? " on" : ""}`}
               onClick={() => onChange({ allowInPerson: !settings.allowInPerson })}
-              aria-label="Yuz yuze randevu"
+              aria-label="Yüz yüze randevu"
             >
               <span />
             </button>
@@ -369,7 +369,7 @@ function CoachAvailability({
               <div>
                 <div style={{ fontSize: 13.5, fontWeight: 700 }}>Telefon randevu</div>
                 <div className="muted" style={{ fontSize: 12 }}>
-                  Ogrenciler telefon gorusmesi isteyebilir
+                  Öğrenciler telefon görüşmesi isteyebilir
                 </div>
               </div>
             </div>
@@ -389,9 +389,9 @@ function CoachAvailability({
                 <KiIcon name="ki-profile-circle" size={18} />
               </span>
               <div>
-                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Ogrenci haftalik limiti</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Öğrenci haftalık limiti</div>
                 <div className="muted" style={{ fontSize: 12 }}>
-                  Ogrenci basina haftalik randevu limiti
+                  Öğrenci başına haftalık randevu limiti
                 </div>
               </div>
             </div>
@@ -411,9 +411,9 @@ function CoachAvailability({
                 <KiIcon name="ki-people" size={18} />
               </span>
               <div>
-                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Veli haftalik limiti</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Veli haftalık limiti</div>
                 <div className="muted" style={{ fontSize: 12 }}>
-                  Veli basina haftalik randevu limiti
+                  Veli başına haftalık randevu limiti
                 </div>
               </div>
             </div>
@@ -433,9 +433,9 @@ function CoachAvailability({
                 <KiIcon name="ki-target" size={18} />
               </span>
               <div>
-                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Haftalik randevu limiti</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700 }}>Haftalık randevu limiti</div>
                 <div className="muted" style={{ fontSize: 12 }}>
-                  Bir ogrencinin haftada isteyebilecegi max randevu (0 = sinirsiz)
+                  Bir öğrencinin haftada isteyebileceği maks. randevu (0 = sınırsız)
                 </div>
               </div>
             </div>
@@ -451,7 +451,7 @@ function CoachAvailability({
         </div>
       </UkSection>
 
-      <UkSection title="Musait Saatlerim" sub="Ogrencilerin yalnizca secili saatlerden randevu alabilir">
+      <UkSection title="Müsait Saatlerim" sub="Öğrenciler yalnızca seçili saatlerden randevu alabilir">
         <div className="card-body" style={{ overflowX: "auto" }}>
           <div className="avail-grid">
             <div />
@@ -483,13 +483,13 @@ function CoachAvailability({
           </div>
           <div className="muted" style={{ fontSize: 11.5, marginTop: 12, display: "flex", alignItems: "center", gap: 6 }}>
             <KiIcon name="ki-flash-circle" size={13} />
-            Hucreye tiklayarak musait saat ac/kapat; acik hucreye tekrar tiklayarak mod sec.
+            Hücreye tıklayarak müsait saat aç/kapat; açık hücreye tekrar tıklayarak mod seç.
           </div>
 
           {selectedCell && (settings.availability[selectedCell.day] ?? []).includes(selectedCell.slot) ? (
             <div style={{ marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
               <div className="label" style={{ marginBottom: 8 }}>
-                {selectedCell.day} {selectedCell.slot} · randevu modlari
+                {selectedCell.day} {selectedCell.slot} · randevu modları
               </div>
               <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
                 {allowedModes().map((mode) => {
@@ -567,7 +567,7 @@ function CoachAppointmentsView() {
 
   return (
     <>
-      <UkPageHead title="Randevular" sub="Gorusme taleplerini yonet ve musait saatlerini belirle" />
+      <UkPageHead title="Randevular" sub="Görüşme taleplerini yönet ve müsait saatlerini belirle" />
 
       <div className="seg" style={{ width: "fit-content" }}>
         <button type="button" className={tab === "liste" ? "on" : ""} onClick={() => setTab("liste")}>
@@ -581,7 +581,7 @@ function CoachAppointmentsView() {
         </button>
         <button type="button" className={tab === "musait" ? "on" : ""} onClick={() => setTab("musait")}>
           <KiIcon name="ki-time" size={16} />
-          Musait Saatlerim
+          Müsait Saatlerim
         </button>
       </div>
 
@@ -589,7 +589,7 @@ function CoachAppointmentsView() {
         <>
           <div className="grid g-4">
             <UkStatCard icon="ki-time" tone="warning" value={pending.length} label="Onay bekleyen" />
-            <UkStatCard icon="ki-check-circle" tone="success" value={approved.length} label="Onayli randevu" />
+            <UkStatCard icon="ki-check-circle" tone="success" value={approved.length} label="Onaylı randevu" />
             <UkStatCard
               icon="ki-technology-2"
               tone="info"
@@ -628,11 +628,11 @@ function CoachAppointmentsView() {
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {isLoading ? (
                 <p className="muted" style={{ fontSize: 13 }}>
-                  Yukleniyor...
+                  Yükleniyor...
                 </p>
               ) : approved.length === 0 ? (
                 <div style={{ padding: "20px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-                  Onayli randevu yok.
+                  Onaylı randevu yok.
                 </div>
               ) : (
                 approved.map((item) => <ApptRow key={item.id} appointment={item} coachView />)
@@ -700,7 +700,7 @@ function ParentAppointmentsView() {
 
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
-      setError(data.error ?? "Randevu olusturulamadi.");
+      setError(data.error ?? "Randevu oluşturulamadı.");
       return;
     }
 
@@ -715,7 +715,7 @@ function ParentAppointmentsView() {
     <>
       <UkPageHead
         title="Randevular"
-        sub="Ogrencinin koc gorusmeleri"
+        sub="Öğrencinin koç görüşmeleri"
         actions={
           <button
             type="button"
@@ -738,12 +738,12 @@ function ParentAppointmentsView() {
             </span>
             <div style={{ flex: 1, minWidth: 200 }}>
               <div style={{ fontSize: 14, fontWeight: 700 }}>
-                {limit === 0 ? "Sinirsiz veli randevu hakkin var" : `Bu hafta ${used}/${limit} veli randevusu kullandin`}
+                {limit === 0 ? "Sınırsız veli randevu hakkın var" : `Bu hafta ${used}/${limit} veli randevusu kullandın`}
               </div>
               <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
                 {canRequest
-                  ? "Kocun musait saatlerinden veli gorusmesi talep edebilirsin."
-                  : "Haftalik veli randevu hakkin doldu."}
+                  ? "Koçun müsait saatlerinden veli görüşmesi talep edebilirsin."
+                  : "Haftalık veli randevu hakkın doldu."}
               </div>
             </div>
           </div>
@@ -756,11 +756,11 @@ function ParentAppointmentsView() {
         </p>
       ) : null}
 
-      <UkSection title="Randevu listesi" sub={`${appointments.length} kayit`}>
+      <UkSection title="Randevu listesi" sub={`${appointments.length} kayıt`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : appointments.length === 0 ? (
             <div style={{ padding: "20px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>

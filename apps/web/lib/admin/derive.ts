@@ -92,28 +92,40 @@ export type OrgStudent = {
   coach: string;
   net: number;
   attend: number;
-  status: "active" | "risk";
+  status: "active" | "risk" | "passive";
 };
 
-export function orgStudents(org: Org): OrgStudent[] {
+export type OrgStudentOptions = {
+  removedStudentIds?: readonly string[];
+  passiveStudentIds?: readonly string[];
+};
+
+export function orgStudents(org: Org, options: OrgStudentOptions = {}): OrgStudent[] {
   const out: OrgStudent[] = [];
   const coaches = orgCoaches(org);
+  const removed = new Set(options.removedStudentIds ?? []);
+  const passive = new Set(options.passiveStudentIds ?? []);
   let si = 0;
   org.branches.forEach((b) => {
     for (let i = 0; i < b.students; i++) {
+      const id = `${org.id}-s${si}`;
+      if (removed.has(id)) {
+        si++;
+        continue;
+      }
       const fn = STUDENT_FIRST[si % STUDENT_FIRST.length];
       const ln = STUDENT_LAST[(si * 3) % STUDENT_LAST.length];
       const branchCoaches = coaches.filter((c) => c.branchId === b.id);
       const coach = branchCoaches[i % Math.max(1, b.coaches)] || coaches[0];
       out.push({
-        id: `${org.id}-s${si}`,
+        id,
         name: `${fn} ${ln}`,
         grade: GRADES[si % GRADES.length],
         branch: b.name,
         coach: coach ? coach.name : "—",
         net: 60 + ((si * 11) % 70) + (si % 3) * 5,
         attend: 70 + ((si * 7) % 30),
-        status: si % 17 === 3 ? "risk" : "active",
+        status: passive.has(id) ? "passive" : si % 17 === 3 ? "risk" : "active",
       });
       si++;
     }

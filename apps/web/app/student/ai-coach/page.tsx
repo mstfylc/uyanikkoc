@@ -9,17 +9,17 @@ const aiFeatures = [
   {
     icon: "ki-target",
     title: "Zayif konu tespiti",
-    desc: "Deneme ve odev verinden en cok hata yaptigin konulari otomatik bulur.",
+    desc: "Deneme ve ödev verinden en çok hata yaptığın konuları otomatik bulur.",
   },
   {
     icon: "ki-calendar",
     title: "Akilli program",
-    desc: "Sana ozel, gune ve net hedefine gore guncellenen calisma plani.",
+    desc: "Sana özel, güne ve net hedefine göre güncellenen çalışma planı.",
   },
   {
     icon: "ki-message-text",
-    title: "7/24 soru cozumu",
-    desc: "Takildigin soruyu fotograflayip adim adim cozum ve benzer soru onerileri alirsin.",
+    title: "7/24 soru çözümü",
+    desc: "Takıldığın soruyu fotoğraflayıp adım adım çözüm ve benzer soru önerileri alırsın.",
   },
   {
     icon: "ki-chart-line-up",
@@ -85,7 +85,7 @@ export default function StudentAiCoachPage() {
 
   return (
     <div className="stack rise" data-testid="ai-coach-coming-soon">
-      <PageHead title="AI Koc" sub="Kisisel yapay zeka kocun - cok yakinda" actions={<Badge tone="primary" dot>Yakinda</Badge>} />
+      <PageHead title="AI Koç" sub="Kişisel yapay zeka koçun - çok yakında" actions={<Badge tone="primary" dot>Yakında</Badge>} />
 
       <div className="hero" style={{ display: "flex", gap: 22, alignItems: "center", flexWrap: "wrap" }}>
         <span className="glass" style={{ width: 76, height: 76, borderRadius: 20, display: "grid", placeItems: "center", flexShrink: 0 }}>
@@ -94,7 +94,7 @@ export default function StudentAiCoachPage() {
         <div style={{ flex: 1, minWidth: 240 }}>
           <h2 style={{ fontSize: 24 }}>Senin icin dusunen bir koc</h2>
           <p style={{ marginTop: 8, maxWidth: 560 }}>
-            Uyanik AI Koc; netlerini, odevlerini ve calisma aliskanliklarini analiz ederek sana ozel oneriler ve program cikaracak. Beta erisimi icin siraya gir.
+            Uyanık AI Koç; netlerini, ödevlerini ve çalışma alışkanlıklarını analiz ederek sana özel öneriler ve program çıkaracak. Beta erişimi için sıraya gir.
           </p>
           <div className="row" style={{ gap: 10, marginTop: 18, flexWrap: "wrap" }}>
             <button
@@ -104,10 +104,10 @@ export default function StudentAiCoachPage() {
               style={joined ? { opacity: 0.85 } : undefined}
             >
               <KiIcon name={joined ? "ki-check" : "ki-flash"} size={16} />
-              {joined ? "Siraya eklendin" : "Erken erisime katil"}
+              {joined ? "Sıraya eklendin" : "Erken erişime katıl"}
             </button>
             <button type="button" className="btn" style={{ background: "rgba(255,255,255,.14)", color: "#fff" }} onClick={() => setHowOpen(true)}>
-              Nasil calisir?
+              Nasıl çalışır?
             </button>
           </div>
         </div>
@@ -129,19 +129,19 @@ export default function StudentAiCoachPage() {
         ))}
       </div>
 
-      <Section title="Onizleme" sub="AI Koc sohbeti - demo">
+      <Section title="Önizleme" sub="AI Koç sohbeti - demo">
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ alignSelf: "flex-end", maxWidth: "75%", background: "var(--primary)", color: "#fff", padding: "11px 15px", borderRadius: "14px 14px 4px 14px", fontSize: 13.5 }}>
-            Turev konusunda hep hata yapiyorum, ne yapmaliyim?
+            Türev konusunda hep hata yapıyorum, ne yapmalıyım?
           </div>
           <div style={{ alignSelf: "flex-start", maxWidth: "78%", background: "var(--surface-3)", padding: "11px 15px", borderRadius: "14px 14px 14px 4px", fontSize: 13.5, lineHeight: 1.55 }}>
             <div className="row" style={{ gap: 7, marginBottom: 6 }}>
               <span className="ai-orb" style={{ width: 24, height: 24, borderRadius: 8 }}>
                 <KiIcon name="ki-technology-2" size={13} />
               </span>
-              <b style={{ fontSize: 12.5 }}>AI Koc</b>
+              <b style={{ fontSize: 12.5 }}>AI Koç</b>
             </div>
-            Son 3 denemende turevde ortalama 4 yanlisin var. Once <b>turev alma kurallarini</b> tekrar et, ardindan sana 20 soruluk bir set hazirlayayim mi?
+            Son 3 denemende türevde ortalama 4 yanlışın var. Önce <b>türev alma kurallarını</b> tekrar et, ardından sana 20 soruluk bir set hazırlayayım mı?
           </div>
           <div className="row" style={{ gap: 10, opacity: 0.6, marginTop: 4 }}>
             <div className="searchbox" style={{ flex: 1, display: "flex" }}>
@@ -164,8 +164,8 @@ export default function StudentAiCoachPage() {
                       <KiIcon name="ki-technology-2" size={19} />
                     </span>
                     <div>
-                      <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>AI Koc nasil calisir?</h3>
-                      <div className="muted" style={{ fontSize: 12 }}>3 adimda kisisel asistanin</div>
+                      <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>AI Koç nasıl çalışır?</h3>
+                      <div className="muted" style={{ fontSize: 12 }}>3 adımda kişisel asistanın</div>
                     </div>
                   </div>
                   <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={() => setHowOpen(false)} aria-label="Kapat">
@@ -174,9 +174,9 @@ export default function StudentAiCoachPage() {
                 </div>
                 <div className="modal-body" style={{ padding: 20, gap: 16 }}>
                   {[
-                    ["ki-chart-line-up", "Verini analiz eder", "Denemelerini, odev sonuclarini ve calisma aliskanliklarini inceler."],
-                    ["ki-target", "Zayif noktalari bulur", "En cok hata yaptigin konulari ve eksiklerini tespit eder."],
-                    ["ki-calendar", "Plan onerir", "Sana ozel, guncellenen bir calisma programi ve soru seti hazirlar."],
+                    ["ki-chart-line-up", "Verini analiz eder", "Denemelerini, ödev sonuçlarını ve çalışma alışkanlıklarını inceler."],
+                    ["ki-target", "Zayıf noktaları bulur", "En çok hata yaptığın konuları ve eksiklerini tespit eder."],
+                    ["ki-calendar", "Plan önerir", "Sana özel, güncellenen bir çalışma programı ve soru seti hazırlar."],
                   ].map(([icon, title, desc], index) => (
                     <div key={title} className="row" style={{ gap: 13, alignItems: "flex-start" }}>
                       <span className="stat-icon tone-primary" style={{ width: 36, height: 36, flexShrink: 0 }}>
@@ -200,7 +200,7 @@ export default function StudentAiCoachPage() {
                     }}
                   >
                     <KiIcon name="ki-flash" size={16} />
-                    Erken erisime katil
+                    Erken erişime katıl
                   </button>
                 </div>
               </div>

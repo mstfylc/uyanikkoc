@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 
 const DEMO_ORG_ID = "org_demo_001";
 const DEMO_BRANCH_ID = "branch_demo_001";
+const KAMPUS_KOC_ORG_ID = "akademi-yildiz";
+const KAMPUS_KOC_BRANCH_ID = "ay-kadikoy";
 const DEMO_PASSWORD_HASH = hashSync("uyanik123", 10);
 
 const prisma = new PrismaClient();
@@ -10,17 +12,33 @@ const prisma = new PrismaClient();
 async function main() {
   await prisma.organization.upsert({
     where: { id: DEMO_ORG_ID },
-    update: { name: "Uyanik Demo Org" },
-    create: { id: DEMO_ORG_ID, name: "Uyanik Demo Org" },
+    update: { name: "Uyanık Demo Kurum" },
+    create: { id: DEMO_ORG_ID, name: "Uyanık Demo Kurum" },
   });
 
   await prisma.branch.upsert({
     where: { id: DEMO_BRANCH_ID },
-    update: { name: "Uyanik Demo Branch", organizationId: DEMO_ORG_ID },
+    update: { name: "Uyanık Demo Şube", organizationId: DEMO_ORG_ID },
     create: {
       id: DEMO_BRANCH_ID,
-      name: "Uyanik Demo Branch",
+      name: "Uyanık Demo Şube",
       organizationId: DEMO_ORG_ID,
+    },
+  });
+
+  await prisma.organization.upsert({
+    where: { id: KAMPUS_KOC_ORG_ID },
+    update: { name: "Kampüs Koç" },
+    create: { id: KAMPUS_KOC_ORG_ID, name: "Kampüs Koç" },
+  });
+
+  await prisma.branch.upsert({
+    where: { id: KAMPUS_KOC_BRANCH_ID },
+    update: { name: "Kadikoy Subesi", organizationId: KAMPUS_KOC_ORG_ID },
+    create: {
+      id: KAMPUS_KOC_BRANCH_ID,
+      name: "Kadikoy Subesi",
+      organizationId: KAMPUS_KOC_ORG_ID,
     },
   });
 
@@ -63,6 +81,13 @@ async function main() {
       role: "BRANCH_MANAGER" as const,
     },
     {
+      id: "user_kampus_koc_owner",
+      email: "incisel@kampuskoc.com",
+      role: "BRANCH_MANAGER" as const,
+      organizationId: KAMPUS_KOC_ORG_ID,
+      branchId: KAMPUS_KOC_BRANCH_ID,
+    },
+    {
       id: "user_admin_001",
       email: "admin@uyanik.local",
       role: "ORG_ADMIN" as const,
@@ -76,16 +101,16 @@ async function main() {
         email: user.email,
         passwordHash: DEMO_PASSWORD_HASH,
         role: user.role,
-        organizationId: DEMO_ORG_ID,
-        branchId: DEMO_BRANCH_ID,
+        organizationId: user.organizationId ?? DEMO_ORG_ID,
+        branchId: user.branchId ?? DEMO_BRANCH_ID,
       },
       create: {
         id: user.id,
         email: user.email,
         passwordHash: DEMO_PASSWORD_HASH,
         role: user.role,
-        organizationId: DEMO_ORG_ID,
-        branchId: DEMO_BRANCH_ID,
+        organizationId: user.organizationId ?? DEMO_ORG_ID,
+        branchId: user.branchId ?? DEMO_BRANCH_ID,
       },
     });
   }
@@ -135,8 +160,8 @@ async function main() {
   }
 
   const coachTaskSeed = [
-    { id: "coach_task_001", text: "Mert'in haftalik programini revize et", studentId: "student_002", due: "Bugun", priority: "high" as const, done: false },
-    { id: "coach_task_002", text: "Elif'in integral testini incele", studentId: "student_001", due: "Bugun", priority: "med" as const, done: false },
+    { id: "coach_task_001", text: "Mert'in haftalık programını revize et", studentId: "student_002", due: "Bugün", priority: "high" as const, done: false },
+    { id: "coach_task_002", text: "Elif'in integral testini incele", studentId: "student_001", due: "Bugün", priority: "med" as const, done: false },
     { id: "coach_task_003", text: "Haftalik raporlari hazirla", studentId: null, due: "7 Haz", priority: "med" as const, done: false },
     { id: "coach_task_004", text: "Deneme #6 sonuclarini analiz et", studentId: null, due: "5 Haz", priority: "low" as const, done: true },
   ];
@@ -166,8 +191,8 @@ async function main() {
   await prisma.assignment.upsert({
     where: { id: "assignment_seed_001" },
     update: {
-      title: "Matematik tekrar odevi",
-      description: "Demo seed odevi — DB-backed alpha",
+      title: "Matematik tekrar ödevi",
+      description: "Demo seed ödevi — DB-backed alpha",
       type: "homework",
       priority: "medium",
       status: "pending",
@@ -182,8 +207,8 @@ async function main() {
     },
     create: {
       id: "assignment_seed_001",
-      title: "Matematik tekrar odevi",
-      description: "Demo seed odevi — DB-backed alpha",
+      title: "Matematik tekrar ödevi",
+      description: "Demo seed ödevi — DB-backed alpha",
       type: "homework",
       priority: "medium",
       status: "pending",
@@ -268,23 +293,23 @@ async function seedBillingPlans() {
   const plans = [
     {
       id: "standart",
-      name: "Standart Kocluk",
-      tagline: "Duzenli takip ve birebir kocluk",
+      name: "Standart Koçluk",
+      tagline: "Düzenli takip ve birebir koçluk",
       monthly: 1499,
       annual: 14990,
       popular: false,
       sortOrder: 0,
       features: [
-        "Haftalik birebir kocluk gorusmesi",
-        "Kisiye ozel haftalik calisma programi",
-        "Odev atama ve takibi",
+        "Haftalık birebir koçluk görüşmesi",
+        "Kişiye özel haftalık çalışma programı",
+        "Ödev atama ve takibi",
         "Deneme analizi ve net takibi",
         "Konu takibi paneli",
       ],
     },
     {
       id: "plus",
-      name: "Plus Kocluk",
+      name: "Plus Koçluk",
       tagline: "Aileyle birlikte tam destek",
       monthly: 2299,
       annual: 22990,
@@ -300,15 +325,15 @@ async function seedBillingPlans() {
     },
     {
       id: "vip",
-      name: "VIP Kocluk",
-      tagline: "Yogun tempo, ust duzey mentorluk",
+      name: "VIP Koçluk",
+      tagline: "Yoğun tempo, üst düzey mentorluk",
       monthly: 3499,
       annual: 34990,
       popular: false,
       sortOrder: 2,
       features: [
         "Plus paketteki her sey",
-        "Haftada 2 birebir gorusme",
+        "Haftada 2 birebir görüşme",
         "Kidemli mentor eslestirmesi",
         "Tercih ve kariyer danismanligi",
         "7/24 oncelikli destek hatti",
@@ -385,14 +410,14 @@ async function seedFaz2Skeletons() {
       studentId: "student_001",
       parentId: null,
       title: "Hos geldin",
-      body: "Uyanik Koc alpha bildirim iskeleti.",
+      body: "Uyanık Koç alpha bildirim iskeleti.",
       read: false,
     },
     create: {
       id: "notification_seed_001",
       studentId: "student_001",
       title: "Hos geldin",
-      body: "Uyanik Koc alpha bildirim iskeleti.",
+      body: "Uyanık Koç alpha bildirim iskeleti.",
       sourceKey: "welcome:student_001",
     },
   });
@@ -414,11 +439,11 @@ async function seedFaz2Skeletons() {
         create: [
           {
             senderRole: "COACH",
-            body: "Merhaba, bu haftaki odev planini birlikte gozden gecirelim.",
+            body: "Merhaba, bu haftaki ödev planını birlikte gözden geçirelim.",
           },
           {
             senderRole: "STUDENT",
-            body: "Tamam hocam, matematik odevine basladim.",
+            body: "Tamam hocam, matematik ödevine başladım.",
           },
         ],
       },
@@ -430,7 +455,7 @@ async function seedFaz2Skeletons() {
     update: {
       coachId: "coach_001",
       title: "Matematik tekrar (sablon)",
-      description: "Gunluk matematik tekrar seti",
+      description: "Günlük matematik tekrar seti",
       type: "homework",
       priority: "medium",
       subject: "Matematik",
@@ -439,7 +464,7 @@ async function seedFaz2Skeletons() {
       id: "template_seed_001",
       coachId: "coach_001",
       title: "Matematik tekrar (sablon)",
-      description: "Gunluk matematik tekrar seti",
+      description: "Günlük matematik tekrar seti",
       type: "homework",
       priority: "medium",
       subject: "Matematik",

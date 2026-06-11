@@ -100,7 +100,7 @@ function AddDemoModal({ onClose }: { onClose: () => void }) {
       <Field label="Talep turu">
         <div className="seg" style={{ width: "100%" }}>
           <button type="button" className={requestKind === "org" ? "on" : ""} style={{ flex: 1 }} onClick={() => { setRequestKind("org"); setPlanId("pro"); }}>Kurum / Franchise</button>
-          <button type="button" className={requestKind === "coach" ? "on" : ""} style={{ flex: 1 }} onClick={() => { setRequestKind("coach"); setPlanId("c-pro"); }}>Bireysel koc</button>
+          <button type="button" className={requestKind === "coach" ? "on" : ""} style={{ flex: 1 }} onClick={() => { setRequestKind("coach"); setPlanId("c-pro"); }}>Bireysel koç</button>
         </div>
       </Field>
       <Field label={requestKind === "org" ? "Kurum adi" : "Ad soyad"}><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></Field>
@@ -146,7 +146,7 @@ function LeadDetailModal({ lead, onClose }: { lead: DemoRequest; onClose: () => 
   return (
     <Modal
       title={lead.name}
-      sub={`${lead.kind === "org" ? "Kurum" : "Bireysel koc"} · ${lead.city} · ${planName(lead)}`}
+      sub={`${lead.kind === "org" ? "Kurum" : "Bireysel koç"} · ${lead.city} · ${planName(lead)}`}
       width={660}
       onClose={onClose}
       foot={
@@ -308,7 +308,7 @@ function DemoCard({ lead, onOpen, onLost }: { lead: DemoRequest; onOpen: () => v
           <div style={{ flex: 1, minWidth: 0 }}>
             <b style={{ fontSize: 15, fontWeight: 800, display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{lead.name}</b>
             <div className="row" style={{ gap: 6, flexWrap: "wrap", marginTop: 5 }}>
-              <span className="badge badge-muted" style={{ height: 21, fontSize: 11 }}><Icon name={lead.kind === "org" ? "building" : "users"} size={12} />{lead.kind === "org" ? "Kurum" : "Bireysel koc"}</span>
+              <span className="badge badge-muted" style={{ height: 21, fontSize: 11 }}><Icon name={lead.kind === "org" ? "building" : "users"} size={12} />{lead.kind === "org" ? "Kurum" : "Bireysel koç"}</span>
               <span className={`badge badge-${meta.tone}`} style={{ height: 21, fontSize: 11 }}>{meta.label}</span>
               <span className="muted" style={{ fontSize: 12 }}>{lead.city} · {lead.source} · {timeAgo(lead.requestedAt)}</span>
             </div>
@@ -363,7 +363,7 @@ export function SuperLeads() {
     };
   }, [snapshot]);
 
-  if (!snapshot) return <div className="card card-pad muted">Yukleniyor...</div>;
+  if (!snapshot) return <div className="card card-pad muted">Yükleniyor...</div>;
 
   const visible = data.demoRequests
     .filter((item) => status === "all" || item.status === status)
@@ -453,7 +453,7 @@ export function SuperLeads() {
                   const meta = SIGNUP_META[item.type];
                   return (
                     <tr key={item.id}>
-                      <td><div className="name"><OrgLogo name={item.name} tone={planColor(item)} size={34} /><div><b>{item.name}</b><span>{item.kind === "org" ? "Kurum" : "Bireysel koc"} · {item.city}</span></div></div></td>
+                      <td><div className="name"><OrgLogo name={item.name} tone={planColor(item)} size={34} /><div><b>{item.name}</b><span>{item.kind === "org" ? "Kurum" : "Bireysel koç"} · {item.city}</span></div></div></td>
                       <td><span className="row" style={{ gap: 7 }}><span className="plan-dot" style={{ background: planColor(item) }} /><span style={{ fontSize: 12.5, fontWeight: 600 }}>{planName(item)}</span></span></td>
                       <td><span className={`badge badge-${meta.tone}`} style={{ height: 22 }}>{meta.label}</span></td>
                       <td><span className="muted" style={{ fontSize: 12.5 }}>{item.method}</span></td>

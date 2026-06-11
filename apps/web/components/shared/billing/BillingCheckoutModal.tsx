@@ -174,7 +174,7 @@ export function BillingCheckoutModal({
             </div>
             <h3>3D Secure dogrulamasi</h3>
             <p className="muted">
-              Bankana yonlendiriliyorsun. Telefonuna gelen tek kullanimlik sifreyle odemeyi onayla.
+              Bankana yönlendiriliyorsun. Telefonuna gelen tek kullanımlık şifreyle ödemeyi onayla.
             </p>
             <div className="co-bankbar">
               <span className="co-bankdot" /> Guvenli baglanti kuruldu…
@@ -187,7 +187,7 @@ export function BillingCheckoutModal({
             </div>
             <h3>Odeme basarili</h3>
             <p className="muted">
-              {plan.name} ({cycle === "annual" ? "Yillik" : "Aylik"}) aboneligin aktif. Makbuzun fatura gecmisine
+              {plan.name} ({cycle === "annual" ? "Yıllık" : "Aylık"}) aboneliğin aktif. Makbuzun fatura geçmişine
               eklendi.
             </p>
           </div>
@@ -290,7 +290,7 @@ export function BillingCheckoutModal({
                     </div>
                     <label className="co-check">
                       <input type="checkbox" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} />
-                      <span>Sonraki odemeler icin karti guvenle kaydet</span>
+                      <span>Sonraki ödemeler için kartı güvenle kaydet</span>
                     </label>
                   </>
                 )}
@@ -330,7 +330,7 @@ export function BillingCheckoutModal({
               <div className="co-summary">
                 <div className="co-sum-head">
                   <span className="badge badge-primary" style={{ height: 22 }}>
-                    {cycle === "annual" ? "Yillik" : "Aylik"} abonelik
+                    {cycle === "annual" ? "Yıllık" : "Aylık"} abonelik
                   </span>
                   <h4>{plan.name}</h4>
                   <p className="muted" style={{ fontSize: 12 }}>
@@ -346,7 +346,7 @@ export function BillingCheckoutModal({
                   </div>
                   {cycle === "annual" ? (
                     <div className="co-sum-row ok">
-                      <span>Yillik indirim</span>
+                      <span>Yıllık indirim</span>
                       <span className="tnum">{annualSavingMonths(plan)} ay bedava</span>
                     </div>
                   ) : null}

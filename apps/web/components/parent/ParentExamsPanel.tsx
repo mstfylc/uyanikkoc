@@ -24,7 +24,7 @@ function formatCategoryNet(value: number): string {
 export function ParentExamsPanel() {
   const [exams, setExams] = useState<ExamResultRecord[]>([]);
   const [summary, setSummary] = useState<ExamTrendSummary | null>(null);
-  const [childName, setChildName] = useState("Ogrenci");
+  const [childName, setChildName] = useState("Öğrenci");
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -107,11 +107,11 @@ export function ParentExamsPanel() {
         />
       </div>
 
-      <UkSection title="Ders Bazinda Net" sub="Cocugunuzun bu denemedeki dagilimi">
+      <UkSection title="Ders Bazında Net" sub="Çocuğunuzun bu denemedeki dağılımı">
         <div className="card-body subj">
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : categoryAverages && studentRow ? (
             EXAM_CAT_ORDER.map((category) => {
@@ -140,14 +140,14 @@ export function ParentExamsPanel() {
             })
           ) : (
             <p className="muted" style={{ fontSize: 13 }}>
-              Ders dagilimi hesaplanamadi.
+              Ders dağılımı hesaplanamadı.
             </p>
           )}
         </div>
       </UkSection>
 
       {exams.length > 1 ? (
-        <UkSection title="Onceki denemeler" sub={`${exams.length} kayit · son: ${summary?.examType ?? "TYT"}`}>
+        <UkSection title="Önceki denemeler" sub={`${exams.length} kayıt · son: ${summary?.examType ?? "TYT"}`}>
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {exams.slice(1, 5).map((exam) => (
               <div key={exam.id} className="between">

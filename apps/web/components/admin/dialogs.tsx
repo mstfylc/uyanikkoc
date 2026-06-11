@@ -13,9 +13,9 @@ import { orgCoaches, orgStudents } from "@/lib/admin/derive";
 import { downloadCSV } from "@/lib/admin/csv";
 import type {
   AdminAccess,
+  BranchStatus,
   CampaignAudience,
   CampaignType,
-  LicenseStatus,
   LicenseSubjectKind,
   OrgManagerRole,
   OrgPlanId,
@@ -567,7 +567,7 @@ export function BranchManageDialog({
   const [tab, setTab] = useState<"genel" | "koclar" | "ayarlar">("genel");
   const [name, setName] = useState(live?.name ?? "");
   const [city, setCity] = useState(live?.city ?? "");
-  const [status, setStatus] = useState<LicenseStatus>(live?.status ?? "active");
+  const [status, setStatus] = useState<BranchStatus>(live?.status ?? "active");
 
   if (!o || !live || !snapshot) return null;
 
@@ -713,9 +713,9 @@ export function BranchManageDialog({
                 <input className="input" value={city} onChange={(e) => setCity(e.target.value)} />
               </Field>
               <Field label="Durum">
-                <select className="input" value={status} onChange={(e) => setStatus(e.target.value as LicenseStatus)}>
+                <select className="input" value={status} onChange={(e) => setStatus(e.target.value as BranchStatus)}>
                   <option value="active">Aktif</option>
-                  <option value="expiring">Düşük doluluk</option>
+                  <option value="warning">Düşük doluluk</option>
                   <option value="suspended">Donduruldu</option>
                 </select>
               </Field>

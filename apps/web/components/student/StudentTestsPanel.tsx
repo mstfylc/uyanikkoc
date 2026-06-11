@@ -84,7 +84,7 @@ export function StudentTestsPanel() {
 
   return (
     <div className="stack rise" data-testid="student-tests-panel">
-      <UkPageHead title="Testlerim" sub="Kocun tarafindan gonderilen envanter testleri" />
+      <UkPageHead title="Testlerim" sub="Koçun tarafından gönderilen envanter testleri" />
 
       <div className="grid g-4">
         <UkStatCard icon="ki-time" tone="warning" value={pending.length} label="Bekleyen test" />
@@ -96,7 +96,7 @@ export function StudentTestsPanel() {
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : pending.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>

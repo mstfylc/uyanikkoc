@@ -11,13 +11,13 @@ export async function POST(req: Request) {
   const email = str(body.email).toLowerCase();
 
   if (!email || !/.+@.+\..+/.test(email)) {
-    return NextResponse.json({ error: "Gecerli bir e-posta girin." }, { status: 400 });
+    return NextResponse.json({ error: "Geçerli bir e-posta girin." }, { status: 400 });
   }
 
   const result = await requestPasswordReset(email);
   return NextResponse.json({
     ok: true,
-    message: "Bu e-posta kayitliysa sifre sifirlama baglantisi olusturuldu.",
+    message: "Bu e-posta kayıtlıysa şifre sıfırlama bağlantısı oluşturuldu.",
     resetUrl: result.resetUrl,
   });
 }

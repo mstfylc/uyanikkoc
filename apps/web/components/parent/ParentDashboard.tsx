@@ -148,9 +148,9 @@ export function ParentDashboard() {
             <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", fontWeight: 600, marginBottom: 6 }}>
               Merhaba
             </div>
-            <h1 style={{ marginBottom: 7, fontSize: 28, fontWeight: 800, letterSpacing: "-.02em" }}>Cocugunuzun gelisimi</h1>
+            <h1 style={{ marginBottom: 7, fontSize: 28, fontWeight: 800, letterSpacing: "-.02em" }}>Çocuğunuzun gelişimi</h1>
             <p>
-              Koc notlari, odev takibi, deneme sonuclari ve randevu ozetleri tek ekranda.
+              Koç notları, ödev takibi, deneme sonuçları ve randevu özetleri tek ekranda.
             </p>
           </div>
           <span className="badge" style={{ background: "rgba(255,255,255,.16)", color: "#fff", height: 26 }}>
@@ -163,8 +163,8 @@ export function ParentDashboard() {
       {!isLoading && summary ? <p className="sr-only">Tamamlanan: {completed}</p> : null}
 
       <div className="grid g-4">
-        <StatCard icon="ki-target" tone="success" value={isLoading ? "-" : `${completionRate}%`} label="Bu hafta odev tamamlama" />
-        <StatCard icon="ki-notepad-edit" tone="warning" value={isLoading ? "-" : pending} label="Bekleyen odev" />
+        <StatCard icon="ki-target" tone="success" value={isLoading ? "-" : `${completionRate}%`} label="Bu hafta ödev tamamlama" />
+        <StatCard icon="ki-notepad-edit" tone="warning" value={isLoading ? "-" : pending} label="Bekleyen ödev" />
         <StatCard
           icon="ki-chart-line-up"
           tone="primary"
@@ -176,15 +176,15 @@ export function ParentDashboard() {
 
       <div className="grid col-main">
         <UkSection
-          title="Haftalik Odevler"
-          sub="Bu haftanin odev ozeti"
+          title="Haftalık Ödevler"
+          sub="Bu haftanın ödev özeti"
           action={<UkBadge tone={completionRate >= 70 ? "success" : "warning"}>{completed}/{total} tamam</UkBadge>}
         >
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {isLoading ? (
-              <div style={{ padding: "16px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Yukleniyor...</div>
+              <div style={{ padding: "16px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Yükleniyor...</div>
             ) : assignments.length === 0 ? (
-              <div style={{ padding: "16px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Bu hafta odev yok.</div>
+              <div style={{ padding: "16px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Bu hafta ödev yok.</div>
             ) : (
               assignments.slice(0, 6).map((assignment) => (
                 <div className="lrow" key={assignment.id} style={{ cursor: "default" }}>
@@ -207,7 +207,7 @@ export function ParentDashboard() {
         </UkSection>
 
         <div className="stack">
-          <UkSection title="Koctan Notlar" sub="Onayli rapor ozeti">
+          <UkSection title="Koçtan Notlar" sub="Onaylı rapor özeti">
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {latestReport ? (
                 <div className="lrow" style={{ cursor: "default", alignItems: "flex-start" }}>
@@ -244,7 +244,7 @@ export function ParentDashboard() {
                     <KiIcon name="ki-calendar" size={18} />
                   </span>
                   <div style={{ flex: 1 }}>
-                    <div className="lr-title">{upcomingAppointment.topic ?? "Koc gorusmesi"}</div>
+                    <div className="lr-title">{upcomingAppointment.topic ?? "Koç görüşmesi"}</div>
                     <div className="lr-meta">
                       {upcomingAppointment.day} {upcomingAppointment.slot} · {upcomingAppointment.mode}
                     </div>
@@ -273,7 +273,7 @@ export function ParentDashboard() {
           </Link>
         </div>
         <div className="card-body">
-          <p className="muted" style={{ fontSize: 13.5, lineHeight: 1.55 }}>{isLoading ? "Yukleniyor..." : weeklyComment}</p>
+          <p className="muted" style={{ fontSize: 13.5, lineHeight: 1.55 }}>{isLoading ? "Yükleniyor..." : weeklyComment}</p>
         </div>
       </div>
     </div>

@@ -45,7 +45,7 @@ type BillingPanelProps = {
 type CheckoutState = { planId: string; cycle: BillingCycle } | null;
 
 const TABS: Array<{ key: BillingTab; label: string; icon: string }> = [
-  { key: "sub", label: "Aboneligim", icon: "ki-star" },
+  { key: "sub", label: "Aboneliğim", icon: "ki-star" },
   { key: "plans", label: "Paketler", icon: "ki-flash" },
   { key: "invoices", label: "Faturalar", icon: "ki-receipt-square" },
   { key: "methods", label: "Odeme Yontemleri", icon: "ki-wallet" },
@@ -148,8 +148,8 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
     <div className="stack rise" data-testid="billing-panel">
       {!embedded ? (
         <UkPageHead
-          title="Abonelik & Odeme"
-          sub="Kocluk paketini, faturalarini ve odeme yontemlerini yonet"
+          title="Abonelik & Ödeme"
+          sub="Koçluk paketini, faturalarını ve ödeme yöntemlerini yönet"
         />
       ) : null}
 
@@ -168,7 +168,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
       </div>
 
       {isLoading ? (
-        <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>
+        <p className="muted" style={{ fontSize: 13 }}>Yükleniyor...</p>
       ) : (
         <>
           {tab === "plans" ? (
@@ -176,10 +176,10 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
               <div className="pricing-toggle-wrap">
                 <div className="seg pricing-toggle">
                   <button type="button" className={pricingCycle === "monthly" ? "on" : ""} onClick={() => setPricingCycle("monthly")}>
-                    Aylik
+                    Aylık
                   </button>
                   <button type="button" className={pricingCycle === "annual" ? "on" : ""} onClick={() => setPricingCycle("annual")}>
-                    Yillik <span className="save-pill">2 ay bedava</span>
+                    Yıllık <span className="save-pill">2 ay bedava</span>
                   </button>
                 </div>
               </div>
@@ -188,7 +188,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                   const current = isCurrentPlan(item, pricingCycle, subscription);
                   return (
                     <div key={item.id} className={`plan-card${item.popular ? " popular" : ""}`}>
-                      {item.popular ? <span className="plan-flag">En cok tercih edilen</span> : null}
+                      {item.popular ? <span className="plan-flag">En çok tercih edilen</span> : null}
                       <div className="plan-top">
                         <span className="plan-dot" style={{ background: planColor(item.id) }} />
                         <h3>{item.name}</h3>
@@ -243,7 +243,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
               </div>
               <div className="pricing-note">
                 <KiIcon name="ki-shield-tick" size={16} />
-                Tum paketler KVKK uyumlu, 3D Secure korumali. Ilk 7 gun icinde iptal edersen ucret iadesi yapilir.
+                Tüm paketler KVKK uyumlu, 3D Secure korumalı. İlk 7 gün içinde iptal edersen ücret iadesi yapılır.
               </div>
             </div>
           ) : null}
@@ -251,7 +251,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
           {tab === "sub" ? (
             <div className="stack" style={{ gap: 16 }}>
               {!subscription || !activePlan ? (
-                <UkSection title="Abonelik yok" sub="Kocluk paketi secmek icin Paketler sekmesine gec">
+                <UkSection title="Abonelik yok" sub="Koçluk paketi seçmek için Paketler sekmesine geç">
                   <div className="card-body">
                     <button type="button" className="btn btn-primary" onClick={() => setTab("plans")}>
                       Paketleri Gor
@@ -273,7 +273,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                           Aktif
                         </UkBadge>
                       )}
-                      <UkBadge tone="muted">{subscription.cycle === "annual" ? "Yillik" : "Aylik"}</UkBadge>
+                      <UkBadge tone="muted">{subscription.cycle === "annual" ? "Yıllık" : "Aylık"}</UkBadge>
                     </div>
                     <p className="muted" style={{ fontSize: 13.5, maxWidth: 440 }}>{activePlan.tagline}</p>
                     <div className="sub-meta">
@@ -282,11 +282,11 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                         <b>{formatBillingDate(subscription.startedAt)}</b>
                       </div>
                       <div>
-                        <span className="muted">{canceled ? "Erisim sonu" : "Sonraki yenileme"}</span>
+                        <span className="muted">{canceled ? "Erişim sonu" : "Sonraki yenileme"}</span>
                         <b>{formatBillingDate(subscription.renewsAt)}</b>
                       </div>
                       <div>
-                        <span className="muted">Odeme yontemi</span>
+                        <span className="muted">Ödeme yöntemi</span>
                         <b className="row" style={{ gap: 6 }}>
                           {card ? (
                             <>
@@ -302,7 +302,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                   <div className="sub-hero-side">
                     <div className="sub-countdown">
                       <span className="tnum">{billingDaysLeft(subscription.renewsAt)}</span>
-                      <span className="muted">gun {canceled ? "erisim" : "kaldi"}</span>
+                      <span className="muted">gün {canceled ? "erişim" : "kaldı"}</span>
                     </div>
                     <div className="tnum" style={{ fontSize: 15, fontWeight: 800 }}>
                       {formatTRY(planPrice(activePlan, subscription.cycle))}
@@ -317,14 +317,14 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                   <div className="notice warn">
                     <KiIcon name="ki-information-2" size={18} />
                     <div style={{ flex: 1 }}>
-                      <b>Aboneligin iptal edildi.</b>
+                      <b>Aboneliğin iptal edildi.</b>
                       <div className="muted" style={{ fontSize: 12.5 }}>
-                        {formatBillingDate(subscription.renewsAt)} tarihine kadar erisimin devam eder.
+                        {formatBillingDate(subscription.renewsAt)} tarihine kadar erişimin devam eder.
                       </div>
                     </div>
                     <button type="button" className="btn btn-primary btn-sm" onClick={() => void patchSubscription("resume")}>
                       <KiIcon name="ki-arrows-circle" size={15} />
-                      Aboneligi Surdur
+                      Aboneliği Sürdür
                     </button>
                   </div>
                 ) : (
@@ -334,7 +334,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                         <div>
                           <b style={{ fontSize: 13.5 }}>Otomatik yenileme</b>
                           <div className="muted" style={{ fontSize: 12 }}>
-                            {subscription.cycle === "annual" ? "Yil" : "Ay"} sonunda{" "}
+                            {subscription.cycle === "annual" ? "Yıl" : "Ay"} sonunda{" "}
                             {formatTRY(planPrice(activePlan, subscription.cycle))} otomatik tahsil edilir
                           </div>
                         </div>
@@ -359,7 +359,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                             onClick={() => openCheckout(subscription.planId, "annual")}
                           >
                             <KiIcon name="ki-star" size={15} />
-                            Yilliga gec · 2 ay bedava
+                            Yılliga gec · 2 ay bedava
                           </button>
                         ) : null}
                         <button
@@ -368,7 +368,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                           style={{ marginLeft: "auto" }}
                           onClick={() => setConfirmCancel(true)}
                         >
-                          Aboneligi iptal et
+                          Aboneliği iptal et
                         </button>
                       </div>
                     </div>
@@ -395,10 +395,10 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                       ? formatBillingDate(invoices[0].issuedAt).split(" ").slice(1).join(" ")
                       : "—"
                   }
-                  label="Son odeme"
+                  label="Son ödeme"
                 />
               </div>
-              <UkSection title="Fatura & Odeme Gecmisi" sub="Gecmis odemelerini goruntule ve makbuzlari indir">
+              <UkSection title="Fatura & Ödeme Geçmişi" sub="Geçmiş ödemelerini görüntüle ve makbuzları indir">
                 <div className="card-body" style={{ padding: 0, overflowX: "auto" }}>
                   <table className="tbl" style={{ minWidth: 640 }}>
                     <thead>
@@ -425,7 +425,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                           const tone =
                             invoice.status === "paid" ? "success" : invoice.status === "pending" ? "warning" : "danger";
                           const label =
-                            invoice.status === "paid" ? "Odendi" : invoice.status === "pending" ? "Bekliyor" : "Basarisiz";
+                            invoice.status === "paid" ? "Ödendi" : invoice.status === "pending" ? "Bekliyor" : "Başarısız";
                           return (
                             <tr key={invoice.id}>
                               <td>
@@ -445,7 +445,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                                     {invoicePlan?.name ?? invoice.planId}
                                   </span>
                                   <span className="muted" style={{ fontSize: 11 }}>
-                                    {invoice.cycle === "annual" ? "Yillik" : "Aylik"}
+                                    {invoice.cycle === "annual" ? "Yıllık" : "Aylık"}
                                     {invoice.installments > 1 ? ` · ${invoice.installments}x` : ""}
                                   </span>
                                 </div>
@@ -499,7 +499,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
             <div className="stack" style={{ gap: 14 }}>
               <UkSection
                 title="Kayitli Kartlar"
-                sub="Yenilemeler ve yeni odemeler icin kullanilir"
+                sub="Yenilemeler ve yeni ödemeler için kullanılır"
                 action={
                   <button type="button" className="btn btn-primary btn-sm" onClick={() => setAddCardOpen(true)}>
                     <KiIcon name="ki-plus" size={15} />
@@ -513,7 +513,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                       <KiIcon name="ki-wallet" size={26} style={{ color: "var(--faint)" }} />
                       <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-2)" }}>Kayitli kart yok</div>
                       <div className="muted" style={{ fontSize: 12 }}>
-                        Hizli odeme icin bir <b style={{ color: "var(--primary-600)" }}>kart ekle</b>
+                        Hızlı ödeme için bir <b style={{ color: "var(--primary-600)" }}>kart ekle</b>
                       </div>
                     </button>
                   ) : (
@@ -525,7 +525,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                             <b className="tnum" style={{ fontSize: 14 }}>
                               •••• •••• •••• {method.last4}
                             </b>
-                            {method.isDefault ? <UkBadge tone="primary">Varsayilan</UkBadge> : null}
+                            {method.isDefault ? <UkBadge tone="primary">Varsayılan</UkBadge> : null}
                           </div>
                           <div className="muted" style={{ fontSize: 12 }}>
                             {method.holder} · son kul. {formatCardExp(method)}
@@ -534,7 +534,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                         <div className="row" style={{ gap: 6, marginLeft: "auto" }}>
                           {!method.isDefault ? (
                             <button type="button" className="btn btn-light btn-sm" onClick={() => void setDefaultCard(method.id)}>
-                              Varsayilan yap
+                              Varsayılan yap
                             </button>
                           ) : null}
                           <button
@@ -586,14 +586,14 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                   <span className="stat-icon tone-danger" style={{ width: 48, height: 48, margin: "0 auto" }}>
                     <KiIcon name="ki-information-2" size={24} />
                   </span>
-                  <h3 style={{ fontSize: 17, fontWeight: 800 }}>Aboneligi iptal et?</h3>
+                  <h3 style={{ fontSize: 17, fontWeight: 800 }}>Aboneliği iptal et?</h3>
                   <p className="muted" style={{ fontSize: 13 }}>
-                    {formatBillingDate(subscription.renewsAt)} tarihine kadar tum kocluk ozelliklerine erisimin surer.
+                    {formatBillingDate(subscription.renewsAt)} tarihine kadar tüm koçluk özelliklerine erişimin sürer.
                   </p>
                 </div>
                 <div className="modal-foot">
                   <button type="button" className="btn btn-light" onClick={() => setConfirmCancel(false)}>
-                    Vazgec
+                    Vazgeç
                   </button>
                   <button
                     type="button"

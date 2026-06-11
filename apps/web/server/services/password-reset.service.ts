@@ -3,8 +3,10 @@ import { hash } from "bcryptjs";
 
 import { shouldUseDatabase } from "@/lib/data/env";
 import { demoUsers } from "@/lib/auth/demo-users";
+import { sendPasswordResetMail } from "./mail.service";
 
 const RESET_TTL_MS = 1000 * 60 * 30;
+const RESET_TTL_MINUTES = RESET_TTL_MS / 60_000;
 
 const globalStore = globalThis as typeof globalThis & {
   __uyanikPasswordResetTokens?: Map<string, { email: string; expiresAt: number; used: boolean }>;
@@ -46,6 +48,14 @@ export async function requestPasswordReset(emailInput: string): Promise<{
       expiresAt,
     });
 
+    if (created) {
+      await sendPasswordResetMail({
+        to: created.email,
+        resetUrl: resetUrl(token),
+        expiresInMinutes: RESET_TTL_MINUTES,
+      });
+    }
+
     return {
       accepted: true,
       resetUrl: created && process.env.NODE_ENV !== "production" ? resetUrl(token) : undefined,
@@ -54,6 +64,11 @@ export async function requestPasswordReset(emailInput: string): Promise<{
 
   if (demoUsers.some((user) => user.email === email)) {
     memoryTokens.set(hashToken(token), { email, expiresAt: expiresAt.getTime(), used: false });
+    await sendPasswordResetMail({
+      to: email,
+      resetUrl: resetUrl(token),
+      expiresInMinutes: RESET_TTL_MINUTES,
+    });
     return { accepted: true, resetUrl: resetUrl(token) };
   }
 

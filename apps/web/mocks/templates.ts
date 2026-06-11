@@ -27,7 +27,7 @@ function seedIfEmpty() {
     {
       id: "template_mat_tekrar",
       coachId: DEMO_COACH_ID,
-      title: "Matematik tekrar odevi",
+      title: "Matematik tekrar ödevi",
       description: "Haftalik tekrar sorulari",
       type: "homework",
       priority: "medium",

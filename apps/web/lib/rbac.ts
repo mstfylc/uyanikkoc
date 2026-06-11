@@ -134,14 +134,13 @@ export function yonetimLoginRoleHint(
   if (YONETIM_BRANCH_ONLY_PREFIXES.some((prefix) => matchesPrefix(pathname, prefix))) {
     return "branch";
   }
-  return "admin";
+  return "branch";
 }
 
 export function loginHrefForPath(pathname: string, roleHint?: "admin" | "branch" | "coach" | null): string {
   const targetPath = pathname === "/yonetim" ? "/yonetim/dashboard" : pathname;
-  const role = roleHint ?? yonetimLoginRoleHint(targetPath);
   const base = `/login?next=${encodeURIComponent(targetPath)}`;
-  return role ? `${base}&role=${role}` : base;
+  return roleHint ? `${base}&role=${roleHint}` : base;
 }
 
 function yonetimMismatchRedirect(role: AppRole, pathname: string): string | null {

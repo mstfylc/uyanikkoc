@@ -28,12 +28,12 @@ export function ResetPasswordForm() {
 
     if (!response.ok) {
       const data = (await response.json().catch(() => ({}))) as { error?: string };
-      setError(data.error ?? "Sifre sifirlanamadi.");
+      setError(data.error ?? "Şifre sıfırlanamadı.");
       return;
     }
 
     setPassword("");
-    setMessage("Sifren guncellendi. Yeni sifrenle giris yapabilirsin.");
+    setMessage("Şifren güncellendi. Yeni şifrenle giriş yapabilirsin.");
   }
 
   return (
@@ -41,7 +41,7 @@ export function ResetPasswordForm() {
       <div className="auth-form-side" style={{ margin: "0 auto" }}>
         <form className="auth-card" onSubmit={submit}>
           <div style={{ marginBottom: 22 }}>
-            <h1 style={{ fontSize: 23, fontWeight: 800 }}>Sifre sifirla</h1>
+            <h1 style={{ fontSize: 23, fontWeight: 800 }}>Şifre sıfırla</h1>
             <p className="muted" style={{ fontSize: 13.5, marginTop: 4 }}>
               Yeni sifren en az 6 karakter olmali.
             </p>
@@ -66,7 +66,7 @@ export function ResetPasswordForm() {
 
           {!token ? (
             <div className="badge badge-danger" style={{ marginBottom: 14, height: "auto", padding: "10px 12px" }}>
-              Sifre sifirlama baglantisi eksik.
+              Şifre sıfırlama bağlantısı eksik.
             </div>
           ) : null}
           {error ? (
@@ -82,11 +82,11 @@ export function ResetPasswordForm() {
 
           <button type="submit" className="btn btn-primary" style={{ width: "100%", height: 46 }} disabled={isSubmitting || !token}>
             <KiIcon name="ki-lock-2" />
-            {isSubmitting ? "Guncelleniyor..." : "Sifreyi guncelle"}
+            {isSubmitting ? "Güncelleniyor..." : "Şifreyi güncelle"}
           </button>
 
           <a href="/login" className="btn btn-light" style={{ width: "100%", marginTop: 10 }}>
-            Girise don
+            Girişe dön
           </a>
         </form>
       </div>

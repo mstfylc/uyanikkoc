@@ -19,16 +19,18 @@ function mapDemoUser(user: DemoUser): AuthUserRecord {
 }
 
 export async function resolveUserByEmail(email: string): Promise<AuthUserRecord | null> {
+  const normalizedEmail = email.trim().toLowerCase();
+
   if (!shouldUseDatabase()) {
     assertProductionMemoryPolicy();
     if (process.env.NODE_ENV === "production") {
       return null;
     }
 
-    const user = demoUsers.find((demoUser) => demoUser.email === email);
+    const user = demoUsers.find((demoUser) => demoUser.email === normalizedEmail);
     return user ? mapDemoUser(user) : null;
   }
 
   const { authRepository } = await import("@uyanik/database");
-  return authRepository.findUserByEmail(email);
+  return authRepository.findUserByEmail(normalizedEmail);
 }

@@ -9,14 +9,14 @@ export const PROFILE_AVATAR_ICONS: ProfileAvatarIcon[] = [
   { id: "trophy", label: "Kupa", glyph: "🏆" },
   { id: "gamepad", label: "Oyun", glyph: "🎮" },
   { id: "music", label: "Muzik", glyph: "🎵" },
-  { id: "headphones", label: "Kulaklik", glyph: "🎧" },
+  { id: "headphones", label: "Kulaklık", glyph: "🎧" },
   { id: "basketball", label: "Basket", glyph: "🏀" },
   { id: "bulb", label: "Ampul", glyph: "💡" },
-  { id: "star", label: "Yildiz", glyph: "⭐" },
+  { id: "star", label: "Yıldız", glyph: "⭐" },
   { id: "book", label: "Kitap", glyph: "📚" },
   { id: "fire", label: "Alev", glyph: "🔥" },
   { id: "target", label: "Hedef", glyph: "🎯" },
-  { id: "sparkle", label: "Parilti", glyph: "✨" },
+  { id: "sparkle", label: "Parıltı", glyph: "✨" },
 ];
 
 export const PROFILE_AVATAR_KEY = "uk_profile_avatar_v1";

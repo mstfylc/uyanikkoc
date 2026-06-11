@@ -49,7 +49,7 @@ function SettingsToast({ message }: { message: string | null }) {
         <div className="fw7" style={{ fontSize: 13.5 }}>
           {message}
         </div>
-        <div className="muted fz12">Tercihler guncellendi</div>
+        <div className="muted fz12">Tercihler güncellendi</div>
       </div>
     </div>
   );
@@ -74,15 +74,15 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
   const tabs: Array<{ key: SettingsTab; label: string; icon: string }> =
     role === "coach"
       ? [
-          { key: "mufredat", label: "Mufredat", icon: "ki-book-open" },
+          { key: "mufredat", label: "Müfredat", icon: "ki-book-open" },
           { key: "profil", label: "Hesap", icon: "ki-profile-circle" },
-          { key: "gorunum", label: "Gorunum", icon: "ki-setting-2" },
+          { key: "gorunum", label: "Görünüm", icon: "ki-setting-2" },
           { key: "bildirimler", label: "Bildirimler", icon: "ki-notification-on" },
           { key: "gizlilik", label: "Gizlilik", icon: "ki-lock" },
         ]
       : [
           { key: "profil", label: "Hesap", icon: "ki-profile-circle" },
-          { key: "gorunum", label: "Gorunum", icon: "ki-setting-2" },
+          { key: "gorunum", label: "Görünüm", icon: "ki-setting-2" },
           { key: "odeme", label: "Abonelik", icon: "ki-wallet" },
           { key: "bildirimler", label: "Bildirimler", icon: "ki-notification-on" },
           { key: "gizlilik", label: "Gizlilik", icon: "ki-lock" },
@@ -147,10 +147,10 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
     setIsSaving(false);
 
     if (response.ok) {
-      setSuccess("Sinav turu guncellendi.");
+      setSuccess("Sınav türü güncellendi.");
       await load();
     } else {
-      setError("Sinav turu kaydedilemedi.");
+      setError("Sınav türü kaydedilemedi.");
     }
   }
 
@@ -167,18 +167,18 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
     setIsSaving(false);
 
     if (!response.ok) {
-      setError("Mufredat kaydedilemedi.");
+      setError("Müfredat kaydedilemedi.");
       return false;
     }
 
     const data = (await response.json()) as { curriculum: CurriculumRecord };
     setCurriculum(data.curriculum);
-    setSuccess("Mufredat guncellendi.");
+    setSuccess("Müfredat güncellendi.");
     return true;
   }
 
   async function resetSubjects(): Promise<boolean> {
-    if (!confirm("Mufredat varsayilan degerlere sifirlansin mi?")) {
+    if (!confirm("Müfredat varsayılan değerlere sıfırlansın mı?")) {
       return false;
     }
 
@@ -194,12 +194,12 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
     setIsSaving(false);
 
     if (!response.ok) {
-      setError("Mufredat sifirlanamadi.");
+      setError("Müfredat sıfırlanamadı.");
       return false;
     }
 
     await load();
-    setSuccess("Mufredat varsayilana sifirlandi.");
+    setSuccess("Müfredat varsayılana sıfırlandı.");
     return true;
   }
 
@@ -211,7 +211,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
     setTheme(choice);
     localStorage.setItem(THEME_KEY, choice);
     applyTheme(choice);
-    showToast("Tema guncellendi");
+    showToast("Tema güncellendi");
   }
 
   function handlePasswordSave() {
@@ -219,7 +219,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
       return;
     }
     setPasswordDraft({ current: "", next: "", confirm: "" });
-    showToast("Sifre guncellendi (demo)");
+    showToast("Şifre güncellendi (demo)");
   }
 
   return (
@@ -242,11 +242,11 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
 
       {tab === "mufredat" && role === "coach" ? (
         <>
-          <UkSection title="Sinav turu">
+          <UkSection title="Sınav türü">
             <div className="card-body">
               {isLoading ? (
                 <p className="muted" style={{ fontSize: 13 }}>
-                  Yukleniyor...
+                  Yükleniyor...
                 </p>
               ) : (
                 <div className="seg" style={{ width: "fit-content" }}>
@@ -266,10 +266,10 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
             </div>
           </UkSection>
 
-          <UkSection title="Mufredat & Konu Gruplari" sub="Ders, grup ve konu yapisini duzenle">
+          <UkSection title="Müfredat & Konu Grupları" sub="Ders, grup ve konu yapısını düzenle">
             {isLoading || !curriculum ? (
               <div className="card-body muted" style={{ fontSize: 13 }}>
-                Yukleniyor...
+                Yükleniyor...
               </div>
             ) : (
               <div className="card-body">
@@ -325,7 +325,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
                 <div>
                   <div style={{ fontSize: 13.5, fontWeight: 700 }}>Tema</div>
                   <div className="muted" style={{ fontSize: 12 }}>
-                    Gorunum sekmesinden yonet
+                    Görünüm sekmesinden yönet
                   </div>
                 </div>
               </div>
@@ -335,7 +335,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
       ) : null}
 
       {tab === "gorunum" ? (
-        <UkSection title="Gorunum" sub="Tema ve arayuz tercihleri">
+        <UkSection title="Görünüm" sub="Tema ve arayüz tercihleri">
           <div className="card-body">
             <div className="seg" style={{ width: "fit-content" }}>
               {(["light", "dark", "system"] as ThemeChoice[]).map((choice) => (
@@ -350,14 +350,14 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
               ))}
             </div>
             <p className="muted" style={{ fontSize: 12.5, marginTop: 12 }}>
-              Secimin tarayicida kaydedilir ve tum panellerde uygulanir.
+              Seçimin tarayıcıda kaydedilir ve tüm panellerde uygulanır.
             </p>
           </div>
         </UkSection>
       ) : null}
 
       {tab === "gizlilik" ? (
-        <UkSection title="Gizlilik & Guvenlik" sub="Sifre ve oturum">
+        <UkSection title="Gizlilik & Güvenlik" sub="Şifre ve oturum">
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div className="grid g-2" style={{ gap: 12 }}>
               <div className="field">
@@ -390,10 +390,10 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
             </div>
             <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
               <button type="button" className="btn btn-primary btn-sm" onClick={handlePasswordSave}>
-                Sifreyi guncelle
+                Şifreyi güncelle
               </button>
               <button type="button" className="btn btn-ghost-danger btn-sm" onClick={() => void signOut({ callbackUrl: "/login" })}>
-                Cikis yap
+                Çıkış yap
               </button>
             </div>
           </div>

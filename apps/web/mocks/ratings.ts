@@ -22,7 +22,7 @@ function seedIfEmpty(coachId: string) {
     studentId: DEMO_STUDENT_002_ID,
     coachId,
     stars: 5,
-    comment: "Hocam cok ilgili, her sorumu hemen yanitliyor. Netlerim ciddi yukseldi!",
+    comment: "Hocam çok ilgili, her sorumu hemen yanıtlıyor. Netlerim ciddi yükseldi!",
     createdAt: timestamp,
   });
   byStudent.set(DEMO_STUDENT_ID, {
@@ -30,7 +30,7 @@ function seedIfEmpty(coachId: string) {
     studentId: DEMO_STUDENT_ID,
     coachId,
     stars: 4,
-    comment: "Program cok duzenli ama bazen randevu bulmakta zorlaniyorum.",
+    comment: "Program çok düzenli ama bazen randevu bulmakta zorlaniyorum.",
     createdAt: timestamp,
   });
 }
@@ -57,11 +57,11 @@ export async function upsertRating(input: UpsertRatingInput): Promise<CoachRatin
   if (!existing) {
     const roster = listCoachStudents(input.coachId);
     const studentName =
-      roster.find((entry) => entry.studentId === input.studentId)?.displayName ?? "Ogrenci";
+      roster.find((entry) => entry.studentId === input.studentId)?.displayName ?? "Öğrenci";
     pushCoachNotification(
       input.coachId,
       "Yeni degerlendirme",
-      `${studentName} koclugunu ${stars} yildizla puanladi`,
+      `${studentName} koçluğunu ${stars} yıldızla puanladı`,
     );
   }
   return rec;
@@ -75,7 +75,7 @@ export async function getCoachSummary(coachId: string): Promise<CoachRatingSumma
     .filter((r) => r.coachId === coachId)
     .map((rating) => ({
       ...rating,
-      studentName: nameByStudent.get(rating.studentId) ?? "Ogrenci",
+      studentName: nameByStudent.get(rating.studentId) ?? "Öğrenci",
     }))
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
   const count = ratings.length;

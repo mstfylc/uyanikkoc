@@ -27,7 +27,7 @@ export function BranchCoachDetail({ coachId }: { coachId: string }) {
   if (!coach) {
     return (
       <div className="stack rise">
-        <Link href="/branch/coaches" className="link-btn">
+        <Link href="/yonetim/coaches" className="link-btn">
           <Icon name="chevronRight" size={15} style={{ transform: "rotate(180deg)" }} />Koçlara dön
         </Link>
         <div className="empty-state">
@@ -47,7 +47,7 @@ export function BranchCoachDetail({ coachId }: { coachId: string }) {
 
   return (
     <div className="stack rise">
-      <Link href="/branch/coaches" className="link-btn" style={{ alignSelf: "flex-start" }}>
+      <Link href="/yonetim/coaches" className="link-btn" style={{ alignSelf: "flex-start" }}>
         <Icon name="chevronRight" size={15} style={{ transform: "rotate(180deg)" }} />Koçlara dön
       </Link>
 
@@ -118,7 +118,7 @@ export function BranchCoachDetail({ coachId }: { coachId: string }) {
                   </thead>
                   <tbody>
                     {students.slice(0, 12).map((s) => (
-                      <tr key={s.id} style={{ cursor: "pointer" }} onClick={() => router.push(`/branch/students/${s.id}`)}>
+                      <tr key={s.id} style={{ cursor: "pointer" }} onClick={() => router.push(`/yonetim/students/${s.id}`)}>
                         <td>
                           <div className="name">
                             <UkAvatar name={s.name} size={30} />
@@ -201,7 +201,7 @@ export function BranchCoachDetail({ coachId }: { coachId: string }) {
         onConfirm={async () => {
           await mutate({ kind: "removeOrgCoach", coachId: coach.id });
           toast(coach.name + " sistemden çıkarıldı", { icon: "ki-information-2", tone: "danger" });
-          router.push("/branch/coaches");
+          router.push("/yonetim/coaches");
         }}
         onClose={() => setRemoveOpen(false)}
       />

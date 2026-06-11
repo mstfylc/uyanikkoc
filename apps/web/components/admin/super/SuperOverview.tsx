@@ -23,7 +23,7 @@ export function SuperOverview() {
           title="Platform Genel BakÄ±ÅŸ"
           sub="UyanÄ±k KoÃ§ â€” tÃ¼m kurumlar, koÃ§lar ve abonelik geliri tek ekranda"
         />
-        <div className="card card-pad muted">Yukleniyor...</div>
+        <div className="card card-pad muted">Yükleniyor...</div>
       </div>
     );
   }

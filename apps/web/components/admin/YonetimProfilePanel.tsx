@@ -40,10 +40,10 @@ function saveTheme(choice: ThemeChoice) {
 }
 
 const ADMIN_DEFAULTS = {
-  name: "Uyanik Koc",
+  name: "Uyanık Koç",
   email: "admin@uyanik.local",
   phone: "0850 000 00 00",
-  sub: "Platform yoneticisi",
+  sub: "Platform yöneticisi",
   tone: "var(--primary)",
   icon: "shield" as const,
 };
@@ -63,6 +63,9 @@ export function YonetimProfilePanel() {
   const [avatarIcon, setAvatarIcon] = useState("rocket");
   const [theme, setTheme] = useState<ThemeChoice>("light");
   const [resetting, setResetting] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
 
   useEffect(() => {
     setAvatarIcon(loadProfileAvatarIcon());
@@ -75,12 +78,14 @@ export function YonetimProfilePanel() {
     if (isBranch && org) {
       setName(org.owner.name);
       setEmail(org.owner.email);
+      setAccountEmail(session?.user?.email ?? org.owner.email);
       setPhone(org.owner.phone);
       return;
     }
     if (role === "admin") {
       setName(session?.user?.name ?? ADMIN_DEFAULTS.name);
       setEmail(session?.user?.email ?? ADMIN_DEFAULTS.email);
+      setAccountEmail(session?.user?.email ?? ADMIN_DEFAULTS.email);
       setPhone(ADMIN_DEFAULTS.phone);
     }
   }, [isBranch, org, role, session?.user?.email, session?.user?.name]);
@@ -91,25 +96,52 @@ export function YonetimProfilePanel() {
 
   const tone = isBranch && org ? org.tone : ADMIN_DEFAULTS.tone;
   const sub =
-    isBranch && org ? `Kurum yoneticisi · ${org.name}` : ADMIN_DEFAULTS.sub;
+    isBranch && org ? `Kurum yöneticisi · ${org.name}` : ADMIN_DEFAULTS.sub;
   const badgeIcon = isBranch ? "building" : "shield";
   const badgeLabel = UK_ROLE_CRUMB[role];
+  const emailChanged = email.trim().toLowerCase() !== accountEmail.trim().toLowerCase();
 
   async function handleSave() {
-    if (isBranch && org) {
-      await mutate({
-        kind: "updateOrgProfile",
-        orgId: org.id,
-        name: org.name,
-        tone: org.tone,
-        email: email.trim(),
-        phone: phone.trim(),
-        ownerName: name.trim(),
+    if (saving) return;
+    setSaving(true);
+    try {
+      if (emailChanged) {
+        const res = await fetch("/api/auth/email", {
+          method: "PATCH",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newEmail: email.trim(), currentPassword }),
+        });
+        if (!res.ok) {
+          const data = (await res.json().catch(() => ({}))) as { error?: string };
+          toast(data.error ?? "E-posta güncellenemedi", { icon: "ki-information-5", tone: "danger" });
+          return;
+        }
+      }
+
+      if (emailChanged) {
+        setAccountEmail(email.trim().toLowerCase());
+      }
+      if (isBranch && org) {
+        await mutate({
+          kind: "updateOrgProfile",
+          orgId: org.id,
+          name: org.name,
+          tone: org.tone,
+          email: email.trim(),
+          phone: phone.trim(),
+          ownerName: name.trim(),
+        });
+      }
+      setCurrentPassword("");
+      setSaved(true);
+      toast(emailChanged ? "E-posta güncellendi. Bir sonraki girişte yeni adresi kullanın." : "Profil güncellendi", {
+        icon: "ki-check-circle",
       });
+      window.setTimeout(() => setSaved(false), 1800);
+    } finally {
+      setSaving(false);
     }
-    setSaved(true);
-    toast("Profil guncellendi", { icon: "ki-check-circle" });
-    window.setTimeout(() => setSaved(false), 1800);
   }
 
   function toggleTheme() {
@@ -131,7 +163,7 @@ export function YonetimProfilePanel() {
 
   return (
     <div className="stack rise" data-testid="yonetim-profile">
-      <UkPageHead title="Profil" sub="Hesap bilgilerin, profil fotografin ve tercihlerin" />
+      <UkPageHead title="Profil" sub="Hesap bilgilerin, profil fotoğrafın ve tercihlerin" />
 
       <div className="grid col-rail">
         <div className="card" style={{ alignSelf: "start", overflow: "hidden" }}>
@@ -173,7 +205,7 @@ export function YonetimProfilePanel() {
         </div>
 
         <div className="stack">
-          <UkSection title="Profil fotografi" sub="Hazir bir ikon sec">
+          <UkSection title="Profil fotoğrafı" sub="Hazır bir ikon seç">
             <div className="card-body">
               <div className="grid g-4" style={{ gap: 10 }}>
                 {PROFILE_AVATAR_ICONS.map((icon) => (
@@ -208,7 +240,7 @@ export function YonetimProfilePanel() {
             action={
               <button type="button" className="btn btn-primary btn-sm" onClick={() => void handleSave()}>
                 <Icon name={saved ? "check" : "settings"} size={15} />
-                {saved ? "Kaydedildi" : "Kaydet"}
+                {saving ? "Kaydediliyor" : saved ? "Kaydedildi" : "Kaydet"}
               </button>
             }
           >
@@ -232,6 +264,19 @@ export function YonetimProfilePanel() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
+              {emailChanged ? (
+                <div className="field">
+                  <label className="label">Mevcut şifre</label>
+                  <input
+                    className="input"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    autoComplete="current-password"
+                    placeholder="E-posta değişikliğini onayla"
+                  />
+                </div>
+              ) : null}
             </div>
           </UkSection>
 
@@ -247,7 +292,7 @@ export function YonetimProfilePanel() {
                   </span>
                   <div>
                     <div style={{ fontSize: 13.5, fontWeight: 700 }}>Koyu tema</div>
-                    <div className="muted" style={{ fontSize: 12 }}>Goz yorgunlugunu azalt</div>
+                    <div className="muted" style={{ fontSize: 12 }}>Göz yorgunluğunu azalt</div>
                   </div>
                 </div>
                 <button
@@ -272,7 +317,7 @@ export function YonetimProfilePanel() {
                 onClick={() => void handleResetDemo()}
               >
                 <Icon name="refresh" size={16} />
-                {resetting ? "Sifirlaniyor…" : "Demo verilerini sifirla"}
+                {resetting ? "Sıfırlanıyor…" : "Demo verilerini sıfırla"}
               </button>
               <button
                 type="button"
@@ -281,7 +326,7 @@ export function YonetimProfilePanel() {
                 onClick={() => void signOut({ callbackUrl: "/login" })}
               >
                 <KiIcon name="ki-exit-right" size={17} />
-                Cikis yap
+                Çıkış yap
               </button>
             </div>
           </UkSection>
