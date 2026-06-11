@@ -1,25 +1,19 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
-import { requireAuth } from "@/lib/auth/api-guard";
-import { verifyMobileToken } from "@/lib/auth/mobile-token";
+import { withMobileAuth } from "@/server/auth/withMobileAuth";
 
-export async function GET(req: NextRequest) {
-  const authResult = await requireAuth(req, ["student"]);
-  if (authResult instanceof NextResponse) {
-    return authResult;
-  }
-
-  const header = req.headers.get("authorization");
-  const token = header?.startsWith("Bearer ") ? header.slice("Bearer ".length).trim() : null;
-  const payload = token ? await verifyMobileToken(token) : null;
-
-  return NextResponse.json(
-    {
-      user: {
-        ...authResult.session.user,
-        email: payload?.email ?? "",
+export const GET = withMobileAuth(
+  async (_req, { user }) =>
+    NextResponse.json(
+      {
+        user: {
+          id: user.id,
+          email: user.email ?? "",
+          role: user.role,
+          studentId: user.studentId ?? null,
+        },
       },
-    },
-    { status: 200 },
-  );
-}
+      { status: 200 },
+    ),
+  { role: "student" },
+);

@@ -4,6 +4,12 @@ import { hash } from "bcryptjs";
 import { shouldUseDatabase } from "@/lib/data/env";
 import { demoUsers } from "@/lib/auth/demo-users";
 import { sendPasswordResetMail } from "./mail.service";
+import {
+  assertAuthNotRateLimited,
+  AuthRateLimitError,
+  normalizeRateLimitEmail,
+  recordAuthFailure,
+} from "./auth-rate-limit.service";
 
 const RESET_TTL_MS = 1000 * 60 * 30;
 const RESET_TTL_MINUTES = RESET_TTL_MS / 60_000;
@@ -35,8 +41,35 @@ function resetUrl(token: string): string {
 export async function requestPasswordReset(emailInput: string): Promise<{
   accepted: true;
   resetUrl?: string;
+}>;
+export async function requestPasswordReset(
+  emailInput: string,
+  opts: { ip?: string },
+): Promise<{
+  accepted: true;
+  resetUrl?: string;
+}>;
+export async function requestPasswordReset(
+  emailInput: string,
+  opts?: { ip?: string },
+): Promise<{
+  accepted: true;
+  resetUrl?: string;
 }> {
-  const email = emailInput.trim().toLowerCase();
+  const email = normalizeRateLimitEmail(emailInput);
+  const ip = opts?.ip ?? "unknown";
+
+  try {
+    await assertAuthNotRateLimited({ scope: "password_reset", email, ip });
+  } catch (error) {
+    if (error instanceof AuthRateLimitError) {
+      return { accepted: true };
+    }
+    throw error;
+  }
+
+  await recordAuthFailure({ scope: "password_reset", email, ip });
+
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + RESET_TTL_MS);
 

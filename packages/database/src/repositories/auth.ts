@@ -1,6 +1,23 @@
 import { prisma } from "../client";
 import type { AuthUserRecord } from "../types";
 
+export type LoginAttemptScope = "web_login" | "password_reset";
+
+export type OtpChallengeRecord = {
+  phone: string;
+  codeHash: string;
+  attempts: number;
+  consumedAt: Date | null;
+  expiresAt: Date;
+  createdAt: Date;
+};
+
+export type RefreshTokenRecord = {
+  tokenHash: string;
+  userId: string;
+  expiresAt: Date;
+};
+
 export async function findUserByEmail(email: string): Promise<AuthUserRecord | null> {
   const normalizedEmail = email.trim().toLowerCase();
   const user = await prisma.user.findUnique({
@@ -54,6 +71,181 @@ export async function findUserById(id: string): Promise<AuthUserRecord | null> {
     coachId: user.coachProfile?.id ?? null,
     parentId: user.parentProfile?.id ?? null,
   };
+}
+
+export async function countRecentLoginAttempts(input: {
+  scope: LoginAttemptScope;
+  email: string;
+  ip: string;
+  since: Date;
+  now: Date;
+}): Promise<number> {
+  await prisma.loginAttempt.deleteMany({
+    where: { expiresAt: { lte: input.now } },
+  });
+
+  return prisma.loginAttempt.count({
+    where: {
+      scope: input.scope,
+      email: input.email,
+      ip: input.ip,
+      createdAt: { gte: input.since },
+      expiresAt: { gt: input.now },
+    },
+  });
+}
+
+export async function recordLoginAttempt(input: {
+  scope: LoginAttemptScope;
+  email: string;
+  ip: string;
+  expiresAt: Date;
+}): Promise<void> {
+  await prisma.loginAttempt.create({
+    data: {
+      scope: input.scope,
+      email: input.email,
+      ip: input.ip,
+      expiresAt: input.expiresAt,
+    },
+  });
+}
+
+export async function clearLoginAttempts(input: {
+  scope: LoginAttemptScope;
+  email: string;
+  ip: string;
+}): Promise<void> {
+  await prisma.loginAttempt.deleteMany({
+    where: {
+      scope: input.scope,
+      email: input.email,
+      ip: input.ip,
+    },
+  });
+}
+
+export async function getOtpChallenge(phone: string): Promise<OtpChallengeRecord | null> {
+  const row = await prisma.otpChallenge.findUnique({ where: { phone } });
+  return row
+    ? {
+        phone: row.phone,
+        codeHash: row.codeHash,
+        attempts: row.attempts,
+        consumedAt: row.consumedAt,
+        expiresAt: row.expiresAt,
+        createdAt: row.createdAt,
+      }
+    : null;
+}
+
+export async function upsertOtpChallenge(input: {
+  phone: string;
+  codeHash: string;
+  expiresAt: Date;
+  createdAt: Date;
+}): Promise<OtpChallengeRecord> {
+  const row = await prisma.otpChallenge.upsert({
+    where: { phone: input.phone },
+    create: {
+      phone: input.phone,
+      codeHash: input.codeHash,
+      attempts: 0,
+      consumedAt: null,
+      expiresAt: input.expiresAt,
+      createdAt: input.createdAt,
+    },
+    update: {
+      codeHash: input.codeHash,
+      attempts: 0,
+      consumedAt: null,
+      expiresAt: input.expiresAt,
+      createdAt: input.createdAt,
+    },
+  });
+
+  return {
+    phone: row.phone,
+    codeHash: row.codeHash,
+    attempts: row.attempts,
+    consumedAt: row.consumedAt,
+    expiresAt: row.expiresAt,
+    createdAt: row.createdAt,
+  };
+}
+
+export async function incrementOtpAttempts(phone: string): Promise<void> {
+  await prisma.otpChallenge.update({
+    where: { phone },
+    data: { attempts: { increment: 1 } },
+  });
+}
+
+export async function consumeOtpChallenge(phone: string, consumedAt: Date): Promise<void> {
+  await prisma.otpChallenge.update({
+    where: { phone },
+    data: { consumedAt },
+  });
+}
+
+export async function deleteOtpChallenge(phone: string): Promise<void> {
+  await prisma.otpChallenge.deleteMany({ where: { phone } });
+}
+
+export async function createRefreshToken(input: {
+  tokenHash: string;
+  userId: string;
+  expiresAt: Date;
+}): Promise<void> {
+  await prisma.refreshToken.create({
+    data: {
+      tokenHash: input.tokenHash,
+      userId: input.userId,
+      expiresAt: input.expiresAt,
+    },
+  });
+}
+
+export async function findRefreshToken(tokenHash: string): Promise<RefreshTokenRecord | null> {
+  const row = await prisma.refreshToken.findUnique({ where: { tokenHash } });
+  return row
+    ? {
+        tokenHash: row.tokenHash,
+        userId: row.userId,
+        expiresAt: row.expiresAt,
+      }
+    : null;
+}
+
+export async function deleteRefreshToken(tokenHash: string): Promise<void> {
+  await prisma.refreshToken.deleteMany({ where: { tokenHash } });
+}
+
+export async function upsertDeviceToken(input: {
+  userId: string;
+  token: string;
+  platform: string;
+}): Promise<void> {
+  await prisma.deviceToken.upsert({
+    where: { userId_token: { userId: input.userId, token: input.token } },
+    create: {
+      userId: input.userId,
+      token: input.token,
+      platform: input.platform,
+    },
+    update: {
+      platform: input.platform,
+    },
+  });
+}
+
+export async function deleteDeviceToken(input: { userId: string; token: string }): Promise<void> {
+  await prisma.deviceToken.deleteMany({
+    where: {
+      userId: input.userId,
+      token: input.token,
+    },
+  });
 }
 
 export async function createPasswordResetToken(input: {

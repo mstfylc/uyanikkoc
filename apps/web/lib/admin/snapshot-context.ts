@@ -5,17 +5,20 @@ import { orgCoaches } from "@/lib/admin/derive";
 import type { Org, SoloCoach } from "@/lib/admin/types";
 
 export type AdminSnapshotContext = {
+  userId?: string | null;
   organizationId?: string | null;
   coachId?: string | null;
   role?: AppRole;
 };
 
 export function snapshotContextFromSession(user: {
+  id?: string | null;
   role: AppRole;
   organizationId?: string | null;
   coachId?: string | null;
 }): AdminSnapshotContext {
   return {
+    userId: user.id,
     organizationId: user.organizationId,
     coachId: user.coachId,
     role: user.role,

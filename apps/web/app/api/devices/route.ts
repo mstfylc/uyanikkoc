@@ -13,7 +13,7 @@ export const POST = withMobileAuth(async (req, { user }) => {
     if (platform !== "ios" && platform !== "android") {
       return NextResponse.json({ message: "platform ios|android olmalı", code: "invalid_platform" }, { status: 400 });
     }
-    await registerDevice(user.id, token);
+    await registerDevice(user.id, token, platform);
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (err) {
     return mobileError(err);

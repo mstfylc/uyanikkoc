@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requestPasswordReset } from "@/server/services/password-reset.service";
+import { clientIpFromHeaders } from "@/server/services/auth-rate-limit.service";
 
 function str(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -14,7 +15,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Geçerli bir e-posta girin." }, { status: 400 });
   }
 
-  const result = await requestPasswordReset(email);
+  const result = await requestPasswordReset(email, { ip: clientIpFromHeaders(req.headers) });
   return NextResponse.json({
     ok: true,
     message: "Bu e-posta kayıtlıysa şifre sıfırlama bağlantısı oluşturuldu.",

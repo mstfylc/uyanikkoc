@@ -53,6 +53,43 @@ export class AdminMutationError extends Error {
 //   return adminRepository;
 // }
 
+async function syncOrgProfileToDatabase(
+  m: Extract<AdminMutation, { kind: "updateOrgProfile" }>,
+  ctx: AdminSnapshotContext,
+  role: AppRole,
+): Promise<void> {
+  if (!shouldUseDatabase()) {
+    return;
+  }
+
+  const { adminStateRepository, authRepository } = await import("@uyanik/database");
+
+  if (role === "branch" && ctx.organizationId === m.orgId && ctx.userId) {
+    const email = m.email.trim().toLowerCase();
+    if (!/.+@.+\..+/.test(email)) {
+      throw new AdminMutationError("invalid owner email");
+    }
+
+    const result = await authRepository.updateUserEmailById({
+      userId: ctx.userId,
+      email,
+    });
+
+    if (result === "email_taken") {
+      throw new AdminMutationError("owner email already exists");
+    }
+
+    if (result === "not_found") {
+      throw new AdminMutationError("owner user not found");
+    }
+  }
+
+  await adminStateRepository.updateOrganizationName({
+    organizationId: m.orgId,
+    name: m.name,
+  });
+}
+
 export async function getAdminSnapshot(ctx: AdminSnapshotContext = {}): Promise<AdminSnapshot> {
   // if (shouldUseDatabase()) return (await repo()).getSnapshot(ctx);
   await loadDbAdminState();
@@ -98,6 +135,7 @@ export async function applyAdminMutation(
       memory.mockToggleOrgModule(m.orgId, m.moduleKey);
       break;
     case "updateOrgProfile":
+      await syncOrgProfileToDatabase(m, ctx, role);
       memory.mockUpdateOrgProfile(m.orgId, {
         name: m.name,
         tone: m.tone,

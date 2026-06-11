@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm db:generate && cd apps/web && node ../../node_modules/next/dist/bin/next build"
+  "buildCommand": "cd ../.. && if [ \"$RUN_PRISMA_MIGRATE_DEPLOY\" = \"1\" ]; then node node_modules/prisma/build/index.js migrate deploy --schema=packages/database/prisma/schema.prisma; fi && pnpm db:generate && cd apps/web && node ../../node_modules/next/dist/bin/next build"
 }

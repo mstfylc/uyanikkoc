@@ -148,8 +148,11 @@ export async function submitStudentAssignmentResult(
   input: { correct: number; wrong: number; blank: number },
 ): Promise<{ assignment: AssignmentRecord; result: import("@/mocks/assignments").AssignmentResultRecord } | null> {
   if (shouldUseDatabase()) {
-    const completed = await completeAssignment(assignmentId, studentId);
-    return completed ? { assignment: completed, result: { correct: input.correct, wrong: input.wrong, blank: input.blank, net: input.correct - input.wrong / 4 } } : null;
+    const { assignmentRepository } = await import("@uyanik/database");
+    const completed = await assignmentRepository.submitAssignmentResult(assignmentId, studentId, input);
+    return completed
+      ? { assignment: completed, result: { correct: input.correct, wrong: input.wrong, blank: input.blank, net: input.correct - input.wrong / 4 } }
+      : null;
   }
 
   const { submitAssignmentResult } = await import("@/mocks/assignments");

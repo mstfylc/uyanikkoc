@@ -1,9 +1,6 @@
-import { compare } from "bcryptjs";
 import { NextResponse } from "next/server";
 
-import { resolveUserByEmail } from "@/lib/auth/resolve-user";
-import { signMobileToken } from "@/lib/auth/mobile-token";
-import { dbRoleToAppRole } from "@uyanik/tokens";
+import { loginEmail, MobileAuthError } from "@/server/services/mobile-auth.service";
 
 export async function POST(req: Request) {
   const body = (await req.json()) as { email?: string; password?: string };
@@ -13,42 +10,30 @@ export async function POST(req: Request) {
   if (!email || !password) {
     return NextResponse.json({ error: "Invalid credentials payload" }, { status: 400 });
   }
-  const user = await resolveUserByEmail(email);
-  if (!user) {
-    return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
-  }
 
-  const passwordValid = await compare(password, user.passwordHash);
-  if (!passwordValid) {
-    return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
-  }
+  try {
+    const result = await loginEmail(email, password);
+    if (result.user.role !== "student") {
+      return NextResponse.json({ error: "Mobile app currently supports student accounts only" }, { status: 403 });
+    }
 
-  const role = dbRoleToAppRole[user.role];
-  if (role !== "student") {
-    return NextResponse.json({ error: "Mobile app currently supports student accounts only" }, { status: 403 });
-  }
-
-  const token = await signMobileToken({
-    sub: user.id,
-    email: user.email,
-    role,
-    organizationId: user.organizationId,
-    branchId: user.branchId,
-    studentId: user.studentId ?? null,
-    coachId: user.coachId ?? null,
-    parentId: user.parentId ?? null,
-  });
-
-  return NextResponse.json(
-    {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        role,
-        studentId: user.studentId ?? null,
+    return NextResponse.json(
+      {
+        token: result.accessToken,
+        refreshToken: result.refreshToken,
+        user: {
+          id: result.user.id,
+          email,
+          role: "student",
+          studentId: result.user.studentId ?? null,
+        },
       },
-    },
-    { status: 200 },
-  );
+      { status: 200 },
+    );
+  } catch (error) {
+    if (error instanceof MobileAuthError) {
+      return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
+    }
+    throw error;
+  }
 }

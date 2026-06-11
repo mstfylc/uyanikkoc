@@ -1,19 +1,24 @@
-/**
- * Mobil kimlik doğrulama servisi (handoff M1/M2/M5).
- *
- * Bu sürüm **bellek modunda** çalışır (DEMO_AUTH_ALLOW_IN_MEMORY varsayılan) ve
- * mevcut repo desenini izler: saf mantık @uyanik/shared'tan gelir, demo kullanıcılar
- * yeniden kullanılır. Gerçek veritabanı kalıcılığı (OtpChallenge / RefreshToken /
- * DeviceToken prisma modelleri + repository) bir sonraki backend adımıdır; o yüzden
- * shouldUseDatabase() iken 501 döner (process-memory token'ı prod'da kullanmamak için).
- */
 import { compare } from "bcryptjs";
 import { normalizePhoneTR } from "@uyanik/shared";
-import { generateOtp, hashOtp, isChallengeUsable, OTP_MAX_ATTEMPTS, OTP_RESEND_MS, otpExpiry, verifyOtp } from "@uyanik/shared/otp";
+import {
+  generateOtp,
+  hashOtp,
+  OTP_MAX_ATTEMPTS,
+  OTP_RESEND_MS,
+  otpExpiry,
+  verifyOtp,
+} from "@uyanik/shared/otp";
 import { generateRefreshToken, hashRefreshToken, refreshExpiry, signAccess } from "@uyanik/shared/token";
 import { shouldUseDatabase } from "@/lib/data/env";
 import { resolveUserByEmail } from "@/lib/auth/resolve-user";
-import { accessSecret, otpPepper, toApiUser, findDemoUserById, demoStudentRecord, type ApiUser } from "@/server/auth/mobile-tokens";
+import {
+  accessSecret,
+  demoStudentRecord,
+  findDemoUserById,
+  otpPepper,
+  toApiUser,
+  type ApiUser,
+} from "@/server/auth/mobile-tokens";
 import { sendSms, SmsError } from "@/server/services/sms.service";
 import type { AuthUserRecord } from "@uyanik/database";
 
@@ -21,6 +26,7 @@ export class MobileAuthError extends Error {
   readonly status: number;
   readonly code: string;
   readonly extra?: Record<string, unknown>;
+
   constructor(status: number, message: string, code: string, extra?: Record<string, unknown>) {
     super(message);
     this.name = "MobileAuthError";
@@ -34,6 +40,7 @@ export interface TokenPair {
   accessToken: string;
   refreshToken: string;
 }
+
 export interface AuthResult extends TokenPair {
   user: ApiUser;
 }
@@ -45,19 +52,18 @@ interface OtpEntry {
   expiresAt: Date;
   createdAt: Date;
 }
+
 interface RefreshEntry {
   userId: string;
   expiresAt: Date;
 }
 
-// Process-memory stores (bellek modu). globalThis'e bağlanır çünkü Next.js route'ları
-// ayrı modül graflarında derler — modül-seviyesi Map route'lar arası paylaşılmaz.
-// (Çok-örnekli prod için DB kalıcılığı gerekir; bkz. assertMemoryMode.)
 interface MobileStores {
-  otp: Map<string, OtpEntry>; // key: E.164 phone
-  refresh: Map<string, RefreshEntry>; // key: sha256(refreshToken)
-  device: Map<string, Set<string>>; // userId -> token set
+  otp: Map<string, OtpEntry>;
+  refresh: Map<string, RefreshEntry>;
+  device: Map<string, Set<string>>;
 }
+
 const globalRef = globalThis as typeof globalThis & { __ukMobileStores?: MobileStores };
 const stores: MobileStores = (globalRef.__ukMobileStores ??= {
   otp: new Map(),
@@ -68,116 +74,189 @@ const otpStore = stores.otp;
 const refreshStore = stores.refresh;
 const deviceStore = stores.device;
 
-function assertMemoryMode(): void {
-  if (shouldUseDatabase()) {
-    throw new MobileAuthError(
-      501,
-      "Mobil kimlik doğrulama için veritabanı kalıcılığı henüz eklenmedi (OtpChallenge/RefreshToken/DeviceToken).",
-      "not_implemented",
-    );
-  }
+async function authRepo() {
+  const { authRepository } = await import("@uyanik/database");
+  return authRepository;
 }
 
-function issueTokens(record: AuthUserRecord, phone?: string): AuthResult {
+async function issueTokens(record: AuthUserRecord, phone?: string): Promise<AuthResult> {
   const apiUser = toApiUser(record, phone);
   const accessToken = signAccess({ sub: record.id, role: apiUser.role }, accessSecret());
   const refreshToken = generateRefreshToken();
-  refreshStore.set(hashRefreshToken(refreshToken), { userId: record.id, expiresAt: refreshExpiry() });
+  const tokenHash = hashRefreshToken(refreshToken);
+  const expiresAt = refreshExpiry();
+
+  if (shouldUseDatabase()) {
+    await (await authRepo()).createRefreshToken({ tokenHash, userId: record.id, expiresAt });
+  } else {
+    refreshStore.set(tokenHash, { userId: record.id, expiresAt });
+  }
+
   return { accessToken, refreshToken, user: apiUser };
 }
 
-/** M1 — OTP iste. */
 export async function requestOtp(phoneRaw: string): Promise<{ resendInMs: number }> {
-  assertMemoryMode();
   const phone = normalizePhoneTR(phoneRaw);
-  if (!phone) throw new MobileAuthError(400, "Geçersiz telefon numarası", "invalid_phone");
+  if (!phone) throw new MobileAuthError(400, "Gecersiz telefon numarasi", "invalid_phone");
 
-  const last = otpStore.get(phone);
+  const repo = shouldUseDatabase() ? await authRepo() : null;
+  const last = repo ? await repo.getOtpChallenge(phone) : otpStore.get(phone);
   if (last) {
     const since = Date.now() - last.createdAt.getTime();
     if (since < OTP_RESEND_MS) {
-      throw new MobileAuthError(429, "Çok sık deneme, biraz bekle", "too_many_requests", { resendInMs: OTP_RESEND_MS - since });
+      throw new MobileAuthError(429, "Cok sik deneme, biraz bekle", "too_many_requests", {
+        resendInMs: OTP_RESEND_MS - since,
+      });
     }
   }
 
   const code = generateOtp();
-  otpStore.set(phone, { codeHash: hashOtp(code, otpPepper()), attempts: 0, consumedAt: null, expiresAt: otpExpiry(), createdAt: new Date() });
+  const challenge = {
+    codeHash: hashOtp(code, otpPepper()),
+    attempts: 0,
+    consumedAt: null,
+    expiresAt: otpExpiry(),
+    createdAt: new Date(),
+  };
+
+  if (repo) {
+    await repo.upsertOtpChallenge({
+      phone,
+      codeHash: challenge.codeHash,
+      expiresAt: challenge.expiresAt,
+      createdAt: challenge.createdAt,
+    });
+  } else {
+    otpStore.set(phone, challenge);
+  }
+
   try {
-    await sendSms(phone, `Uyanık Koç giriş kodun: ${code}`);
+    await sendSms(phone, `Uyanik Koc giris kodun: ${code}`);
   } catch (error) {
-    otpStore.delete(phone);
+    if (repo) {
+      await repo.deleteOtpChallenge(phone);
+    } else {
+      otpStore.delete(phone);
+    }
     if (error instanceof SmsError) {
       throw new MobileAuthError(502, "SMS gonderilemedi", "sms_failed", { reason: error.code });
     }
     throw error;
   }
+
   return { resendInMs: OTP_RESEND_MS };
 }
 
-/** M1/M2 — OTP doğrula → token oturumu. */
 export async function verifyOtpCode(phoneRaw: string, codeInput: string): Promise<AuthResult> {
-  assertMemoryMode();
   const phone = normalizePhoneTR(phoneRaw);
-  if (!phone) throw new MobileAuthError(400, "Geçersiz telefon numarası", "invalid_phone");
+  if (!phone) throw new MobileAuthError(400, "Gecersiz telefon numarasi", "invalid_phone");
 
-  const entry = otpStore.get(phone);
-  if (!entry || !isChallengeUsable(entry)) throw new MobileAuthError(410, "Kodun süresi doldu, tekrar iste", "otp_expired");
-  if (entry.attempts >= OTP_MAX_ATTEMPTS) throw new MobileAuthError(423, "Çok fazla yanlış deneme, kilitlendi", "otp_locked");
-
-  if (!verifyOtp(codeInput, entry.codeHash, otpPepper())) {
-    entry.attempts += 1;
-    throw new MobileAuthError(401, "Kod hatalı", "invalid_code");
+  const repo = shouldUseDatabase() ? await authRepo() : null;
+  const entry = repo ? await repo.getOtpChallenge(phone) : otpStore.get(phone);
+  if (!entry || entry.consumedAt || entry.expiresAt <= new Date()) {
+    throw new MobileAuthError(410, "Kodun suresi doldu, tekrar iste", "otp_expired");
+  }
+  if (entry.attempts >= OTP_MAX_ATTEMPTS) {
+    throw new MobileAuthError(423, "Cok fazla yanlis deneme, kilitlendi", "otp_locked");
   }
 
-  entry.consumedAt = new Date();
-  // Bellek modu: telefonla giren kullanıcı demo öğrenciye eşlenir.
-  const record = demoStudentRecord();
+  if (!verifyOtp(codeInput, entry.codeHash, otpPepper())) {
+    if (repo) {
+      await repo.incrementOtpAttempts(phone);
+    } else {
+      entry.attempts += 1;
+    }
+    throw new MobileAuthError(401, "Kod hatali", "invalid_code");
+  }
+
+  if (repo) {
+    await repo.consumeOtpChallenge(phone, new Date());
+  } else {
+    entry.consumedAt = new Date();
+  }
+
+  const otpEmail = process.env.MOBILE_OTP_USER_EMAIL?.trim();
+  if (repo && !otpEmail) {
+    throw new MobileAuthError(401, "Telefon kullaniciya bagli degil", "invalid_credentials");
+  }
+  const record = repo ? await repo.findUserByEmail(otpEmail!) : demoStudentRecord();
+  if (!record) {
+    throw new MobileAuthError(401, "Telefon kullaniciya bagli degil", "invalid_credentials");
+  }
+
   return issueTokens(record, phone);
 }
 
-/** M5 — E-posta + şifre ile token oturumu (cookie SET ETMEZ). */
 export async function loginEmail(email: string, password: string): Promise<AuthResult> {
-  assertMemoryMode();
   const record = await resolveUserByEmail(email);
-  if (!record) throw new MobileAuthError(401, "E-posta veya şifre hatalı", "invalid_credentials");
+  if (!record) throw new MobileAuthError(401, "E-posta veya sifre hatali", "invalid_credentials");
   const ok = await compare(password, record.passwordHash);
-  if (!ok) throw new MobileAuthError(401, "E-posta veya şifre hatalı", "invalid_credentials");
+  if (!ok) throw new MobileAuthError(401, "E-posta veya sifre hatali", "invalid_credentials");
   return issueTokens(record);
 }
 
-/** M2 — refresh token rotasyonu. */
 export async function refreshSession(refreshToken: string): Promise<TokenPair> {
-  assertMemoryMode();
-  if (!refreshToken) throw new MobileAuthError(401, "Oturum süresi doldu", "invalid_refresh");
+  if (!refreshToken) throw new MobileAuthError(401, "Oturum suresi doldu", "invalid_refresh");
+
   const hash = hashRefreshToken(refreshToken);
-  const entry = refreshStore.get(hash);
+  const repo = shouldUseDatabase() ? await authRepo() : null;
+  const entry = repo ? await repo.findRefreshToken(hash) : refreshStore.get(hash);
   if (!entry || entry.expiresAt < new Date()) {
-    refreshStore.delete(hash);
-    throw new MobileAuthError(401, "Oturum süresi doldu", "invalid_refresh");
+    if (repo) {
+      await repo.deleteRefreshToken(hash);
+    } else {
+      refreshStore.delete(hash);
+    }
+    throw new MobileAuthError(401, "Oturum suresi doldu", "invalid_refresh");
   }
-  refreshStore.delete(hash); // rotate: eskiyi iptal et
-  const record = findDemoUserById(entry.userId);
-  if (!record) throw new MobileAuthError(401, "Oturum süresi doldu", "invalid_refresh");
+
+  if (repo) {
+    await repo.deleteRefreshToken(hash);
+  } else {
+    refreshStore.delete(hash);
+  }
+
+  const record = repo ? await repo.findUserById(entry.userId) : findDemoUserById(entry.userId);
+  if (!record) throw new MobileAuthError(401, "Oturum suresi doldu", "invalid_refresh");
 
   const accessToken = signAccess({ sub: record.id, role: toApiUser(record).role }, accessSecret());
   const newRefresh = generateRefreshToken();
-  refreshStore.set(hashRefreshToken(newRefresh), { userId: record.id, expiresAt: refreshExpiry() });
+  const newHash = hashRefreshToken(newRefresh);
+  const expiresAt = refreshExpiry();
+  if (repo) {
+    await repo.createRefreshToken({ tokenHash: newHash, userId: record.id, expiresAt });
+  } else {
+    refreshStore.set(newHash, { userId: record.id, expiresAt });
+  }
+
   return { accessToken, refreshToken: newRefresh };
 }
 
-/** Çıkış — refresh token'ı iptal et. */
 export async function revokeRefresh(refreshToken: string): Promise<void> {
-  if (refreshToken) refreshStore.delete(hashRefreshToken(refreshToken));
+  if (!refreshToken) return;
+  const hash = hashRefreshToken(refreshToken);
+  if (shouldUseDatabase()) {
+    await (await authRepo()).deleteRefreshToken(hash);
+    return;
+  }
+  refreshStore.delete(hash);
 }
 
-/** M3 — cihaz push token'ı kaydı (bellek modu). */
-export async function registerDevice(userId: string, token: string): Promise<void> {
-  assertMemoryMode();
+export async function registerDevice(userId: string, token: string, platform = "unknown"): Promise<void> {
+  if (shouldUseDatabase()) {
+    await (await authRepo()).upsertDeviceToken({ userId, token, platform });
+    return;
+  }
+
   const set = deviceStore.get(userId) ?? new Set<string>();
   set.add(token);
   deviceStore.set(userId, set);
 }
 
 export async function removeDevice(userId: string, token: string): Promise<void> {
+  if (shouldUseDatabase()) {
+    await (await authRepo()).deleteDeviceToken({ userId, token });
+    return;
+  }
   deviceStore.get(userId)?.delete(token);
 }

@@ -11,6 +11,8 @@ import { demoUsers, type DemoUser } from "@/lib/auth/demo-users";
 export function accessSecret(): string {
   const secret = process.env.JWT_ACCESS_SECRET?.trim();
   if (secret) return secret;
+  const authSecret = (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET)?.trim();
+  if (authSecret) return authSecret;
   if (process.env.NODE_ENV === "production") {
     throw new Error("JWT_ACCESS_SECRET is required in production");
   }
@@ -21,6 +23,8 @@ export function accessSecret(): string {
 export function otpPepper(): string {
   const pepper = process.env.OTP_PEPPER?.trim();
   if (pepper) return pepper;
+  const authSecret = (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET)?.trim();
+  if (authSecret) return authSecret;
   if (process.env.NODE_ENV === "production") {
     throw new Error("OTP_PEPPER is required in production");
   }
@@ -33,6 +37,7 @@ export interface ApiUser {
   name: string;
   role: AuthRole;
   avatarInitials: string;
+  studentId?: string | null;
   phone?: string;
 }
 
@@ -67,6 +72,7 @@ export function toApiUser(record: AuthUserRecord, phone?: string): ApiUser {
     name,
     role: dbRoleToAppRole[record.role],
     avatarInitials: initialsOf(name),
+    studentId: record.studentId,
     phone,
   };
 }

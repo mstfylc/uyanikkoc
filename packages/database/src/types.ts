@@ -32,6 +32,14 @@ export type AssignmentRecord = {
   updatedAt: string;
   completed: boolean;
   completedAt: string | null;
+  result?: AssignmentResultRecord | null;
+};
+
+export type AssignmentResultRecord = {
+  correct: number;
+  wrong: number;
+  blank: number;
+  net: number;
 };
 
 export type ParentSummaryRecord = {

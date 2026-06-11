@@ -1,7 +1,3 @@
-/**
- * Mobil Bearer token guard — web `withApiAuth` muadili (cookie yerine access JWT).
- * Süresi geçmiş/geçersiz token → 401 { code: "token_expired" } (client refresh tetikler).
- */
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyAccess, type AuthRole } from "@uyanik/shared/token";
 import { dbRoleToAppRole } from "@uyanik/tokens";
@@ -13,24 +9,37 @@ import { accessSecret } from "./mobile-tokens";
 export interface MobileUser {
   id: string;
   role: AuthRole;
+  email?: string;
+  studentId?: string | null;
+  coachId?: string | null;
+  parentId?: string | null;
 }
+
 export interface MobileAuthContext {
   user: MobileUser;
 }
+
 export type MobileRouteHandler = (req: NextRequest, ctx: MobileAuthContext) => Promise<NextResponse> | NextResponse;
 
-async function isCurrentMobileUser(user: MobileUser): Promise<boolean> {
+async function resolveCurrentMobileUser(user: MobileUser): Promise<MobileUser | null> {
   if (!shouldUseDatabase()) {
-    return true;
+    return user;
   }
 
   const { authRepository } = await import("@uyanik/database");
   const record = await authRepository.findUserById(user.id);
-  if (!record) {
-    return false;
+  if (!record || dbRoleToAppRole[record.role] !== user.role) {
+    return null;
   }
 
-  return dbRoleToAppRole[record.role] === user.role;
+  return {
+    id: record.id,
+    role: user.role,
+    email: record.email,
+    studentId: record.studentId,
+    coachId: record.coachId,
+    parentId: record.parentId,
+  };
 }
 
 export function withMobileAuth(handler: MobileRouteHandler, opts?: { role?: AuthRole }) {
@@ -43,18 +52,18 @@ export function withMobileAuth(handler: MobileRouteHandler, opts?: { role?: Auth
 
     const payload = verifyAccess(match[1], accessSecret());
     if (!payload) {
-      return NextResponse.json({ message: "Oturum süresi doldu", code: "token_expired" }, { status: 401 });
+      return NextResponse.json({ message: "Oturum suresi doldu", code: "token_expired" }, { status: 401 });
     }
 
     if (opts?.role && payload.role !== opts.role) {
-      return NextResponse.json({ message: "Erişim yok", code: "forbidden" }, { status: 403 });
+      return NextResponse.json({ message: "Erisim yok", code: "forbidden" }, { status: 403 });
     }
 
-    const user = { id: payload.sub, role: payload.role };
-    if (!(await isCurrentMobileUser(user))) {
-      return NextResponse.json({ message: "Oturum sÃ¼resi doldu", code: "token_expired" }, { status: 401 });
+    const currentUser = await resolveCurrentMobileUser({ id: payload.sub, role: payload.role });
+    if (!currentUser) {
+      return NextResponse.json({ message: "Oturum suresi doldu", code: "token_expired" }, { status: 401 });
     }
 
-    return handler(req, { user });
+    return handler(req, { user: currentUser });
   };
 }

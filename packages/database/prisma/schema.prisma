@@ -88,9 +88,64 @@ model User {
   invoices       Invoice[]
   supportTickets SupportTicket[]
   passwordResetTokens PasswordResetToken[]
+  refreshTokens  RefreshToken[]
+  deviceTokens   DeviceToken[]
 
   @@index([organizationId, branchId])
   @@map("users")
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  scope     String
+  email     String
+  ip        String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([scope, email, ip, createdAt])
+  @@index([expiresAt])
+  @@map("login_attempts")
+}
+
+model OtpChallenge {
+  id         String    @id @default(cuid())
+  phone      String    @unique
+  codeHash   String
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+
+  @@index([expiresAt])
+  @@map("otp_challenges")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model DeviceToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String
+  platform  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, token])
+  @@index([userId])
+  @@map("device_tokens")
 }
 
 model PasswordResetToken {
@@ -201,6 +256,7 @@ model Assignment {
   coach       CoachProfile       @relation("CoachAssignments", fields: [coachId], references: [id], onDelete: Cascade)
   student     StudentProfile     @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
   branch      Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  result      AssignmentResult?
 
   @@index([coachId])
   @@index([studentId])
@@ -208,6 +264,22 @@ model Assignment {
   @@index([branchId])
   @@index([status])
   @@map("assignments")
+}
+
+model AssignmentResult {
+  id           String     @id @default(cuid())
+  assignmentId String     @unique
+  studentId    String
+  correct      Int
+  wrong        Int
+  blank        Int
+  net          Float
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("assignment_results")
 }
 
 model Subject {

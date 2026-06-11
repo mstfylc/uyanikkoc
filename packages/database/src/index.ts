@@ -37,6 +37,7 @@ export type {
   AssignmentCreateInput,
   AssignmentPriority,
   AssignmentRecord,
+  AssignmentResultRecord,
   AssignmentStatus,
   AssignmentTemplateRecord,
   AssignmentType,

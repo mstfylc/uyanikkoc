@@ -18,3 +18,13 @@ export async function saveAdminState(snapshot: unknown): Promise<unknown> {
   });
   return row.snapshot;
 }
+
+export async function updateOrganizationName(input: {
+  organizationId: string;
+  name: string;
+}): Promise<void> {
+  await prisma.organization.update({
+    where: { id: input.organizationId },
+    data: { name: input.name },
+  });
+}

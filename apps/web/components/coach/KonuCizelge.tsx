@@ -206,16 +206,31 @@ function cizBuildSessions(subject: string, topic: string, importanceIdx: number,
   return sessions;
 }
 
-function cizBuildAll() {
+function cizBuildAll(curr: Record<string, Array<{ grup: string; konular: string[] }>> = CIZ_CURR) {
   const out: Record<string, Record<string, CizSession[]>> = {};
-  Object.keys(CIZ_CURR).forEach((subj) => {
+  Object.keys(curr).forEach((subj) => {
     out[subj] = {};
-    const flat = CIZ_CURR[subj]!.flatMap((g) => g.konular);
+    const flat = curr[subj]!.flatMap((g) => g.konular);
     flat.forEach((t, i) => {
       out[subj]![t] = cizBuildSessions(subj, t, i, flat.length);
     });
   });
   return out;
+}
+
+function cizWeekForDate(date: Date): number {
+  const diff = date.getTime() - cizMonday(0).getTime();
+  return Math.max(0, Math.min(CIZ_WEEKS - 1, Math.floor(diff / (7 * 24 * 60 * 60 * 1000))));
+}
+
+function cizCurrFromSubjects(subjects: SubjectRecord[] | undefined): Record<string, Array<{ grup: string; konular: string[] }>> | null {
+  if (!subjects?.length) return null;
+  const curr: Record<string, Array<{ grup: string; konular: string[] }>> = {};
+  for (const subject of subjects) {
+    const topics = subject.topics.map((topic) => topic.name).filter(Boolean);
+    if (topics.length > 0) curr[subject.name] = [{ grup: "Konular", konular: topics }];
+  }
+  return Object.keys(curr).length > 0 ? curr : null;
 }
 
 function buildColumns(view: CizView, topicsSessions: Record<string, CizSession[]>, weekIdx: number): { cols: CizColumn[]; kind: CizKind } {
@@ -383,12 +398,15 @@ function CellPopover({
   );
 }
 
-export function KonuCizelge({ maxHeight = "70vh", showTip = true, hideTabs = false, subj: subjProp, onSubj }: KonuCizelgeProps) {
-  const ALL0 = useMemo(() => cizBuildAll(), []);
-  const subjects = Object.keys(CIZ_CURR);
+export function KonuCizelge({ studentId, subjects: subjectRecords, maxHeight = "70vh", showTip = true, hideTabs = false, subj: subjProp, onSubj }: KonuCizelgeProps) {
+  const realCurr = useMemo(() => cizCurrFromSubjects(subjectRecords), [subjectRecords]);
+  const curr = realCurr ?? CIZ_CURR;
+  const ALL0 = useMemo(() => (realCurr ? null : cizBuildAll(curr)), [curr, realCurr]);
+  const subjects = Object.keys(curr);
+  const [remoteSessions, setRemoteSessions] = useState<Record<string, CizSession[]>>({});
   const [overrides, setOverrides] = useCizOverrides();
   const [subjState, setSubjState] = useState(subjects[0] ?? "Türkçe");
-  const validSubjProp = subjProp != null && CIZ_CURR[subjProp] != null ? subjProp : undefined;
+  const validSubjProp = subjProp != null && curr[subjProp] != null ? subjProp : undefined;
   const subj = validSubjProp ?? subjState;
   const setSubj = (subject: string) => {
     setSubjState(subject);
@@ -404,20 +422,71 @@ export function KonuCizelge({ maxHeight = "70vh", showTip = true, hideTabs = fal
   const [scState, setScState] = useState({ l: false, r: false, first: 1, last: 1, total: 0 });
   const todayWeek = CIZ_WEEKS - 1;
 
+  useEffect(() => {
+    if (!subjects.includes(subj)) {
+      setSubjState(subjects[0] ?? "");
+    }
+  }, [subjects, subj]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!studentId || !realCurr) {
+      setRemoteSessions({});
+      return;
+    }
+
+    fetch(`/api/coach/students/topics/sessions?studentId=${encodeURIComponent(studentId)}`, {
+      credentials: "same-origin",
+    })
+      .then((response) => (response.ok ? response.json() : { sessions: [] }))
+      .then((data: { sessions?: Array<{ id: string; subjectName: string; topicName: string; date: string; questionCount: number; correctCount: number }> }) => {
+        if (cancelled) return;
+        const next: Record<string, CizSession[]> = {};
+        for (const session of data.sessions ?? []) {
+          const date = new Date(session.date);
+          if (Number.isNaN(date.getTime())) continue;
+          const key = `${session.subjectName}:${session.topicName}`;
+          next[key] ??= [];
+          next[key].push({
+            id: session.id,
+            date,
+            w: cizWeekForDate(date),
+            soru: session.questionCount,
+            dogru: session.correctCount,
+          });
+        }
+        for (const key of Object.keys(next)) {
+          next[key]!.sort((a, b) => a.date.getTime() - b.date.getTime());
+        }
+        setRemoteSessions(next);
+      })
+      .catch(() => {
+        if (!cancelled) setRemoteSessions({});
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [studentId, realCurr]);
+
   const topicsSessions = useMemo(() => {
     const o: Record<string, CizSession[]> = {};
-    CIZ_CURR[subj]!.flatMap((g) => g.konular).forEach((t) => {
-      o[t] = ALL0[subj]![t]!.map((s) => {
+    curr[subj]?.flatMap((g) => g.konular).forEach((t) => {
+      if (realCurr) {
+        o[t] = remoteSessions[`${subj}:${t}`] ?? [];
+        return;
+      }
+      o[t] = (ALL0?.[subj]?.[t] ?? []).map((s) => {
         const ov = overrides[s.id];
         return ov ? { ...s, soru: ov.s, dogru: ov.d } : s;
       });
     });
     return o;
-  }, [subj, overrides, ALL0]);
+  }, [subj, overrides, ALL0, curr, realCurr, remoteSessions]);
 
   const { cols, kind } = useMemo(() => buildColumns(view, topicsSessions, weekIdx), [view, topicsSessions, weekIdx]);
   const ql = q.trim().toLocaleLowerCase("tr");
-  const groups = CIZ_CURR[subj]!
+  const groups = (curr[subj] ?? [])
     .map((g) => ({ grup: g.grup, konular: g.konular.filter((t) => !ql || t.toLocaleLowerCase("tr").includes(ql)) }))
     .filter((g) => g.konular.length);
 
@@ -497,8 +566,8 @@ export function KonuCizelge({ maxHeight = "70vh", showTip = true, hideTabs = fal
         <div className="cz-tabs" style={{ marginBottom: 14 }}>
           {subjects.map((s) => {
             const on = s === subj;
-            const c = CIZ_SUBJ_COLOR[s];
-            const nTopics = CIZ_CURR[s]!.reduce((a, g) => a + g.konular.length, 0);
+            const c = CIZ_SUBJ_COLOR[s] ?? "var(--primary)";
+            const nTopics = curr[s]!.reduce((a, g) => a + g.konular.length, 0);
             return (
               <button key={s} className={`cz-tab${on ? " on" : ""}`} style={on ? { background: c } : {}} onClick={() => { setSubj(s); setPop(null); }}>
                 {!on && <span className="sw" style={{ background: c }} />}{s}<span className="ct">{nTopics}</span>

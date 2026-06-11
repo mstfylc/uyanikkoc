@@ -22,6 +22,12 @@ function mapAssignment(assignment: {
   updatedAt: Date;
   completed: boolean;
   completedAt: Date | null;
+  result?: {
+    correct: number;
+    wrong: number;
+    blank: number;
+    net: number;
+  } | null;
 }): AssignmentRecord {
   return {
     id: assignment.id,
@@ -40,6 +46,14 @@ function mapAssignment(assignment: {
     updatedAt: assignment.updatedAt.toISOString(),
     completed: assignment.completed,
     completedAt: assignment.completedAt?.toISOString() ?? null,
+    result: assignment.result
+      ? {
+          correct: assignment.result.correct,
+          wrong: assignment.result.wrong,
+          blank: assignment.result.blank,
+          net: assignment.result.net,
+        }
+      : null,
   };
 }
 
@@ -66,6 +80,7 @@ export async function listAssignmentsForStudent(studentId: string): Promise<Assi
   const assignments = await prisma.assignment.findMany({
     where: { studentId },
     orderBy: { createdAt: "desc" },
+    include: { result: true },
   });
 
   return assignments.map(mapAssignment);
@@ -75,6 +90,7 @@ export async function listAssignmentsForCoach(coachId: string): Promise<Assignme
   const assignments = await prisma.assignment.findMany({
     where: { coachId },
     orderBy: { createdAt: "desc" },
+    include: { result: true },
   });
 
   return assignments.map(mapAssignment);
@@ -86,6 +102,7 @@ export async function completeAssignment(
 ): Promise<AssignmentRecord | null> {
   const existing = await prisma.assignment.findFirst({
     where: { id: assignmentId, studentId },
+    include: { result: true },
   });
 
   if (!existing || existing.status === "completed") {
@@ -99,6 +116,52 @@ export async function completeAssignment(
       completed: true,
       completedAt: new Date(),
     },
+    include: { result: true },
+  });
+
+  return mapAssignment(assignment);
+}
+
+export async function submitAssignmentResult(
+  assignmentId: string,
+  studentId: string,
+  input: { correct: number; wrong: number; blank: number },
+): Promise<AssignmentRecord | null> {
+  const existing = await prisma.assignment.findFirst({
+    where: { id: assignmentId, studentId },
+    select: { id: true },
+  });
+
+  if (!existing) {
+    return null;
+  }
+
+  const net = input.correct - input.wrong / 4;
+  const assignment = await prisma.assignment.update({
+    where: { id: assignmentId },
+    data: {
+      status: "completed",
+      completed: true,
+      completedAt: new Date(),
+      result: {
+        upsert: {
+          create: {
+            studentId,
+            correct: input.correct,
+            wrong: input.wrong,
+            blank: input.blank,
+            net,
+          },
+          update: {
+            correct: input.correct,
+            wrong: input.wrong,
+            blank: input.blank,
+            net,
+          },
+        },
+      },
+    },
+    include: { result: true },
   });
 
   return mapAssignment(assignment);
@@ -108,6 +171,7 @@ export async function getParentSummary(parentId: string): Promise<ParentSummaryR
   const assignments = await prisma.assignment.findMany({
     where: { parentId },
     orderBy: { createdAt: "desc" },
+    include: { result: true },
   });
 
   const mapped = assignments.map(mapAssignment);

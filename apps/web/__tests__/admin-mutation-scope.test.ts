@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DEMO_COACH_ID, DEMO_ORG_ID } from "@/lib/auth/demo-users";
 import { orgCoaches } from "@/lib/admin/derive";
@@ -7,6 +7,22 @@ import { assertMutationAllowed } from "@/lib/admin/mutation-scope";
 import type { Org } from "@/lib/admin/types";
 import { applyAdminMutation } from "@/server/services/admin.service";
 import { getMockSnapshot, findTask, loadMockSnapshot, resetMockStore } from "@/mocks/admin";
+
+const getAdminState = vi.fn(async () => null);
+const saveAdminState = vi.fn(async (snapshot: unknown) => snapshot);
+const updateOrganizationName = vi.fn(async () => undefined);
+const updateUserEmailById = vi.fn(async () => "updated" as const);
+
+vi.mock("@uyanik/database", () => ({
+  adminStateRepository: {
+    getAdminState,
+    saveAdminState,
+    updateOrganizationName,
+  },
+  authRepository: {
+    updateUserEmailById,
+  },
+}));
 
 const demoOrg: Org = {
   id: DEMO_ORG_ID,
@@ -31,6 +47,11 @@ const demoOrg: Org = {
   billing: { taxId: "123", taxOffice: "VD", billingAddress: "Istanbul", paymentMethod: "Havale" },
   notifications: { licenseReminders: true, paymentAlerts: true, weeklyReport: false, productUpdates: true },
 };
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.clearAllMocks();
+});
 
 describe("admin mutation scope", () => {
   it("branch baska kuruma yazamaz", () => {
@@ -116,5 +137,39 @@ describe("admin mutation scope", () => {
     expect(afterOrg.coaches.used).toBe(beforeCoaches + 1);
     expect(afterOrg.branches[0]!.coaches).toBe(beforeBranchCoaches + 1);
     expect(after.orgInvites[0]).toMatchObject({ kind: "coach", email: "yeni.koc@example.com" });
+  });
+
+  it("branch profil guncellemesi DB kullanirken owner email ve kurum adini normalize tablolara yazar", async () => {
+    vi.stubEnv("DATABASE_URL", "postgresql://admin-profile-test");
+    vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "false");
+    resetMockStore();
+
+    const after = await applyAdminMutation(
+      {
+        kind: "updateOrgProfile",
+        orgId: DEMO_ORG_ID,
+        name: "Yeni Kurum Adi",
+        tone: "#123456",
+        email: "Yeni.Owner@Example.com",
+        phone: "0532 000 00 00",
+        ownerName: "Yeni Owner",
+      },
+      { userId: "user_kampus_koc_owner", organizationId: DEMO_ORG_ID, role: "branch" },
+      "branch",
+    );
+
+    expect(updateUserEmailById).toHaveBeenCalledWith({
+      userId: "user_kampus_koc_owner",
+      email: "yeni.owner@example.com",
+    });
+    expect(updateOrganizationName).toHaveBeenCalledWith({
+      organizationId: DEMO_ORG_ID,
+      name: "Yeni Kurum Adi",
+    });
+    expect(after.orgs.find((org) => org.id === DEMO_ORG_ID)?.owner).toMatchObject({
+      name: "Yeni Owner",
+      email: "Yeni.Owner@Example.com",
+      phone: "0532 000 00 00",
+    });
   });
 });

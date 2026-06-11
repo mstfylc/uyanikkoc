@@ -5,9 +5,9 @@ import { mobileError } from "@/server/auth/mobile-http";
 
 // GET /api/mobile/schedule → { days, daysFull, today, schedule }
 export const GET = withMobileAuth(
-  async () => {
+  async (_req, { user }) => {
     try {
-      return NextResponse.json(getSchedule(), { status: 200 });
+      return NextResponse.json(await getSchedule(user.studentId ?? undefined), { status: 200 });
     } catch (err) {
       return mobileError(err);
     }
