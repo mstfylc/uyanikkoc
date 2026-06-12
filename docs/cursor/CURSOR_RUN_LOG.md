@@ -26,6 +26,7 @@
 | 2026-06-06 | DESIGN coach-productivity | - | typecheck OK, lint OK, unit 51 OK | mobil tasarım: Koç Görevleri + Toplu Duyuru backend; database -> shared dep fix |
 | 2026-06-12 | WEB V6 FINAL P0 mapping | - | not run (docs-only) | Handoff okundu; canlı route/component/backend gap map üretildi; implementation yapılmadı |
 | 2026-06-12 | WEB V6 FINAL P1 token/style parity | this commit | typecheck OK; lint OK; build OK with local CI secret env | v6 color/global token uyumu; route/backend/component eklenmedi |
+| 2026-06-12 | WEB V6 FINAL production DB migration | this commit | install OK; db:generate OK; db:migrate OK; typecheck OK; lint OK; unit OK; build OK | Neon backup branch `pre-v6-migration-backup`; V6 migrations applied; redeploy pending |
 | 2026-06-12 | WEB V6 FINAL P2 Yanlış Defteri | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | student DB-backed mistakes route/API; P3 batch feeders bekliyor |
 | 2026-06-12 | WEB V6 FINAL P3 batch feeders | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | optik submission -> idempotent mistakes; assignment item detail eksik |
 | 2026-06-12 | WEB V6 FINAL P4 mistakes review UI | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | Odak Tekrar modalı, due expansion, photo lightbox, topic-null fallback |
@@ -37,6 +38,7 @@
 | 2026-06-12 | WEB V6 FINAL P10 coach notifications DB scope | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | Notification coachId scope, DB-backed coach list/read/mark-all |
 | 2026-06-12 | WEB V6 FINAL P11 visual acceptance cleanup | this commit | typecheck OK | P1-P10 gap maps and visual acceptance final audit cleanup |
 | 2026-06-12 | WEB V6 FINAL release readiness | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | Production migration/env/deploy/smoke checklist |
+| 2026-06-12 | WEB V6 FINAL production DB preflight | - | DB read-only OK; blocked before backup/migration | Neon DB reached; latest migration 20260611193000_login_attempts; pg_dump missing and URL is pooler |
 
 ## Kural
 

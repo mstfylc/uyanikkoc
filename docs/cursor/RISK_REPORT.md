@@ -10,6 +10,24 @@ Status: clear
 
 Production readiness dokumani hazirlandi. Aktif release blokaj riski tespit edilmedi; non-blocking kalanlar mobile/modal/coach topics PNG QA, AssignmentResult question-level payload eksigi ve object storage/photo upload eksigidir. `pnpm typecheck`, `pnpm lint`, `pnpm test:unit` ve gecici local CI secret env ile web build gecti.
 
+## Production DB Preflight - Blocked
+
+Status: blocked
+
+After loading the local env file without logging secrets, production guard passed and read-only Neon DB migration table access succeeded. Current DB has 31 applied migrations, latest `20260611193000_login_attempts`; V6 migrations are pending.
+
+Migration remains blocked because `pg_dump` is not available in the current shell and the current Neon URL is pooled. Per release rules, no backup means no migration; Prisma migration should also prefer direct/unpooled Neon URL. No backup, `pnpm db:migrate`, build, or redeploy was run.
+
+Required resolution: install PostgreSQL client tools for `pg_dump` or create/confirm a Neon restore point, then rerun with a direct/unpooled Neon migration `DATABASE_URL`. Secret values must remain masked and must not be written to repo files.
+
+## Production DB Migration Status - 2026-06-12
+
+Status: clear for DB migration; redeploy pending.
+
+Neon backup branch `pre-v6-migration-backup` exists, main direct/unpooled DB URL was used with `pooler=false`, and V6 migrations were applied successfully. Post-migration latest migration is `20260612200000_notification_coach_scope`.
+
+Remaining non-code release risk: production redeploy and smoke tests were not run because SSH/CI/restart target is still not available. No secret values or env files were committed.
+
 ## P10 Status
 
 Status: clear

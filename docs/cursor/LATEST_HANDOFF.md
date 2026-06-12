@@ -1,8 +1,26 @@
 # Latest Handoff
 
+## Production DB Migration Status - 2026-06-12
+
+- Status: DB migrated; redeploy pending.
+- Neon backup branch `pre-v6-migration-backup` was created before migration.
+- Main branch direct/unpooled Neon URL was used with `pooler=false`; secret values were not written to repo docs.
+- V6 migrations applied: `20260612120000_mistakes`, `20260612130000_mistake_topic_nullable`, `20260612190000_thread_member_read_mute`, `20260612200000_notification_coach_scope`.
+- Post-migration latest migration is `20260612200000_notification_coach_scope`.
+- Verification passed: install, db generate, db migrate, typecheck, lint, unit tests, and web production build.
+- Redeploy/smoke remains pending until SSH/CI/restart target is available.
+
 **Son yurutulen faz:** Web v6 Final Release / Production Readiness Check  
 **Tarih:** 2026-06-12  
 **Kapsam:** V6 main/production alimi icin deploy sirasi, migration listesi, env kontrolu ve smoke test checklist'i.
+
+## Production DB Preflight Attempt
+
+- Env file was loaded from local Downloads without logging secret values.
+- Production guard passed and read-only DB migration table access succeeded.
+- DB currently has 31 applied migrations; latest applied migration is `20260611193000_login_attempts`.
+- V6 migrations are pending, but backup/migration stopped because `pg_dump` is unavailable and the current Neon URL uses pooler.
+- No backup, migration, build, or redeploy was run.
 
 ## P0 Çıktıları
 

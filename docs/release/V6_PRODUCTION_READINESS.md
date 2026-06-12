@@ -1,5 +1,18 @@
 # Uyanik Koc Web V6 - Production Readiness Check
 
+## Production DB Migration Status - 2026-06-12
+
+Status: DB MIGRATED, REDEPLOY PENDING.
+
+- Env was loaded from the local external env file without writing secret values to repo docs or logs.
+- Neon restore path exists via backup branch `pre-v6-migration-backup`; migration used the main direct/unpooled Neon URL (`pooler=false`, host masked).
+- Pre-migration DB state: 31 applied migrations, latest `20260611193000_login_attempts`; V6 migrations were pending.
+- Migration preflight found no `DROP TABLE`, `DROP COLUMN`, or destructive rename. `20260612130000_mistake_topic_nullable` only relaxes `topic` with `DROP NOT NULL`.
+- Applied V6 migrations: `20260612120000_mistakes`, `20260612130000_mistake_topic_nullable`, `20260612190000_thread_member_read_mute`, `20260612200000_notification_coach_scope`.
+- Post-migration DB state: 35 applied migrations, latest `20260612200000_notification_coach_scope`.
+- Verification passed: `pnpm install --frozen-lockfile`, `pnpm db:generate`, `pnpm db:migrate`, `pnpm typecheck`, `pnpm lint`, `pnpm test:unit`, `pnpm --filter @uyanik/web build`.
+- Redeploy was not run because the production SSH/CI/restart target is still not provided; smoke tests remain pending after redeploy.
+
 Date: 2026-06-12
 Scope: release / production readiness only. No feature, UI, backend, dependency, or migration changes were made in this phase.
 
@@ -126,3 +139,32 @@ These commands were run for release readiness on 2026-06-12:
 - `AUTH_SECRET=local-ci-build-secret-not-for-production-32chars NEXTAUTH_SECRET=local-ci-build-secret-not-for-production-32chars pnpm --filter @uyanik/web build`
 
 Final command results must be recorded in `docs/cursor/CURSOR_RUN_LOG.md` for the release readiness commit.
+
+## Production DB Migration Status
+
+Status: BLOCKED before backup/migration.
+
+Preflight on 2026-06-12 initially found the current Codex shell did not expose production readiness env values. After loading the user-provided local env file, the guarded read-only DB preflight was rerun without logging secrets.
+
+- `DATABASE_URL`: present, masked Neon host confirmed
+- `AUTH_SECRET` or `NEXTAUTH_SECRET`: present
+- `DEMO_AUTH_ALLOW_IN_MEMORY=false`: confirmed
+- `AI_COACH_ENABLED=false`: confirmed
+- DB read-only migration table check: OK
+- Current DB applied migration count: 31
+- Current DB latest applied migration: `20260611193000_login_attempts`
+- Pending V6 migrations: `20260612120000_mistakes`, `20260612130000_mistake_topic_nullable`, `20260612190000_thread_member_read_mute`, `20260612200000_notification_coach_scope`
+- Backup tool: `pg_dump` not available in current shell
+- Connection note: current `DATABASE_URL` host is Neon but uses pooler; migration should prefer direct/unpooled URL
+
+Result:
+
+- Backup was not attempted.
+- `pnpm db:migrate` was not run.
+- Production build was not run because backup/migration precondition failed.
+- Redeploy pending: SSH/CI target required.
+
+Required next input:
+
+- Install PostgreSQL client tools so `pg_dump` is available, or create a Neon restore point/backup and provide confirmation.
+- Use a direct/unpooled Neon migration URL for `DATABASE_URL` before running Prisma migrations.
