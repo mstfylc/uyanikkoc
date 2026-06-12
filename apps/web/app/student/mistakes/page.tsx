@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkPageHead } from "@/components/design/UkPageHead";
@@ -13,7 +14,7 @@ type MistakeStatus = "acik" | "tekrar" | "kapandi";
 type Mistake = {
   id: string;
   subject: string;
-  topic: string;
+  topic: string | null;
   subtopic: string;
   errorType: ErrorType;
   source: string;
@@ -68,6 +69,10 @@ function isDue(mistake: Mistake) {
   return mistake.status !== "kapandi" && Boolean(mistake.nextDue) && new Date(`${mistake.nextDue}T00:00:00`) <= new Date();
 }
 
+function topicLabel(mistake: Mistake) {
+  return mistake.topic?.trim() || "Konu bilgisi yok";
+}
+
 function StageDots({ stage }: { stage: number }) {
   return (
     <span className="row" title={`${stage}/4 tekrar tamam`} style={{ gap: 4 }}>
@@ -86,6 +91,106 @@ function StageDots({ stage }: { stage: number }) {
   );
 }
 
+function ZeroErrorReviewModal({
+  list,
+  index,
+  reviewed,
+  onClose,
+  onSkip,
+  onReview,
+}: {
+  list: Mistake[];
+  index: number;
+  reviewed: number;
+  onClose: () => void;
+  onSkip: () => void;
+  onReview: (id: string) => void;
+}) {
+  const item = list[index] ?? null;
+  const progress = list.length ? Math.min(index / list.length, 1) * 100 : 100;
+
+  return createPortal(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-panel" style={{ maxWidth: 520 }} onClick={(event) => event.stopPropagation()}>
+        <div className="modal-head">
+          <div className="row" style={{ gap: 10 }}>
+            <span className="lr-icon" style={{ color: "var(--primary)" }}>
+              <KiIcon name="ki-technology-2" size={18} />
+            </span>
+            <div>
+              <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Odak Tekrar</h3>
+              <div className="muted" style={{ fontSize: 12 }}>
+                {item ? `${index + 1} / ${list.length} - sifir hata dongusu` : "Tamamlandi"}
+              </div>
+            </div>
+          </div>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="Kapat">
+            <KiIcon name="ki-cross" size={17} />
+          </button>
+        </div>
+        <div className="modal-body" style={{ gap: 14 }}>
+          <div style={{ height: 7, borderRadius: 999, background: "var(--surface-3)", overflow: "hidden" }}>
+            <span style={{ display: "block", width: `${progress}%`, height: "100%", background: "var(--primary)" }} />
+          </div>
+          {item ? (
+            <>
+              <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+                <Badge tone="muted">{item.subject}</Badge>
+                <Badge tone={ERROR_LABELS[item.errorType].tone}>{ERROR_LABELS[item.errorType].label}</Badge>
+                <Badge tone="muted">{QUESTION_LABELS[item.qType]}</Badge>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 850 }}>{topicLabel(item)}</div>
+              {item.subtopic ? <div className="muted" style={{ fontSize: 13 }}>{item.subtopic}</div> : null}
+              {item.photoUrl ? (
+                <img src={item.photoUrl} alt="" style={{ maxHeight: 180, width: "100%", objectFit: "cover", borderRadius: 13 }} />
+              ) : null}
+              <div style={{ padding: 12, borderRadius: 13, background: "var(--surface-3)", color: "var(--text-2)", fontSize: 13 }}>
+                {item.note ? (
+                  <>
+                    <strong style={{ color: "var(--text)" }}>Cozum notun</strong>
+                    <div style={{ marginTop: 5 }}>{item.note}</div>
+                  </>
+                ) : (
+                  "Bu yanlista not yok - dogru cozumu zihninden gecir, sonra isaretle."
+                )}
+              </div>
+              <div className="between" style={{ gap: 10, flexWrap: "wrap" }}>
+                <div className="row" style={{ gap: 8 }}>
+                  <StageDots stage={item.stage} />
+                  <span className="muted" style={{ fontSize: 12 }}>{item.nextDue ? `${item.nextDue} tekrari` : "son tekrar"}</span>
+                </div>
+                {item.source ? <span className="muted" style={{ fontSize: 12 }}>Kaynak: {item.source}</span> : null}
+              </div>
+            </>
+          ) : (
+            <div style={{ padding: "24px 0", textAlign: "center" }}>
+              <span className="lr-icon" style={{ width: 60, height: 60, color: "var(--success)", margin: "0 auto 12px" }}>
+                <KiIcon name="ki-check-circle" size={28} />
+              </span>
+              <h3 style={{ fontSize: 18, fontWeight: 850 }}>Tekrar turu bitti</h3>
+              <p className="muted" style={{ marginTop: 6 }}>{reviewed} yanlisi tekrar ettin. Bir sonraki aralikta sistem otomatik hatirlatacak.</p>
+            </div>
+          )}
+        </div>
+        <div className="modal-foot" style={{ justifyContent: "flex-end" }}>
+          {item ? (
+            <>
+              <button type="button" className="btn btn-ghost" onClick={onSkip}>Atla</button>
+              <button type="button" className="btn btn-primary" onClick={() => onReview(item.id)}>
+                <KiIcon name="ki-check-circle" size={16} />
+                Tekrar ettim
+              </button>
+            </>
+          ) : (
+            <button type="button" className="btn btn-primary" onClick={onClose}>Kapat</button>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 function recentFrequency(mistakes: Mistake[]) {
   const since = new Date();
   since.setDate(since.getDate() - 13);
@@ -94,7 +199,7 @@ function recentFrequency(mistakes: Mistake[]) {
   const byTopic = new Map<string, number>();
   for (const item of recent) {
     byType[item.errorType] += 1;
-    const topicKey = `${item.subject} · ${item.topic}`;
+    const topicKey = `${item.subject} · ${topicLabel(item)}`;
     byTopic.set(topicKey, (byTopic.get(topicKey) ?? 0) + 1);
   }
   const ranked = Object.entries(byType)
@@ -116,6 +221,11 @@ function recentFrequency(mistakes: Mistake[]) {
 export default function StudentMistakesPage() {
   const [mistakes, setMistakes] = useState<Mistake[]>([]);
   const [form, setForm] = useState(INITIAL_FORM);
+  const [showAllDue, setShowAllDue] = useState(false);
+  const [reviewList, setReviewList] = useState<Mistake[] | null>(null);
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const [reviewedCount, setReviewedCount] = useState(0);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [subjectFilter, setSubjectFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -169,6 +279,20 @@ export default function StudentMistakesPage() {
     await loadMistakes();
   }
 
+  async function reviewFromFocus(id: string) {
+    const response = await fetch(`/api/student/mistakes/${id}/review`, {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    if (!response.ok) {
+      setError("Tekrar kaydedilemedi.");
+      return;
+    }
+    setReviewedCount((count) => count + 1);
+    setReviewIndex((current) => current + 1);
+    await loadMistakes();
+  }
+
   async function deleteMistake(id: string) {
     const response = await fetch(`/api/student/mistakes/${id}`, {
       method: "DELETE",
@@ -183,6 +307,7 @@ export default function StudentMistakesPage() {
 
   const subjects = useMemo(() => Array.from(new Set(mistakes.map((item) => item.subject))).sort(), [mistakes]);
   const due = useMemo(() => mistakes.filter(isDue).sort((a, b) => (a.nextDue ?? "").localeCompare(b.nextDue ?? "")), [mistakes]);
+  const visibleDue = showAllDue ? due : due.slice(0, 5);
   const shown = useMemo(
     () =>
       mistakes.filter((item) => {
@@ -233,7 +358,23 @@ export default function StudentMistakesPage() {
       <UkSection
         title="Sifir Hata Dongusu"
         sub={due.length ? "Bugun tekrar edilecekler" : "1 -> 3 -> 7 -> 21 gun otomatik tekrar takvimi"}
-        action={due.length ? <Badge tone="warning">{due.length} tekrar</Badge> : null}
+        action={due.length ? (
+          <div className="row" style={{ gap: 8 }}>
+            <Badge tone="warning">{due.length} tekrar</Badge>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => {
+                setReviewList(due);
+                setReviewIndex(0);
+                setReviewedCount(0);
+              }}
+            >
+              <KiIcon name="ki-technology-2" size={15} />
+              Odak tekrar
+            </button>
+          </div>
+        ) : null}
       >
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {due.length === 0 ? (
@@ -241,13 +382,13 @@ export default function StudentMistakesPage() {
               Bugun tekrar edilecek yanlis yok - dongu temiz.
             </div>
           ) : (
-            due.slice(0, 5).map((item) => (
+            visibleDue.map((item) => (
               <div key={item.id} className="lrow">
                 <span className="lr-icon" style={{ color: "var(--warning)" }}>
                   <KiIcon name="ki-time" size={18} />
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="lr-title">{item.topic} · {item.subject}</div>
+                  <div className="lr-title">{topicLabel(item)} · {item.subject}</div>
                   <div className="lr-meta">
                     <Badge tone={ERROR_LABELS[item.errorType].tone}>{ERROR_LABELS[item.errorType].label}</Badge>
                     <StageDots stage={item.stage} />
@@ -260,6 +401,11 @@ export default function StudentMistakesPage() {
               </div>
             ))
           )}
+          {due.length > 5 ? (
+            <button type="button" className="btn btn-light btn-sm" onClick={() => setShowAllDue((value) => !value)} style={{ width: "fit-content" }}>
+              {showAllDue ? "Daha az goster" : `+${due.length - 5} tekrar daha goster`}
+            </button>
+          ) : null}
         </div>
       </UkSection>
 
@@ -394,11 +540,17 @@ export default function StudentMistakesPage() {
           ) : (
             shown.map((item) => (
               <div key={item.id} className="lrow" style={{ alignItems: "flex-start" }}>
-                <span className="lr-icon" style={{ color: "var(--danger)" }}>
-                  <KiIcon name="ki-shield-cross" size={18} />
-                </span>
+                {item.photoUrl ? (
+                  <button type="button" className="lr-icon" style={{ padding: 0, overflow: "hidden" }} onClick={() => setLightboxUrl(item.photoUrl)} aria-label="Fotografi ac">
+                    <img src={item.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </button>
+                ) : (
+                  <span className="lr-icon" style={{ color: "var(--danger)" }}>
+                    <KiIcon name="ki-shield-cross" size={18} />
+                  </span>
+                )}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="lr-title">{item.topic}{item.subtopic ? <span className="muted"> · {item.subtopic}</span> : null}</div>
+                  <div className="lr-title">{topicLabel(item)}{item.subtopic ? <span className="muted"> · {item.subtopic}</span> : null}</div>
                   <div className="lr-meta">
                     <Badge tone={ERROR_LABELS[item.errorType].tone}>{ERROR_LABELS[item.errorType].label}</Badge>
                     <Badge tone={STATUS_LABELS[item.status].tone}>{STATUS_LABELS[item.status].label}</Badge>
@@ -417,6 +569,22 @@ export default function StudentMistakesPage() {
           )}
         </div>
       </UkSection>
+      {reviewList ? (
+        <ZeroErrorReviewModal
+          list={reviewList}
+          index={reviewIndex}
+          reviewed={reviewedCount}
+          onClose={() => setReviewList(null)}
+          onSkip={() => setReviewIndex((current) => current + 1)}
+          onReview={(id) => void reviewFromFocus(id)}
+        />
+      ) : null}
+      {lightboxUrl ? createPortal(
+        <div className="modal-overlay" onClick={() => setLightboxUrl(null)}>
+          <img src={lightboxUrl} alt="" style={{ maxWidth: "min(92vw, 880px)", maxHeight: "86vh", borderRadius: 18, boxShadow: "var(--shadow-lg)" }} />
+        </div>,
+        document.body,
+      ) : null}
     </div>
   );
 }

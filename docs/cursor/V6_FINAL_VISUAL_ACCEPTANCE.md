@@ -36,7 +36,7 @@ Checklist:
 - [ ] HataFrekansiCard: yatay tone barları, teşhis, en sık konular.
 - [ ] MistakeAddModal: ders/konu, 6 hata tipi toggle, kaynak, not, photoUrl UI/disabled hali, "1 -> 3 -> 7 -> 21".
 - [ ] MistakeBatchModal: bulk + satır hata tipi; ödev max 12, deneme max 14.
-- [ ] ZeroErrorReview: ilerleme, kart kart review, "Atla", "Tekrar ettim", bitiş ekranı.
+- [x] ZeroErrorReview: ilerleme, kart kart review, "Atla", "Tekrar ettim", bitiş ekranı.
 
 ## 3. Student `/student/dashboard`
 

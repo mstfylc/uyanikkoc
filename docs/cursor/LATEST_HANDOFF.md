@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yürütülen faz:** Web v6 Final P3 Ödev/Deneme Sonucu -> Yanlış Defteri Batch  
+**Son yürütülen faz:** Web v6 Final P4 Yanlış Defteri UI parity / review flow  
 **Tarih:** 2026-06-12  
-**Kapsam:** Optik/deneme sonucu yanlış ve boşlarını idempotent Yanlış Defteri batch kaydına bağlama; UI polish yok.
+**Kapsam:** Öğrenci Yanlış Defteri review flow parity; yeni backend/route yok.
 
 ## P0 Çıktıları
 
@@ -61,6 +61,15 @@
 - AssignmentResult akışında soru/konu/soru bazlı cevap yok; bu fazda assignment'tan otomatik mistake üretilmedi, veri uydurulmadı.
 - Memory/mock parity eklendi; production memory guard gevşetilmedi.
 
+## P4 Bulguları
+
+- `/student/mistakes` Sıfır Hata Döngüsü'ne `Odak tekrar` modalı eklendi.
+- Focus review akışı kart kart ilerler; `Atla`, `Tekrar ettim`, progress bar ve bitiş ekranı var.
+- Due listesinde ilk 5 kayıt gösterilir, fazlası için `daha fazla/daha az` kontrolü eklendi.
+- Mistake satırlarında `photoUrl` thumbnail + lightbox açılır; foto yoksa mevcut placeholder korunur.
+- P3'ten gelen `topic=null` kayıtlar güvenli biçimde `Konu bilgisi yok` olarak gösterilir.
+- Test: `pnpm typecheck` OK, `pnpm lint` OK, `pnpm test:unit` OK, local CI secret env ile build OK.
+
 ## Sonraki Adım
 
-P4: Yanlış Defteri UI parity / review flow.
+P5: Koç/veli Yanlış Defteri insight ve yetkili read mount.
