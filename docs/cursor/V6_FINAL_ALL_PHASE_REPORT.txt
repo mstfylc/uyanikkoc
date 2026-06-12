@@ -1,0 +1,111 @@
+Uyanik Koc Web V6 Final - All Phase Report
+Date: 2026-06-12
+Workspace: mstfylc/uyanikkoc - apps/web
+
+Final Acceptance Status
+- PASS: pnpm db:generate
+- PASS: pnpm typecheck
+- PASS: pnpm lint
+- PASS: pnpm test:unit
+- PASS: AUTH_SECRET=local-ci-build-secret-not-for-production-32chars NEXTAUTH_SECRET=local-ci-build-secret-not-for-production-32chars pnpm --filter @uyanik/web build
+- Web unit summary observed in final gate: 26 test files passed, 109 tests passed.
+- Build note: temporary local CI secrets were command-scoped only; no .env or fallback secret was committed.
+- Known non-blocking environment warnings: Metronic assets missing locally, Prisma package.json config deprecation warning, Next ESLint plugin warning.
+
+Scope Guard Summary
+- Existing live Next.js App Router structure was preserved.
+- Existing screens/components were not deleted or rewritten from scratch.
+- No live AI integration was added; AI Coach remains a coming-soon surface.
+- CRM files/env/upload/log areas were not touched.
+- Production memory fallback was not loosened.
+- Role-based guarded routes were preserved instead of adding generic v6 wrapper routes where not required.
+
+P0 - Mapping / Inventory
+- Commit: none, docs-only mapping phase.
+- Output: V6_FINAL_SCREEN_GAP_MAP.md, V6_FINAL_COMPONENT_GAP_MAP.md, V6_FINAL_BACKEND_GAP_MAP.md, V6_FINAL_VISUAL_ACCEPTANCE.md, LATEST_HANDOFF.md, CURSOR_RUN_LOG.md, RISK_REPORT.md.
+- Result: live route/component/backend inventory completed before implementation.
+- Accepted risks: missing mobile/modal PNGs, missing coach topics PNG, missing student mistakes feature, missing v6 backend pieces, partial messaging/notification persistence.
+
+P1 - Token / Style Parity Gate
+- Commit: 00c0415 chore(design): align web v6 tokens
+- Sources: v6 tokens and token-css-map compared against apps/web/styles/uk-design.css and globals.css.
+- Result: light muted token set to #6B6F85; dark surface/neutral tokens aligned with v6; warning alias aligned.
+- Tests: typecheck OK, lint OK, web build OK with temporary local CI secrets.
+- Risk: initial production build required AUTH_SECRET/NEXTAUTH_SECRET; accepted as expected env requirement, not a code/design defect.
+
+P2 - Student Yanlis Defteri Backend/UI
+- Commit: b0aed5d feat(mistakes): add student mistake notebook
+- Result: Mistake and MistakeReview models, repository/service/API, /student/mistakes route, student nav entry, summary cards, add/list/review foundations.
+- Guard: studentId is taken from session scope; dataURL/base64 photoUrl rejected.
+- Tests: db:generate OK, typecheck OK, lint OK, unit OK, web build OK.
+
+P3 - Assignment/Exam Result Batch Feeders
+- Commit: d41e9d5 feat(mistakes): ingest assignment and exam mistakes
+- Result: optik submission answer key + student answers feed wrong/blank answers into mistakes using sourceType optik_submission.
+- Duplicate prevention: idempotency by student/source/ref/label/subject/topic/errorType matching in service/repository.
+- Data gap: AssignmentResult lacks question/topic/question-level answer payload, so assignment result ingestion does not fabricate mistakes.
+- Tests: db:generate OK, typecheck OK, lint OK, unit OK, web build OK.
+
+P4 - Yanlis Defteri UI Review Flow
+- Commit: bd60180 feat(mistakes): add focused review flow
+- Result: focused ZeroErrorReview modal, card-by-card review, skip/reviewed actions, due expansion, thumbnail/lightbox handling.
+- Topic-null safety: optik records without topic render as "Konu bilgisi yok".
+- Tests: typecheck OK, lint OK, unit OK, web build OK.
+
+P5 - Coach/Parent Mistake Insights
+- Commit: 11f5074 feat(mistakes): add scoped coach parent insights
+- Result: coach roster-scoped student mistake insight API/card and parent child-scoped read-only aggregate.
+- Guard: coach can read only roster students; parent can read only own child aggregate; no write action added.
+- Tests: typecheck OK, lint OK, unit OK, web build OK.
+
+P6 - NetGainMap
+- Commit: a8841dc feat(exams): add scoped net gain map
+- Result: exam-derived NetGainMap for student, coach roster student, and parent child views.
+- Guard: coach roster and parent child-scope checks enforced.
+- UI: mounted into student exams, coach topics, and parent dashboard.
+- Tests: typecheck OK, lint OK, unit OK, web build OK.
+
+P7 - SmartOdev Preview / Assign
+- Commit: 0886566 feat(assignments): add smart assignment preview
+- Result: coach smart assignment endpoint supports preview and assign actions.
+- Preview: derives signals from mistakes, NetGainMap, and topic tracking without DB write.
+- Assign: uses existing assignment creation flow and roster guard; no new dependency/schema.
+- Tests: typecheck OK, lint OK, unit OK, web build OK.
+
+P8 - Takvimim Agenda
+- Commit: 25aa2e4 feat(schedule): add student agenda card
+- Result: /api/student/agenda aggregates assignments, exams, appointments, due mistakes, and study items.
+- UI: TakvimimCard mounted on student dashboard with agenda/week/month modes and route-aware item clicks.
+- Guard: studentId comes from session; no new table/migration/dependency.
+- Tests: typecheck OK, lint OK, unit OK, web build OK.
+
+P9 - Messaging Read/Mute Persistence
+- Commit: efa8261 feat(messages): persist thread read state
+- Result: ThreadMember lastReadAt/muted persistence, guarded thread-state endpoint, unread/mute UI state.
+- Parity: memory mode parity kept for dev; production memory guard unchanged.
+- Tests: db:generate OK, typecheck OK, lint OK, unit OK, web build OK.
+
+P10 - Coach Notifications DB Scope
+- Commit: 9d30b68 feat(notifications): add coach db scope
+- Result: Notification.coachId nullable relation/index added; coach list/read/mark-all works through DB repository in DB mode.
+- Parity: memory/mock behavior kept for dev; student/parent scopes preserved.
+- Tests: db:generate OK, typecheck OK, lint OK, unit OK, web build OK.
+
+P11 - Visual Acceptance / Final Audit Cleanup
+- Commit: c9f74f2 docs(v6): finalize visual acceptance audit
+- Result: visual acceptance, backend gap map, screen gap map, component gap map, latest handoff, run log, and risk report updated with P1-P10 closure status.
+- Boundary: docs-only; no browser pixel QA or PNG generation.
+- Tests: typecheck OK.
+
+Open / Accepted Non-Blocking Items
+- Mobile PNGs, modal PNGs, and coach topics desktop PNG remain absent from handoff assets; browser/manual QA is still needed before pixel sign-off.
+- AssignmentResult still lacks question-level/topic-level payload for automatic assignment-result mistake generation; no fake question text/topic was generated.
+- Mistake photo object storage is not implemented; dataURL/base64 is intentionally not stored in DB.
+- Generic v6 message/notification wrapper routes were not added because live role-based guarded routes already exist and were preserved.
+
+Final Report
+- Final acceptance criteria passed on 2026-06-12.
+- All implementation phases P1-P10 are committed.
+- P11 documentation audit is committed.
+- Current final implementation head before this report artifact: c9f74f2.
+- This TXT report was generated after final acceptance passed.
