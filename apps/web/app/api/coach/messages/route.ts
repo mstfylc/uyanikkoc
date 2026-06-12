@@ -9,6 +9,6 @@ export const GET = withApiAuth(["coach"], async (_req, { session }) => {
     return NextResponse.json({ error: "Coach profile missing" }, { status: 400 });
   }
 
-  const threads = await listCoachMessageThreads(coachId);
+  const threads = await listCoachMessageThreads(coachId, session.user.id);
   return NextResponse.json({ threads }, { status: 200 });
 });

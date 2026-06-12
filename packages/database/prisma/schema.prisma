@@ -832,10 +832,12 @@ enum ThreadKind {
 }
 
 model ThreadMember {
-  id       String        @id @default(cuid())
-  threadId String
-  userId   String
-  thread   MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  id         String        @id @default(cuid())
+  threadId   String
+  userId     String
+  lastReadAt DateTime?
+  muted      Boolean       @default(false)
+  thread     MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
   @@unique([threadId, userId])
   @@index([userId])

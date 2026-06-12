@@ -3,13 +3,36 @@ import type { MessageRecord, MessageThreadRecord } from "@uyanik/database";
 import { shouldUseDatabase } from "@/lib/data/env";
 import * as memoryMessages from "@/mocks/messages";
 
-export async function listCoachMessageThreads(coachId: string): Promise<MessageThreadRecord[]> {
+const memoryThreadState = globalThis as typeof globalThis & {
+  __uyanikThreadState?: Record<string, { lastReadAt?: string; muted?: boolean }>;
+};
+const threadState = memoryThreadState.__uyanikThreadState ?? (memoryThreadState.__uyanikThreadState = {});
+
+function stateKey(threadId: string, userId: string): string {
+  return `${threadId}:${userId}`;
+}
+
+function withMemoryState(threads: MessageThreadRecord[], userId?: string): MessageThreadRecord[] {
+  if (!userId) return threads;
+  return threads.map((thread) => {
+    const state = threadState[stateKey(thread.id, userId)];
+    const lastReadAt = state?.lastReadAt ?? null;
+    return {
+      ...thread,
+      lastReadAt,
+      muted: state?.muted ?? false,
+      unreadCount: thread.messages.filter((message) => !lastReadAt || message.createdAt > lastReadAt).length,
+    };
+  });
+}
+
+export async function listCoachMessageThreads(coachId: string, userId?: string): Promise<MessageThreadRecord[]> {
   if (shouldUseDatabase()) {
     const { messageRepository } = await import("@uyanik/database");
-    return messageRepository.listThreadsForCoach(coachId);
+    return messageRepository.listThreadsForCoach(coachId, userId);
   }
 
-  return memoryMessages.listThreadsForCoach(coachId);
+  return withMemoryState(memoryMessages.listThreadsForCoach(coachId), userId);
 }
 
 export async function listStudentMessageThreads(
@@ -21,7 +44,7 @@ export async function listStudentMessageThreads(
     return messageRepository.listThreadsForStudent(studentId, userId);
   }
 
-  return memoryMessages.listThreadsForStudent(studentId, userId);
+  return withMemoryState(memoryMessages.listThreadsForStudent(studentId, userId), userId);
 }
 
 export async function listParentMessageThreads(
@@ -33,16 +56,17 @@ export async function listParentMessageThreads(
     return messageRepository.listThreadsForParent(parentId, userId);
   }
 
-  return memoryMessages.listThreadsForParent(parentId, userId);
+  return withMemoryState(memoryMessages.listThreadsForParent(parentId, userId), userId);
 }
 
-export async function getMessageThread(threadId: string): Promise<MessageThreadRecord | null> {
+export async function getMessageThread(threadId: string, userId?: string): Promise<MessageThreadRecord | null> {
   if (shouldUseDatabase()) {
     const { messageRepository } = await import("@uyanik/database");
-    return messageRepository.getThreadById(threadId);
+    return messageRepository.getThreadById(threadId, userId);
   }
 
-  return memoryMessages.getThreadById(threadId);
+  const thread = memoryMessages.getThreadById(threadId);
+  return thread ? withMemoryState([thread], userId)[0] ?? null : null;
 }
 
 export async function appendThreadMessage(
@@ -56,6 +80,32 @@ export async function appendThreadMessage(
   }
 
   return memoryMessages.appendMessage(threadId, senderRole, body);
+}
+
+export async function markMessageThreadRead(threadId: string, userId: string): Promise<void> {
+  if (shouldUseDatabase()) {
+    const { messageRepository } = await import("@uyanik/database");
+    await messageRepository.markThreadRead(threadId, userId);
+    return;
+  }
+
+  threadState[stateKey(threadId, userId)] = {
+    ...threadState[stateKey(threadId, userId)],
+    lastReadAt: new Date().toISOString(),
+  };
+}
+
+export async function setMessageThreadMuted(threadId: string, userId: string, muted: boolean): Promise<void> {
+  if (shouldUseDatabase()) {
+    const { messageRepository } = await import("@uyanik/database");
+    await messageRepository.setThreadMuted(threadId, userId, muted);
+    return;
+  }
+
+  threadState[stateKey(threadId, userId)] = {
+    ...threadState[stateKey(threadId, userId)],
+    muted,
+  };
 }
 
 export async function createGroupThread(

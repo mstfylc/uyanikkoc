@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yurutulen faz:** Web v6 Final P8 Takvimim / agenda aggregation  
+**Son yurutulen faz:** Web v6 Final P9 Messaging unread/read/mute persistence  
 **Tarih:** 2026-06-12  
-**Kapsam:** Ogrenci dashboard icin assignment, deneme, randevu, due mistake ve study block agenda aggregation.
+**Kapsam:** ThreadMember lastReadAt/muted persistence, unread hesaplama ve mevcut messages UI state aksiyonlari.
 
 ## P0 Çıktıları
 
@@ -102,6 +102,14 @@
 - Yeni tablo/migration/dependency yok; data mevcut servislerden turetilir.
 - Due mistakes `nextDue` olan acik kayitlardan gelir.
 
+## P9 Bulgulari
+
+- `ThreadMember.lastReadAt` ve `ThreadMember.muted` additive migration ile eklendi.
+- Thread listeleri viewer userId ile `unreadCount`, `muted`, `lastReadAt` doner.
+- `/api/messages/thread-state` read ve mute aksiyonlarini tek guarded endpointte toplar.
+- `MessagesPanel` thread acilinca okundu isaretler; mute toggle ve unread/sessiz badge gosterir.
+- Memory mode icin service-level thread state parity eklendi; production memory guard degistirilmedi.
+
 ## Sonraki Adim
 
-P9: Messaging unread/read/mute persistence.
+P10: Coach notifications DB scope veya v6 visual acceptance cleanup.

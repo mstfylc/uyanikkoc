@@ -63,8 +63,35 @@ export function MessagesPanel({
     if (response.ok) {
       const data = (await response.json()) as { thread: MessageThreadRecord };
       setThread(data.thread);
+      void fetch("/api/messages/thread-state", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ threadId: selectedId, action: "read" }),
+      }).then(() => {
+        setThreads((current) =>
+          current.map((item) => item.id === selectedId ? { ...item, unreadCount: 0, lastReadAt: new Date().toISOString() } : item),
+        );
+      });
     }
   }, [apiBase, selectedId]);
+
+  async function toggleMute() {
+    if (!activeThread) return;
+    const nextMuted = !activeThread.muted;
+    const response = await fetch("/api/messages/thread-state", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ threadId: activeThread.id, action: "mute", muted: nextMuted }),
+    });
+    if (response.ok) {
+      setThreads((current) =>
+        current.map((item) => item.id === activeThread.id ? { ...item, muted: nextMuted } : item),
+      );
+      setThread((current) => current ? { ...current, muted: nextMuted } : current);
+    }
+  }
 
   useEffect(() => {
     void loadThreads();
@@ -168,6 +195,10 @@ export function MessagesPanel({
           >
             {preview}
           </div>
+          <div className="lr-meta" style={{ marginTop: 4 }}>
+            {item.unreadCount ? <span className="badge badge-primary">{item.unreadCount} yeni</span> : null}
+            {item.muted ? <span className="badge badge-muted">Sessiz</span> : null}
+          </div>
         </div>
       </button>
     );
@@ -257,6 +288,12 @@ export function MessagesPanel({
                     </div>
                   ) : null}
                 </div>
+                {activeThread ? (
+                  <button type="button" className="btn btn-light btn-sm" onClick={() => void toggleMute()}>
+                    <KiIcon name={activeThread.muted ? "ki-notification-on" : "ki-notification"} size={14} />
+                    {activeThread.muted ? "Sesi ac" : "Sessize al"}
+                  </button>
+                ) : null}
               </div>
 
               <div className="msg-body">

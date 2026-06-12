@@ -82,6 +82,9 @@ export type MessageThreadRecord = {
   name: string | null;
   title: string;
   memberUserIds?: string[];
+  unreadCount?: number;
+  muted?: boolean;
+  lastReadAt?: string | null;
   messages: MessageRecord[];
   createdAt: string;
   updatedAt: string;

@@ -27,7 +27,7 @@ function mapThread(thread: {
   title: string;
   createdAt: Date;
   updatedAt: Date;
-  members?: Array<{ userId: string }>;
+  members?: Array<{ userId: string; lastReadAt?: Date | null; muted?: boolean }>;
   messages: Array<{
     id: string;
     threadId: string;
@@ -35,7 +35,15 @@ function mapThread(thread: {
     body: string;
     createdAt: Date;
   }>;
-}): MessageThreadRecord {
+}, viewerUserId?: string): MessageThreadRecord {
+  const viewerMember = viewerUserId
+    ? thread.members?.find((member) => member.userId === viewerUserId)
+    : undefined;
+  const lastReadAt = viewerMember?.lastReadAt ?? null;
+  const unreadCount = viewerUserId
+    ? thread.messages.filter((message) => !lastReadAt || message.createdAt > lastReadAt).length
+    : undefined;
+
   return {
     id: thread.id,
     coachId: thread.coachId,
@@ -44,6 +52,9 @@ function mapThread(thread: {
     kind: thread.kind ?? "dm",
     name: thread.name ?? null,
     memberUserIds: thread.members?.map((member) => member.userId),
+    unreadCount,
+    muted: viewerMember?.muted ?? false,
+    lastReadAt: lastReadAt ? lastReadAt.toISOString() : null,
     title: thread.title,
     messages: thread.messages.map(mapMessage),
     createdAt: thread.createdAt.toISOString(),
@@ -51,7 +62,7 @@ function mapThread(thread: {
   };
 }
 
-export async function listThreadsForCoach(coachId: string): Promise<MessageThreadRecord[]> {
+export async function listThreadsForCoach(coachId: string, userId?: string): Promise<MessageThreadRecord[]> {
   const threads = await prisma.messageThread.findMany({
     where: { coachId },
     orderBy: { updatedAt: "desc" },
@@ -61,7 +72,7 @@ export async function listThreadsForCoach(coachId: string): Promise<MessageThrea
     },
   });
 
-  return threads.map(mapThread);
+  return threads.map((thread) => mapThread(thread, userId));
 }
 
 export async function listThreadsForStudent(
@@ -88,7 +99,7 @@ export async function listThreadsForStudent(
       : [];
 
   return [...dmThreads, ...groupThreads]
-    .map(mapThread)
+    .map((thread) => mapThread(thread, userId))
     .sort((left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime());
 }
 
@@ -116,17 +127,17 @@ export async function listThreadsForParent(
       : [];
 
   return [...dmThreads, ...groupThreads]
-    .map(mapThread)
+    .map((thread) => mapThread(thread, userId))
     .sort((left, right) => new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime());
 }
 
-export async function getThreadById(threadId: string): Promise<MessageThreadRecord | null> {
+export async function getThreadById(threadId: string, userId?: string): Promise<MessageThreadRecord | null> {
   const thread = await prisma.messageThread.findUnique({
     where: { id: threadId },
     include: { members: true, messages: { orderBy: { createdAt: "asc" } } },
   });
 
-  return thread ? mapThread(thread) : null;
+  return thread ? mapThread(thread, userId) : null;
 }
 
 export async function appendMessage(
@@ -153,4 +164,20 @@ export async function appendMessage(
   });
 
   return mapMessage(message);
+}
+
+export async function markThreadRead(threadId: string, userId: string): Promise<void> {
+  await prisma.threadMember.upsert({
+    where: { threadId_userId: { threadId, userId } },
+    create: { threadId, userId, lastReadAt: new Date() },
+    update: { lastReadAt: new Date() },
+  });
+}
+
+export async function setThreadMuted(threadId: string, userId: string, muted: boolean): Promise<void> {
+  await prisma.threadMember.upsert({
+    where: { threadId_userId: { threadId, userId } },
+    create: { threadId, userId, muted },
+    update: { muted },
+  });
 }
