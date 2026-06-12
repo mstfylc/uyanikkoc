@@ -49,6 +49,29 @@ enum ResultExamType {
   LGS
 }
 
+enum MistakeErrorType {
+  bilgi
+  islem
+  sure
+  dikkat
+  yorum
+  unutma
+}
+
+enum MistakeQuestionType {
+  yeninesil
+  klasik
+  islem
+  yorum
+  grafik
+}
+
+enum MistakeStatus {
+  acik
+  tekrar
+  kapandi
+}
+
 model Organization {
   id       String   @id
   name     String
@@ -199,6 +222,7 @@ model StudentProfile {
   coachTopicTargets CoachTopicTarget[]
   appointments Appointment[]
   sources StudentSource[]
+  mistakes Mistake[]
 
   @@map("student_profiles")
 }
@@ -464,6 +488,47 @@ model ExamSubjectResult {
 
   @@index([examResultId])
   @@map("exam_subject_results")
+}
+
+model Mistake {
+  id          String              @id @default(cuid())
+  studentId   String
+  subject     String
+  topic       String
+  subtopic    String              @default("")
+  errorType   MistakeErrorType    @default(islem)
+  source      String              @default("")
+  qType       MistakeQuestionType @default(klasik)
+  note        String              @default("")
+  photoUrl    String?
+  status      MistakeStatus       @default(acik)
+  stage       Int                 @default(0)
+  nextDue     DateTime?
+  sourceKind  String?
+  sourceRefId String?
+  sourceLabel String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  student     StudentProfile      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  reviews     MistakeReview[]
+
+  @@index([studentId, status])
+  @@index([studentId, nextDue])
+  @@index([studentId, createdAt])
+  @@map("mistakes")
+}
+
+model MistakeReview {
+  id        String   @id @default(cuid())
+  mistakeId String
+  studentId String
+  stage     Int
+  reviewedAt DateTime @default(now())
+  mistake   Mistake  @relation(fields: [mistakeId], references: [id], onDelete: Cascade)
+
+  @@index([mistakeId])
+  @@index([studentId, reviewedAt])
+  @@map("mistake_reviews")
 }
 
 model Notification {

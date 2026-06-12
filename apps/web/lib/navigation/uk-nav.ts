@@ -13,6 +13,7 @@ const STUDENT_NAV: UkNavItem[] = [
   { href: "/student/topics", label: "Konu Takibi", icon: "ki-book-open" },
   { href: "/student/exams", label: "Denemeler", icon: "ki-chart-simple" },
   { href: "/student/assignments", label: "Ödevlerim", icon: "ki-notepad-edit" },
+  { href: "/student/mistakes", label: "Yanlış Defteri", icon: "ki-shield-cross", tag: "Yeni" },
   { href: "/student/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/student/appointments", label: "Randevular", icon: "ki-calendar-tick" },
   { href: "/student/tests", label: "Testlerim", icon: "ki-star" },

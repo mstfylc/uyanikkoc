@@ -31,6 +31,7 @@ export { DEFAULT_CURRICULUM_SUBJECTS } from "./repositories/curriculum";
 export * as denemeRepository from "./repositories/deneme-events";
 export * as testRepository from "./repositories/tests";
 export * as parentReportRepository from "./repositories/parent-reports";
+export * as mistakeRepository from "./repositories/mistakes";
 export { buildExamTrendSummary, computeSubjectNet, computeTotalNet } from "./repositories/exams";
 export { buildTopicSummary } from "./repositories/topics";
 export type {

@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yürütülen faz:** Web v6 Final P1 token/style parity  
+**Son yürütülen faz:** Web v6 Final P2 Yanlış Defteri backend + öğrenci ekranı  
 **Tarih:** 2026-06-12  
-**Kapsam:** v6 color/global token uyumu; route/backend/component implementation yok.
+**Kapsam:** DB-backed `/student/mistakes`, student-only API, non-destructive Prisma migration, student nav.
 
 ## P0 Çıktıları
 
@@ -44,6 +44,15 @@
 - Typography/radius/shadow/layout tokenları karşılaştırıldı; mevcut değerler v6 tokenlarla uyumlu bulundu.
 - Test: `pnpm typecheck` OK, `pnpm lint` OK, geçici local CI secret env ile `pnpm --filter @uyanik/web build` OK. Secret dosyaya yazılmadı.
 
+## P2 Bulguları
+
+- `Mistake`, `MistakeReview` modelleri ve `20260612120000_mistakes` migration eklendi.
+- `mistakeRepository` + `mistake.service.ts` eklendi; `studentId` yalnız session scope'tan alınır.
+- `/api/student/mistakes`, `/batch`, `/:id`, `/:id/review` tek catch-all handler ile DB-backed çalışır.
+- `/student/mistakes` route ve student nav item eklendi; özet, Sıfır Hata Döngüsü, Hata Frekansı, ekleme formu, filtreli liste var.
+- Spaced repetition sunucuda `1 -> 3 -> 7 -> 21`; `photoUrl` dataURL/base64 kabul etmez.
+- Test: `pnpm db:generate` OK, `pnpm typecheck` OK, `pnpm lint` OK, `pnpm test:unit` OK, local CI secret env ile build OK.
+
 ## Sonraki Adım
 
-P1 tamamlandı. P2'ye bu fazda geçilmedi.
+P3: Ödev/deneme sonucu -> Yanlış Defteri batch beslemesi. Coach/parent insights P4'e bırakıldı.

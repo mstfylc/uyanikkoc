@@ -26,6 +26,7 @@
 | 2026-06-06 | DESIGN coach-productivity | - | typecheck OK, lint OK, unit 51 OK | mobil tasarım: Koç Görevleri + Toplu Duyuru backend; database -> shared dep fix |
 | 2026-06-12 | WEB V6 FINAL P0 mapping | - | not run (docs-only) | Handoff okundu; canlı route/component/backend gap map üretildi; implementation yapılmadı |
 | 2026-06-12 | WEB V6 FINAL P1 token/style parity | this commit | typecheck OK; lint OK; build OK with local CI secret env | v6 color/global token uyumu; route/backend/component eklenmedi |
+| 2026-06-12 | WEB V6 FINAL P2 Yanlış Defteri | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | student DB-backed mistakes route/API; P3 batch feeders bekliyor |
 
 ## Kural
 
