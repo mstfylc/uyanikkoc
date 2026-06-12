@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { TakvimimCard } from "@/components/student/TakvimimCard";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_TYPE_LABELS,
@@ -520,13 +521,15 @@ export function StudentDashboard() {
 
       <div className="grid col-main">
         <Assignments assignments={assignments} isLoading={isLoading} onComplete={handleComplete} />
-        <SubjectProgress />
+        <TakvimimCard />
       </div>
 
       <div className="grid col-main">
+        <SubjectProgress />
         <ExamPerformance />
-        <UpcomingExams />
       </div>
+
+      <UpcomingExams />
 
       <AiBand />
     </div>

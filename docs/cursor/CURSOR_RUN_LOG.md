@@ -32,6 +32,7 @@
 | 2026-06-12 | WEB V6 FINAL P5 coach/parent mistakes insight | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | roster/parent scoped read-only mistakes insight |
 | 2026-06-12 | WEB V6 FINAL P6 NetGainMap | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | exam-derived NetGainMap endpoints and mounts |
 | 2026-06-12 | WEB V6 FINAL P7 SmartOdev | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | coach smart assignment preview and assign |
+| 2026-06-12 | WEB V6 FINAL P8 Takvimim agenda | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | student agenda aggregation and dashboard card |
 
 ## Kural
 

@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yurutulen faz:** Web v6 Final P7 SmartOdev preview/assign servis entegrasyonu  
+**Son yurutulen faz:** Web v6 Final P8 Takvimim / agenda aggregation  
 **Tarih:** 2026-06-12  
-**Kapsam:** Koc icin roster guard'li SmartOdev preview ve assign; mevcut Assignment modeli korunarak atama.
+**Kapsam:** Ogrenci dashboard icin assignment, deneme, randevu, due mistake ve study block agenda aggregation.
 
 ## P0 Çıktıları
 
@@ -94,6 +94,14 @@
 - `SmartOdevModal` coach assignments ekranina eklendi; atama sonrasi liste yenilenir.
 - Yeni schema/dependency yok; smart metadata mevcut assignment description alanina uyumlu ozet olarak yazilir.
 
+## P8 Bulgulari
+
+- `/api/student/agenda` eklendi; studentId yalniz session'dan gelir.
+- Agenda `assignment`, `exam`, `appointment`, `mistake`, `study` kaynaklarini read-only birlestirir.
+- `TakvimimCard` student dashboard'a mount edildi; item click ilgili mevcut route'a gider.
+- Yeni tablo/migration/dependency yok; data mevcut servislerden turetilir.
+- Due mistakes `nextDue` olan acik kayitlardan gelir.
+
 ## Sonraki Adim
 
-P8: Takvimim / agenda aggregation.
+P9: Messaging unread/read/mute persistence.
