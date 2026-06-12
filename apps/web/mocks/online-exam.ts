@@ -130,10 +130,10 @@ export async function submitOptik(input: SubmitOptikInput): Promise<OptikSubmiss
 export async function getSubmissionReview(
   examId: string,
   studentId: string,
-): Promise<{ submission: OptikSubmissionRecord; answerKey: string[] } | null> {
+): Promise<{ submission: OptikSubmissionRecord; answerKey: string[]; examTitle: string; examType: "TYT" | "AYT" | "LGS" } | null> {
   seedSubmissionsIfEmpty(studentId);
   const exam = exams.find((e) => e.id === examId);
   const submission = subs.get(k(examId, studentId));
   if (!exam || !submission) return null;
-  return { submission, answerKey: exam.answerKey };
+  return { submission, answerKey: exam.answerKey, examTitle: exam.title, examType: exam.examType };
 }

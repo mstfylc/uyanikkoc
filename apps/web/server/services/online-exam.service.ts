@@ -23,14 +23,31 @@ export async function listStudentExams(
 }
 
 export async function submitOptik(input: SubmitOptikInput): Promise<OptikSubmissionRecord> {
-  if (shouldUseDatabase()) return (await repo()).submitOptik(input);
-  return memoryOnline.submitOptik(input);
+  const submission = shouldUseDatabase() ? await (await repo()).submitOptik(input) : await memoryOnline.submitOptik(input);
+  const review = await getOptikReview(input.examId, input.studentId);
+  if (review) {
+    const { ingestOptikSubmissionMistakes } = await import("@/server/services/mistake.service");
+    await ingestOptikSubmissionMistakes({
+      studentId: input.studentId,
+      examId: input.examId,
+      examType: review.examType,
+      examTitle: review.examTitle,
+      answers: review.submission.answers,
+      answerKey: review.answerKey,
+    });
+  }
+  return submission;
 }
 
 export async function getOptikReview(
   examId: string,
   studentId: string,
-): Promise<{ submission: OptikSubmissionRecord; answerKey: string[] } | null> {
+): Promise<{
+  submission: OptikSubmissionRecord;
+  answerKey: string[];
+  examTitle: string;
+  examType: "TYT" | "AYT" | "LGS";
+} | null> {
   if (shouldUseDatabase()) return (await repo()).getSubmissionReview(examId, studentId);
   return memoryOnline.getSubmissionReview(examId, studentId);
 }

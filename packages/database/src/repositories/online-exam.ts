@@ -66,12 +66,12 @@ export async function submitOptik(input: SubmitOptikInput): Promise<OptikSubmiss
 export async function getSubmissionReview(
   examId: string,
   studentId: string,
-): Promise<{ submission: OptikSubmissionRecord; answerKey: string[] } | null> {
+): Promise<{ submission: OptikSubmissionRecord; answerKey: string[]; examTitle: string; examType: "TYT" | "AYT" | "LGS" } | null> {
   const exam = await prisma.onlineExam.findUnique({ where: { id: examId } });
   if (!exam) return null;
   const sub = await prisma.optikSubmission.findUnique({
     where: { examId_studentId: { examId, studentId } },
   });
   if (!sub) return null;
-  return { submission: mapSub(sub), answerKey: exam.answerKey };
+  return { submission: mapSub(sub), answerKey: exam.answerKey, examTitle: exam.title, examType: exam.examType };
 }

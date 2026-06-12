@@ -5,17 +5,19 @@ export const MIS_INTERVALS = [1, 3, 7, 21] as const;
 export type MistakeErrorType = "bilgi" | "islem" | "sure" | "dikkat" | "yorum" | "unutma";
 export type MistakeQuestionType = "yeninesil" | "klasik" | "islem" | "yorum" | "grafik";
 export type MistakeStatus = "acik" | "tekrar" | "kapandi";
+export type MistakeSourceType = "assignment_result" | "exam_result" | "optik_submission" | "manual";
+const SOURCE_TYPES: MistakeSourceType[] = ["assignment_result", "exam_result", "optik_submission", "manual"];
 
 export type MistakeInput = {
   subject: string;
-  topic: string;
+  topic?: string | null;
   subtopic?: string;
   errorType?: MistakeErrorType;
   source?: string;
   qType?: MistakeQuestionType;
   note?: string;
   photoUrl?: string | null;
-  sourceKind?: string | null;
+  sourceKind?: MistakeSourceType | null;
   sourceRefId?: string | null;
   sourceLabel?: string | null;
 };
@@ -28,7 +30,7 @@ export type MistakeRecord = {
   id: string;
   studentId: string;
   subject: string;
-  topic: string;
+  topic: string | null;
   subtopic: string;
   errorType: MistakeErrorType;
   source: string;
@@ -50,7 +52,7 @@ type MistakeWithReviews = {
   id: string;
   studentId: string;
   subject: string;
-  topic: string;
+  topic: string | null;
   subtopic: string;
   errorType: MistakeErrorType;
   source: string;
@@ -78,6 +80,11 @@ function toYmd(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
+function normalizeSourceKind(sourceKind: string | null): MistakeSourceType | null {
+  if (!sourceKind) return null;
+  return SOURCE_TYPES.includes(sourceKind as MistakeSourceType) ? sourceKind as MistakeSourceType : "manual";
+}
+
 function mapMistake(mistake: MistakeWithReviews): MistakeRecord {
   return {
     id: mistake.id,
@@ -93,7 +100,7 @@ function mapMistake(mistake: MistakeWithReviews): MistakeRecord {
     status: mistake.status,
     stage: mistake.stage,
     nextDue: mistake.nextDue ? toYmd(mistake.nextDue) : null,
-    sourceKind: mistake.sourceKind,
+    sourceKind: normalizeSourceKind(mistake.sourceKind),
     sourceRefId: mistake.sourceRefId,
     sourceLabel: mistake.sourceLabel,
     createdAt: mistake.createdAt.toISOString(),
@@ -123,14 +130,14 @@ export async function createForStudent(studentId: string, input: MistakeInput): 
     data: {
       studentId,
       subject: input.subject,
-      topic: input.topic,
+      topic: input.topic ?? null,
       subtopic: input.subtopic ?? "",
       errorType: input.errorType ?? "islem",
       source: input.source ?? "",
       qType: input.qType ?? "klasik",
       note: input.note ?? "",
       photoUrl: input.photoUrl ?? null,
-      sourceKind: input.sourceKind ?? null,
+      sourceKind: input.sourceKind ?? "manual",
       sourceRefId: input.sourceRefId ?? null,
       sourceLabel: input.sourceLabel ?? null,
       status: "acik",
@@ -148,14 +155,14 @@ export async function createBatchForStudent(studentId: string, items: MistakeInp
     data: {
       studentId,
       subject: item.subject,
-      topic: item.topic,
+      topic: item.topic ?? null,
       subtopic: item.subtopic ?? "",
       errorType: item.errorType ?? "islem",
       source: item.source ?? "",
       qType: item.qType ?? "klasik",
       note: item.note ?? "",
       photoUrl: item.photoUrl ?? null,
-      sourceKind: item.sourceKind ?? null,
+      sourceKind: item.sourceKind ?? "manual",
       sourceRefId: item.sourceRefId ?? null,
       sourceLabel: item.sourceLabel ?? null,
       status: "acik",
@@ -164,6 +171,41 @@ export async function createBatchForStudent(studentId: string, items: MistakeInp
     },
     include: { reviews: true },
   }))).then((mistakes) => mistakes.map(mapMistake));
+}
+
+export async function createBatchForStudentIdempotent(
+  studentId: string,
+  items: MistakeInput[],
+): Promise<{ created: MistakeRecord[]; skipped: number }> {
+  const created: MistakeRecord[] = [];
+  let skipped = 0;
+
+  for (const item of items) {
+    const sourceKind = item.sourceKind ?? "manual";
+    const sourceRefId = item.sourceRefId ?? null;
+    const sourceLabel = item.sourceLabel ?? null;
+    if (sourceRefId) {
+      const duplicate = await prisma.mistake.findFirst({
+        where: {
+          studentId,
+          sourceKind,
+          sourceRefId,
+          sourceLabel,
+          subject: item.subject,
+          topic: item.topic ?? null,
+          errorType: item.errorType ?? "islem",
+        },
+        select: { id: true },
+      });
+      if (duplicate) {
+        skipped += 1;
+        continue;
+      }
+    }
+    created.push(await createForStudent(studentId, { ...item, sourceKind, sourceRefId, sourceLabel }));
+  }
+
+  return { created, skipped };
 }
 
 export async function updateForStudent(

@@ -494,7 +494,7 @@ model Mistake {
   id          String              @id @default(cuid())
   studentId   String
   subject     String
-  topic       String
+  topic       String?
   subtopic    String              @default("")
   errorType   MistakeErrorType    @default(islem)
   source      String              @default("")

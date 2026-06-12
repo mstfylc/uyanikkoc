@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yürütülen faz:** Web v6 Final P2 Yanlış Defteri backend + öğrenci ekranı  
+**Son yürütülen faz:** Web v6 Final P3 Ödev/Deneme Sonucu -> Yanlış Defteri Batch  
 **Tarih:** 2026-06-12  
-**Kapsam:** DB-backed `/student/mistakes`, student-only API, non-destructive Prisma migration, student nav.
+**Kapsam:** Optik/deneme sonucu yanlış ve boşlarını idempotent Yanlış Defteri batch kaydına bağlama; UI polish yok.
 
 ## P0 Çıktıları
 
@@ -53,6 +53,14 @@
 - Spaced repetition sunucuda `1 -> 3 -> 7 -> 21`; `photoUrl` dataURL/base64 kabul etmez.
 - Test: `pnpm db:generate` OK, `pnpm typecheck` OK, `pnpm lint` OK, `pnpm test:unit` OK, local CI secret env ile build OK.
 
+## P3 Bulguları
+
+- Optik submission submit akışı answer key + öğrenci cevaplarından yanlış/boşları `optik_submission` source type ile mistake batch'e yazar.
+- Duplicate engelleme `studentId + sourceKind + sourceRefId + sourceLabel + subject + topic + errorType` eşleşmesiyle servis/repository katmanında yapılır; `sourceRefId = optik:{examId}`.
+- Konu bilgisi optik akışında yok; `subject = examType`, `topic = null`, `source = examTitle`, `sourceLabel = Soru N`.
+- AssignmentResult akışında soru/konu/soru bazlı cevap yok; bu fazda assignment'tan otomatik mistake üretilmedi, veri uydurulmadı.
+- Memory/mock parity eklendi; production memory guard gevşetilmedi.
+
 ## Sonraki Adım
 
-P3: Ödev/deneme sonucu -> Yanlış Defteri batch beslemesi. Coach/parent insights P4'e bırakıldı.
+P4: Yanlış Defteri UI parity / review flow.
