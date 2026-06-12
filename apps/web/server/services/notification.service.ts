@@ -71,6 +71,12 @@ export async function markParentNotificationRead(
 }
 
 export async function listCoachNotifications(coachId: string): Promise<NotificationListResult> {
+  if (shouldUseDatabase()) {
+    const { notificationRepository } = await import("@uyanik/database");
+    const notifications = await notificationRepository.listNotificationsForCoach(coachId);
+    return { notifications, unreadCount: countUnread(notifications) };
+  }
+
   const notifications = memoryNotifications.listForCoach(coachId);
   return { notifications, unreadCount: countUnread(notifications) };
 }
@@ -79,6 +85,11 @@ export async function markCoachNotificationRead(
   coachId: string,
   notificationId: string,
 ): Promise<NotificationRecord | null> {
+  if (shouldUseDatabase()) {
+    const { notificationRepository } = await import("@uyanik/database");
+    return notificationRepository.markNotificationRead(notificationId, { coachId });
+  }
+
   return memoryNotifications.markRead(notificationId, { coachId });
 }
 
@@ -99,5 +110,10 @@ export async function markAllParentNotificationsRead(parentId: string): Promise<
 }
 
 export async function markAllCoachNotificationsRead(coachId: string): Promise<number> {
+  if (shouldUseDatabase()) {
+    const { notificationRepository } = await import("@uyanik/database");
+    return notificationRepository.markAllNotificationsRead({ coachId });
+  }
+
   return memoryNotifications.markAllRead({ coachId });
 }

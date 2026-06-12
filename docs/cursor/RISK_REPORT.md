@@ -4,6 +4,12 @@
 **Son faz:** Web v6 Final P1 token/style parity  
 **Durum:** P1 clear
 
+## P10 Status
+
+Status: clear
+
+Coach notifications DB scope tamamlandi; `Notification.coachId` nullable scope ile eklendi, coach list/read/mark-all DB modunda `coachId` filtresiyle calisir. `pnpm db:generate`, `pnpm typecheck`, `pnpm lint`, `pnpm test:unit` ve gecici local CI secret env ile web build gecti. Aktif P10 riski yok.
+
 ## P1 Status
 
 Status: clear

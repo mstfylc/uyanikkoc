@@ -246,6 +246,7 @@ model CoachProfile {
   topicTargets CoachTopicTarget[]
   appointmentSettings AppointmentSettings?
   appointments Appointment[]
+  notifications Notification[]
 
   @@map("coach_profiles")
 }
@@ -535,6 +536,7 @@ model Notification {
   id        String          @id @default(cuid())
   studentId String?
   parentId  String?
+  coachId   String?
   title     String
   body      String
   read      Boolean         @default(false)
@@ -542,9 +544,11 @@ model Notification {
   createdAt DateTime        @default(now())
   student   StudentProfile? @relation(fields: [studentId], references: [id], onDelete: Cascade)
   parent    ParentProfile?  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  coach     CoachProfile?   @relation(fields: [coachId], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([parentId])
+  @@index([coachId])
   @@map("notifications")
 }
 

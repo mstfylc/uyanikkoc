@@ -34,6 +34,7 @@
 | 2026-06-12 | WEB V6 FINAL P7 SmartOdev | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | coach smart assignment preview and assign |
 | 2026-06-12 | WEB V6 FINAL P8 Takvimim agenda | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | student agenda aggregation and dashboard card |
 | 2026-06-12 | WEB V6 FINAL P9 messaging read state | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | ThreadMember read/mute persistence and UI state |
+| 2026-06-12 | WEB V6 FINAL P10 coach notifications DB scope | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | Notification coachId scope, DB-backed coach list/read/mark-all |
 
 ## Kural
 

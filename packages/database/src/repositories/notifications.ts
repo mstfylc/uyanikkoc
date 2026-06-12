@@ -5,6 +5,7 @@ function mapNotification(notification: {
   id: string;
   studentId: string | null;
   parentId: string | null;
+  coachId: string | null;
   title: string;
   body: string;
   read: boolean;
@@ -14,6 +15,7 @@ function mapNotification(notification: {
     id: notification.id,
     studentId: notification.studentId,
     parentId: notification.parentId,
+    coachId: notification.coachId,
     title: notification.title,
     body: notification.body,
     read: notification.read,
@@ -74,15 +76,25 @@ export async function listNotificationsForParent(parentId: string): Promise<Noti
   return notifications.map(mapNotification);
 }
 
+export async function listNotificationsForCoach(coachId: string): Promise<NotificationRecord[]> {
+  const notifications = await prisma.notification.findMany({
+    where: { coachId },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return notifications.map(mapNotification);
+}
+
 export async function markNotificationRead(
   notificationId: string,
-  filter: { studentId?: string; parentId?: string },
+  filter: { studentId?: string; parentId?: string; coachId?: string },
 ): Promise<NotificationRecord | null> {
   const existing = await prisma.notification.findFirst({
     where: {
       id: notificationId,
       studentId: filter.studentId,
       parentId: filter.parentId,
+      coachId: filter.coachId,
     },
   });
 
@@ -98,8 +110,12 @@ export async function markNotificationRead(
   return mapNotification(notification);
 }
 
-export async function markAllNotificationsRead(filter: { studentId?: string; parentId?: string }): Promise<number> {
-  if (!filter.studentId && !filter.parentId) {
+export async function markAllNotificationsRead(filter: {
+  studentId?: string;
+  parentId?: string;
+  coachId?: string;
+}): Promise<number> {
+  if (!filter.studentId && !filter.parentId && !filter.coachId) {
     return 0;
   }
 
@@ -107,6 +123,7 @@ export async function markAllNotificationsRead(filter: { studentId?: string; par
     where: {
       studentId: filter.studentId,
       parentId: filter.parentId,
+      coachId: filter.coachId,
       read: false,
     },
     data: { read: true },

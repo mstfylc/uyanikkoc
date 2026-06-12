@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yurutulen faz:** Web v6 Final P9 Messaging unread/read/mute persistence  
+**Son yurutulen faz:** Web v6 Final P10 Coach notifications DB scope  
 **Tarih:** 2026-06-12  
-**Kapsam:** ThreadMember lastReadAt/muted persistence, unread hesaplama ve mevcut messages UI state aksiyonlari.
+**Kapsam:** Coach notification list/read/mark-all akislarinin DB modunda coach scope ile calismasi.
 
 ## P0 Çıktıları
 
@@ -77,6 +77,15 @@
 - Insight servisinde acik, tekrar sirasi, kapanan ve konu/frekans gruplari tek helper ile uretilir.
 - Koc ogrenci detayina ve veli dashboard'a shared `MistakeInsightsCard` mount edildi; write aksiyonu eklenmedi.
 - Konu bilgisi olmayan optik kayitlar subject seviyesinde gruplanir; topic uydurulmaz.
+
+## P10 Bulgulari
+
+- `Notification` modeline nullable `coachId` relation/index eklendi; ogrenci/veli scope korunur.
+- Coach notification list/read/mark-all DB modunda `notificationRepository` uzerinden `coachId` filtresiyle calisir.
+- Memory/mock parity dev mod icin korunur; production memory fallback gevsetilmedi.
+- Yeni route, UI, dependency veya auth degisikligi eklenmedi.
+- Test: `pnpm db:generate` OK, `pnpm typecheck` OK, `pnpm lint` OK, `pnpm test:unit` OK, local CI secret env ile build OK.
+- Sonraki adim: P11 - visual acceptance cleanup / final audit.
 
 ## P6 Bulgulari
 

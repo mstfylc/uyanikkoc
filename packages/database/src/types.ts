@@ -59,6 +59,7 @@ export type NotificationRecord = {
   id: string;
   studentId: string | null;
   parentId: string | null;
+  coachId: string | null;
   title: string;
   body: string;
   read: boolean;
