@@ -5,7 +5,6 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { CoachOdevAtaModal } from "@/components/coach/CoachOdevAtaModal";
-import { KonuCizelge } from "@/components/coach/KonuCizelge";
 import { CoachSchoolScheduleModal } from "@/components/coach/CoachSchoolScheduleModal";
 import { UkAvatar } from "@/components/design/UkAvatar";
 import { UkBadge } from "@/components/design/UkBadge";
@@ -14,6 +13,7 @@ import { UkNumStepper } from "@/components/design/UkNumStepper";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { MistakeInsightsCard } from "@/components/shared/MistakeInsightsCard";
 import { NetGainMap } from "@/components/shared/NetGainMap";
 import { buildCoachStudentRows } from "@/lib/design/coach-student-rows";
 import {
@@ -65,7 +65,6 @@ export function CoachTopicsPanel() {
   const [noteKind, setNoteKind] = useState<CoachNoteKind>("general");
   const [activeSubject, setActiveSubject] = useState("");
   const [kaynakFilter, setKaynakFilter] = useState<string | "all">("all");
-  const [topicView, setTopicView] = useState<"liste" | "cizelge">("cizelge");
   const [chartMode, setChartMode] = useState<QuestionChartMode>("daily");
   const [chartOffset, setChartOffset] = useState(0);
   const [targets, setTargets] = useState<Record<string, number>>({});
@@ -195,6 +194,27 @@ export function CoachTopicsPanel() {
     if (kaynakFilter === "all") return activePerSubj.t;
     return activePerSubj.t.filter((topic) => topic.kaynaklar.includes(kaynakFilter));
   }, [activePerSubj, kaynakFilter]);
+  const activeTopicGroups = useMemo(() => {
+    if (!activePerSubj) return [];
+
+    const curriculumGroups = curriculum?.subjects[activePerSubj.s] ?? [];
+    if (curriculumGroups.length === 0) {
+      return [{ name: "Konu listesi", topics: filteredTopics }];
+    }
+
+    const remaining = new Set(filteredTopics.map((topic) => topic.n));
+    const groups = curriculumGroups
+      .map((group) => {
+        const topicNames = new Set(group.topics);
+        const topics = filteredTopics.filter((topic) => topicNames.has(topic.n));
+        topics.forEach((topic) => remaining.delete(topic.n));
+        return { name: group.name, topics };
+      })
+      .filter((group) => group.topics.length > 0);
+
+    const ungrouped = filteredTopics.filter((topic) => remaining.has(topic.n));
+    return ungrouped.length > 0 ? [...groups, { name: "Diger konular", topics: ungrouped }] : groups;
+  }, [activePerSubj, curriculum, filteredTopics]);
   const studentRow = useMemo(
     () => buildCoachStudentRows(students, assignments, []).find((row) => row.studentId === studentId),
     [students, assignments, studentId],
@@ -335,6 +355,55 @@ export function CoachTopicsPanel() {
       ) : null}
 
       {studentId ? <NetGainMap mode="coach" studentId={studentId} /> : null}
+
+      {studentId ? (
+        <div className="grid g-2">
+          <MistakeInsightsCard mode="coach" studentId={studentId} />
+          <UkSection
+            title="Hata Frekansi"
+            sub="Deneme ve yanlis defteri verisine gore tekrar onceligi"
+            action={<UkBadge tone={weak.length > 0 ? "warning" : "success"}>{weak.length} odak konu</UkBadge>}
+          >
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {weak.length === 0 ? (
+                <div className="muted" style={{ padding: "10px 0", textAlign: "center", fontSize: 13 }}>
+                  Tekrar bekleyen hata frekansi yok.
+                </div>
+              ) : (
+                weak.slice(0, 4).map((topic) => {
+                  const color = subjectColor(topic.subj);
+                  return (
+                    <button
+                      type="button"
+                      className="lrow"
+                      key={`${topic.subj}-${topic.n}-freq`}
+                      onClick={() => setOdevModal({ open: true, subject: topic.subj, topic: topic.n })}
+                    >
+                      <span
+                        className="lr-icon"
+                        style={{ background: `color-mix(in srgb, ${color} 13%, transparent)`, color }}
+                      >
+                        <KiIcon name="ki-chart-simple" size={17} />
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
+                        <div className="lr-title">{topic.n}</div>
+                        <div className="lr-meta">
+                          <span className="d">{topic.subj}</span>
+                          <span className="d" style={{ color: "var(--danger)", fontWeight: 800 }}>
+                            {topic.yanlis} yanlis
+                          </span>
+                          <span className="d">%{topic.oran} dogru</span>
+                        </div>
+                      </div>
+                      <UkBadge tone="primary">Odev ata</UkBadge>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </UkSection>
+        </div>
+      ) : null}
 
       {summary ? (
         <div className="grid g-4">
@@ -657,42 +726,27 @@ export function CoachTopicsPanel() {
 
       <div className="between" style={{ alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
         <div>
-          <h2 style={{ fontSize: 18, fontWeight: 800 }}>Konu Tablosu</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 800 }}>Konu Takibi</h2>
           <p className="muted" style={{ fontSize: 13, marginTop: 3 }}>
-            Ders bazinda konu ilerlemesi ve soru takibi
+            Ders rayindan sec, konu kartlarindan kaynak ve odev aksiyonunu yonet
           </p>
         </div>
-        <div className="seg" style={{ width: "fit-content" }}>
-          <button type="button" className={topicView === "liste" ? "on" : ""} onClick={() => setTopicView("liste")}>
-            <KiIcon name="ki-notepad-edit" size={15} />
-            Liste
-          </button>
-          <button type="button" className={topicView === "cizelge" ? "on" : ""} onClick={() => setTopicView("cizelge")}>
-            <KiIcon name="ki-book-open" size={15} />
-            Cizelge
-          </button>
-        </div>
+        {activePerSubj ? (
+          <UkBadge tone="primary">
+            {activePerSubj.done}/{activePerSubj.total} konu
+          </UkBadge>
+        ) : null}
       </div>
 
-      {topicView === "cizelge" ? (
-        <KonuCizelge
-          studentId={studentId}
-          subjects={subjects}
-          maxHeight="58vh"
-          showTip={false}
-          subj={activeSubject}
-          onSubj={setActiveSubject}
-        />
-      ) : (
-        <div className="grid col-rail">
-          <div className="card" style={{ overflow: "hidden" }}>
-          <div className="card-head">
-            <h3>Dersler</h3>
+      <div className="ktx">
+        <aside className="ktx-rail">
+          <div className="ktx-rail-head">
+            <b>Dersler</b>
           </div>
-          <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 4 }}>
+          <div className="ktx-rail-list">
             {isLoading ? (
               <p className="muted" style={{ fontSize: 13, padding: 8 }}>
-                Yükleniyor...
+                Yukleniyor...
               </p>
             ) : (
               perSubj.map((subject) => {
@@ -703,50 +757,50 @@ export function CoachTopicsPanel() {
                   <button
                     key={subject.s}
                     type="button"
-                    className="user-card"
-                    style={{ background: on ? "var(--surface-3)" : "none", borderRadius: 11 }}
+                    className={`ktx-subj${on ? " on" : ""}`}
                     onClick={() => setActiveSubject(subject.s)}
                   >
-                    <span
-                      className="swatch"
-                      style={{ width: 10, height: 10, borderRadius: 4, background: color, flexShrink: 0 }}
-                    />
-                    <div className="user-meta" style={{ flex: 1 }}>
-                      <b style={{ fontSize: 13, color: on ? color : "var(--text)" }}>{subject.s}</b>
-                      <span style={{ fontSize: 11 }}>
-                        {subject.done}/{subject.total} konu · {subject.soru} soru
-                      </span>
-                    </div>
-                    <span className="tnum" style={{ fontSize: 12.5, fontWeight: 800, color }}>
-                      {pct}%
+                    <span className="top" style={{ color: on ? color : undefined }}>
+                      <span className="sw" style={{ background: color }} />
+                      <span className="nm">{subject.s}</span>
+                      <span className="pct tnum">{pct}%</span>
+                    </span>
+                    <span className="meta">
+                      {subject.done}/{subject.total} konu - {subject.soru} soru
+                    </span>
+                    <span className="bar">
+                      <span style={{ width: `${pct}%`, background: color }} />
                     </span>
                   </button>
                 );
               })
             )}
           </div>
-        </div>
+        </aside>
 
         {activePerSubj ? (
-          <UkSection
-            title={activePerSubj.s}
-            sub={`${activePerSubj.done}/${activePerSubj.total} konu tamamlandi · ${activePerSubj.soru} soru cozuldu`}
-            action={
-              <div className="row" style={{ gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <section className="ktx-panel">
+            <div className="ktx-phead">
+              <span className="sw" style={{ background: subjectColor(activePerSubj.s) }} />
+              <div>
+                <div className="ttl">{activePerSubj.s}</div>
+                <div className="sub">
+                  {activePerSubj.done}/{activePerSubj.total} konu tamamlandi - {activePerSubj.soru} soru cozuldu
+                </div>
+              </div>
+              <div className="ktx-filters">
                 <button
                   type="button"
-                  className={`type-chip${kaynakFilter === "all" ? " on" : ""}`}
-                  style={{ height: 24, fontSize: 11 }}
+                  className={`ktx-fchip${kaynakFilter === "all" ? " on" : ""}`}
                   onClick={() => setKaynakFilter("all")}
                 >
-                  Tümü
+                  Tumu
                 </button>
                 {activeKaynakList.map((source) => (
                   <button
                     key={source}
                     type="button"
-                    className={`type-chip${kaynakFilter === source ? " on" : ""}`}
-                    style={{ height: 24, fontSize: 11 }}
+                    className={`ktx-fchip${kaynakFilter === source ? " on" : ""}`}
                     onClick={() => setKaynakFilter(source)}
                   >
                     <KiIcon name="ki-book-open" size={12} />
@@ -754,85 +808,87 @@ export function CoachTopicsPanel() {
                   </button>
                 ))}
               </div>
-            }
-          >
-            <div className="card-body" style={{ padding: 0, overflowX: "auto" }}>
-              <table className="tbl" style={{ minWidth: 560 }}>
-                <thead>
-                  <tr>
-                    <th>Konu</th>
-                    <th>Kaynaklar</th>
-                    <th style={{ textAlign: "center" }}>Soru</th>
-                    <th style={{ textAlign: "center" }}>Dogru</th>
-                    <th style={{ textAlign: "right" }}>Durum</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTopics.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="muted" style={{ padding: 16, textAlign: "center" }}>
-                        Secilen kaynakta konu yok.
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredTopics.map((topic) => {
-                    const cfg = TOPIC_STATUS[topic.s];
-                    return (
-                      <tr key={`${topic.n}-${topic.kaynaklar.join("-")}`}>
-                        <td>
-                          <div className="row" style={{ gap: 10 }}>
-                            <TopicStatusIcon state={topic.s} />
-                            <b style={{ fontSize: 13, fontWeight: 700 }}>{topic.n}</b>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
-                            {topic.kaynaklar.map((source, sourceIndex) => {
-                              const done = topic.kaynakDone[sourceIndex];
-                              return (
-                                <span
-                                  key={source}
-                                  className="src-pill"
-                                  style={{
-                                    borderColor: done ? "var(--success)" : "var(--border)",
-                                    color: done ? "var(--success)" : "var(--text-2)",
-                                    background: done ? "var(--success-soft)" : "var(--surface-2)",
-                                  }}
-                                >
-                                  <KiIcon name={done ? "ki-check" : "ki-book-open"} size={11} />
-                                  {source}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          <span className="tnum" style={{ fontWeight: 700 }}>
-                            {topic.soru || "—"}
-                          </span>
-                        </td>
-                        <td style={{ textAlign: "center" }}>
-                          <span
-                            className="tnum"
-                            style={{ fontWeight: 700, color: topic.dogru ? "var(--success)" : "var(--faint)" }}
-                          >
-                            {topic.dogru || "—"}
-                          </span>
-                        </td>
-                        <td style={{ textAlign: "right" }}>
-                          <UkBadge tone={cfg.tone}>{cfg.label}</UkBadge>
-                        </td>
-                      </tr>
-                    );
-                  })
-                  )}
-                </tbody>
-              </table>
             </div>
-          </UkSection>
+            <div className="ktx-body">
+              {filteredTopics.length === 0 ? (
+                <div className="muted" style={{ padding: 18, textAlign: "center", fontSize: 13 }}>
+                  Secilen kaynakta konu yok.
+                </div>
+              ) : (
+                activeTopicGroups.map((group) => {
+                  const groupDoneCount = group.topics.filter((topic) => topic.s === "done").length;
+                  const groupPct = group.topics.length > 0 ? Math.round((groupDoneCount / group.topics.length) * 100) : 0;
+                  const color = subjectColor(activePerSubj.s);
+                  return (
+                    <div className="ktx-grp" key={group.name}>
+                      <div className="ktx-grp-head">
+                        <span className="gn">{group.name}</span>
+                        <span className="gc">{groupDoneCount}/{group.topics.length} konu</span>
+                        <span className="gbar">
+                          <span style={{ width: `${groupPct}%`, background: color }} />
+                        </span>
+                        <span className="gp tnum">{groupPct}%</span>
+                      </div>
+                      {group.topics.map((topic) => {
+                        const cfg = TOPIC_STATUS[topic.s];
+                        const accuracy = topic.soru > 0 ? Math.round((topic.dogru / topic.soru) * 100) : 0;
+                        return (
+                          <div className={`ktx-topic ${topic.s}`} key={`${group.name}-${topic.n}-${topic.kaynaklar.join("-")}`}>
+                            <span className={`ktx-st ${topic.s}`} title={cfg.label}>
+                              <TopicStatusIcon state={topic.s} />
+                            </span>
+                            <div className="ktx-tmain">
+                              <div className="ktx-tname">{topic.n}</div>
+                              <div className="ktx-srcs">
+                                {topic.kaynaklar.map((source, sourceIndex) => {
+                                  const done = topic.kaynakDone[sourceIndex];
+                                  return (
+                                    <span key={source} className={`ktx-src${done ? " done" : ""}`}>
+                                      <KiIcon name={done ? "ki-check" : "ki-book-open"} size={11} />
+                                      {source}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                            <div className="ktx-tstat">
+                              {topic.soru > 0 ? (
+                                <>
+                                  <div className="l1">
+                                    <span className="soru tnum">
+                                      {topic.soru}<s> soru</s>
+                                    </span>
+                                    <span className="acc" style={{ color: accuracy >= 75 ? "var(--success)" : "var(--warning)" }}>
+                                      %{accuracy}
+                                    </span>
+                                  </div>
+                                  <div className="accbar">
+                                    <span style={{ width: `${accuracy}%`, background: accuracy >= 75 ? "var(--success)" : "var(--warning)" }} />
+                                  </div>
+                                </>
+                              ) : (
+                                <span className="empty">Henuz soru yok</span>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              className="ktx-ata"
+                              title="Odev ata"
+                              onClick={() => setOdevModal({ open: true, subject: activePerSubj.s, topic: topic.n })}
+                            >
+                              <KiIcon name="ki-plus" size={16} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </section>
         ) : null}
-        </div>
-      )}
+      </div>
 
       <UkSection title="Öğrenci notları" sub={`${notes.length} not`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>

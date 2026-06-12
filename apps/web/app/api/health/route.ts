@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+import { getAuthEnvDiagnostics } from "@/lib/auth/runtime-env";
+
 export async function GET() {
-  return NextResponse.json({ status: "ok" });
+  const diagnostics = getAuthEnvDiagnostics();
+  return NextResponse.json({ status: "ok", authSecret: diagnostics.authSecret });
 }
