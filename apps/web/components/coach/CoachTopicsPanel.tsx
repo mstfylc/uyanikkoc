@@ -14,6 +14,7 @@ import { UkNumStepper } from "@/components/design/UkNumStepper";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { NetGainMap } from "@/components/shared/NetGainMap";
 import { buildCoachStudentRows } from "@/lib/design/coach-student-rows";
 import {
   buildNetData,
@@ -332,6 +333,8 @@ export function CoachTopicsPanel() {
           </div>
         </div>
       ) : null}
+
+      {studentId ? <NetGainMap mode="coach" studentId={studentId} /> : null}
 
       {summary ? (
         <div className="grid g-4">

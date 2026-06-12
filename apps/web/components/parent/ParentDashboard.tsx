@@ -7,6 +7,7 @@ import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
 import { MistakeInsightsCard } from "@/components/shared/MistakeInsightsCard";
+import { NetGainMap } from "@/components/shared/NetGainMap";
 import {
   ASSIGNMENT_STATUS_LABELS,
   ASSIGNMENT_TYPE_LABELS,
@@ -208,6 +209,8 @@ export function ParentDashboard() {
         </UkSection>
 
         <div className="stack">
+          <NetGainMap mode="parent" />
+
           <MistakeInsightsCard mode="parent" />
 
           <UkSection title="Koçtan Notlar" sub="Onaylı rapor özeti">

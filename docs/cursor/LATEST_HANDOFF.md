@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yurutulen faz:** Web v6 Final P5 Koc/veli Yanlis Defteri insight read mount  
+**Son yurutulen faz:** Web v6 Final P6 NetGainMap ortak servis ve rol bazli mount  
 **Tarih:** 2026-06-12  
-**Kapsam:** Koc roster guard ve veli child-scope ile Yanlis Defteri insight okuma; write yok.
+**Kapsam:** Deneme sonuclarindan turetilen NetGainMap; student/coach/parent read endpointleri ve mevcut ekran mountlari.
 
 ## P0 Çıktıları
 
@@ -78,6 +78,14 @@
 - Koc ogrenci detayina ve veli dashboard'a shared `MistakeInsightsCard` mount edildi; write aksiyonu eklenmedi.
 - Konu bilgisi olmayan optik kayitlar subject seviyesinde gruplanir; topic uydurulmaz.
 
+## P6 Bulgulari
+
+- `exam.service.ts` son iki deneme sonucundan subject bazli NetGainMap turetir; yeni tablo/migration yok.
+- `/api/student/net-gain`, `/api/coach/students/[id]/net-gain`, `/api/parent/net-gain` eklendi.
+- Koc endpoint roster guard, veli endpoint parent child-scope guard kullanir.
+- Shared `NetGainMap` `/student/exams`, `/coach/topics`, `/parent/dashboard` icine mount edildi.
+- CTA student icin programa, coach icin mevcut odev atama akisini acan sayfaya gider; parent read-only kalir.
+
 ## Sonraki Adım
 
-P6: NetGainMap ortak servis ve rol bazli mount.
+P7: SmartOdev preview/assign servis entegrasyonu.

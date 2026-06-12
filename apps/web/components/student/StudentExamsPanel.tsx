@@ -7,6 +7,7 @@ import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkSparkline } from "@/components/design/UkSparkline";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { NetGainMap } from "@/components/shared/NetGainMap";
 import { StudentExamAnalysis } from "@/components/student/StudentExamAnalysis";
 import { StudentManualExamModal } from "@/components/student/StudentManualExamModal";
 import { DenemeKayitModal } from "@/components/student/DenemeKayitModal";
@@ -146,6 +147,8 @@ export function StudentExamsPanel() {
           deltaDir={summary?.trend === "down" ? "down" : "up"}
         />
       </div>
+
+      <NetGainMap mode="student" />
 
       {tab === "analysis" ? (
         <StudentExamAnalysis exams={exams} selected={selected} onSelect={setSelectedId} />
