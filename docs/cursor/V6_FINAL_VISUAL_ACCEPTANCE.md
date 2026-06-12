@@ -173,3 +173,10 @@ Checklist:
 - Full page: <= %2.0.
 - Shadow/gradient/blur: <= %3.0.
 - Zero tolerance: tokenlar, tone mapping, subject colors, selected states, toast/empty Turkish copy, spaced repetition `1 -> 3 -> 7 -> 21`.
+
+## P11 Final Audit Delta
+
+- P1-P10 implementasyonuyla dogrulanan alanlar: v6 token gate, `/student/mistakes`, ZeroErrorReview, NetGainMap mounts, SmartOdev preview/assign, Takvimim agenda, messaging read/mute persistence, coach notification DB scope.
+- Bu faz browser pixel QA veya yeni PNG uretimi yapmadi; mobile PNG, modal PNG ve coach topics PNG eksigi cozuldu diye isaretlenmedi.
+- AssignmentResult soru bazli payload eksigi devam eder; optik/deneme akisi Yanlis Defteri batch beslemesini karsilar ve konu yoksa topic uydurmaz.
+- Mevcut role-based route yapisi korunur; v6 generic wrapper route'lari eklenmedi.

@@ -69,3 +69,9 @@ P0 kapsamı: mevcut `apps/web` route/component yapısı esas alınmıştır. Han
 ## P0 Sonucu
 
 Ana eksikler: `/student/mistakes` route yok; v6 NetGainMap, TakvimimCard, SmartOdevModal, HataFrekansi/ZeroError bileşenleri canlı component ağacında yok; mobil/modal PNG yok; coach topics PNG yok. Sonraki faza geçmeden bu riskler `RISK_REPORT.md` içinde işaretlendi.
+## P11 Final Audit Delta
+
+- P1-P10 ile `/student/mistakes`, NetGainMap, SmartOdev, Takvimim agenda, messaging read/mute persistence ve coach notification DB scope canli route yapisina uyarlandi.
+- Mevcut ekranlar silinmedi veya bastan yazilmadi; eklemeler mevcut dashboard/detail/panel akislari icinde yapildi.
+- Mobile PNG, modal PNG ve coach topics desktop PNG eksikleri cozulmedi; visual acceptance dokumaninda manual/browser QA notu olarak kalir.
+- Assignment result tarafinda soru bazli payload eksigi devam eder; optik/deneme akisi Yanlis Defteri'ni besler.

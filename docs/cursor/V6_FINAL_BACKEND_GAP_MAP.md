@@ -67,3 +67,9 @@ P0 backend envanteri canlı pattern'e göre çıkarıldı: `apps/web/app/api/**`
 - Handoff'taki Zustand/React Query önerisi canlı projede dependency izni değildir; mevcut fetch + service + repository pattern'i kullanılmalı.
 - Production'da demo-memory store yasak; memory fallback yalnız `DEMO_AUTH_ALLOW_IN_MEMORY=true` dev koşulunda kalmalı.
 - Storage yoksa Yanlış Defteri foto upload UI disabled/opsiyonel ve riskli kabul edilmeli; DB'ye dataURL yazılmamalı.
+## P11 Final Audit Delta
+
+- Cozuldu: Mistake/MistakeReview backend, student mistakes API/route, coach/parent read-only mistake insights, optik submission -> idempotent mistake batch, NetGainMap, SmartOdev preview/assign, student agenda, ThreadMember read/mute persistence ve coach notification DB scope.
+- Kismen kalan: AssignmentResult payload'inda soru/konu bazli veri olmadigi icin assignment sonucu -> mistake batch otomatik uretimi yapilmaz; veri uydurulmaz.
+- Bilerek eklenmedi: v6 generic message/notification route wrapper'lari; mevcut role-based guarded route yapisi korundu.
+- Kalan operasyonel not: Mistake photo object storage yok; dataURL/base64 DB'ye yazilmaz.

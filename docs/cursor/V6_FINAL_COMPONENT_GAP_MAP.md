@@ -28,3 +28,9 @@ Bu map final handoff içindeki 9 component spec'in tamamını canlı repo hedefl
 - Takvimim aggregation endpointi yok.
 - Messaging v6 unread/read/mute için `ThreadMember.lastReadAt`, `ThreadMember.muted` ve user-scoped notification genişletmesi gerekiyor.
 - CSS v6 token parity yok; P1 gate zorunlu.
+## P11 Final Audit Delta
+
+- Implemented/revized: Yanlis Defteri family, HataFrekansi, ZeroErrorLoop/Review, NetGainMap, SmartOdev, TakvimimCard, messaging read/mute state and role notification scope.
+- Existing route/component boundaries preserved; shared cards were mounted into student/coach/parent flows instead of replacing screens.
+- Remaining visual evidence gap: mobile PNG, modal PNG and coach topics PNG are still absent from handoff assets; browser/manual QA required before pixel-signoff.
+- P1-P10 closed the major backend/component gaps listed below; AssignmentResult question-level detail remains unavailable and is documented as data-contract gap.

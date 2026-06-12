@@ -10,6 +10,12 @@ Status: clear
 
 Coach notifications DB scope tamamlandi; `Notification.coachId` nullable scope ile eklendi, coach list/read/mark-all DB modunda `coachId` filtresiyle calisir. `pnpm db:generate`, `pnpm typecheck`, `pnpm lint`, `pnpm test:unit` ve gecici local CI secret env ile web build gecti. Aktif P10 riski yok.
 
+## P11 Status
+
+Status: clear
+
+Final audit cleanup docs-only tamamlandi. Aktif kod riski yok; kalan mobile/modal/coach topics PNG eksigi browser/manual visual QA notu olarak tutuldu, cozuldu diye isaretlenmedi.
+
 ## P1 Status
 
 Status: clear
