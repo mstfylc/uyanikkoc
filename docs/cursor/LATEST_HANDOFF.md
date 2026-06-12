@@ -1,8 +1,19 @@
 # Latest Handoff
 
+## Final Live V6 Status - 2026-06-12
+
+- Status: deployed and smoke-tested on `https://koc.uyanik.com.tr`.
+- Latest code commit deployed: `da59907` (`feat(coach): align topics screen with v6 handoff`).
+- `/api/health` returned `{"status":"ok","authSecret":"ok"}`.
+- Student smoke passed: login, Takvimim, Yanlis Defteri add/list/review, student exams NetGainMap, online optik submit/review -> Yanlis Defteri ingestion.
+- Coach smoke passed: `/coach/topics` `.ktx` rail/topic-card visual QA, single `Odev Ata` modal, SmartOdev preview + assign.
+- Parent smoke passed: dashboard mistake/net insight APIs and surface.
+- Messages read/mute and notifications read surface passed on live demo data.
+- Remaining risk: reset email delivery is not active because production `RESEND_API_KEY` is empty.
+
 ## Production Redeploy + Smoke Status - 2026-06-12
 
-- Status: redeployed; smoke blocked.
+- Status: superseded by final live V6 status above.
 - Production redeploy completed from `main` commit `68ad23b` and Vercel aliased `https://koc.uyanik.com.tr`.
 - DB migration was not rerun.
 - `/api/health` returned `{"status":"ok"}`; current route does not include `authSecret`, so that field cannot be directly verified from health.

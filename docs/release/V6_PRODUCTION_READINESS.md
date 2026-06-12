@@ -1,8 +1,20 @@
 # Uyanik Koc Web V6 - Production Readiness Check
 
+## Final Production Smoke Status - 2026-06-12
+
+Status: REDEPLOYED, SMOKE PASSED WITH MAIL RISK.
+
+- Current deployed code: `da59907` (`feat(coach): align topics screen with v6 handoff`), deployed to Vercel production and aliased to `https://koc.uyanik.com.tr`.
+- DB migration was not rerun; Neon main remains at latest migration `20260612200000_notification_coach_scope`.
+- `/api/health` returned `{"status":"ok","authSecret":"ok"}` on the live domain.
+- Production demo role smoke passed for student, coach, and parent with approved demo accounts.
+- `/coach/topics` now uses the Claude v5/v6 `.ktx` rail + topic-card view as the primary view; generic `KonuCizelge` table is not rendered inside `.ktx`.
+- Live desktop/mobile browser QA screenshots were captured at `%TEMP%/v6-live-coach-topics-desktop.png` and `%TEMP%/v6-live-coach-topics-mobile.png`.
+- Remaining risk: production password-reset email is not deliverable until `RESEND_API_KEY` has a real non-empty value.
+
 ## Production Redeploy + Smoke Status - 2026-06-12
 
-Status: REDEPLOYED, SMOKE BLOCKED.
+Status: SUPERSEDED BY FINAL PRODUCTION SMOKE STATUS ABOVE.
 
 - Production redeploy completed from `main` commit `68ad23b`; Vercel build completed and aliased `https://koc.uyanik.com.tr`.
 - DB migration was not rerun.

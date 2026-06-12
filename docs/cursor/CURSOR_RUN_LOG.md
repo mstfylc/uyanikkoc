@@ -41,6 +41,7 @@
 | 2026-06-12 | WEB V6 FINAL P11 visual acceptance cleanup | this commit | typecheck OK | P1-P10 gap maps and visual acceptance final audit cleanup |
 | 2026-06-12 | WEB V6 FINAL release readiness | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | Production migration/env/deploy/smoke checklist |
 | 2026-06-12 | WEB V6 FINAL production DB preflight | - | DB read-only OK; blocked before backup/migration | Neon DB reached; latest migration 20260611193000_login_attempts; pg_dump missing and URL is pooler |
+| 2026-06-12 | WEB V6 FINAL live completion | da59907 | db:generate OK; typecheck OK; lint OK; unit OK; build OK; Vercel deploy OK; live smoke OK | `/coach/topics` ktx parity; health authSecret OK; student/coach/parent smoke passed; mail risk remains |
 
 ## Kural
 
