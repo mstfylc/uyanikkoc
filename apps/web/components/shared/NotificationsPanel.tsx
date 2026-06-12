@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
@@ -8,12 +8,13 @@ import type { NotificationRecord } from "@uyanik/database";
 import { useCallback, useEffect, useState } from "react";
 
 type NotificationsPanelProps = {
-  role: "student" | "parent";
+  role: "student" | "coach" | "parent";
 };
 
 const ROLE_SUB: Record<NotificationsPanelProps["role"], string> = {
-  student: "Ödev hatırlatmaları ve güncellemeler",
-  parent: "Ödev hatırlatmaları ve çocuk güncellemeleri",
+  student: "Odev hatirlatmalari ve guncellemeler",
+  coach: "Ogrenci aksiyonlari, sistem ve kocluk guncellemeleri",
+  parent: "Odev hatirlatmalari ve cocuk guncellemeleri",
 };
 
 export function NotificationsPanel({ role }: NotificationsPanelProps) {
@@ -46,11 +47,35 @@ export function NotificationsPanel({ role }: NotificationsPanelProps) {
     }
   }
 
+  async function markAllRead() {
+    const response = await fetch(`/api/${role}/notifications`, {
+      method: "PATCH",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ markAll: true }),
+    });
+
+    if (response.ok) {
+      await load();
+    }
+  }
+
   const unreadCount = notifications.filter((item) => !item.read).length;
 
   return (
     <div className="stack rise" data-testid={`${role}-notifications`}>
-      <UkPageHead title="Bildirimler" sub={ROLE_SUB[role]} />
+      <UkPageHead
+        title="Bildirimler"
+        sub={ROLE_SUB[role]}
+        actions={
+          unreadCount > 0 ? (
+            <button type="button" className="btn btn-light btn-sm" onClick={() => void markAllRead()}>
+              <KiIcon name="ki-check" size={14} />
+              Tumunu okundu yap
+            </button>
+          ) : null
+        }
+      />
 
       {unreadCount > 0 ? (
         <div className="row" style={{ gap: 8 }}>
@@ -60,11 +85,11 @@ export function NotificationsPanel({ role }: NotificationsPanelProps) {
         </div>
       ) : null}
 
-      <UkSection title="Tüm bildirimler" sub={`${notifications.length} kayıt`}>
+      <UkSection title="TÃ¼m bildirimler" sub={`${notifications.length} kayÄ±t`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yükleniyor...
+              YÃ¼kleniyor...
             </p>
           ) : notifications.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
