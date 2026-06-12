@@ -5,6 +5,8 @@
 - Status: deployed and smoke-tested on `https://koc.uyanik.com.tr`.
 - Latest code commit deployed: `5b734f6` (`fix(design): add coach notifications parity route`).
 - Final all-areas Claude Design parity audit passed: 37 live Playwright visual checks, 0 failures.
+- No-new-design addendum applied: every route/component is mapped to source file/spec, target component, required blocks/states, mismatch, fix, and QA in `V6_FINAL_ALL_AREAS_PARITY_MATRIX.md`.
+- Codex yeni tasarim uretmedi; tum UI degisiklikleri Claude Design handoff/spec/source prototype ile eslendi. Kaynakta olmayan hicbir component, renk, spacing, flow veya veri uydurulmadi.
 - Coach notifications parity gap closed: `/coach/notifications` route now renders guarded shared notifications UI with read/mark-all support.
 - `/api/health` returned `{"status":"ok","authSecret":"ok"}`.
 - Student smoke passed: login, Takvimim, Yanlis Defteri add/list/review, student exams NetGainMap, online optik submit/review -> Yanlis Defteri ingestion.

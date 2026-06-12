@@ -5,6 +5,8 @@
 Status: REDEPLOYED, SMOKE PASSED WITH MAIL RISK.
 
 - Final all-areas Claude Design parity audit completed after `5b734f6`; 37 live Playwright visual checks passed with 0 failures.
+- No-new-design contract addendum applied: route/component mapping now records source/spec, target, required layout blocks, required states, mismatch, applied fix, and QA result.
+- Codex yeni tasarim uretmedi; tum UI degisiklikleri Claude Design handoff/spec/source prototype ile eslendi. Kaynakta olmayan hicbir component, renk, spacing, flow veya veri uydurulmadi.
 - Coach notifications route was added and redeployed; `/coach/notifications` now renders the shared guarded notifications panel with read and mark-all support.
 - Current deployed code: `5b734f6` (`fix(design): add coach notifications parity route`), deployed to Vercel production and aliased to `https://koc.uyanik.com.tr`.
 - DB migration was not rerun; Neon main remains at latest migration `20260612200000_notification_coach_scope`.

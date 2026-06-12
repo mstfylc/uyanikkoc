@@ -43,6 +43,7 @@
 | 2026-06-12 | WEB V6 FINAL production DB preflight | - | DB read-only OK; blocked before backup/migration | Neon DB reached; latest migration 20260611193000_login_attempts; pg_dump missing and URL is pooler |
 | 2026-06-12 | WEB V6 FINAL live completion | da59907 | db:generate OK; typecheck OK; lint OK; unit OK; build OK; Vercel deploy OK; live smoke OK | `/coach/topics` ktx parity; health authSecret OK; student/coach/parent smoke passed; mail risk remains |
 | 2026-06-12 | WEB V6 FINAL all-areas design parity audit | 5b734f6 | db:generate OK; typecheck OK; lint OK; unit OK; build OK; Vercel deploy OK; visual QA 37/37 OK | Coach notifications route/panel parity fixed; `/coach/topics` order + `.ktx` desktop/mobile QA OK |
+| 2026-06-12 | WEB V6 FINAL no-new-design addendum audit | this commit | docs-only; reused visual QA 37/37 OK | Matrix expanded with source/target/layout/states/mismatch/fix/QA per route; no new design decisions added |
 
 ## Kural
 
