@@ -2,7 +2,14 @@
 
 ## Production DB Migration Status - 2026-06-12
 
-Status: DB MIGRATED, REDEPLOY PENDING.
+Status: REDEPLOY + SMOKE TEST PENDING.
+
+- Code ready: yes
+- DB migrated: yes
+- Build/test passed: yes
+- Redeploy: pending
+- Smoke test: pending
+- Blocking item: production SSH/CI/restart target required
 
 - Env was loaded from the local external env file without writing secret values to repo docs or logs.
 - Neon restore path exists via backup branch `pre-v6-migration-backup`; migration used the main direct/unpooled Neon URL (`pooler=false`, host masked).
@@ -142,29 +149,29 @@ Final command results must be recorded in `docs/cursor/CURSOR_RUN_LOG.md` for th
 
 ## Production DB Migration Status
 
-Status: BLOCKED before backup/migration.
+Status: DB MIGRATED, REDEPLOY PENDING.
 
-Preflight on 2026-06-12 initially found the current Codex shell did not expose production readiness env values. After loading the user-provided local env file, the guarded read-only DB preflight was rerun without logging secrets.
+Preflight on 2026-06-12 initially found the current Codex shell did not expose production readiness env values. After loading the user-provided local env file, DB preflight and migration were completed without logging secrets.
 
 - `DATABASE_URL`: present, masked Neon host confirmed
 - `AUTH_SECRET` or `NEXTAUTH_SECRET`: present
 - `DEMO_AUTH_ALLOW_IN_MEMORY=false`: confirmed
 - `AI_COACH_ENABLED=false`: confirmed
-- DB read-only migration table check: OK
-- Current DB applied migration count: 31
-- Current DB latest applied migration: `20260611193000_login_attempts`
-- Pending V6 migrations: `20260612120000_mistakes`, `20260612130000_mistake_topic_nullable`, `20260612190000_thread_member_read_mute`, `20260612200000_notification_coach_scope`
-- Backup tool: `pg_dump` not available in current shell
-- Connection note: current `DATABASE_URL` host is Neon but uses pooler; migration should prefer direct/unpooled URL
+- DB migration table check: OK
+- Final DB applied migration count: 35
+- Final DB latest applied migration: `20260612200000_notification_coach_scope`
+- Applied V6 migrations: `20260612120000_mistakes`, `20260612130000_mistake_topic_nullable`, `20260612190000_thread_member_read_mute`, `20260612200000_notification_coach_scope`
+- Backup/restore path: Neon branch `pre-v6-migration-backup`
+- Connection note: direct/unpooled Neon URL was used for migration
 
 Result:
 
-- Backup was not attempted.
-- `pnpm db:migrate` was not run.
-- Production build was not run because backup/migration precondition failed.
+- V6 DB migration completed.
+- `pnpm db:migrate` passed.
+- Production build and test gate passed.
 - Redeploy pending: SSH/CI target required.
 
 Required next input:
 
-- Install PostgreSQL client tools so `pg_dump` is available, or create a Neon restore point/backup and provide confirmation.
-- Use a direct/unpooled Neon migration URL for `DATABASE_URL` before running Prisma migrations.
+- Provide production SSH/CI/restart target for redeploy.
+- Run the smoke test checklist after redeploy.

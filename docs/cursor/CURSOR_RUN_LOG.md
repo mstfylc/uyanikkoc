@@ -27,6 +27,7 @@
 | 2026-06-12 | WEB V6 FINAL P0 mapping | - | not run (docs-only) | Handoff okundu; canlı route/component/backend gap map üretildi; implementation yapılmadı |
 | 2026-06-12 | WEB V6 FINAL P1 token/style parity | this commit | typecheck OK; lint OK; build OK with local CI secret env | v6 color/global token uyumu; route/backend/component eklenmedi |
 | 2026-06-12 | WEB V6 FINAL production DB migration | this commit | install OK; db:generate OK; db:migrate OK; typecheck OK; lint OK; unit OK; build OK | Neon backup branch `pre-v6-migration-backup`; V6 migrations applied; redeploy pending |
+| 2026-06-12 | WEB V6 FINAL redeploy readiness | this commit | docs-only | Code ready yes; DB migrated yes; build/test passed yes; redeploy pending; smoke pending; SSH/CI/restart target required |
 | 2026-06-12 | WEB V6 FINAL P2 Yanlış Defteri | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | student DB-backed mistakes route/API; P3 batch feeders bekliyor |
 | 2026-06-12 | WEB V6 FINAL P3 batch feeders | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | optik submission -> idempotent mistakes; assignment item detail eksik |
 | 2026-06-12 | WEB V6 FINAL P4 mistakes review UI | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | Odak Tekrar modalı, due expansion, photo lightbox, topic-null fallback |
