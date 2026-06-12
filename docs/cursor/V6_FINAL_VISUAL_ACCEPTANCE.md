@@ -4,7 +4,9 @@ Bu checklist `visual-qa/acceptance-checklist.md` maddelerinin canlı repo route 
 
 ## Final Live Browser QA - 2026-06-12
 
-- [x] Live domain `https://koc.uyanik.com.tr` redeployed from `da59907`.
+- [x] Final all-areas parity pass reran after coach notifications fix: 37 live Playwright visual checks passed, 0 failed.
+- [x] Coach `/coach/notifications` route exists, uses shared notifications panel, supports read and mark-all through guarded coach API.
+- [x] Live domain `https://koc.uyanik.com.tr` redeployed from `5b734f6`.
 - [x] `/api/health` returns `authSecret: ok`.
 - [x] Student dashboard Takvimim, Yanlis Defteri add/list/review, student exams NetGainMap, and optik submit/review -> Yanlis Defteri ingestion passed on live demo data.
 - [x] Coach `/coach/topics` passed desktop/mobile browser QA with `.ktx` rail, `.ktx-topic` cards, NetGainMap, Yanlis Defteri Insight, Hata Frekansi, no `.ktx table`, and shared `Odev Ata` modal.

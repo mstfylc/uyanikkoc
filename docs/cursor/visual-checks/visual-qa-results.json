@@ -1,0 +1,230 @@
+{
+  "base": "https://koc.uyanik.com.tr",
+  "createdAt": "2026-06-12T18:08:12.980Z",
+  "total": 37,
+  "failed": [],
+  "results": [
+    {
+      "route": "/student/dashboard",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":10,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/dashboard",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":10,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/mistakes",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":8,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/mistakes",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":8,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/exams",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":8,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/exams",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":8,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/assignments",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":6,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/assignments",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":6,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/messages",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/messages",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/notifications",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/notifications",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/dashboard",
+      "mode": "desktop-dark",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":10,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/student/notifications",
+      "mode": "desktop-dark",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/dashboard",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":8,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/dashboard",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":8,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/students",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":5,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/students",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":5,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/topics",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":14,\"ktx\":1,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/topics",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":14,\"ktx\":1,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/assignments",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":6,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/assignments",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":6,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/messages",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/messages",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/notifications",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/notifications",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/dashboard",
+      "mode": "desktop-dark",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":8,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/notifications",
+      "mode": "desktop-dark",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/coach/topics",
+      "mode": "order-and-modals",
+      "ok": true,
+      "detail": "{\"order\":[[\"Konu Takibi\",53],[\"NetGainMap\",490],[\"Yanlis Defteri Insight\",645],[\"Hata Frekansi\",898],[\"Genel konu tamamlama\",1036],[\"Net Gelisimi\",1119],[\"Haftalik Soru Hedefi\",1357],[\"Deneme Analizleri\",1569],[\"Soru Takibi\",1684]],\"hasModal\":3}"
+    },
+    {
+      "route": "/parent/dashboard",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":10,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/parent/dashboard",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":10,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/parent/messages",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":0,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/parent/messages",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":0,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/parent/notifications",
+      "mode": "desktop-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/parent/notifications",
+      "mode": "mobile-light",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/parent/dashboard",
+      "mode": "desktop-dark",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":10,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    },
+    {
+      "route": "/parent/notifications",
+      "mode": "desktop-dark",
+      "ok": true,
+      "detail": "{\"overflowX\":0,\"cards\":1,\"ktx\":0,\"ktxTable\":0,\"modals\":0}"
+    }
+  ]
+}

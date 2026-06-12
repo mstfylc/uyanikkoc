@@ -3,7 +3,9 @@
 ## Final Live V6 Status - 2026-06-12
 
 - Status: deployed and smoke-tested on `https://koc.uyanik.com.tr`.
-- Latest code commit deployed: `da59907` (`feat(coach): align topics screen with v6 handoff`).
+- Latest code commit deployed: `5b734f6` (`fix(design): add coach notifications parity route`).
+- Final all-areas Claude Design parity audit passed: 37 live Playwright visual checks, 0 failures.
+- Coach notifications parity gap closed: `/coach/notifications` route now renders guarded shared notifications UI with read/mark-all support.
 - `/api/health` returned `{"status":"ok","authSecret":"ok"}`.
 - Student smoke passed: login, Takvimim, Yanlis Defteri add/list/review, student exams NetGainMap, online optik submit/review -> Yanlis Defteri ingestion.
 - Coach smoke passed: `/coach/topics` `.ktx` rail/topic-card visual QA, single `Odev Ata` modal, SmartOdev preview + assign.

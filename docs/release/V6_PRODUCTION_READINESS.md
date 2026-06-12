@@ -4,7 +4,9 @@
 
 Status: REDEPLOYED, SMOKE PASSED WITH MAIL RISK.
 
-- Current deployed code: `da59907` (`feat(coach): align topics screen with v6 handoff`), deployed to Vercel production and aliased to `https://koc.uyanik.com.tr`.
+- Final all-areas Claude Design parity audit completed after `5b734f6`; 37 live Playwright visual checks passed with 0 failures.
+- Coach notifications route was added and redeployed; `/coach/notifications` now renders the shared guarded notifications panel with read and mark-all support.
+- Current deployed code: `5b734f6` (`fix(design): add coach notifications parity route`), deployed to Vercel production and aliased to `https://koc.uyanik.com.tr`.
 - DB migration was not rerun; Neon main remains at latest migration `20260612200000_notification_coach_scope`.
 - `/api/health` returned `{"status":"ok","authSecret":"ok"}` on the live domain.
 - Production demo role smoke passed for student, coach, and parent with approved demo accounts.
