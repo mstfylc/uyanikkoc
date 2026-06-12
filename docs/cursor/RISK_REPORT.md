@@ -1,8 +1,14 @@
 # Risk Report - Web v6 Final
 
 **Tarih:** 2026-06-12  
-**Son faz:** Web v6 Final P1 token/style parity  
-**Durum:** P1 clear
+**Son faz:** Web v6 Final Release / Production Readiness Check  
+**Durum:** release readiness clear
+
+## Release Readiness Status
+
+Status: clear
+
+Production readiness dokumani hazirlandi. Aktif release blokaj riski tespit edilmedi; non-blocking kalanlar mobile/modal/coach topics PNG QA, AssignmentResult question-level payload eksigi ve object storage/photo upload eksigidir. `pnpm typecheck`, `pnpm lint`, `pnpm test:unit` ve gecici local CI secret env ile web build gecti.
 
 ## P10 Status
 

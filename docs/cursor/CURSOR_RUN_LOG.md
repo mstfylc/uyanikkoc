@@ -36,6 +36,7 @@
 | 2026-06-12 | WEB V6 FINAL P9 messaging read state | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | ThreadMember read/mute persistence and UI state |
 | 2026-06-12 | WEB V6 FINAL P10 coach notifications DB scope | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK with local CI secret env | Notification coachId scope, DB-backed coach list/read/mark-all |
 | 2026-06-12 | WEB V6 FINAL P11 visual acceptance cleanup | this commit | typecheck OK | P1-P10 gap maps and visual acceptance final audit cleanup |
+| 2026-06-12 | WEB V6 FINAL release readiness | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | Production migration/env/deploy/smoke checklist |
 
 ## Kural
 

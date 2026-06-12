@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yurutulen faz:** Web v6 Final P11 Visual acceptance / final audit cleanup  
+**Son yurutulen faz:** Web v6 Final Release / Production Readiness Check  
 **Tarih:** 2026-06-12  
-**Kapsam:** P1-P10 sonrasinda screen/component/backend/visual acceptance dokumanlarinin canli repo gercekligine gore temizlenmesi.
+**Kapsam:** V6 main/production alimi icin deploy sirasi, migration listesi, env kontrolu ve smoke test checklist'i.
 
 ## P0 Çıktıları
 
@@ -94,6 +94,15 @@
 - AssignmentResult soru bazli payload eksigi acikca korundu; optik/deneme akisi Yanlis Defteri batch beslemesini karsilar.
 - Kod degisikligi yok; route/backend/dependency/migration eklenmedi.
 - Test: docs-only faz icin `pnpm typecheck` OK.
+
+## Release / Production Readiness Bulgulari
+
+- `docs/release/V6_PRODUCTION_READINESS.md` olusturuldu; kod, UI, backend veya migration degisikligi yapilmadi.
+- V6 migration sirasi belgelendi: `20260612120000_mistakes`, `20260612130000_mistake_topic_nullable`, `20260612190000_thread_member_read_mute`, `20260612200000_notification_coach_scope`.
+- Production deploy sirasi backup -> env kontrolu -> install -> db generate -> db migrate -> build -> start/redeploy -> smoke test olarak yazildi.
+- Env checklist'i production secret, production DB, `DEMO_AUTH_ALLOW_IN_MEMORY=false`, `AI_COACH_ENABLED=false` ve CRM izolasyonu uzerinden netlestirildi.
+- Smoke test checklist'i ogrenci/coach/veli v6 akislari, messages read/mute ve notifications read/mark-all icin eklendi.
+- Test: `pnpm typecheck` OK, `pnpm lint` OK, `pnpm test:unit` OK, local CI secret env ile build OK.
 
 ## P6 Bulgulari
 
