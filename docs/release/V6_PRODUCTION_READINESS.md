@@ -1,15 +1,26 @@
 # Uyanik Koc Web V6 - Production Readiness Check
 
+## Production Redeploy + Smoke Status - 2026-06-12
+
+Status: REDEPLOYED, SMOKE BLOCKED.
+
+- Production redeploy completed from `main` commit `68ad23b`; Vercel build completed and aliased `https://koc.uyanik.com.tr`.
+- DB migration was not rerun.
+- Live `/api/health` returned `{"status":"ok"}`. The current health route does not expose an `authSecret` field, so `authSecret: ok` cannot be directly asserted from this endpoint.
+- Production login with the documented organization owner account succeeded and remained valid after reload on `/yonetim/dashboard`.
+- Student, coach, and parent smoke login with documented demo accounts was rejected on production DB; V6 student/coach/parent flows were not fully smoke-tested.
+- Blocking item: provide valid production student/coach/parent smoke credentials or seed/enable approved production smoke accounts, then rerun the role flow checklist.
+
 ## Production DB Migration Status - 2026-06-12
 
-Status: REDEPLOY + SMOKE TEST PENDING.
+Status: REDEPLOYED, SMOKE BLOCKED.
 
 - Code ready: yes
 - DB migrated: yes
 - Build/test passed: yes
-- Redeploy: pending
-- Smoke test: pending
-- Blocking item: production SSH/CI/restart target required
+- Redeploy: yes
+- Smoke test: blocked
+- Blocking item: valid production student/coach/parent smoke credentials required
 
 - Env was loaded from the local external env file without writing secret values to repo docs or logs.
 - Neon restore path exists via backup branch `pre-v6-migration-backup`; migration used the main direct/unpooled Neon URL (`pooler=false`, host masked).
@@ -18,7 +29,7 @@ Status: REDEPLOY + SMOKE TEST PENDING.
 - Applied V6 migrations: `20260612120000_mistakes`, `20260612130000_mistake_topic_nullable`, `20260612190000_thread_member_read_mute`, `20260612200000_notification_coach_scope`.
 - Post-migration DB state: 35 applied migrations, latest `20260612200000_notification_coach_scope`.
 - Verification passed: `pnpm install --frozen-lockfile`, `pnpm db:generate`, `pnpm db:migrate`, `pnpm typecheck`, `pnpm lint`, `pnpm test:unit`, `pnpm --filter @uyanik/web build`.
-- Redeploy was not run because the production SSH/CI/restart target is still not provided; smoke tests remain pending after redeploy.
+- Redeploy was run on Vercel and aliased to the live domain; student/coach/parent role smoke remains blocked by missing valid production smoke credentials.
 
 Date: 2026-06-12
 Scope: release / production readiness only. No feature, UI, backend, dependency, or migration changes were made in this phase.

@@ -1,1 +1,1 @@
-Redeploy/smoke pending because production SSH/CI/restart target is not available.
+Production smoke is blocked after successful redeploy: `/api/health` returns `{"status":"ok"}`, but the current route does not expose `authSecret`; organization owner login works, while documented student/coach/parent demo accounts are rejected by production DB. Valid production smoke credentials or approved seeded smoke accounts are required to complete V6 role smoke.

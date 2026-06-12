@@ -1,14 +1,24 @@
 # Latest Handoff
 
+## Production Redeploy + Smoke Status - 2026-06-12
+
+- Status: redeployed; smoke blocked.
+- Production redeploy completed from `main` commit `68ad23b` and Vercel aliased `https://koc.uyanik.com.tr`.
+- DB migration was not rerun.
+- `/api/health` returned `{"status":"ok"}`; current route does not include `authSecret`, so that field cannot be directly verified from health.
+- Organization owner login worked on `/yonetim/dashboard` and survived reload.
+- Student/coach/parent demo logins were rejected by production DB, so V6 role smoke checklist remains pending.
+- Required next input: valid production smoke credentials for student, coach, and parent, or approved seeded smoke accounts.
+
 ## Production DB Migration Status - 2026-06-12
 
-- Status: DB migrated; redeploy pending.
+- Status: DB migrated; redeployed; smoke blocked.
 - Neon backup branch `pre-v6-migration-backup` was created before migration.
 - Main branch direct/unpooled Neon URL was used with `pooler=false`; secret values were not written to repo docs.
 - V6 migrations applied: `20260612120000_mistakes`, `20260612130000_mistake_topic_nullable`, `20260612190000_thread_member_read_mute`, `20260612200000_notification_coach_scope`.
 - Post-migration latest migration is `20260612200000_notification_coach_scope`.
 - Verification passed: install, db generate, db migrate, typecheck, lint, unit tests, and web production build.
-- Redeploy/smoke remains pending until SSH/CI/restart target is available.
+- Redeploy completed; student/coach/parent smoke remains blocked until valid production smoke credentials are available.
 
 **Son yurutulen faz:** Web v6 Final Release / Production Readiness Check  
 **Tarih:** 2026-06-12  
@@ -19,9 +29,9 @@
 - Code ready: yes.
 - DB migrated: yes.
 - Build/test passed: yes.
-- Redeploy: pending.
-- Smoke test: pending.
-- Blocking item: production SSH/CI/restart target required.
+- Redeploy: yes.
+- Smoke test: blocked.
+- Blocking item: valid production student/coach/parent smoke credentials required.
 
 ## P0 Çıktıları
 
