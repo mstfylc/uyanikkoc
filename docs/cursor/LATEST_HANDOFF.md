@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yürütülen faz:** Web v6 Final P4 Yanlış Defteri UI parity / review flow  
+**Son yurutulen faz:** Web v6 Final P5 Koc/veli Yanlis Defteri insight read mount  
 **Tarih:** 2026-06-12  
-**Kapsam:** Öğrenci Yanlış Defteri review flow parity; yeni backend/route yok.
+**Kapsam:** Koc roster guard ve veli child-scope ile Yanlis Defteri insight okuma; write yok.
 
 ## P0 Çıktıları
 
@@ -70,6 +70,14 @@
 - P3'ten gelen `topic=null` kayıtlar güvenli biçimde `Konu bilgisi yok` olarak gösterilir.
 - Test: `pnpm typecheck` OK, `pnpm lint` OK, `pnpm test:unit` OK, local CI secret env ile build OK.
 
+## P5 Bulgulari
+
+- Koc icin `/api/coach/students/[id]/mistakes` eklendi; yalniz roster ogrencisi icin insight doner.
+- Veli icin `/api/parent/mistakes/summary` eklendi; parentId -> child studentId cozumlemesiyle read-only aggregate doner.
+- Insight servisinde acik, tekrar sirasi, kapanan ve konu/frekans gruplari tek helper ile uretilir.
+- Koc ogrenci detayina ve veli dashboard'a shared `MistakeInsightsCard` mount edildi; write aksiyonu eklenmedi.
+- Konu bilgisi olmayan optik kayitlar subject seviyesinde gruplanir; topic uydurulmaz.
+
 ## Sonraki Adım
 
-P5: Koç/veli Yanlış Defteri insight ve yetkili read mount.
+P6: NetGainMap ortak servis ve rol bazli mount.

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
+import { MistakeInsightsCard } from "@/components/shared/MistakeInsightsCard";
 import {
   ASSIGNMENT_STATUS_LABELS,
   ASSIGNMENT_TYPE_LABELS,
@@ -207,6 +208,8 @@ export function ParentDashboard() {
         </UkSection>
 
         <div className="stack">
+          <MistakeInsightsCard mode="parent" />
+
           <UkSection title="Koçtan Notlar" sub="Onaylı rapor özeti">
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {latestReport ? (

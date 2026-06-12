@@ -1,4 +1,6 @@
 import { shouldUseDatabase } from "@/lib/data/env";
+import { resolveStudentIdForParent } from "@/server/services/motivation.service";
+import { coachHasStudent } from "@/server/services/roster.service";
 
 const ERROR_TYPES = ["bilgi", "islem", "sure", "dikkat", "yorum", "unutma"] as const;
 const QUESTION_TYPES = ["yeninesil", "klasik", "islem", "yorum", "grafik"] as const;
@@ -21,6 +23,25 @@ export type StudentMistakeInput = {
 export type StudentMistakePatch = Partial<
   Pick<StudentMistakeInput, "subject" | "topic" | "subtopic" | "errorType" | "source" | "qType" | "note" | "photoUrl">
 >;
+
+export type MistakeInsightGroup = {
+  key: string;
+  label: string;
+  subject: string;
+  topic: string | null;
+  openCount: number;
+  dueCount: number;
+  lastSource: string;
+};
+
+export type MistakeInsights = {
+  total: number;
+  openCount: number;
+  dueCount: number;
+  closedCount: number;
+  reviewCount: number;
+  groups: MistakeInsightGroup[];
+};
 
 function cleanText(value: unknown): string | undefined {
   return typeof value === "string" ? value.trim() : undefined;
@@ -95,6 +116,70 @@ export async function listStudentMistakes(studentId: string) {
   }
   const repository = await getRepository();
   return repository.listForStudent(studentId);
+}
+
+function isDue(nextDue: string | null): boolean {
+  return Boolean(nextDue && nextDue <= new Date().toISOString().slice(0, 10));
+}
+
+function buildMistakeInsights(mistakes: Awaited<ReturnType<typeof listStudentMistakes>>): MistakeInsights {
+  const groups = new Map<string, MistakeInsightGroup>();
+
+  for (const mistake of mistakes) {
+    if (mistake.status === "kapandi") {
+      continue;
+    }
+
+    const topic = mistake.topic ?? null;
+    const key = `${mistake.subject}::${topic ?? ""}`;
+    const existing = groups.get(key) ?? {
+      key,
+      label: topic ? `${mistake.subject} / ${topic}` : mistake.subject,
+      subject: mistake.subject,
+      topic,
+      openCount: 0,
+      dueCount: 0,
+      lastSource: "",
+    };
+
+    existing.openCount += 1;
+    if (isDue(mistake.nextDue)) {
+      existing.dueCount += 1;
+    }
+    if (!existing.lastSource && mistake.source) {
+      existing.lastSource = mistake.source;
+    }
+    groups.set(key, existing);
+  }
+
+  const dueCount = mistakes.filter((mistake) => mistake.status !== "kapandi" && isDue(mistake.nextDue)).length;
+  return {
+    total: mistakes.length,
+    openCount: mistakes.filter((mistake) => mistake.status !== "kapandi").length,
+    dueCount,
+    closedCount: mistakes.filter((mistake) => mistake.status === "kapandi").length,
+    reviewCount: mistakes.reduce((count, mistake) => count + mistake.history.length, 0),
+    groups: [...groups.values()]
+      .sort((left, right) => right.dueCount - left.dueCount || right.openCount - left.openCount)
+      .slice(0, 5),
+  };
+}
+
+export async function getCoachStudentMistakeInsights(coachId: string, studentId: string): Promise<MistakeInsights | null> {
+  if (!(await coachHasStudent(coachId, studentId))) {
+    return null;
+  }
+
+  return buildMistakeInsights(await listStudentMistakes(studentId));
+}
+
+export async function getParentMistakeInsights(parentId: string): Promise<MistakeInsights | null> {
+  const studentId = await resolveStudentIdForParent(parentId);
+  if (!studentId) {
+    return null;
+  }
+
+  return buildMistakeInsights(await listStudentMistakes(studentId));
 }
 
 export async function createStudentMistake(studentId: string, input: StudentMistakeInput) {

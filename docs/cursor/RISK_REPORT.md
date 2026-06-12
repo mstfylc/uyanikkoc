@@ -59,3 +59,9 @@ Assignment service layer refactor only. Risk yok; davranış değişmedi, yeni t
 ### PROMPT 09 - 2026-06-04
 
 Eski blokaj `DATABASE_URL` yoktu; yerel Postgres docker-compose ile çözüldü.
+
+---
+
+## P5 Kapanis - 2026-06-12
+
+Risk yok. Koc/veli Yanlis Defteri insight read mount roster ve parent child-scope guard ile tamamlandi; write aksiyonu eklenmedi.

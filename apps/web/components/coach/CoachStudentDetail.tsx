@@ -8,6 +8,7 @@ import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { MistakeInsightsCard } from "@/components/shared/MistakeInsightsCard";
 import { ASSIGNMENT_STATUS_LABELS } from "@/lib/assignment-labels";
 import {
   describeExamTrend,
@@ -131,6 +132,8 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
       </div>
 
       <div className="grid col-main">
+        <MistakeInsightsCard mode="coach" studentId={studentId} />
+
         <UkSection title="Deneme trendi">
           <div className="card-body">
             {summary.examSummary.latestNet != null ? (
