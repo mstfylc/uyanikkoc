@@ -1,8 +1,8 @@
 # Latest Handoff
 
-**Son yurutulen faz:** Web v6 Final P6 NetGainMap ortak servis ve rol bazli mount  
+**Son yurutulen faz:** Web v6 Final P7 SmartOdev preview/assign servis entegrasyonu  
 **Tarih:** 2026-06-12  
-**Kapsam:** Deneme sonuclarindan turetilen NetGainMap; student/coach/parent read endpointleri ve mevcut ekran mountlari.
+**Kapsam:** Koc icin roster guard'li SmartOdev preview ve assign; mevcut Assignment modeli korunarak atama.
 
 ## P0 Çıktıları
 
@@ -86,6 +86,14 @@
 - Shared `NetGainMap` `/student/exams`, `/coach/topics`, `/parent/dashboard` icine mount edildi.
 - CTA student icin programa, coach icin mevcut odev atama akisini acan sayfaya gider; parent read-only kalir.
 
-## Sonraki Adım
+## P7 Bulgulari
 
-P7: SmartOdev preview/assign servis entegrasyonu.
+- `/api/coach/smart-assignments` tek POST route ile `preview` ve `assign` aksiyonlarini destekler.
+- Preview sinyalleri Yanlis Defteri, NetGainMap ve konu takibinden server tarafinda turetilir.
+- Assign aksiyonu mevcut `createCoachAssignment` akisini kullanir; roster guard ve parent resolve korunur.
+- `SmartOdevModal` coach assignments ekranina eklendi; atama sonrasi liste yenilenir.
+- Yeni schema/dependency yok; smart metadata mevcut assignment description alanina uyumlu ozet olarak yazilir.
+
+## Sonraki Adim
+
+P8: Takvimim / agenda aggregation.

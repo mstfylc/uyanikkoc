@@ -9,6 +9,7 @@ import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { SmartOdevModal } from "@/components/coach/SmartOdevModal";
 import { StudentResourcesCard } from "@/components/student/StudentResourcesCard";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
@@ -52,6 +53,7 @@ export function CoachAssignmentsPanel() {
   const [week, setWeek] = useState("w0");
   const [filter, setFilter] = useState<"all" | "pending" | "done" | "result">("all");
   const [studentFilter, setStudentFilter] = useState("all");
+  const [smartOpen, setSmartOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -107,6 +109,7 @@ export function CoachAssignmentsPanel() {
   const completed = inWeek.filter((item) => item.completed).length;
   const rate = total ? Math.round((completed / total) * 100) : 0;
   const overdue = inWeek.filter((item) => isAssignmentOpen(item) && item.dueDate && new Date(item.dueDate) < new Date()).length;
+  const smartStudent = students.find((student) => student.studentId === studentFilter) ?? students[0] ?? null;
 
   return (
     <div className="stack rise" data-testid="coach-assignments-panel">
@@ -128,6 +131,10 @@ export function CoachAssignmentsPanel() {
                 </option>
               ))}
             </select>
+            <button type="button" className="btn btn-light btn-sm" disabled={!smartStudent} onClick={() => setSmartOpen(true)}>
+              <KiIcon name="ki-abstract-26" size={16} />
+              SmartOdev
+            </button>
             <Link href="/coach/assignments/create" className="btn btn-primary btn-sm">
               <KiIcon name="ki-plus" size={16} />
               Yeni ödev
@@ -266,6 +273,16 @@ export function CoachAssignmentsPanel() {
           editable
         />
       )}
+
+      {smartStudent ? (
+        <SmartOdevModal
+          open={smartOpen}
+          studentId={smartStudent.studentId}
+          studentName={smartStudent.displayName}
+          onClose={() => setSmartOpen(false)}
+          onAssigned={() => void load()}
+        />
+      ) : null}
     </div>
   );
 }

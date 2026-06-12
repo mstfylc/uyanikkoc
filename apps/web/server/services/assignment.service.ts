@@ -25,6 +25,20 @@ export type CoachCreateAssignmentBody = Partial<
   title: string;
 };
 
+export type SmartAssignmentPreview = {
+  studentId: string;
+  title: string;
+  subject: string;
+  topic: string;
+  questionCount: number;
+  source: string;
+  dueDate: string;
+  priority: AssignmentCreateInput["priority"];
+  quality: "low" | "medium" | "high";
+  overdueAlert: boolean;
+  signals: string[];
+};
+
 async function createAssignment(input: AssignmentCreateInput): Promise<AssignmentRecord> {
   if (shouldUseDatabase()) {
     const { assignmentRepository } = await import("@uyanik/database");
@@ -114,6 +128,92 @@ export async function createCoachAssignment(
     subject: body.subject ?? null,
     dueDate: body.dueDate ?? null,
   });
+}
+
+function addDaysYmd(days: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+export async function previewCoachSmartAssignment(
+  coachId: string,
+  studentId: string,
+): Promise<SmartAssignmentPreview | null> {
+  if (!(await coachHasStudent(coachId, studentId))) {
+    return null;
+  }
+
+  const [{ getCoachStudentMistakeInsights }, { getCoachStudentNetGainMap }, { listStudentTopics }] = await Promise.all([
+    import("@/server/services/mistake.service"),
+    import("@/server/services/exam.service"),
+    import("@/server/services/topic.service"),
+  ]);
+  const [mistakes, netGain, topics] = await Promise.all([
+    getCoachStudentMistakeInsights(coachId, studentId),
+    getCoachStudentNetGainMap(coachId, studentId),
+    listStudentTopics(studentId),
+  ]);
+
+  const mistakeGroup = mistakes?.groups[0] ?? null;
+  const weakNet = netGain?.items.find((item) => item.gain < 0) ?? netGain?.items.at(-1) ?? null;
+  const incompleteTopic = topics.subjects
+    .flatMap((subject) => subject.topics.map((topic) => ({ subject: subject.name, topic })))
+    .find((item) => !item.topic.progress.completed);
+
+  const subject = mistakeGroup?.subject ?? weakNet?.subject ?? incompleteTopic?.subject ?? "Genel";
+  const topic = mistakeGroup?.topic ?? incompleteTopic?.topic.name ?? `${subject} tekrar`;
+  const dueDate = addDaysYmd(mistakeGroup?.dueCount ? 1 : 2);
+  const questionCount = mistakeGroup?.dueCount ? Math.min(60, Math.max(20, mistakeGroup.dueCount * 10)) : 30;
+  const signals = [
+    mistakeGroup ? `${mistakeGroup.openCount} acik hata` : "Yanlis Defteri sinyali yok",
+    weakNet ? `Net sinyali: ${weakNet.gain > 0 ? "+" : ""}${weakNet.gain}` : "Deneme net sinyali yok",
+    incompleteTopic ? "Tamamlanmamis konu bulundu" : "Konu takibi sinyali yok",
+    dueDate === addDaysYmd(1) ? "Yakın tekrar" : "Dengeli tekrar",
+  ];
+
+  return {
+    studentId,
+    title: `${topic} - SmartOdev`,
+    subject,
+    topic,
+    questionCount,
+    source: mistakeGroup?.lastSource || "Koc onerisi",
+    dueDate,
+    priority: mistakeGroup?.dueCount ? "high" : "medium",
+    quality: mistakeGroup || weakNet ? "high" : "medium",
+    overdueAlert: Boolean(mistakeGroup?.dueCount),
+    signals,
+  };
+}
+
+export async function assignCoachSmartAssignment(
+  coachId: string,
+  branchId: string,
+  studentId: string,
+): Promise<{ preview: SmartAssignmentPreview; assignment: AssignmentRecord } | null> {
+  const preview = await previewCoachSmartAssignment(coachId, studentId);
+  if (!preview) {
+    return null;
+  }
+
+  const assignment = await createCoachAssignment(coachId, branchId, {
+    studentId,
+    title: preview.title,
+    subject: preview.subject,
+    type: "practice",
+    priority: preview.priority,
+    dueDate: preview.dueDate,
+    description: [
+      `${preview.questionCount} soru`,
+      `Konu: ${preview.topic}`,
+      `Kaynak: ${preview.source}`,
+      `Kalite: ${preview.quality}`,
+      preview.overdueAlert ? "Gecikme uyarisi: aktif" : "",
+    ].filter(Boolean).join(" - "),
+  });
+
+  return { preview, assignment };
 }
 
 export async function listStudentAssignments(studentId: string): Promise<

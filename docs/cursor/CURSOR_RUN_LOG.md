@@ -31,6 +31,7 @@
 | 2026-06-12 | WEB V6 FINAL P4 mistakes review UI | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | Odak Tekrar modalı, due expansion, photo lightbox, topic-null fallback |
 | 2026-06-12 | WEB V6 FINAL P5 coach/parent mistakes insight | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | roster/parent scoped read-only mistakes insight |
 | 2026-06-12 | WEB V6 FINAL P6 NetGainMap | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | exam-derived NetGainMap endpoints and mounts |
+| 2026-06-12 | WEB V6 FINAL P7 SmartOdev | this commit | typecheck OK; lint OK; unit OK; build OK with local CI secret env | coach smart assignment preview and assign |
 
 ## Kural
 
