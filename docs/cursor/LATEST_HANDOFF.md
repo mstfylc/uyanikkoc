@@ -1,64 +1,49 @@
 # Latest Handoff
 
-**Son tamamlanan faz:** Mobil tasarım — Koç verimlilik backend'leri (Görevler + Toplu Duyuru)  
-**Branch:** `claude/elegant-mccarthy-9tfNd`
+**Son yürütülen faz:** Web v6 Final P1 token/style parity  
+**Tarih:** 2026-06-12  
+**Kapsam:** v6 color/global token uyumu; route/backend/component implementation yok.
 
-## Bu faz (design coach-productivity)
+## P0 Çıktıları
 
-Kaynak: Claude mobil tasarımı (tek dosya, öğrenci/koç/veli). Tasarımdaki backend'siz iki
-koç ekranı için API yazıldı:
+- `docs/cursor/V6_FINAL_SCREEN_GAP_MAP.md`
+- `docs/cursor/V6_FINAL_COMPONENT_GAP_MAP.md`
+- `docs/cursor/V6_FINAL_BACKEND_GAP_MAP.md`
+- `docs/cursor/V6_FINAL_VISUAL_ACCEPTANCE.md`
+- `docs/cursor/CURSOR_RUN_LOG.md`
+- `docs/cursor/RISK_REPORT.md`
 
-- **Koç Görevleri** — `GET /api/coach/tasks`, `POST` (action: create | toggle | delete)
-  - Model `CoachTask` (text, studentId?, due?, done, priority high|med|low), koç-scope'lu
-  - Servis sıralaması: tamamlanmamış → öncelik → en yeni
-- **Koç Toplu Duyuru** — `GET /api/coach/announcements`, `POST { title, body, audience }`
-  - Model `CoachAnnouncement`; kitle çözümü (veli içeren → veliler, diğer → kadro)
-  - Oluşturma kadro/velilere `Notification` üretir; `reach` = gerçek alıcı sayısı
-- Her iki özellik DB + bellek (mock) modunda; migration `20260606180000_coach_tasks_announcements`
-- **Düzeltme:** `@uyanik/database` paketine eksik `@uyanik/shared` workspace bağımlılığı eklendi
-  (billing/online-exam repo'ları kullanıyordu; izole tsc çözemiyordu)
+## Handoff Kaynakları
 
-## Test özeti
+- Final paket: `C:/Users/musta/Downloads/uyanikkoc (2).zip` -> `_handoff_web_v6_final/`
+- Audit: `C:/Users/musta/Downloads/V6_HANDOFF_PACKAGE_AUDIT.md`
+- Apply prompt: `C:/Users/musta/Downloads/CODEX_UYANIKKOC_WEB_V6_FINAL_APPLY_PROMPT.md`
+- Önceki prototip paketi: `C:/Users/musta/Downloads/uyanikkoc (1).zip` -> `indir/uyanikkoc-web-source-v5/`
 
-typecheck ✓ · lint ✓ · unit 51 ✓ (yeni: `coach-productivity.test.ts` 6 test)
+## Canlı Repo Gerçekliği
 
-> Not: `DATABASE_URL` yok → bellek modunda doğrulandı. DB için `pnpm db:migrate && pnpm db:seed`.
+- Bu yeni proje değil; canlı `apps/web` Next 15 App Router yapısı korunacak.
+- Gerçek dashboard route'ları: `/student/dashboard`, `/coach/dashboard`, `/parent/dashboard`.
+- Mevcut pattern: `app/api` -> `server/services` -> `packages/database/src/repositories` -> Prisma.
+- NextAuth/Auth.js korunacak; alternatif JWT/auth sistemi yazılmayacak.
+- AI Koç canlı AI entegrasyonuna çevrilmeyecek; `Yakında` yüzeyi korunacak.
 
----
+## P0 Bulguları
 
-## Önceki faz (Review follow-up)
+- `/student/mistakes` route ve Yanlış Defteri backend'i yok.
+- v6 component ailesinden NetGainMap, SmartOdevModal, TakvimimCard, HataFrekansiCard, ZeroErrorLoop canlı component ağacında yok.
+- Messaging/notifications kısmi DB-backed; unread/read/mute ve coach notification DB scope eksik.
+- Assignment/AssignmentResult mevcut; v6 smart assignment ve source/topic/question/feedback alanları eksik.
+- Mobile/modal PNG'ler ve coach topics PNG handoff paketinde yok; QA riskleri `RISK_REPORT.md` içinde.
 
-**Son commit:** `1831e36` — `docs(cursor): handoff and run-log for review follow-up`
+## P1 Bulguları
 
-## Vercel demo (güncel)
+- `apps/web/styles/uk-design.css` light `--muted` `#6B6F85` yapıldı.
+- Dark neutral token seti final `tokens/colors.json` ile hizalandı: `--surface #181C2B`, `--surface-2 #1F2435`, `--surface-3 #282E43`, `--border #2E3450`, `--border-strong #3C4366`, `--text-2 #C9CDDF`, `--muted #969BB4`, `--faint #6E7391`.
+- `apps/web/app/globals.css` warning alias değeri `#B26A12` ile hizalandı.
+- Typography/radius/shadow/layout tokenları karşılaştırıldı; mevcut değerler v6 tokenlarla uyumlu bulundu.
+- Test: `pnpm typecheck` OK, `pnpm lint` OK, geçici local CI secret env ile `pnpm --filter @uyanik/web build` OK. Secret dosyaya yazılmadı.
 
-- URL: `https://uyanikkoc.vercel.app`
-- Health: `/api/health` → `authSecret: "ok"` ise env tamam; yeni secret üretmeye gerek yok
-- Login: `student@uyanik.local` / `uyanik123`
-- PR merge **gerekmez** — tüm fix'ler `main`'de (`2faf8e1` auth + `91cd19b`…`1831e36` review)
+## Sonraki Adım
 
-## Bu faz (review follow-up)
-
-- `fix(coach)` — koç rapor özetinde `resolveParentIdForStudent`
-- `fix(appointments)` — `resolveCoachIdForStudent`; koç yoksa 404
-- `fix(exams)` — CSV import sunucu doğrulaması
-- `feat(health)` — `authSecret: ok|missing` teşhisi
-- Açık follow-up: mock sabitlerini `lib/constants`'a taşıma (henüz yapılmadı)
-
-Env sorunu yalnızca `authSecret: "missing"` görürseniz — bkz. `docs/deploy/VERCEL.md` (**All Environments**).
-
-## Önceki faz (P14 roster)
-
-- `CoachStudent` modeli + migration `20260604220000_coach_student_roster`
-- `GET /api/coach/students` — koç roster listesi
-- Ödev/deneme formlarında öğrenci seçimi (dropdown)
-- `/coach/students` roster sayfası + detay linkleri
-- Seed: `student_002`, `parent_002`, iki koç–öğrenci bağlantısı
-
-## Migration
-
-Yerel: `pnpm db:migrate && pnpm db:seed`
-
-## Test özeti
-
-typecheck ✓ · unit ✓ · build ✓
+P1 tamamlandı. P2'ye bu fazda geçilmedi.
