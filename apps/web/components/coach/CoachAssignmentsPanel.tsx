@@ -202,7 +202,7 @@ export function CoachAssignmentsPanel() {
               <Link href="/coach/topics" style={{ color: "var(--primary-600)", fontWeight: 700 }}>
                 Konu Takibi
               </Link>{" "}
-              sayfasından ödev atayabilirsiniz.
+              sayfasından “Ödev Ata” ile ekleyebilirsin.
             </div>
           ) : (
             shown.map((assignment) => {

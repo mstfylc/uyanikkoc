@@ -189,7 +189,7 @@ export function ParentDashboard() {
       <div className="grid col-main">
         <UkSection
           title="Haftalık Ödevler"
-          sub="Bu haftanın ödev özeti"
+          sub={`${childName ?? "Çocuğunuzun"} · bu hafta`}
           action={<UkBadge tone={completionRate >= 70 ? "success" : "warning"}>{completed}/{total} tamam</UkBadge>}
         >
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -219,11 +219,7 @@ export function ParentDashboard() {
         </UkSection>
 
         <div className="stack">
-          <NetGainMap mode="parent" />
-
-          <MistakeInsightsCard mode="parent" />
-
-          <UkSection title="Koçtan Notlar" sub="Onaylı rapor özeti">
+          <UkSection title="Koçtan Notlar" sub="Önemli uyarılar">
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {latestReport ? (
                 <div className="lrow" style={{ cursor: "default", alignItems: "flex-start" }}>
@@ -242,7 +238,7 @@ export function ParentDashboard() {
                 </div>
               ) : (
                 <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-                  Henüz onaylı rapor yok.
+                  Henüz not yok.
                 </div>
               )}
               <Link href="/parent/reports" className="btn btn-light btn-sm" style={{ alignSelf: "flex-start" }}>
@@ -276,6 +272,10 @@ export function ParentDashboard() {
           </UkSection>
         </div>
       </div>
+
+      <NetGainMap mode="parent" />
+
+      <MistakeInsightsCard mode="parent" />
 
       <div className="card" data-testid="parent-weekly-comment">
         <div className="card-head">
