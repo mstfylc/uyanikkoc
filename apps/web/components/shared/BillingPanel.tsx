@@ -350,7 +350,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                       <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
                         <button type="button" className="btn btn-outline" onClick={() => setTab("plans")}>
                           <KiIcon name="ki-arrow-up" size={16} />
-                          Plani Degistir / Yukselt
+                          Planı Değiştir / Yükselt
                         </button>
                         {subscription.cycle === "monthly" ? (
                           <button
@@ -386,7 +386,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
             <div className="stack" style={{ gap: 14 }}>
               <div className="grid g-3">
                 <UkStatCard icon="ki-receipt-square" tone="primary" value={invoices.length} label="Toplam fatura" />
-                <UkStatCard icon="ki-dollar" tone="success" value={formatTRY(paidTotal)} label="Odenen tutar" />
+                <UkStatCard icon="ki-dollar" tone="success" value={formatTRY(paidTotal)} label="Ödenen tutar" />
                 <UkStatCard
                   icon="ki-calendar"
                   tone="info"
@@ -542,7 +542,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                             className="icon-btn"
                             style={{ width: 34, height: 34, color: "var(--danger)" }}
                             onClick={() => void removeCard(method.id)}
-                            title="Karti sil"
+                            title="Kartı sil"
                             aria-label="Sil"
                           >
                             <KiIcon name="ki-plus" size={16} style={{ transform: "rotate(45deg)" }} />
@@ -553,7 +553,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                   )}
                   <div className="pm-secure">
                     <KiIcon name="ki-lock" size={14} />
-                    Kart bilgilerin uygulamada saklanmaz; iyzico guvenli kasasinda tutulur.
+                    Kart bilgilerin uygulamada saklanmaz; iyzico güvenli kasasında tutulur.
                   </div>
                 </div>
               </UkSection>

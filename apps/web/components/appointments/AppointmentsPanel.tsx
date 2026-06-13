@@ -154,7 +154,7 @@ function StudentAppointmentsView() {
     <>
       <UkPageHead
         title="Randevular"
-        sub="Koçunla online veya yüz yüze görüşme planla"
+        sub="Koçunla online, yüz yüze veya telefonla görüşme planla"
         actions={
           <button
             type="button"
@@ -164,7 +164,7 @@ function StudentAppointmentsView() {
             style={{ opacity: canRequest && settings ? 1 : 0.5 }}
           >
             <KiIcon name="ki-plus" />
-            Randevu Iste
+            Randevu İste
           </button>
         }
       />
@@ -182,7 +182,7 @@ function StudentAppointmentsView() {
               <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
                 {canRequest
                   ? "Koçunun müsait saatlerinden seçim yapabilirsin."
-                  : "Haftalık randevu hakkın doldu."}
+                  : "Haftalık randevu hakkın doldu. Gelecek hafta tekrar dene."}
               </div>
             </div>
           </div>
@@ -195,7 +195,7 @@ function StudentAppointmentsView() {
         </p>
       ) : null}
 
-      <UkSection title="Randevularim" sub={`${appointments.length} talep`}>
+      <UkSection title="Randevularım" sub={`${appointments.length} talep`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
@@ -624,7 +624,7 @@ function CoachAppointmentsView() {
             </UkSection>
           ) : null}
 
-          <UkSection title="Yaklasan Randevular" sub={`${approved.length} onayli`}>
+          <UkSection title="Yaklaşan Randevular" sub={`${approved.length} onaylı`}>
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {isLoading ? (
                 <p className="muted" style={{ fontSize: 13 }}>
@@ -715,7 +715,7 @@ function ParentAppointmentsView() {
     <>
       <UkPageHead
         title="Randevular"
-        sub="Öğrencinin koç görüşmeleri"
+        sub="Çocuğunun koçuyla online, yüz yüze veya telefonla görüşme planla"
         actions={
           <button
             type="button"
@@ -725,7 +725,7 @@ function ParentAppointmentsView() {
             style={{ opacity: canRequest && settings ? 1 : 0.5 }}
           >
             <KiIcon name="ki-plus" />
-            Randevu Iste
+            Randevu İste
           </button>
         }
       />
@@ -756,7 +756,7 @@ function ParentAppointmentsView() {
         </p>
       ) : null}
 
-      <UkSection title="Randevu listesi" sub={`${appointments.length} kayıt`}>
+      <UkSection title="Randevularım" sub={`${appointments.length} talep`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
@@ -764,7 +764,7 @@ function ParentAppointmentsView() {
             </p>
           ) : appointments.length === 0 ? (
             <div style={{ padding: "20px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-              Randevu kaydi yok.
+              Henüz randevu talebin yok.
             </div>
           ) : (
             appointments.map((item) => <ApptRow key={item.id} appointment={item} />)
