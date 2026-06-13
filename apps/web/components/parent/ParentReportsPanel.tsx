@@ -32,8 +32,8 @@ export function ParentReportsPanel() {
 
   return (
     <div className="stack rise" data-testid="parent-reports-panel">
-      <UkPageHead title="Gelişim Raporları" sub="Koçunuzun onayladığı haftalık raporlar" />
-      <UkSection title="Raporlar" sub={`${reports.length} kayıt`}>
+      <UkPageHead title="Gelişim Raporları" sub="Koçun gönderdiği haftalık raporları görüntüle ve indir" />
+      <UkSection title="Haftalık Raporlar" sub={`${reports.length} rapor`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
@@ -41,7 +41,7 @@ export function ParentReportsPanel() {
             </p>
           ) : reports.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Henuz onayli rapor yok.
+              Henüz rapor gönderilmedi. Koçun haftalık raporu onayladığında burada görünecek.
             </p>
           ) : (
             reports.map((report) => (
@@ -62,7 +62,7 @@ export function ParentReportsPanel() {
                     <span className="d">Çalışma: {report.detail.hours} saat</span>
                   </div>
                 </div>
-                <UkBadge tone="success">Onaylandi</UkBadge>
+                <UkBadge tone="success">Onaylandı</UkBadge>
               </button>
             ))
           )}

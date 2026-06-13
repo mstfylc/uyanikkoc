@@ -76,7 +76,7 @@ export function CoachRevenuePanel() {
     <div className="stack rise" data-testid="coach-revenue-panel">
       <UkPageHead
         title="Gelir & Tahsilat"
-        sub="Subenin abonelik geliri, tahsilat durumu ve platform ucreti"
+        sub="Şubenin abonelik geliri, tahsilat durumu ve platform ücreti"
         actions={
           <button type="button" className="btn btn-light" onClick={exportCsv}>
             <KiIcon name="ki-cloud-download" size={16} />
@@ -86,14 +86,14 @@ export function CoachRevenuePanel() {
       />
 
       <div className="grid g-4">
-        <UkStatCard icon="ki-dollar" tone="primary" value={formatTRY(mrr)} label="Aylik tekrarli gelir" delta="+%7,1" />
+        <UkStatCard icon="ki-dollar" tone="primary" value={formatTRY(mrr)} label="Aylık tekrarlı gelir" delta="+%7,1" />
         <UkStatCard icon="ki-people" tone="success" value={`${active}/${subscribers.length}`} label="Aktif abonelik" />
         <UkStatCard icon="ki-information-2" tone="warning" value={formatTRY(overdueTotal)} label="Bekleyen tahsilat" />
-        <UkStatCard icon="ki-office-bag" tone="info" value={formatTRY(view?.platformFee ?? 0)} label="Platform ucreti" />
+        <UkStatCard icon="ki-office-bag" tone="info" value={formatTRY(view?.platformFee ?? 0)} label="Platform ücreti" />
       </div>
 
       <div className="rev-split">
-        <UkSection title="Aylik Gelir Trendi" sub="Son 6 ay · sube toplam tahsilati">
+        <UkSection title="Aylık Gelir Trendi" sub="Son 6 ay · şube toplam tahsilatı">
           <div className="card-body">
             <div className="rev-bars">
               {trend.map((item, index) => (
@@ -158,8 +158,8 @@ export function CoachRevenuePanel() {
       </div>
 
       <UkSection
-        title="Ogrenci Tahsilatlari"
-        sub="Abonelik bazinda tahsilat durumu"
+        title="Öğrenci Tahsilatları"
+        sub="Abonelik bazında tahsilat durumu"
         action={
           <div className="seg" style={{ width: "fit-content" }}>
             <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>
