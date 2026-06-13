@@ -8,12 +8,12 @@ import { KiIcon } from "@/components/design/KiIcon";
 const aiFeatures = [
   {
     icon: "ki-target",
-    title: "Zayif konu tespiti",
+    title: "Zayıf konu tespiti",
     desc: "Deneme ve ödev verinden en çok hata yaptığın konuları otomatik bulur.",
   },
   {
     icon: "ki-calendar",
-    title: "Akilli program",
+    title: "Akıllı program",
     desc: "Sana özel, güne ve net hedefine göre güncellenen çalışma planı.",
   },
   {
@@ -24,7 +24,7 @@ const aiFeatures = [
   {
     icon: "ki-chart-line-up",
     title: "Net tahmini",
-    desc: "Gidisatina gore sinav netini ve siralama hedefini tahmin eder.",
+    desc: "Gidişatına göre sınav netini ve sıralama hedefini tahmin eder.",
   },
 ];
 
@@ -85,14 +85,14 @@ export default function StudentAiCoachPage() {
 
   return (
     <div className="stack rise" data-testid="ai-coach-coming-soon">
-      <PageHead title="AI Koç" sub="Kişisel yapay zeka koçun - çok yakında" actions={<Badge tone="primary" dot>Yakında</Badge>} />
+      <PageHead title="AI Koç" sub="Kişisel yapay zekâ koçun — çok yakında" actions={<Badge tone="primary" dot>Yakında</Badge>} />
 
       <div className="hero" style={{ display: "flex", gap: 22, alignItems: "center", flexWrap: "wrap" }}>
         <span className="glass" style={{ width: 76, height: 76, borderRadius: 20, display: "grid", placeItems: "center", flexShrink: 0 }}>
           <KiIcon name="ki-technology-2" size={38} />
         </span>
         <div style={{ flex: 1, minWidth: 240 }}>
-          <h2 style={{ fontSize: 24 }}>Senin icin dusunen bir koc</h2>
+          <h2 style={{ fontSize: 24 }}>Senin için düşünen bir koç</h2>
           <p style={{ marginTop: 8, maxWidth: 560 }}>
             Uyanık AI Koç; netlerini, ödevlerini ve çalışma alışkanlıklarını analiz ederek sana özel öneriler ve program çıkaracak. Beta erişimi için sıraya gir.
           </p>
@@ -129,7 +129,7 @@ export default function StudentAiCoachPage() {
         ))}
       </div>
 
-      <Section title="Önizleme" sub="AI Koç sohbeti - demo">
+      <Section title="Önizleme" sub="AI Koç sohbeti — demo">
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ alignSelf: "flex-end", maxWidth: "75%", background: "var(--primary)", color: "#fff", padding: "11px 15px", borderRadius: "14px 14px 4px 14px", fontSize: 13.5 }}>
             Türev konusunda hep hata yapıyorum, ne yapmalıyım?
@@ -145,7 +145,7 @@ export default function StudentAiCoachPage() {
           </div>
           <div className="row" style={{ gap: 10, opacity: 0.6, marginTop: 4 }}>
             <div className="searchbox" style={{ flex: 1, display: "flex" }}>
-              <input placeholder="Mesaj yaz... (yakinda aktif)" disabled />
+              <input placeholder="Mesaj yaz... (yakında aktif)" disabled />
             </div>
             <button type="button" className="btn btn-primary" disabled>
               <KiIcon name="ki-send" size={16} />
