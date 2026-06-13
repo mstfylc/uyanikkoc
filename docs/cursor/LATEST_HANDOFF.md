@@ -2,13 +2,14 @@
 
 ## Student Web PDF Parity Delta - 2026-06-13
 
-- Status: implemented, tested, and browser-QA checked locally.
+- Status: implemented, tested, browser-QA checked locally, pushed, and deployed to production.
 - Scope: existing `apps/web` student routes only; no new project, route, backend, schema, migration, dependency, CRM, or AI integration.
 - Source mapping used the student PDF screenshots plus Claude Design `SADAKAT-SPEC-ogrenci-*` files for dashboard, schedule, topics, exams, assignments, and mistakes.
 - Codex yeni tasarım üretmedi; tüm UI değişiklikleri Claude Design handoff/spec/source prototype ile eşlendi. Kaynakta olmayan hiçbir component, renk, spacing, flow veya veri uydurulmadı.
 - Main fixes: student Turkish copy parity; dashboard block order; `/student/topics` compact summary + heat map + tabs + list; `/student/exams` NetGainMap/results flow; `/student/mistakes` summary/review/frequency populated demo state.
 - Browser QA passed locally with demo-memory and Auth.js student cookie for desktop 1440 and mobile 390 on dashboard, schedule, topics, exams, assignments, mistakes; no overflow, no alert, no target ASCII/bozuk text signal.
 - Test: `pnpm db:generate` OK after stopping local dev server file lock; `pnpm typecheck` OK; `pnpm lint` OK; `pnpm test:unit` OK; local CI secret env web build OK.
+- Commit/deploy: `b1a4eda` pushed to `origin/main`; Vercel production deploy `dpl_BGs41avayUABMgmMvkeFCgn7evft` aliased to `https://koc.uyanik.com.tr`; `/api/health` returned `{"status":"ok","authSecret":"ok"}`.
 - Evidence screenshots: `docs/cursor/visual-checks/student-current-final/`.
 
 ## Reality Parity Delta - 2026-06-13
