@@ -169,7 +169,7 @@ export function KaynakKatalogModal({
             <div>
               <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Kaynak Katalogu</h3>
               <div className="muted" style={{ fontSize: 12 }}>
-                Turkiye geneli bilinen yayinevi kitaplari · {KAYNAK_CATALOG.length} kaynak
+                Türkiye geneli bilinen yayınevi kitapları · {KAYNAK_CATALOG.length} kaynak
               </div>
             </div>
           </div>
@@ -192,14 +192,14 @@ export function KaynakKatalogModal({
             <div className="seg" style={{ width: "fit-content" }}>
               {(["Tumu", "YKS", "LGS"] as const).map((value) => (
                 <button key={value} type="button" className={exam === value ? "on" : ""} onClick={() => setExam(value)}>
-                  {value === "Tumu" ? "Tumu" : value}
+                  {value === "Tumu" ? "Tümü" : value}
                 </button>
               ))}
             </div>
             <div className="searchbox" style={{ margin: 0, minWidth: 200, flex: "1 1 200px", display: "flex" }}>
               <KiIcon name="ki-magnifier" size={16} />
               <input
-                placeholder="Kitap veya yayinevi ara..."
+                placeholder="Kitap veya yayınevi ara..."
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
@@ -215,7 +215,7 @@ export function KaynakKatalogModal({
                 setPub("Tumu");
               }}
             >
-              <option value="Tumu">Tum dersler</option>
+              <option value="Tumu">Tüm dersler</option>
               {subjectOptions.map((item) => (
                 <option key={item} value={item}>
                   {item}
@@ -228,7 +228,7 @@ export function KaynakKatalogModal({
               value={pub}
               onChange={(event) => setPub(event.target.value)}
             >
-              <option value="Tumu">Tum yayinevleri</option>
+              <option value="Tumu">Tüm yayınevleri</option>
               {publisherOptions.map((item) => (
                 <option key={item} value={item}>
                   {item}
@@ -241,7 +241,7 @@ export function KaynakKatalogModal({
               value={type}
               onChange={(event) => setType(event.target.value as KaynakTypeKey | "Tumu")}
             >
-              <option value="Tumu">Tum turler</option>
+              <option value="Tumu">Tüm türler</option>
               {Object.entries(KAYNAK_TUR).map(([key, meta]) => (
                 <option key={key} value={key}>
                   {meta.label}
@@ -264,8 +264,8 @@ export function KaynakKatalogModal({
                     <KiIcon name="ki-magnifier" size={14} />
                   </span>
                   <div style={{ fontSize: 12.5, lineHeight: 1.5 }}>
-                    {results.length} kaynak bulundu; ilk {MAX_VISIBLE_RESULTS} kaynak gosteriliyor. Daha net sonuc icin
-                    kitap, yayinevi veya ders filtresi kullan.
+                    {results.length} kaynak bulundu; ilk {MAX_VISIBLE_RESULTS} kaynak gösteriliyor. Daha net sonuç için
+                    kitap, yayınevi veya ders filtresi kullan.
                   </div>
                 </div>
               ) : null}

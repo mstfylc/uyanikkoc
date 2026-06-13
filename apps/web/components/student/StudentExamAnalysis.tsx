@@ -35,9 +35,9 @@ function buildProjection(totalNet: number) {
 export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAnalysisProps) {
   if (!selected) {
     return (
-      <UkSection title="Deneme analizi" sub="Analiz icin bir deneme secin">
+      <UkSection title="Deneme analizi" sub="Analiz için bir deneme seçin">
         <div className="card-body muted" style={{ fontSize: 13 }}>
-          Sonuclar sekmesinden bir deneme secin veya yeni sonuc ekleyin.
+          Sonuçlar sekmesinden bir deneme seçin veya yeni sonuç ekleyin.
         </div>
       </UkSection>
     );
@@ -126,7 +126,7 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
             <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
               <UkBadge tone="success">
                 <KiIcon name="ki-star" size={13} />
-                En guclu: {strongest.subjectName}
+                En güçlü: {strongest.subjectName}
               </UkBadge>
               <UkBadge tone="danger">
                 <KiIcon name="ki-information-2" size={13} />

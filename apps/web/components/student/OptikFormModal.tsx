@@ -158,19 +158,19 @@ export function OptikFormModal({ open, exam, onClose, onSubmitted }: OptikFormMo
                   <b className="tnum" style={{ color: "var(--success)" }}>
                     {result.correct}
                   </b>
-                  <span>Dogru</span>
+                  <span>Doğru</span>
                 </div>
                 <div>
                   <b className="tnum" style={{ color: "var(--danger)" }}>
                     {result.wrong}
                   </b>
-                  <span>Yanlis</span>
+                  <span>Yanlış</span>
                 </div>
                 <div>
                   <b className="tnum" style={{ color: "var(--muted)" }}>
                     {result.blank}
                   </b>
-                  <span>Bos</span>
+                  <span>Boş</span>
                 </div>
               </div>
             </div>

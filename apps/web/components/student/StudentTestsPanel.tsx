@@ -117,7 +117,7 @@ export function StudentTestsPanel() {
                     </div>
                   </div>
                   <button type="button" className="btn btn-primary btn-sm" onClick={() => openTest(assignment)}>
-                    Basla
+                    Başla
                   </button>
                 </div>
               );
@@ -130,7 +130,7 @@ export function StudentTestsPanel() {
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {completed.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Henuz tamamlanan test yok.
+              Henüz tamamlanan test yok.
             </p>
           ) : (
             completed.map((assignment) => {
@@ -153,7 +153,7 @@ export function StudentTestsPanel() {
                       ) : null}
                     </div>
                   </div>
-                  <UkBadge tone="success">Tamamlandi</UkBadge>
+                  <UkBadge tone="success">Tamamlandı</UkBadge>
                 </div>
               );
             })
@@ -271,7 +271,7 @@ export function StudentTestsPanel() {
                   ))}
                   <div className="modal-foot" style={{ justifyContent: "flex-end", gap: 10, marginTop: 4 }}>
                     <button type="button" className="btn btn-light" onClick={() => setActiveId(null)}>
-                      Iptal
+                      İptal
                     </button>
                     <button type="submit" disabled={isSubmitting} className="btn btn-primary">
                       {isSubmitting ? "Gonderiliyor..." : "Testi tamamla"}

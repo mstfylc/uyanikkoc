@@ -9,7 +9,7 @@ export type UkNavItem = {
 
 const STUDENT_NAV: UkNavItem[] = [
   { href: "/student/dashboard", label: "Dashboard", icon: "ki-element-11" },
-  { href: "/student/schedule", label: "Calisma Programi", icon: "ki-calendar" },
+  { href: "/student/schedule", label: "Çalışma Programı", icon: "ki-calendar" },
   { href: "/student/topics", label: "Konu Takibi", icon: "ki-book-open" },
   { href: "/student/exams", label: "Denemeler", icon: "ki-chart-simple" },
   { href: "/student/assignments", label: "Ödevlerim", icon: "ki-notepad-edit" },
@@ -26,7 +26,7 @@ const COACH_NAV: UkNavItem[] = [
   { href: "/coach/dashboard", label: "Dashboard", icon: "ki-element-11" },
   { href: "/coach/students", label: "Öğrencilerim", icon: "ki-people" },
   { href: "/coach/topics", label: "Konu Takibi", icon: "ki-book-open" },
-  { href: "/coach/topics/annual", label: "Yillik Cizelge", icon: "ki-notebook", tag: "Yeni" },
+  { href: "/coach/topics/annual", label: "Yıllık Çizelge", icon: "ki-notebook", tag: "Yeni" },
   { href: "/coach/assignments", label: "Ödev & Görev", icon: "ki-notepad-edit" },
   { href: "/coach/exams", label: "Denemeler", icon: "ki-chart-simple" },
   { href: "/coach/messages", label: "Mesajlar", icon: "ki-messages" },
@@ -41,9 +41,9 @@ const COACH_NAV: UkNavItem[] = [
 ];
 
 const PARENT_NAV: UkNavItem[] = [
-  { href: "/parent/dashboard", label: "Genel Bakis", icon: "ki-element-11" },
-  { href: "/parent/exams", label: "Deneme Sonuclari", icon: "ki-chart-simple" },
-  { href: "/parent/reports", label: "Gelisim Raporlari", icon: "ki-notepad-edit" },
+  { href: "/parent/dashboard", label: "Genel Bakış", icon: "ki-element-11" },
+  { href: "/parent/exams", label: "Deneme Sonuçları", icon: "ki-chart-simple" },
+  { href: "/parent/reports", label: "Gelişim Raporları", icon: "ki-notepad-edit" },
   { href: "/parent/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/parent/appointments", label: "Randevular", icon: "ki-calendar-tick" },
   { href: "/parent/billing", label: "Abonelik", icon: "ki-wallet" },
@@ -65,7 +65,7 @@ const YONETIM_BRANCH_NAV: UkNavItem[] = [
 // Super Admin tüm yönetim ekranlarına erişir (platform + kurum), bu yüzden nav
 // branch panelindeki kurum ekranlarını da içerir (hiyerarşik superset).
 const YONETIM_ADMIN_NAV: UkNavItem[] = [
-  { href: "/yonetim/dashboard", label: "Genel Bakis", icon: "ki-element-11" },
+  { href: "/yonetim/dashboard", label: "Genel Bakış", icon: "ki-element-11" },
   { href: "/yonetim/orgs", label: "Kurumlar & Franchise", icon: "ki-office-bag" },
   { href: "/yonetim/branches", label: "Şubeler", icon: "ki-flag" },
   { href: "/yonetim/licenses", label: "Lisans Takibi", icon: "ki-shield-tick" },
@@ -77,7 +77,7 @@ const YONETIM_ADMIN_NAV: UkNavItem[] = [
   { href: "/yonetim/revenue", label: "Gelir & Faturalama", icon: "ki-dollar" },
   { href: "/yonetim/reports", label: "Raporlar", icon: "ki-chart-line-up" },
   { href: "/yonetim/campaigns", label: "Kampanyalar", icon: "ki-flash" },
-  { href: "/yonetim/modules", label: "Modul Bayraklari", icon: "ki-technology-2" },
+  { href: "/yonetim/modules", label: "Modül Bayrakları", icon: "ki-technology-2" },
   { href: "/yonetim/support", label: "Destek & Sistem", icon: "ki-messages" },
   { href: "/yonetim/settings", label: "Ayarlar", icon: "ki-setting-2" },
 ];

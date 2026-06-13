@@ -11,6 +11,17 @@ Bu checklist `visual-qa/acceptance-checklist.md` maddelerinin canlı repo route 
 - [x] Evidence: `docs/cursor/visual-checks/desktop-light-coach-topics-reality.png`, `desktop-light-coach-topics-modal-reality.png`, `mobile-light-coach-topics-reality.png`.
 - [x] Production redeployed from `641f19c`; live `/api/health` returned `{"status":"ok","authSecret":"ok"}`.
 
+## Student Web PDF Parity QA - 2026-06-13
+
+- [x] Source mapping used `1-uyanik-koc-design-ekran-goruntuleri.pdf`, `SADAKAT-SPEC-ogrenci-dashboard.md`, `SADAKAT-SPEC-ogrenci-schedule.md`, `SADAKAT-SPEC-ogrenci-topics.md`, `SADAKAT-SPEC-ogrenci-exams.md`, `SADAKAT-SPEC-ogrenci-assignments.md`, and `SADAKAT-SPEC-ogrenci-mistakes.md`.
+- [x] `/student/dashboard` order aligned: hero/streak, four stats, assignments + subject progress, full-width Takvimim, exam performance + upcoming exams, AI Koç band.
+- [x] `/student/topics` aligned from old large stat-card layout to source-backed compact summary strip, curriculum heat map, subject tabs, and selected subject topic list.
+- [x] `/student/exams` aligned with NetGainMap above tab content, `Sonuçlar/Analiz/Online Deneme` tabs, Net Gelişimi, Deneme Geçmişi, and Net Dağılımı.
+- [x] `/student/mistakes` aligned with `yd-summary`, Sıfır Hata Döngüsü, Hata Frekansı, add form, and filtered list; demo-memory seed now shows a populated review/frequency state.
+- [x] Turkish copy parity pass completed for student dashboard/schedule/topics/exams/assignments/mistakes and shared student helper surfaces.
+- [x] Browser QA passed locally with demo-memory and a local Auth.js student cookie: desktop 1440 and mobile 390 for dashboard, schedule, topics, exams, assignments, mistakes; no horizontal overflow, no alert, no target ASCII/bozuk metin signal.
+- [x] Evidence screenshots saved locally under `docs/cursor/visual-checks/student-current-final/`.
+
 ## Final Live Browser QA - 2026-06-12
 
 - [x] Final all-areas parity pass reran after coach notifications fix: 37 live Playwright visual checks passed, 0 failed.

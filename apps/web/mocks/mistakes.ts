@@ -1,3 +1,5 @@
+import { DEMO_STUDENT_ID } from "@/mocks/assignments";
+
 const MIS_INTERVALS = [1, 3, 7, 21] as const;
 
 type MistakeInput = {
@@ -58,7 +60,87 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+function seedDemoMistakes() {
+  if (mistakes.some((item) => item.studentId === DEMO_STUDENT_ID)) {
+    return;
+  }
+
+  const timestamp = nowIso();
+  const seeds: Array<Pick<MistakeRecord, "subject" | "topic" | "subtopic" | "errorType" | "source" | "qType" | "note" | "stage" | "nextDue">> = [
+    {
+      subject: "Matematik",
+      topic: "Problemler",
+      subtopic: "Yaş problemi",
+      errorType: "islem",
+      source: "3D TYT Matematik Soru Bankası",
+      qType: "klasik",
+      note: "Oran kurarken bilinmeyeni yanlış yere aldım.",
+      stage: 0,
+      nextDue: addDays(0),
+    },
+    {
+      subject: "Matematik",
+      topic: "Türev",
+      subtopic: "Maksimum-minimum",
+      errorType: "bilgi",
+      source: "Orijinal AYT Matematik",
+      qType: "grafik",
+      note: "Kritik nokta yorumunu tekrar et.",
+      stage: 1,
+      nextDue: addDays(1),
+    },
+    {
+      subject: "Türkçe",
+      topic: "Paragraf",
+      subtopic: "Ana düşünce",
+      errorType: "sure",
+      source: "Hız ve Renk Paragraf",
+      qType: "yorum",
+      note: "Şıkları acele elemişim.",
+      stage: 2,
+      nextDue: addDays(3),
+    },
+    {
+      subject: "Fizik",
+      topic: "Kuvvet ve Newton",
+      subtopic: "Sürtünme",
+      errorType: "dikkat",
+      source: "345 TYT Fizik",
+      qType: "islem",
+      note: "Birim dönüşümünü kontrol et.",
+      stage: 0,
+      nextDue: addDays(0),
+    },
+  ];
+
+  for (const seed of seeds) {
+    mistakes.push({
+      id: `mistake_seed_${seq++}`,
+      studentId: DEMO_STUDENT_ID,
+      subject: seed.subject,
+      topic: seed.topic,
+      subtopic: seed.subtopic,
+      errorType: seed.errorType,
+      source: seed.source,
+      qType: seed.qType,
+      note: seed.note,
+      photoUrl: null,
+      status: seed.stage > 0 ? "tekrar" : "acik",
+      stage: seed.stage,
+      nextDue: seed.nextDue,
+      sourceKind: "manual",
+      sourceRefId: null,
+      sourceLabel: null,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      history: [],
+    });
+  }
+  globalStore.__uyanikMistakeSeq = seq;
+}
+
 export function listForStudent(studentId: string): MistakeRecord[] {
+  seedDemoMistakes();
   return mistakes.filter((item) => item.studentId === studentId);
 }
 

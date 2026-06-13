@@ -226,13 +226,13 @@ async function main() {
     update: {
       studentId: "student_001",
       examType: "TYT",
-      name: "Matematik (ornek — silinebilir)",
+      name: "Matematik",
     },
     create: {
       id: "subject_seed_tyt_mat",
       studentId: "student_001",
       examType: "TYT",
-      name: "Matematik (ornek — silinebilir)",
+      name: "Matematik",
     },
   });
 
@@ -241,13 +241,13 @@ async function main() {
     update: {
       subjectId: sampleSubject.id,
       studentId: "student_001",
-      name: "Temel kavramlar (ornek)",
+          name: "Temel Kavramlar",
     },
     create: {
       id: "topic_seed_tyt_1",
       subjectId: sampleSubject.id,
       studentId: "student_001",
-      name: "Temel kavramlar (ornek)",
+          name: "Temel Kavramlar",
       progress: {
         create: {
           studentId: "student_001",
@@ -263,13 +263,13 @@ async function main() {
     update: {
       subjectId: sampleSubject.id,
       studentId: "student_001",
-      name: "Problemler (ornek)",
+          name: "Problemler",
     },
     create: {
       id: "topic_seed_tyt_2",
       subjectId: sampleSubject.id,
       studentId: "student_001",
-      name: "Problemler (ornek)",
+          name: "Problemler",
       progress: {
         create: {
           studentId: "student_001",

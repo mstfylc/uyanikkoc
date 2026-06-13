@@ -15,7 +15,7 @@ type SubjectRow = {
 const EXAM_TYPES: ResultExamType[] = ["TYT", "AYT", "LGS"];
 
 const DEFAULT_SUBJECTS: SubjectRow[] = [
-  { subjectName: "Turkce", correct: "", wrong: "" },
+  { subjectName: "Türkçe", correct: "", wrong: "" },
   { subjectName: "Matematik", correct: "", wrong: "" },
   { subjectName: "Fen", correct: "", wrong: "" },
   { subjectName: "Sosyal", correct: "", wrong: "" },
@@ -174,7 +174,7 @@ export function StudentManualExamModal({ open, onClose, onSaved }: StudentManual
                   <input
                     type="number"
                     min={0}
-                    placeholder="Dogru"
+                    placeholder="Doğru"
                     value={row.correct}
                     onChange={(event) => updateSubject(index, "correct", event.target.value)}
                     className="input"
@@ -182,7 +182,7 @@ export function StudentManualExamModal({ open, onClose, onSaved }: StudentManual
                   <input
                     type="number"
                     min={0}
-                    placeholder="Yanlis"
+                    placeholder="Yanlış"
                     value={row.wrong}
                     onChange={(event) => updateSubject(index, "wrong", event.target.value)}
                     className="input"
@@ -200,7 +200,7 @@ export function StudentManualExamModal({ open, onClose, onSaved }: StudentManual
 
           <div className="row" style={{ gap: 10, justifyContent: "flex-end" }}>
             <button type="button" className="btn btn-light" onClick={onClose}>
-              Iptal
+              İptal
             </button>
             <button type="submit" disabled={isSubmitting} className="btn btn-primary">
               {isSubmitting ? "Kaydediliyor..." : "Kaydet"}

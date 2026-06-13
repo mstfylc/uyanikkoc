@@ -18,6 +18,7 @@ import type { SchoolScheduleRecord } from "@uyanik/database";
 
 const DAY_INDEX = new Date().getDay();
 const TODAY_LABEL = ["Paz", "Pzt", "Sal", "Car", "Per", "Cum", "Cmt"][DAY_INDEX] ?? "Pzt";
+const DAY_LABELS: Record<string, string> = { Pzt: "Pzt", Sal: "Sal", Car: "Çar", Per: "Per", Cum: "Cum", Cmt: "Cmt", Paz: "Paz" };
 
 export function StudentSchedulePanel() {
   const { data: session } = useSession();
@@ -179,11 +180,11 @@ export function StudentSchedulePanel() {
     <div className="stack rise" data-testid="student-schedule-panel">
       <UkPageHead
         title="Çalışma Programı"
-        sub={`${examProfile.label} · günlük plan`}
+        sub="Koçunla planladığın haftalık çalışma takvimi"
         actions={
           <button type="button" className="btn btn-primary btn-sm" onClick={() => setBlockModalOpen(true)}>
             <KiIcon name="ki-plus" />
-            Blok ekle
+            Çalışma bloğu ekle
           </button>
         }
       />
@@ -193,7 +194,7 @@ export function StudentSchedulePanel() {
         <UkStatCard icon="ki-check-circle" tone="success" value={countWeeklyDone(studyPlan)} label="Tamamlanan blok" />
       </div>
 
-      <UkSection title="Haftalık tamamlama" sub="Gün bazında plan ilerlemesi">
+      <UkSection title="Haftalık Çalışma" sub="Günlük tamamlanan saat">
         <div className="card-body">
           <UkBarChart data={weeklyChart} max={100} />
         </div>
@@ -209,7 +210,7 @@ export function StudentSchedulePanel() {
                 className={activeDay === day ? "on" : ""}
                 onClick={() => setActiveDay(day)}
               >
-                {day}
+                {DAY_LABELS[day] ?? day}
                 {day === TODAY_LABEL ? " · bugün" : ""}
               </button>
             ))}
@@ -366,9 +367,9 @@ export function StudentSchedulePanel() {
               <div className="modal-panel" style={{ maxWidth: 480 }} onClick={(event) => event.stopPropagation()}>
                 <div className="modal-head">
                   <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 800 }}>Çalışma bloğu ekle</h3>
+                    <h3 style={{ fontSize: 16, fontWeight: 800 }}>Çalışma Bloğu Ekle</h3>
                     <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
-                      Haftalık planına yeni blok ekle
+                      {(DAY_LABELS[blockDraft.day] ?? blockDraft.day)} programına
                     </div>
                   </div>
                   <button
@@ -435,7 +436,7 @@ export function StudentSchedulePanel() {
                     </div>
                     <div className="field">
                       <label className="label" htmlFor="block-type">
-                        Tur
+                        Tür
                       </label>
                       <select
                         id="block-type"
@@ -443,9 +444,9 @@ export function StudentSchedulePanel() {
                         value={blockDraft.type}
                         onChange={(event) => setBlockDraft((current) => ({ ...current, type: event.target.value }))}
                       >
-                        <option value="Soru">Soru</option>
-                        <option value="Video">Video</option>
-                        <option value="Konu">Konu</option>
+                        <option value="Soru">Soru çözümü</option>
+                        <option value="Video">Video ders</option>
+                        <option value="Konu">Konu tekrarı</option>
                         <option value="Deneme">Deneme</option>
                       </select>
                     </div>
@@ -457,7 +458,7 @@ export function StudentSchedulePanel() {
                     <input
                       id="block-topic"
                       className="input"
-                      placeholder="Ornek: Turev uygulamalari"
+                      placeholder="Örnek: Türev uygulamaları"
                       value={blockDraft.topic}
                       onChange={(event) => setBlockDraft((current) => ({ ...current, topic: event.target.value }))}
                     />
@@ -474,7 +475,7 @@ export function StudentSchedulePanel() {
                           value={blockDraft.source}
                           onChange={(event) => setBlockDraft((current) => ({ ...current, source: event.target.value }))}
                         >
-                          <option value="">Kaynak sec (opsiyonel)</option>
+                          <option value="">Kaynak seç (opsiyonel)</option>
                           {studentSources.map((source) => (
                             <option key={source} value={source}>
                               {source}
@@ -485,7 +486,7 @@ export function StudentSchedulePanel() {
                       <div className="grid g-2">
                         <div className="field">
                           <label className="label" htmlFor="block-correct">
-                            Dogru
+                            Doğru
                           </label>
                           <input
                             id="block-correct"
@@ -498,7 +499,7 @@ export function StudentSchedulePanel() {
                         </div>
                         <div className="field">
                           <label className="label" htmlFor="block-wrong">
-                            Yanlis
+                            Yanlış
                           </label>
                           <input
                             id="block-wrong"
@@ -519,7 +520,7 @@ export function StudentSchedulePanel() {
                   ) : null}
                   <div className="row" style={{ gap: 10, justifyContent: "flex-end" }}>
                     <button type="button" className="btn btn-light" onClick={() => setBlockModalOpen(false)}>
-                      Iptal
+                      Vazgeç
                     </button>
                     <button type="submit" className="btn btn-primary" disabled={isSavingBlock}>
                       {isSavingBlock ? "Ekleniyor..." : "Ekle"}

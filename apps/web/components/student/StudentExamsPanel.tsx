@@ -16,7 +16,6 @@ import { UkBadge } from "@/components/design/UkBadge";
 import { cargoBadgeLabel, cargoBadgeTone } from "@/lib/design/motivation-ui";
 import { subjectColor } from "@/lib/design/subject-colors";
 import {
-  describeExamTrend,
   formatExamNet,
   RESULT_EXAM_TYPE_LABELS,
 } from "@uyanik/shared";
@@ -25,6 +24,7 @@ import type { ExamResultRecord, ExamTrendSummary, OnlineExamRecord } from "@uyan
 type ExamTab = "results" | "online" | "analysis";
 
 const SUBJECT_NET_MAX: Record<string, number> = {
+  Türkçe: 40,
   Turkce: 40,
   Matematik: 40,
   Fen: 20,
@@ -44,7 +44,7 @@ export function StudentExamsPanel() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [tab, setTab] = useState<ExamTab>("results");
   const [manualOpen, setManualOpen] = useState(false);
-  const [kayıtOpen, setKayitOpen] = useState(false);
+  const [kayitOpen, setKayitOpen] = useState(false);
   const [onlineExams, setOnlineExams] = useState<OnlineExamRecord[]>([]);
   const [optikExam, setOptikExam] = useState<OnlineExamRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -97,7 +97,7 @@ export function StudentExamsPanel() {
     <div className="stack rise" data-testid="student-exams-panel">
       <UkPageHead
         title="Denemeler"
-        sub="Deneme sonuçların ve performans trendi"
+        sub="Deneme sonuçların ve net analizin"
         actions={
           <div className="row" style={{ gap: 8 }}>
             <button type="button" className="btn btn-light btn-sm" onClick={() => setKayitOpen(true)}>
@@ -106,7 +106,7 @@ export function StudentExamsPanel() {
             </button>
             <button type="button" className="btn btn-primary btn-sm" onClick={() => setManualOpen(true)}>
               <KiIcon name="ki-plus" />
-              Manuel Gir
+              Sonuç gir
             </button>
           </div>
         }
@@ -114,41 +114,47 @@ export function StudentExamsPanel() {
 
       <div className="seg" style={{ width: "fit-content" }}>
         <button type="button" className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>
-          Sonuclar
-        </button>
-        <button type="button" className={tab === "online" ? "on" : ""} onClick={() => setTab("online")}>
-          Online Deneme
+          <KiIcon name="ki-chart-simple" />
+          Sonuçlar
         </button>
         <button type="button" className={tab === "analysis" ? "on" : ""} onClick={() => setTab("analysis")}>
+          <KiIcon name="ki-target" />
           Analiz
         </button>
-      </div>
-
-      <div className="grid g-4">
-        <UkStatCard
-          icon="ki-chart-simple"
-          tone="primary"
-          value={summary?.latestNet != null ? formatExamNet(summary.latestNet) : "—"}
-          label="Son deneme neti"
-        />
-        <UkStatCard icon="ki-chart-line-up" tone="info" value={summary?.examCount ?? 0} label="Toplam deneme" />
-        <UkStatCard
-          icon="ki-flag"
-          tone="success"
-          value={summary?.examType ? RESULT_EXAM_TYPE_LABELS[summary.examType] : "—"}
-          label="Son sinav turu"
-        />
-        <UkStatCard
-          icon="ki-arrow-up"
-          tone={summary?.trend === "up" ? "success" : summary?.trend === "down" ? "danger" : "warning"}
-          value={summary ? describeExamTrend(summary.trend) : "—"}
-          label="Trend"
-          delta={summary?.previousNet != null ? formatExamNet(summary.previousNet) : undefined}
-          deltaDir={summary?.trend === "down" ? "down" : "up"}
-        />
+        <button type="button" className={tab === "online" ? "on" : ""} onClick={() => setTab("online")}>
+          <KiIcon name="ki-notepad" />
+          Online Deneme
+        </button>
       </div>
 
       <NetGainMap mode="student" />
+
+      {tab === "results" ? (
+        <div className="grid g-4">
+          <UkStatCard icon="ki-chart-simple" tone="primary" value={summary?.examCount ?? 0} label="Toplam deneme" />
+          <UkStatCard
+            icon="ki-target"
+            tone="info"
+            value={summary?.latestNet != null ? formatExamNet(summary.latestNet) : "—"}
+            label="Ortalama net"
+          />
+          <UkStatCard
+            icon="ki-award"
+            tone="success"
+            value={summary?.latestNet != null ? formatExamNet(summary.latestNet) : "—"}
+            label="En yüksek net"
+          />
+          <UkStatCard icon="ki-chart-line-up" tone="warning" value="—" label="Sıralama tahmini" />
+        </div>
+      ) : null}
+
+      {tab === "results" && trendNets.length > 1 ? (
+        <UkSection title="Net Gelişimi" sub="Son denemelerdeki TYT netlerin">
+          <div className="card-body">
+            <UkSparkline data={trendNets} height={84} />
+          </div>
+        </UkSection>
+      ) : null}
 
       {tab === "analysis" ? (
         <StudentExamAnalysis exams={exams} selected={selected} onSelect={setSelectedId} />
@@ -165,8 +171,8 @@ export function StudentExamsPanel() {
             <div style={{ flex: 1 }}>
               <b style={{ fontSize: 13.5 }}>Online deneme nasıl çalışır?</b>
               <div className="muted" style={{ fontSize: 12.5 }}>
-                Deneme kitapcigin kargoyla gelir. Cozdukten sonra optik formu buradan online doldur, netin aninda
-                hesaplansin.
+                Deneme kitapçığın kargoyla gelir. Çözdükten sonra optik formu buradan online doldur, netin anında
+                hesaplansın.
               </div>
             </div>
           </div>
@@ -206,7 +212,7 @@ export function StudentExamsPanel() {
                       <div className="row" style={{ gap: 8 }}>
                         <OptikResultBadge submission={exam.submission} />
                         <button type="button" className="btn btn-light btn-sm" onClick={() => setOptikExam(exam)}>
-                          Optigi Gor
+                          Optiği Gör
                         </button>
                       </div>
                     ) : (
@@ -223,16 +229,8 @@ export function StudentExamsPanel() {
         </>
       ) : (
         <>
-          {trendNets.length > 1 ? (
-            <UkSection title="Net trendi" sub="Kronolojik deneme performansi">
-              <div className="card-body">
-                <UkSparkline data={trendNets} height={72} />
-              </div>
-            </UkSection>
-          ) : null}
-
           <div className="grid col-main">
-            <UkSection title="Deneme listesi" sub={`${exams.length} kayıt`}>
+            <UkSection title="Deneme Geçmişi" sub={`${exams.length} sonuç`}>
               <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {isLoading ? (
                   <p className="muted" style={{ fontSize: 13 }}>
@@ -240,7 +238,7 @@ export function StudentExamsPanel() {
                   </p>
                 ) : exams.length === 0 ? (
                   <p className="muted" style={{ fontSize: 13 }}>
-                    Henuz deneme sonucu yok.
+                    Henüz deneme sonucu yok.
                   </p>
                 ) : (
                   exams.map((exam) => {
@@ -273,11 +271,11 @@ export function StudentExamsPanel() {
               </div>
             </UkSection>
 
-            <UkSection title="Ders detayi" sub={selected ? selected.label ?? "Secili deneme" : "Deneme secin"}>
+            <UkSection title="Net Dağılımı" sub={selected ? selected.label ?? "Seçili deneme" : "Deneme seçin"}>
               <div className="card-body">
                 {!selected ? (
                   <p className="muted" style={{ fontSize: 13 }}>
-                    Detay icin bir deneme secin.
+                    Detay için bir deneme seçin.
                   </p>
                 ) : (
                   <>
@@ -308,8 +306,8 @@ export function StudentExamsPanel() {
                       <thead>
                         <tr>
                           <th>Ders</th>
-                          <th>Dogru</th>
-                          <th>Yanlis</th>
+                          <th>Doğru</th>
+                          <th>Yanlış</th>
                           <th>Net</th>
                         </tr>
                       </thead>
@@ -353,7 +351,7 @@ export function StudentExamsPanel() {
       />
 
       <DenemeKayitModal
-        open={kayıtOpen}
+        open={kayitOpen}
         onClose={() => setKayitOpen(false)}
         onGoOnline={() => setTab("online")}
       />

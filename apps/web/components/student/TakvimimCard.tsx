@@ -62,12 +62,12 @@ export function TakvimimCard() {
     : 0;
 
   return (
-    <UkSection title="Takvimim" sub="Odev, tekrar, randevu ve calisma akisi" action={<UkBadge tone={total > 0 ? "warning" : "success"}>{total} aktif</UkBadge>}>
+    <UkSection title="Takvimim" sub="Ödev, tekrar, randevu ve çalışma akışı" action={<UkBadge tone={total > 0 ? "warning" : "success"}>{total} aktif</UkBadge>}>
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {isLoading ? (
-          <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>
+          <p className="muted" style={{ fontSize: 13 }}>Yükleniyor...</p>
         ) : !agenda || agenda.items.length === 0 ? (
-          <p className="muted" style={{ fontSize: 13 }}>Bugun icin kayitli akis yok.</p>
+          <p className="muted" style={{ fontSize: 13 }}>Bugün için kayıtlı akış yok.</p>
         ) : (
           agenda.items.slice(0, 6).map((item) => (
             <Link key={item.id} href={item.href} className="lrow" style={{ textDecoration: "none" }}>

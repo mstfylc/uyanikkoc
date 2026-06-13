@@ -7,7 +7,6 @@ import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
-import { UkStatCard } from "@/components/design/UkStatCard";
 import { filterSubjectsForStudentExam, studentSinav } from "@/lib/design/student-exam";
 import { subjectColor } from "@/lib/design/subject-colors";
 import { TOPIC_EXAM_TYPE_LABELS } from "@uyanik/shared";
@@ -33,9 +32,9 @@ function nextTopicStatus(current: TopicStatus): TopicStatus {
 }
 
 function statusLabel(status: TopicStatus): string {
-  if (status === "done") return "Tamamlandi";
+  if (status === "done") return "Tamamlandı";
   if (status === "progress") return "Devam ediyor";
-  return "Baslanmadi";
+  return "Başlanmadı";
 }
 
 function statusIcon(status: TopicStatus): string {
@@ -56,7 +55,7 @@ function downloadTopicReport(subjects: SubjectRecord[]) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = "konu-takip-raporu.csv";
+  anchor.download = "konu-takibi-raporu.csv";
   anchor.click();
   URL.revokeObjectURL(url);
 }
@@ -120,6 +119,10 @@ export function StudentTopicPanel() {
 
   const activeSubject = subjects.find((subject) => subject.id === activeSubjectId) ?? subjects[0] ?? null;
   const pendingTopics = summary ? summary.totalTopics - summary.completedTopics : 0;
+  const progressTopics = useMemo(
+    () => subjects.flatMap((subject) => subject.topics).filter((topic) => getTopicStatus(topic) === "progress").length,
+    [subjects],
+  );
 
   async function handleCreateSubject(event: React.FormEvent) {
     event.preventDefault();
@@ -212,7 +215,7 @@ export function StudentTopicPanel() {
     <div className="stack rise" data-testid="student-topic-panel">
       <UkPageHead
         title="Konu Takibi"
-        sub={`${examProfile.label} · ders bazinda ilerleme`}
+        sub={`${examProfile.kind} müfredatına göre konu konu ilerlemen`}
         actions={
           subjects.length > 0 ? (
             <button type="button" className="btn btn-light btn-sm" onClick={() => downloadTopicReport(subjects)}>
@@ -224,16 +227,30 @@ export function StudentTopicPanel() {
       />
 
       {summary ? (
-        <div className="grid g-4">
-          <UkStatCard icon="ki-book-open" tone="primary" value={summary.totalTopics} label="Toplam konu" />
-          <UkStatCard icon="ki-check-circle" tone="success" value={summary.completedTopics} label="Tamamlanan" />
-          <UkStatCard icon="ki-time" tone="warning" value={pendingTopics} label="Bekleyen" />
-          <UkStatCard
-            icon="ki-chart-pie-simple"
-            tone="info"
-            value={`%${summary.completionRate}`}
-            label="Genel ilerleme"
-          />
+        <div className="card topic-summary-strip">
+          <div className="between" style={{ marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
+            <div className="row" style={{ gap: 10, alignItems: "baseline" }}>
+              <span className="tnum topic-summary-value">%{summary.completionRate}</span>
+              <span className="muted topic-summary-label">genel ilerleme · {summary.totalTopics} konu</span>
+            </div>
+            <div className="row" style={{ gap: 16, flexWrap: "wrap" }}>
+              {[
+                ["success", "Tamamlanan", summary.completedTopics],
+                ["warning", "Devam eden", progressTopics],
+                ["muted", "Başlanmadı", pendingTopics - progressTopics],
+              ].map(([tone, label, value]) => (
+                <span key={label as string} className="row topic-summary-chip">
+                  <span className={`topic-summary-dot ${tone as string}`} />
+                  <span className="muted">{label as string}</span>
+                  <b className="tnum">{value as number}</b>
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="topic-summary-bar">
+            <span style={{ width: `${summary.completionRate}%`, background: "var(--success)" }} />
+            <span style={{ width: `${summary.totalTopics ? Math.round((progressTopics / summary.totalTopics) * 100) : 0}%`, background: "var(--warning)" }} />
+          </div>
         </div>
       ) : null}
 
@@ -242,47 +259,62 @@ export function StudentTopicPanel() {
           Yükleniyor...
         </p>
       ) : subjects.length === 0 ? (
-        <UkSection title="Konu alani yok">
+        <UkSection title="Konu alanı yok">
           <div className="card-body muted" style={{ fontSize: 13 }}>
-            Asagidan yeni ders alani ekleyebilirsin.
+            Aşağıdan yeni ders alanı ekleyebilirsin.
           </div>
         </UkSection>
       ) : activeSubject ? (
-        <div className="grid col-rail">
-          <div className="card" style={{ overflow: "hidden", alignSelf: "start" }}>
-            <div className="card-head">
-              <h3>Dersler</h3>
-            </div>
-            <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 4 }}>
-              {subjects.map((subject) => {
-                const color = subjectColor(subject.name);
-                const done = subject.topics.filter((topic) => topic.progress.completed).length;
-                const total = subject.topics.length;
-                const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-                const on = subject.id === activeSubject.id;
-
-                return (
-                  <button
-                    key={subject.id}
-                    type="button"
-                    className="user-card"
-                    style={{ background: on ? "var(--surface-3)" : "none", borderRadius: 11 }}
-                    onClick={() => setActiveSubjectId(subject.id)}
-                  >
-                    <span
-                      className="swatch"
-                      style={{ width: 10, height: 10, borderRadius: 4, background: color, flexShrink: 0 }}
-                    />
-                    <div className="user-meta" style={{ flex: 1 }}>
-                      <b style={{ fontSize: 13, color: on ? color : "var(--text)" }}>{subject.name}</b>
-                      <span style={{ fontSize: 11 }}>
-                        {done}/{total} konu · %{pct}
-                      </span>
+        <>
+          <UkSection title="Müfredat haritası" sub="Her kare bir konu — yeşil tamam, sarı devam, kesik gri başlanmadı. Bir kareye dokun, aşağıda detayını aç.">
+            <div className="card-body">
+              <div className="kt-map">
+                {subjects.map((subject) => {
+                  const color = subjectColor(subject.name);
+                  const done = subject.topics.filter((topic) => topic.progress.completed).length;
+                  const total = subject.topics.length;
+                  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+                  const on = subject.id === activeSubject.id;
+                  return (
+                    <div key={subject.id} className={`kt-srow${on ? " on" : ""}`}>
+                      <button type="button" className="kt-slabel" onClick={() => setActiveSubjectId(subject.id)}>
+                        <span className="swatch" style={{ width: 10, height: 10, borderRadius: 4, background: color, flexShrink: 0 }} />
+                        <b style={{ color: on ? color : "var(--text)" }}>{subject.name}</b>
+                      </button>
+                      <div className="kt-cells">
+                        {subject.topics.map((topic) => {
+                          const status = getTopicStatus(topic);
+                          return (
+                            <button
+                              key={topic.id}
+                              type="button"
+                              className={`kt-cell ${status}`}
+                              title={`${topic.name} · ${statusLabel(status)}`}
+                              onClick={() => setActiveSubjectId(subject.id)}
+                            />
+                          );
+                        })}
+                      </div>
+                      <span className="tnum kt-spct" style={{ color }}>{pct}%</span>
                     </div>
-                  </button>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
+          </UkSection>
+
+          <div className="seg topic-tabs" style={{ width: "fit-content", flexWrap: "wrap" }}>
+            {subjects.map((subject) => (
+              <button
+                key={subject.id}
+                type="button"
+                className={subject.id === activeSubject.id ? "on" : ""}
+                onClick={() => setActiveSubjectId(subject.id)}
+              >
+                <span className="swatch" style={{ background: subjectColor(subject.name) }} />
+                {subject.name}
+              </button>
+            ))}
           </div>
 
           <UkSection
@@ -290,14 +322,14 @@ export function StudentTopicPanel() {
             sub={TOPIC_EXAM_TYPE_LABELS[activeSubject.examType]}
             action={
               <button type="button" className="btn btn-light btn-sm" onClick={() => setShowEditor((open) => !open)}>
-                {showEditor ? "Duzenlemeyi kapat" : "Duzenle"}
+                {showEditor ? "Düzenlemeyi kapat" : "Düzenle"}
               </button>
             }
           >
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {activeSubject.topics.length === 0 ? (
                 <p className="muted" style={{ fontSize: 13 }}>
-                  Bu derste henuz konu yok.
+                  Bu derste henüz konu yok.
                 </p>
               ) : (
                 activeSubject.topics.map((topic) => {
@@ -316,7 +348,7 @@ export function StudentTopicPanel() {
                           cursor: "pointer",
                         }}
                         onClick={() => void cycleTopicStatus(topic)}
-                        aria-label={`${topic.name} durumunu degistir`}
+                        aria-label={`${topic.name} durumunu değiştir`}
                       >
                         <KiIcon name={statusIcon(status)} size={18} />
                       </button>
@@ -366,7 +398,7 @@ export function StudentTopicPanel() {
                           className="btn btn-sm btn-light"
                           onClick={() => void cycleTopicStatus(topic)}
                         >
-                          Durumu degistir
+                          Durumu değiştir
                         </button>
                       )}
                     </div>
@@ -379,7 +411,7 @@ export function StudentTopicPanel() {
                   <input
                     className="input"
                     style={{ flex: 1, minWidth: 180 }}
-                    placeholder="Yeni konu adi"
+                    placeholder="Yeni konu adı"
                     value={topicNames[activeSubject.id] ?? ""}
                     onChange={(event) =>
                       setTopicNames((current) => ({ ...current, [activeSubject.id]: event.target.value }))
@@ -404,10 +436,10 @@ export function StudentTopicPanel() {
               ) : null}
             </div>
           </UkSection>
-        </div>
+        </>
       ) : null}
 
-      <UkSection title="Yeni ders alani">
+      <UkSection title="Yeni ders alanı">
         <form onSubmit={handleCreateSubject} className="card-body">
           <div className="row" style={{ flexWrap: "wrap", gap: 10 }}>
             <select

@@ -470,7 +470,7 @@ function SourceTrackerRow({
               <input
                 className="input"
                 inputMode="numeric"
-                placeholder="Dogru"
+                placeholder="Doğru"
                 value={draft.dogru}
                 onChange={(event) => onDraft({ ...draft, dogru: event.target.value.replace(/\D/g, "") })}
                 style={{ width: 86, height: 34 }}

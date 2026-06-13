@@ -134,7 +134,7 @@ export async function getStudentAgenda(studentId: string): Promise<StudentAgenda
       id: `mistake:${mistake.id}`,
       kind: "mistake" as const,
       title: mistake.topic ?? mistake.subject,
-      meta: "Yanlis Defteri tekrar",
+      meta: "Yanlış Defteri tekrar",
       href: "/student/mistakes",
       tone: "danger" as const,
       when: mistake.nextDue,

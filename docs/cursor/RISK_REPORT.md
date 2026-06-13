@@ -3,6 +3,7 @@
 Status: OPEN - non-design mail delivery configuration required.
 
 - Claude Design web parity blocker: none.
+- 2026-06-13 student web PDF parity delta: dashboard/schedule/topics/exams/assignments/mistakes source-backed fixes passed local desktop/mobile browser QA; no new design was produced.
 - 2026-06-13 reality parity delta: `/coach/topics` source-backed fixes and browser QA passed locally; no new design was produced.
 - 2026-06-13 production redeploy completed from `641f19c`; live `/api/health` returned `authSecret: ok`.
 - `CODEX_P12_COACH_TOPICS_PIXEL_PARITY_PROMPT.md` file was not present in Downloads/repo search paths; its coach-topics acceptance criteria were covered by the final audit prompt, no-new-design addendum, and canonical `coach-konu.jsx/css`.

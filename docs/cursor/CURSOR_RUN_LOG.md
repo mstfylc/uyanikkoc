@@ -45,6 +45,7 @@
 | 2026-06-12 | WEB V6 FINAL all-areas design parity audit | 5b734f6 | db:generate OK; typecheck OK; lint OK; unit OK; build OK; Vercel deploy OK; visual QA 37/37 OK | Coach notifications route/panel parity fixed; `/coach/topics` order + `.ktx` desktop/mobile QA OK |
 | 2026-06-12 | WEB V6 FINAL no-new-design addendum audit | this commit | docs-only; reused visual QA 37/37 OK | Matrix expanded with source/target/layout/states/mismatch/fix/QA per route; no new design decisions added |
 | 2026-06-13 | WEB V6 REALITY parity delta | 641f19c | db:generate OK; typecheck OK; lint OK; unit OK; build OK; browser QA OK; Vercel deploy OK; health OK | `/coach/topics` source-backed order/copy/modal parity fixed; `.ktx=1`, `.ktx table=0`, mobile/desktop no overflow; no new design produced |
+| 2026-06-13 | WEB student PDF parity delta | this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK; browser QA OK | Student dashboard/schedule/topics/exams/assignments/mistakes aligned to PDF + SADAKAT specs; no new design produced |
 
 ## Kural
 

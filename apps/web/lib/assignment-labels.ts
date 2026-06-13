@@ -1,24 +1,24 @@
 import type { AssignmentPriority, AssignmentStatus, AssignmentType } from "@uyanik/database";
 
 export const ASSIGNMENT_TYPE_LABELS: Record<AssignmentType, string> = {
-  homework: "Odev",
-  exam_prep: "Sinav hazirligi",
+  homework: "Ödev",
+  exam_prep: "Sınav hazırlığı",
   reading: "Okuma",
-  practice: "Alistirma",
-  other: "Diger",
+  practice: "Alıştırma",
+  other: "Diğer",
 };
 
 export const ASSIGNMENT_PRIORITY_LABELS: Record<AssignmentPriority, string> = {
-  low: "Dusuk",
+  low: "Düşük",
   medium: "Orta",
-  high: "Yuksek",
+  high: "Yüksek",
 };
 
 export const ASSIGNMENT_STATUS_LABELS: Record<AssignmentStatus, string> = {
   pending: "Bekliyor",
   in_progress: "Devam ediyor",
-  completed: "Tamamlandi",
-  cancelled: "Iptal",
+  completed: "Tamamlandı",
+  cancelled: "İptal",
 };
 
 export function isAssignmentOpen(assignment: {
