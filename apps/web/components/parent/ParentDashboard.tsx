@@ -137,6 +137,7 @@ export function ParentDashboard() {
   const overdueCount = summary ? countOverdueAssignments(assignments) : 0;
   const weeklyComment = buildParentWeeklyComment(completionRate, overdueCount, pending);
   const latestReport = reports[0] ?? null;
+  const childName = latestReport?.studentName?.trim().split(" ")[0] ?? null;
   const upcomingAppointment = useMemo(
     () => appointments.find((item) => item.status === "approved" || item.status === "pending") ?? null,
     [appointments],
@@ -148,11 +149,13 @@ export function ParentDashboard() {
         <div className="between" style={{ alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", fontWeight: 600, marginBottom: 6 }}>
-              Merhaba
+              Merhaba 👋
             </div>
-            <h1 style={{ marginBottom: 7, fontSize: 28, fontWeight: 800, letterSpacing: "-.02em" }}>Çocuğunuzun gelişimi</h1>
+            <h1 style={{ marginBottom: 7, fontSize: 28, fontWeight: 800, letterSpacing: "-.02em" }}>
+              {childName ? `Çocuğunuz ${childName}'in gelişimi` : "Çocuğunuzun gelişimi"}
+            </h1>
             <p>
-              Koç notları, ödev takibi, deneme sonuçları ve randevu özetleri tek ekranda.
+              Koç <b style={{ color: "#fff" }}>Dilek Emen</b> · 11. Sınıf Sayısal · Hedef YKS 2026
             </p>
           </div>
           <span className="badge" style={{ background: "rgba(255,255,255,.16)", color: "#fff", height: 26 }}>
@@ -171,9 +174,9 @@ export function ParentDashboard() {
           icon="ki-chart-line-up"
           tone="primary"
           value={latestReport ? `${latestReport.netDelta > 0 ? "+" : ""}${latestReport.netDelta}` : "-"}
-          label="Son rapor net degisimi"
+          label="Son rapor net değişimi"
         />
-        <StatCard icon="ki-calendar" tone="info" value={upcomingAppointment ? "1" : "0"} label="Yaklasan randevu" />
+        <StatCard icon="ki-calendar" tone="info" value={upcomingAppointment ? "1" : "0"} label="Yaklaşan randevu" />
       </div>
 
       <div className="grid col-main">
@@ -232,7 +235,7 @@ export function ParentDashboard() {
                 </div>
               ) : (
                 <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-                  Henuz onayli rapor yok.
+                  Henüz onaylı rapor yok.
                 </div>
               )}
               <Link href="/parent/reports" className="btn btn-light btn-sm" style={{ alignSelf: "flex-start" }}>
@@ -242,7 +245,7 @@ export function ParentDashboard() {
             </div>
           </UkSection>
 
-          <UkSection title="Yaklasan Randevu">
+          <UkSection title="Yaklaşan Randevu">
             <div className="card-body">
               {upcomingAppointment ? (
                 <div className="lrow" style={{ cursor: "default" }}>
@@ -256,11 +259,11 @@ export function ParentDashboard() {
                     </div>
                   </div>
                   <UkBadge tone={upcomingAppointment.status === "approved" ? "success" : "warning"}>
-                    {upcomingAppointment.status === "approved" ? "Onayli" : "Bekliyor"}
+                    {upcomingAppointment.status === "approved" ? "Onaylı" : "Bekliyor"}
                   </UkBadge>
                 </div>
               ) : (
-                <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Onayli randevu yok.</div>
+                <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Onaylı randevu yok.</div>
               )}
             </div>
           </UkSection>
@@ -270,8 +273,8 @@ export function ParentDashboard() {
       <div className="card" data-testid="parent-weekly-comment">
         <div className="card-head">
           <div>
-            <h3>Haftalik Yorum</h3>
-            <p className="sub">Bu haftanin kisa gelisim yorumu</p>
+            <h3>Haftalık Yorum</h3>
+            <p className="sub">Bu haftanın kısa gelişim yorumu</p>
           </div>
           <Link href="/parent/messages" className="btn btn-primary btn-sm">
             <KiIcon name="ki-message-text" />
