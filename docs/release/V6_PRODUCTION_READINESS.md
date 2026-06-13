@@ -214,3 +214,14 @@ Required next input:
 
 - Provide production SSH/CI/restart target for redeploy.
 - Run the smoke test checklist after redeploy.
+
+## DB Hardening Rollout Status - 2026-06-13
+
+Status: DB HARDENING DEPLOYED AND SMOKE TESTED.
+
+- Main includes P-DB-2 token cleanup, P-DB-1 composite indexes, P-DB-3 assignment parent FK, P-OPS-1 Prisma singleton/pool warning, and P-TEST-1 staging k6 harness.
+- Production DB backup/snapshot was taken outside the repo before P-DB-3 migration: `C:\Users\musta\db-backups\uyanikkoc-json\uyanikkoc_pre_pdb3_20260613_224205.json`, sha256 `2afda63c0f2dbb4de73c1c5b26c4db2c26bbd10321b65f20a9aff4876be693e5`.
+- Production migration applied: `20260613213000_assignment_parent_fk`; latest migration table check confirmed it is applied.
+- Production deploy completed: Vercel deployment `dpl_DNuFHGb3Duq2DRbbmj4iXtqdD3sX`, alias `https://koc.uyanik.com.tr`.
+- Smoke passed: `/api/health` status/authSecret/database OK; demo student/coach/parent login and dashboards returned 200; token cleanup job import is callable.
+- DB hardening blocker: none.

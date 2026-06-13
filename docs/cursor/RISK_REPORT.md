@@ -2,6 +2,8 @@
 
 Status: OPEN - non-design mail delivery configuration required.
 
+- DB hardening blocker: none. P-DB-1/P-DB-2/P-DB-3/P-OPS-1/P-TEST-1 are implemented, tested, migrated/deployed where applicable, and smoke-tested on production.
+- 2026-06-13 DB hardening remaining set: production JSON snapshot was taken outside the repo, `20260613213000_assignment_parent_fk` was applied, Vercel deploy completed, `/api/health` returned status/authSecret/database OK, and demo role dashboard smoke passed.
 - Claude Design web parity blocker: none.
 - 2026-06-13 student web PDF parity delta: dashboard/schedule/topics/exams/assignments/mistakes source-backed fixes passed local desktop/mobile browser QA, production deploy, and live health; no new design was produced.
 - 2026-06-13 reality parity delta: `/coach/topics` source-backed fixes and browser QA passed locally; no new design was produced.

@@ -215,6 +215,17 @@
 - Deploy: Vercel production deploy `dpl_3nHzn5oQacyVsEXjufH1rmDzu4nX` READY ve `https://koc.uyanik.com.tr` alias OK.
 - Smoke: `/api/health` status/authSecret/database OK; demo student/coach/parent login + dashboard 200; `runTokenCleanupJob` import/cağrilabilirlik OK.
 
+## DB Hardening Kapanis - Remaining Set - 2026-06-13
+
+- P-DB-3 uygulandi ve main'e alindi: `Assignment.parentId` icin `ParentProfile` foreign key eklendi; migration `20260613213000_assignment_parent_fk`.
+- P-OPS-1 uygulandi ve main'e alindi: Prisma client production dahil global singleton olarak yeniden kullaniliyor; production runtime direct/unpooled `DATABASE_URL` kullanirsa warning uretir.
+- P-TEST-1 uygulandi ve main'e alindi: staging icin k6 health/login/student-read kapasite harness'i eklendi; production domainlerde `ALLOW_PROD_LOAD=true` olmadan kosmaz.
+- Testler: `pnpm db:generate` OK, `pnpm typecheck` OK, `pnpm lint` OK, `pnpm test:unit` OK, local CI secret env ile `pnpm --filter @uyanik/web build` OK.
+- Backup/snapshot: production DB icin repo disi JSON snapshot alindi (`C:\Users\musta\db-backups\uyanikkoc-json\uyanikkoc_pre_pdb3_20260613_224205.json`, sha256 `2afda63c0f2dbb4de73c1c5b26c4db2c26bbd10321b65f20a9aff4876be693e5`, 55 tablo).
+- Production migration: `20260613213000_assignment_parent_fk` direct Neon URL ile uygulandi; latest migration olarak dogrulandi.
+- Deploy: Vercel production deploy `dpl_DNuFHGb3Duq2DRbbmj4iXtqdD3sX` READY ve `https://koc.uyanik.com.tr` alias OK.
+- Smoke: `/api/health` status/authSecret/database OK; demo student/coach/parent login + dashboard 200; `runTokenCleanupJob` import/cagrilabilirlik OK.
+
 ## Sonraki Adim
 
-DB hardening P-DB-1/P-DB-2 kapandi. P-DB-3/P-OPS-1/P-TEST-1'e gecilmedi.
+DB hardening P-DB-1/P-DB-2/P-DB-3/P-OPS-1/P-TEST-1 kapandi. DB hardening icin kalan blocker yok; mevcut operasyonel mail delivery riski `RISK_REPORT.md` icinde ayrica acik.

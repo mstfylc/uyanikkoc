@@ -46,6 +46,7 @@
 | 2026-06-12 | WEB V6 FINAL no-new-design addendum audit | this commit | docs-only; reused visual QA 37/37 OK | Matrix expanded with source/target/layout/states/mismatch/fix/QA per route; no new design decisions added |
 | 2026-06-13 | WEB V6 REALITY parity delta | 641f19c | db:generate OK; typecheck OK; lint OK; unit OK; build OK; browser QA OK; Vercel deploy OK; health OK | `/coach/topics` source-backed order/copy/modal parity fixed; `.ktx=1`, `.ktx table=0`, mobile/desktop no overflow; no new design produced |
 | 2026-06-13 | WEB student PDF parity delta | b1a4eda | db:generate OK; typecheck OK; lint OK; unit OK; build OK; browser QA OK; Vercel deploy OK; health OK | Student dashboard/schedule/topics/exams/assignments/mistakes aligned to PDF + SADAKAT specs; no new design produced |
+| 2026-06-13 | DB hardening remaining set | 95cc3a6 + this commit | db:generate OK; typecheck OK; lint OK; unit OK; build OK; production migrate OK; Vercel deploy OK; smoke OK | P-DB-3 FK, P-OPS-1 Prisma singleton/pool warning, P-TEST-1 staging k6 harness; latest migration 20260613213000_assignment_parent_fk |
 
 ## Kural
 
