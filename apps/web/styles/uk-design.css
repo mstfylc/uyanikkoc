@@ -1642,3 +1642,24 @@ button.triage-row:hover { background: var(--surface-2); }
   .ktx-topic { align-items: flex-start; flex-wrap: wrap; }
   .ktx-tstat { min-width: 88px; margin-left: auto; }
 }
+
+/* Ödev takvimi (Ödevlerim → Takvim görünümü) — kaynak: odev-ata.css */
+.odev-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.odev-cal-grid.head { margin-bottom: 6px; }
+.odev-cal-dow { text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); padding: 2px 0; }
+.odev-cal-cell { aspect-ratio: 1 / 1; min-height: 54px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 6px 7px; cursor: pointer; transition: background .12s, border-color .12s, box-shadow .12s; }
+.odev-cal-cell.empty { border: none; background: none; cursor: default; }
+.odev-cal-cell.has:hover { border-color: var(--primary); background: var(--surface-2); }
+.odev-cal-cell.today { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.odev-cal-cell.sel { background: var(--primary-soft); border-color: var(--primary); }
+.odev-cal-num { font-size: 12.5px; font-weight: 700; color: var(--text-2); line-height: 1; }
+.odev-cal-cell.today .odev-cal-num { color: var(--primary-600); }
+.odev-cal-dots { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+.odev-cal-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.odev-cal-more { font-size: 9.5px; font-weight: 800; color: var(--muted); line-height: 1; }
+
+@media (max-width: 560px) {
+  .odev-cal-grid { gap: 4px; }
+  .odev-cal-cell { min-height: 46px; border-radius: 9px; padding: 4px 5px; }
+  .odev-cal-num { font-size: 11px; }
+}

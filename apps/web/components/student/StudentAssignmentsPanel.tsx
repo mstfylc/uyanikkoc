@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkPageHead } from "@/components/design/UkPageHead";
+import { UkSection } from "@/components/design/UkSection";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_TYPE_LABELS,
@@ -269,9 +270,263 @@ function AssignmentCard({
   );
 }
 
+type ViewMode = "liste" | "gunluk" | "takvim";
+
+type ViewProps = {
+  assignments: AssignmentItem[];
+  onResult: (assignment: AssignmentItem) => void;
+  onComplete: (assignmentId: string) => void;
+};
+
+const CAL_DOW = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+
+function toYmd(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function dueYmd(assignment: AssignmentItem): string | null {
+  return assignment.dueDate ? toYmd(new Date(assignment.dueDate)) : null;
+}
+
+function dayLabel(ymd: string): string {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const date = new Date(`${ymd}T00:00:00`);
+  const diff = Math.round((date.getTime() - today.getTime()) / 86400000);
+  if (diff === 0) return "Bugün";
+  if (diff === 1) return "Yarın";
+  if (diff === -1) return "Dün";
+  return date.toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long" });
+}
+
+function ListView({ assignments, onResult, onComplete }: ViewProps) {
+  const [week, setWeek] = useState("w0");
+  const shown = useMemo(() => {
+    if (week === "all") return assignments;
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(now.getDate() - (week === "w0" ? 7 : 14));
+    const end = new Date(now);
+    end.setDate(now.getDate() - (week === "w0" ? 0 : 7));
+    return assignments.filter((assignment) => {
+      if (!assignment.dueDate) return week === "w0";
+      const due = new Date(assignment.dueDate);
+      return due >= start && due <= end;
+    });
+  }, [assignments, week]);
+  const pending = shown.filter((assignment) => isAssignmentOpen(assignment));
+  const doneList = shown.filter((assignment) => !isAssignmentOpen(assignment));
+
+  return (
+    <>
+      <div className="seg" style={{ width: "fit-content", flexWrap: "wrap" }}>
+        {weeks.map((item) => (
+          <button key={item.id} type="button" className={week === item.id ? "on" : ""} onClick={() => setWeek(item.id)}>
+            {item.label}
+          </button>
+        ))}
+      </div>
+      <UkSection title="Atanan Ödevler" sub={`${weeks.find((item) => item.id === week)?.range} · ${pending.length} bekleyen`}>
+        <ul
+          data-testid="assignment-list"
+          className="card-body"
+          style={{ display: "flex", flexDirection: "column", gap: 10, listStyle: "none", paddingLeft: 0, margin: 0 }}
+        >
+          {shown.length === 0 ? (
+            <div style={{ padding: "24px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
+              Bu hafta atanmış ödev yok.
+            </div>
+          ) : (
+            [...pending, ...doneList].map((assignment) => (
+              <AssignmentCard key={assignment.id} assignment={assignment} onResult={onResult} onComplete={onComplete} />
+            ))
+          )}
+        </ul>
+      </UkSection>
+    </>
+  );
+}
+
+function DailyPlanView({ assignments, onResult, onComplete }: ViewProps) {
+  const todayYmd = toYmd(new Date());
+  const overdue = assignments
+    .filter((assignment) => isAssignmentOpen(assignment) && dueYmd(assignment) !== null && dueYmd(assignment)! < todayYmd)
+    .sort((a, b) => (dueYmd(a) ?? "").localeCompare(dueYmd(b) ?? ""));
+  const byDay = new Map<string, AssignmentItem[]>();
+  for (const assignment of assignments) {
+    const key = dueYmd(assignment);
+    if (key && key >= todayYmd) {
+      byDay.set(key, [...(byDay.get(key) ?? []), assignment]);
+    }
+  }
+  if (!byDay.has(todayYmd)) byDay.set(todayYmd, []);
+  const days = [...byDay.keys()].sort();
+
+  return (
+    <div data-testid="assignment-list" className="stack">
+      {overdue.length ? (
+        <UkSection title="Geciken görevler" sub={`${overdue.length} görev tarihini geçti — önce bunları tamamla`}>
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {overdue.map((assignment) => (
+              <AssignmentCard key={assignment.id} assignment={assignment} onResult={onResult} onComplete={onComplete} />
+            ))}
+          </div>
+        </UkSection>
+      ) : null}
+
+      {days.map((ymd) => {
+        const items = [...(byDay.get(ymd) ?? [])].sort(
+          (a, b) => Number(!isAssignmentOpen(a)) - Number(!isAssignmentOpen(b)),
+        );
+        const doneCount = items.filter((assignment) => !isAssignmentOpen(assignment)).length;
+        return (
+          <UkSection
+            key={ymd}
+            title={dayLabel(ymd)}
+            sub={items.length ? `${items.length} görev · ${doneCount}/${items.length} tamam` : "Planlı görev yok — serbest tekrar günü"}
+          >
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {items.length === 0 ? (
+                <div style={{ padding: "16px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
+                  Bugün koçundan atanmış görev yok. Eksik konularına tekrar yapabilirsin. 💪
+                </div>
+              ) : (
+                items.map((assignment) => (
+                  <AssignmentCard key={assignment.id} assignment={assignment} onResult={onResult} onComplete={onComplete} />
+                ))
+              )}
+            </div>
+          </UkSection>
+        );
+      })}
+    </div>
+  );
+}
+
+function CalendarView({ assignments, onResult, onComplete }: ViewProps) {
+  const byDate = useMemo(() => {
+    const map = new Map<string, AssignmentItem[]>();
+    for (const assignment of assignments) {
+      const key = dueYmd(assignment);
+      if (key) map.set(key, [...(map.get(key) ?? []), assignment]);
+    }
+    return map;
+  }, [assignments]);
+  const undated = assignments.filter((assignment) => dueYmd(assignment) === null);
+
+  const defaultMonth = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const assignment of assignments) {
+      const key = dueYmd(assignment)?.slice(0, 7);
+      if (key) counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? toYmd(new Date()).slice(0, 7);
+    const [yy, mm] = top.split("-").map(Number);
+    return new Date(yy, mm - 1, 1);
+  }, [assignments]);
+
+  const [month, setMonth] = useState(defaultMonth);
+  const [selected, setSelected] = useState<string | null>(null);
+  const todayYmd = toYmd(new Date());
+
+  const first = new Date(month.getFullYear(), month.getMonth(), 1);
+  const startDow = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const cells: Array<Date | null> = [];
+  for (let i = 0; i < startDow; i += 1) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d += 1) cells.push(new Date(month.getFullYear(), month.getMonth(), d));
+  while (cells.length % 7) cells.push(null);
+
+  const monthLabel = month.toLocaleDateString("tr-TR", { month: "long", year: "numeric" });
+  const monthCount = assignments.filter((assignment) => dueYmd(assignment)?.slice(0, 7) === toYmd(month).slice(0, 7)).length;
+  const selList = selected ? (byDate.get(selected) ?? []) : [];
+
+  return (
+    <div data-testid="assignment-list" className="stack">
+      <UkSection
+        title="Ödev Takvimi"
+        sub={`${monthCount} görev · güne tıklayıp detayları gör`}
+        action={
+          <div className="row" style={{ gap: 8, alignItems: "center" }}>
+            <button type="button" className="icon-btn" style={{ width: 32, height: 32 }} aria-label="Önceki ay" onClick={() => { setSelected(null); setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1)); }}>
+              <KiIcon name="ki-arrow-right" size={16} style={{ transform: "rotate(180deg)" }} />
+            </button>
+            <b style={{ fontSize: 13.5, minWidth: 130, textAlign: "center", textTransform: "capitalize" }}>{monthLabel}</b>
+            <button type="button" className="icon-btn" style={{ width: 32, height: 32 }} aria-label="Sonraki ay" onClick={() => { setSelected(null); setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1)); }}>
+              <KiIcon name="ki-arrow-right" size={16} />
+            </button>
+          </div>
+        }
+      >
+        <div className="card-body">
+          <div className="odev-cal-grid head">{CAL_DOW.map((d) => <div key={d} className="odev-cal-dow">{d}</div>)}</div>
+          <div className="odev-cal-grid">
+            {cells.map((date, index) => {
+              if (!date) return <div key={index} className="odev-cal-cell empty" />;
+              const key = toYmd(date);
+              const items = byDate.get(key) ?? [];
+              const isToday = key === todayYmd;
+              const isSel = selected === key;
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  className={`odev-cal-cell${isToday ? " today" : ""}${isSel ? " sel" : ""}${items.length ? " has" : ""}`}
+                  onClick={() => setSelected(isSel ? null : key)}
+                >
+                  <span className="odev-cal-num">{date.getDate()}</span>
+                  {items.length ? (
+                    <span className="odev-cal-dots">
+                      {items.slice(0, 4).map((assignment, j) => {
+                        const overdue = isAssignmentOpen(assignment) && assignment.dueDate != null && new Date(assignment.dueDate) < new Date();
+                        const background = !isAssignmentOpen(assignment) ? "var(--success)" : overdue ? "var(--danger)" : assignmentColor(assignment);
+                        return <span key={j} className="odev-cal-dot" title={assignment.subject ?? "Genel"} style={{ background }} />;
+                      })}
+                      {items.length > 4 ? <span className="odev-cal-more">+{items.length - 4}</span> : null}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+          <div className="row" style={{ gap: 14, flexWrap: "wrap", marginTop: 14, fontSize: 11.5, color: "var(--muted)" }}>
+            <span className="row" style={{ gap: 5 }}><span className="odev-cal-dot" style={{ background: "var(--primary)" }} />Bekleyen</span>
+            <span className="row" style={{ gap: 5 }}><span className="odev-cal-dot" style={{ background: "var(--success)" }} />Tamamlanan</span>
+            <span className="row" style={{ gap: 5 }}><span className="odev-cal-dot" style={{ background: "var(--danger)" }} />Gecikmiş</span>
+          </div>
+        </div>
+      </UkSection>
+
+      {selected ? (
+        <UkSection title={new Date(`${selected}T00:00:00`).toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "long" })} sub={`${selList.length} görev`}>
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {selList.length === 0 ? (
+              <div style={{ padding: "18px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Bu gün için görev yok.</div>
+            ) : (
+              selList.map((assignment) => (
+                <AssignmentCard key={assignment.id} assignment={assignment} onResult={onResult} onComplete={onComplete} />
+              ))
+            )}
+          </div>
+        </UkSection>
+      ) : null}
+
+      {undated.length ? (
+        <UkSection title="Tarihsiz görevler" sub={`${undated.length} görev`}>
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {undated.map((assignment) => (
+              <AssignmentCard key={assignment.id} assignment={assignment} onResult={onResult} onComplete={onComplete} />
+            ))}
+          </div>
+        </UkSection>
+      ) : null}
+    </div>
+  );
+}
+
 export function StudentAssignmentsPanel({ resources }: { resources: React.ReactNode }) {
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
-  const [week, setWeek] = useState("w0");
+  const [view, setView] = useState<ViewMode>("gunluk");
   const [activeAssignment, setActiveAssignment] = useState<AssignmentItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -322,26 +577,30 @@ export function StudentAssignmentsPanel({ resources }: { resources: React.ReactN
     return { total, done, pending, overdue, resultCount, rate: calculateCompletionRate(total, done) };
   }, [assignments]);
 
-  const shown = useMemo(() => {
-    if (week === "all") return assignments;
-    const now = new Date();
-    const start = new Date(now);
-    start.setDate(now.getDate() - (week === "w0" ? 7 : 14));
-    const end = new Date(now);
-    end.setDate(now.getDate() - (week === "w0" ? 0 : 7));
-    return assignments.filter((assignment) => {
-      if (!assignment.dueDate) return week === "w0";
-      const due = new Date(assignment.dueDate);
-      return due >= start && due <= end;
-    });
-  }, [assignments, week]);
-
-  const pending = shown.filter((assignment) => isAssignmentOpen(assignment));
-  const doneList = shown.filter((assignment) => !isAssignmentOpen(assignment));
+  const onComplete = (assignmentId: string) => void saveResult(assignmentId);
 
   return (
     <div className="stack rise">
-      <UkPageHead title="Ödevlerim" sub="Koçunun atadığı görevler — sonucunu gir, takip et" />
+      <UkPageHead
+        title="Ödevlerim"
+        sub="Koçunun atadığı görevler — sonucunu gir, takip et"
+        actions={
+          <div className="seg" role="tablist" aria-label="Görünüm" style={{ flexWrap: "wrap" }}>
+            <button type="button" className={view === "liste" ? "on" : ""} onClick={() => setView("liste")}>
+              <KiIcon name="ki-menu" size={15} />
+              Liste
+            </button>
+            <button type="button" className={view === "gunluk" ? "on" : ""} onClick={() => setView("gunluk")}>
+              <KiIcon name="ki-check-circle" size={15} />
+              Günlük plan
+            </button>
+            <button type="button" className={view === "takvim" ? "on" : ""} onClick={() => setView("takvim")}>
+              <KiIcon name="ki-calendar" size={15} />
+              Takvim
+            </button>
+          </div>
+        }
+      />
 
       <div className="grid g-4">
         <StatCard icon="ki-notepad-edit" tone="primary" value={isLoading ? "-" : stats.total} label="Toplam görev" />
@@ -350,48 +609,19 @@ export function StudentAssignmentsPanel({ resources }: { resources: React.ReactN
         <StatCard icon="ki-shield-cross" tone="danger" value={isLoading ? "-" : stats.overdue} label="Gecikmiş" />
       </div>
 
-      <div className="seg" style={{ width: "fit-content", flexWrap: "wrap" }}>
-        {weeks.map((item) => (
-          <button key={item.id} type="button" className={week === item.id ? "on" : ""} onClick={() => setWeek(item.id)}>
-            {item.label}
-          </button>
-        ))}
-      </div>
+      {error ? (
+        <p role="alert" className="badge badge-danger" style={{ width: "fit-content" }}>{error}</p>
+      ) : null}
 
-      <section className="card">
-        <div className="card-head">
-          <div>
-            <h3>Atanan Ödevler</h3>
-            <p className="sub">{weeks.find((item) => item.id === week)?.range} · {pending.length} bekleyen</p>
-          </div>
-          <Badge tone="muted" icon="ki-chart-simple">{stats.resultCount} sonuç</Badge>
-        </div>
-        <ul
-          data-testid="assignment-list"
-          className="card-body"
-          style={{ display: "flex", flexDirection: "column", gap: 10, listStyle: "none", paddingLeft: 0, margin: 0 }}
-        >
-          {error ? (
-            <p role="alert" className="badge badge-danger" style={{ width: "fit-content" }}>{error}</p>
-          ) : null}
-          {isLoading ? (
-            <p className="muted" style={{ fontSize: 13 }}>Yükleniyor...</p>
-          ) : shown.length === 0 ? (
-            <div style={{ padding: "24px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-              Bu hafta atanmış ödev yok.
-            </div>
-          ) : (
-            [...pending, ...doneList].map((assignment) => (
-              <AssignmentCard
-                key={assignment.id}
-                assignment={assignment}
-                onResult={setActiveAssignment}
-                onComplete={(assignmentId) => void saveResult(assignmentId)}
-              />
-            ))
-          )}
-        </ul>
-      </section>
+      {isLoading ? (
+        <p className="muted" style={{ fontSize: 13 }}>Yükleniyor...</p>
+      ) : view === "liste" ? (
+        <ListView assignments={assignments} onResult={setActiveAssignment} onComplete={onComplete} />
+      ) : view === "takvim" ? (
+        <CalendarView assignments={assignments} onResult={setActiveAssignment} onComplete={onComplete} />
+      ) : (
+        <DailyPlanView assignments={assignments} onResult={setActiveAssignment} onComplete={onComplete} />
+      )}
 
       {resources}
 
