@@ -228,7 +228,7 @@ export function MessagesPanel({
         </p>
       ) : threads.length === 0 ? (
         <p className="muted" style={{ fontSize: 13 }}>
-          Henuz mesaj yok.
+          Henüz mesaj yok.
         </p>
       ) : (
         <div className="card" style={{ overflow: "hidden" }}>
@@ -291,7 +291,7 @@ export function MessagesPanel({
                 {activeThread ? (
                   <button type="button" className="btn btn-light btn-sm" onClick={() => void toggleMute()}>
                     <KiIcon name={activeThread.muted ? "ki-notification-on" : "ki-notification"} size={14} />
-                    {activeThread.muted ? "Sesi ac" : "Sessize al"}
+                    {activeThread.muted ? "Sesi aç" : "Sessize al"}
                   </button>
                 ) : null}
               </div>
@@ -321,7 +321,7 @@ export function MessagesPanel({
                               ? "Koç"
                               : message.senderRole === "PARENT"
                                 ? "Veli"
-                                : "Ogrenci"}
+                                : "Öğrenci"}
                           </div>
                         ) : null}
                         <div
@@ -356,7 +356,7 @@ export function MessagesPanel({
                   })
                 ) : (
                   <p className="muted" style={{ fontSize: 13 }}>
-                    Thread secin.
+                    Sohbet seç.
                   </p>
                 )}
               </div>

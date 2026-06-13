@@ -31,19 +31,19 @@ export function CoachMessagesPanel() {
         apiBase="/api/coach/messages"
         selfRole="COACH"
         title="Mesajlar"
-        subtitle="Ogrenci, veli ve gruplar"
+        subtitle="Öğrenci, veli ve gruplar"
         testId="coach-messages-panel"
         enableGroupTabs
         headerAction={
           <button type="button" className="btn btn-primary btn-sm" onClick={() => setGroupOpen(true)}>
             <KiIcon name="ki-people" />
-            Grup olustur
+            Grup oluştur
           </button>
         }
         threadMeta={(thread) =>
           thread.kind === "group"
             ? `Grup · ${thread.messages[thread.messages.length - 1]?.body ?? "Mesaj yok"}`
-            : `${thread.studentId ? "Ogrenci" : "Veli"} · ${thread.messages[thread.messages.length - 1]?.body ?? "Mesaj yok"}`
+            : `${thread.studentId ? "Öğrenci" : "Veli"} · ${thread.messages[thread.messages.length - 1]?.body ?? "Mesaj yok"}`
         }
       />
 

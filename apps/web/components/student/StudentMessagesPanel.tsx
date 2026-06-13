@@ -8,10 +8,10 @@ export function StudentMessagesPanel() {
       apiBase="/api/student/messages"
       selfRole="STUDENT"
       title="Mesajlar"
-      subtitle="Koc ve gruplar"
+      subtitle="Koçun ve grupların"
       testId="student-messages-panel"
       enableGroupTabs
-      dmSectionLabel="Kocun"
+      dmSectionLabel="Koçun"
     />
   );
 }
