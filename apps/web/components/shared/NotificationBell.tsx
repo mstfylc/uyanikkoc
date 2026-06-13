@@ -143,7 +143,7 @@ export function NotificationBell({ role }: NotificationBellProps) {
               </div>
               {unreadCount > 0 ? (
                 <button type="button" className="link-btn" style={{ fontSize: 12 }} onClick={() => void markAllRead()}>
-                  Tumunu okundu isaretle
+                  Tümünü okundu işaretle
                 </button>
               ) : null}
             </div>
@@ -184,7 +184,7 @@ export function NotificationBell({ role }: NotificationBellProps) {
 
             <Link href={settingsPath(role)} className="notif-foot" onClick={() => setOpen(false)}>
               <KiIcon name="ki-setting-2" size={15} />
-              Bildirim ayarlari
+              Bildirim ayarları
             </Link>
           </div>
         </>

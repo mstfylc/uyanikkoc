@@ -27,7 +27,7 @@ const ROLE_LABELS: Record<ProfilePanelProps["role"], string> = {
 };
 
 const ROLE_SUB: Record<ProfilePanelProps["role"], string> = {
-  student: "11. Sinif · Sayisal",
+  student: "11. Sınıf · Sayısal",
   coach: "YKS & LGS Koçu",
   parent: "Veli · Elif'in annesi",
 };
@@ -46,9 +46,9 @@ const ROLE_STATS: Record<ProfilePanelProps["role"], Array<{ icon: string; text: 
     { icon: "ki-calendar", text: "Üye: Eyl 2024" },
   ],
   student: [
-    { icon: "ki-book", text: "11. Sinif · Sayisal" },
+    { icon: "ki-book", text: "11. Sınıf · Sayısal" },
     { icon: "ki-chart-simple", text: "Hedef: YKS 2026" },
-    { icon: "ki-flame", text: "12 gun seri" },
+    { icon: "ki-flame", text: "12 gün seri" },
   ],
   parent: [
     { icon: "ki-profile-circle", text: "Elif Yildiz · Öğrenci" },
@@ -193,7 +193,7 @@ export function ProfilePanel({ role }: ProfilePanelProps) {
             </div>
           </UkSection>
 
-          <UkSection title="Hazır ikonlar" sub="Profil avatarını seç">
+          <UkSection title="Profil Fotoğrafı" sub="Hazır bir ikon seç ya da kendi fotoğrafını yükle">
             <div className="card-body">
               <div className="grid g-4" style={{ gap: 10 }}>
                 {PROFILE_AVATAR_ICONS.map((icon) => (

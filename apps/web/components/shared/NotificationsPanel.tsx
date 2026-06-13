@@ -71,7 +71,7 @@ export function NotificationsPanel({ role }: NotificationsPanelProps) {
           unreadCount > 0 ? (
             <button type="button" className="btn btn-light btn-sm" onClick={() => void markAllRead()}>
               <KiIcon name="ki-check" size={14} />
-              Tumunu okundu yap
+              Tümünü okundu işaretle
             </button>
           ) : null
         }
@@ -93,7 +93,7 @@ export function NotificationsPanel({ role }: NotificationsPanelProps) {
             </p>
           ) : notifications.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Bildirim yok.
+              Henüz bildirim yok.
             </p>
           ) : (
             notifications.map((notification) => (
