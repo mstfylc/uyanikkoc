@@ -1,0 +1,48 @@
+EN GUNCEL KANONIK SURUM: uyanikkoc-yonetim-claudecode-v4  (Yonetim Paneli — Claude Code handoff)
+
+Urun: Uyanik Koc YONETIM PANELI — ogrenci/koc/veli web uygulamasindan AYRI urun.
+3 mod: Super Admin · Kurum Yoneticisi · Bireysel Koc. Tasarim sistemi web ile ORTAK (marka #534AB7).
+Tum dosyalar UTF-8 text. Dosya ADLARI ASCII'dir (path kisiti); ARAYUZ METINLERI TAM TURKCE'dir,
+dogruluk kaynagi admin/*.jsx'tir (kodlarken Turkce karakteri ASCII'ye dusurme — bkz. CLAUDE.md).
+
+KOK
+  CLAUDE.md                       Claude Code kalici talimatlari (once oku).
+  uyanik-koc-yonetim-paneli.html  Kanonik HTML — 3 modun tum ekranlarinin girisi.
+  tokens.json                     Token (light+dark) — WEB ILE ORTAK, birebir.
+  VALIDATION.md                   Token paritesi + denetim raporu.
+  manifest.txt                    Bu dosya.
+
+handoff/
+  README.md                       Kanonik talimat + 3 mod + ekran envanteri ozeti.
+  EKRANLAR.md                     Ekran listesi (3 mod, amac + ana bilesenler + prompt eslesmesi).
+  SADAKAT-SPEC-INDEX.md           Tum ekran-bazli birebir yerlesim spec'lerinin indeksi.
+  SADAKAT-SPEC-yonetim-<ekran>.md Ekran spec'leri (SA + Kurum + Bireysel Koc + profil).
+  data-contracts.md               RBAC + veri modeli (org/coach/plan/modul/manager).
+  RISKS_AND_GAPS.md               Sinirlar: marka, AI Koc "Yakinda", CRM yok, veri uydurma yok.
+  QA-CAPTURE-RECETESI.md          PNG curated set + boot-direct + DevTools recetesi.
+
+exports/yonetim/                  QA ekran goruntuleri (curated, desktop light+dark) + README.
+
+TASARIM SISTEMI (web ile ORTAK)
+  src/styles.css, billing.css     :root + [data-theme=dark] token'lari + tum component siniflari.
+  src/icons.jsx, logo.jsx, ui.jsx, ui-actions.jsx, billing-store.jsx, billing-checkout.jsx
+
+PANELE OZEL (admin/)
+  admin.css                       .mode-seg, .meter*, .lic-hero*, .org-logo, .alert-strip, .switch,
+                                  .fb-card, .task-row + mobil responsive.
+  admin-data.jsx                  Tum panel verisi + yardimcilar (orgs, getActiveOrg, platformMetrics,
+                                  MODULES, ORG_PLANS, COACH_PLANS, TRY, daysLeft...).
+  admin-ui.jsx                    Panel primitifleri (PageHead, Section, Modal, Field, Meter,
+                                  StatusBadge, OrgLogo, EmptyState, Avatar, Tabs, RankBars, Donut, Ring...).
+  admin-app.jsx                   Kabuk: MODES + renderPage + AdminSidebar + AdminTopbar + AdminProfile.
+  superadmin.jsx / superadmin2.jsx  SA ekranlari (taban).
+  kurum.jsx / kurum2.jsx          Kurum ekranlari.
+  coach-license.jsx               Bireysel koc ekranlari.
+  leads.jsx, plans-packages.jsx, sa-reports.jsx, settings.jsx  SA: talepler/lisans-turleri/raporlar/ayarlar.
+  admin-extra.jsx / 2 / 3 / 4     OVERRIDE bilesenleri — SON yuklenen kazanir (HTML sirasi korunmali).
+
+OVERRIDE NOTU: SACoaches(extra2) · SAOrgDetail+SASupport(extra3) · SALicenses+Kurum koc/ogrenci/
+  yonetici/lisans detaylari(extra4) taban dosyayi EZER. Port'ta en son tanim esas (spec'lerde isaretli).
+
+CALISTIRMA: uyanik-koc-yonetim-paneli.html tarayicida ac. Topbar mod switcher ile gec.
+FONT: Plus Jakarta Sans (Google Fonts). IKON: SVG path (src/icons.jsx). Harici gorsel yok.
