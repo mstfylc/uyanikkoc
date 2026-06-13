@@ -35,6 +35,7 @@ async function sessionFromBearer(req: NextRequest): Promise<SessionRoleSnapshot 
   return {
     user: {
       id: payload.sub,
+      name: null,
       role: payload.role,
       organizationId: payload.organizationId,
       branchId: payload.branchId,
@@ -73,6 +74,7 @@ export async function requireAuth(
     session: {
       user: {
         id: session.user.id,
+        name: session.user.name ?? null,
         role: session.user.role,
         organizationId: session.user.organizationId ?? null,
         branchId: session.user.branchId ?? null,

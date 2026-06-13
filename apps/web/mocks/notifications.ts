@@ -4,6 +4,12 @@ import { DEMO_PARENT_ID, DEMO_STUDENT_ID, listAssignmentsForParent, listAssignme
 import { DEMO_COACH_ID } from "@/mocks/messages";
 
 type StoredNotification = NotificationRecord & { coachId?: string | null };
+type NotificationSeedInput = Omit<NotificationRecord, "icon" | "tone" | "page"> & {
+  coachId?: string | null;
+  icon?: string | null;
+  tone?: string | null;
+  page?: string | null;
+};
 
 const globalStore = globalThis as typeof globalThis & {
   __uyanikNotifications?: StoredNotification[];
@@ -16,6 +22,16 @@ const sourceKeys =
 
 function nowIso(offsetMinutes = 0): string {
   return new Date(Date.now() - offsetMinutes * 60_000).toISOString();
+}
+
+function withNotificationDefaults(notification: NotificationSeedInput): StoredNotification {
+  return {
+    ...notification,
+    coachId: notification.coachId ?? null,
+    icon: notification.icon ?? null,
+    tone: notification.tone ?? null,
+    page: notification.page ?? null,
+  };
 }
 
 function isOverdueAssignment(assignment: AssignmentRecord, now = new Date()): boolean {
@@ -34,6 +50,7 @@ function seedIfEmpty() {
   }
 
   notifications.push(
+    ...[
     {
       id: "notif_s1",
       studentId: DEMO_STUDENT_ID,
@@ -174,7 +191,7 @@ function seedIfEmpty() {
       read: true,
       createdAt: nowIso(2880),
     },
-  );
+  ].map(withNotificationDefaults));
 }
 
 export function resetNotificationsForTests(): void {
@@ -198,16 +215,19 @@ export function syncOverdue(
     }
 
     sourceKeys.add(sourceKey);
-    notifications.push({
+    notifications.push(withNotificationDefaults({
       id: `notification_${notifications.length + 1}`,
       studentId,
       parentId,
       coachId: null,
+      icon: "clock",
+      tone: "warning",
       title: "Gecikmiş ödev",
       body: `"${assignment.title}" ödevinin son tarihi geçti.`,
+      page: "assignments",
       read: false,
       createdAt: nowIso(),
-    });
+    }));
   }
 }
 
@@ -288,7 +308,7 @@ export function countUnread(items: NotificationRecord[]): number {
 
 export function pushStudentNotification(studentId: string, title: string, body: string): void {
   seedIfEmpty();
-  notifications.unshift({
+  notifications.unshift(withNotificationDefaults({
     id: `notification_${notifications.length + 1}`,
     studentId,
     parentId: null,
@@ -297,12 +317,12 @@ export function pushStudentNotification(studentId: string, title: string, body: 
     body,
     read: false,
     createdAt: nowIso(),
-  });
+  }));
 }
 
 export function pushParentNotification(parentId: string, title: string, body: string): void {
   seedIfEmpty();
-  notifications.unshift({
+  notifications.unshift(withNotificationDefaults({
     id: `notification_${notifications.length + 1}`,
     studentId: null,
     parentId,
@@ -311,12 +331,12 @@ export function pushParentNotification(parentId: string, title: string, body: st
     body,
     read: false,
     createdAt: nowIso(),
-  });
+  }));
 }
 
 export function pushCoachNotification(coachId: string, title: string, body: string): void {
   seedIfEmpty();
-  notifications.unshift({
+  notifications.unshift(withNotificationDefaults({
     id: `notification_${notifications.length + 1}`,
     studentId: null,
     parentId: null,
@@ -325,5 +345,5 @@ export function pushCoachNotification(coachId: string, title: string, body: stri
     body,
     read: false,
     createdAt: nowIso(),
-  });
+  }));
 }

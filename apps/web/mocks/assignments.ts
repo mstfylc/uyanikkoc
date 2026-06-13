@@ -43,6 +43,42 @@ function daysFromNow(days: number, hour = 12): string {
   return date.toISOString();
 }
 
+type AssignmentSeedInput = Omit<
+  Assignment,
+  | "week"
+  | "topic"
+  | "source"
+  | "count"
+  | "odevType"
+  | "odevTypes"
+  | "note"
+  | "assignedAt"
+  | "smart"
+  | "overdueAlert"
+  | "quality"
+  | "feedback"
+  | "result"
+>;
+
+function withAssignmentDefaults(assignment: AssignmentSeedInput): Assignment {
+  return {
+    ...assignment,
+    week: "w0",
+    topic: null,
+    source: "",
+    count: 0,
+    odevType: null,
+    odevTypes: [],
+    note: "",
+    assignedAt: assignment.createdAt,
+    smart: false,
+    overdueAlert: false,
+    quality: false,
+    feedback: null,
+    result: null,
+  };
+}
+
 function seedIfEmpty(): void {
   if (assignments.length > 0) {
     return;
@@ -50,6 +86,7 @@ function seedIfEmpty(): void {
 
   const timestamp = nowIso();
   assignments.push(
+    ...([
     {
       id: "assignment_demo_001",
       title: "Turev kurallari - 40 soru",
@@ -158,7 +195,7 @@ function seedIfEmpty(): void {
       completed: true,
       completedAt: daysFromNow(-5, 19),
     },
-  );
+  ] satisfies AssignmentSeedInput[]).map(withAssignmentDefaults));
 
   assignmentResults.assignment_demo_002 = { correct: 24, wrong: 4, blank: 2, net: 23 };
   assignmentResults.assignment_demo_004 = { correct: 21, wrong: 3, blank: 1, net: 20.25 };
@@ -171,11 +208,23 @@ export function createAssignment(input: AssignmentCreateInput): Assignment {
     id: `assignment_${assignments.length + 1}`,
     title: input.title,
     description: input.description ?? null,
+    week: input.week ?? "w0",
+    topic: input.topic ?? null,
+    source: input.source ?? "",
+    count: input.count ?? 0,
+    odevType: input.odevType ?? null,
+    odevTypes: input.odevTypes ?? [],
+    note: input.note ?? "",
     type: input.type ?? "homework",
     priority: input.priority ?? "medium",
     status: "pending",
     subject: input.subject ?? null,
     dueDate: input.dueDate ?? null,
+    assignedAt: input.assignedAt ?? timestamp,
+    smart: input.smart ?? false,
+    overdueAlert: input.overdueAlert ?? false,
+    quality: input.quality ?? false,
+    feedback: input.feedback ?? null,
     coachId: input.coachId,
     studentId: input.studentId,
     parentId: input.parentId,
@@ -184,6 +233,7 @@ export function createAssignment(input: AssignmentCreateInput): Assignment {
     updatedAt: timestamp,
     completed: false,
     completedAt: null,
+    result: null,
   };
 
   assignments.push(assignment);

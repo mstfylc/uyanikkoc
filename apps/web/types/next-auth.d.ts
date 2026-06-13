@@ -16,6 +16,7 @@ declare module "next-auth" {
 
   interface User {
     role: AppRole;
+    name?: string | null;
     organizationId?: string | null;
     branchId?: string | null;
     studentId?: string | null;
@@ -27,6 +28,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     role?: AppRole;
+    name?: string | null;
     organizationId?: string | null;
     branchId?: string | null;
     studentId?: string | null;

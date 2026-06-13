@@ -46,8 +46,9 @@ function defaultSettings(coachId: string): AppointmentSettingsRecord {
   };
 }
 
-function displayNameFromEmail(email: string): string {
-  return email
+function displayNameFromUser(user: { name: string | null; email: string }): string {
+  if (user.name?.trim()) return user.name.trim();
+  return user.email
     .split("@")[0]
     .replace(/[._-]+/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
@@ -88,13 +89,13 @@ function mapAppointment(row: {
   requesterRole: "student" | "parent";
   status: AppointmentStatus;
   createdAt: Date;
-  student: { user: { email: string } };
+  student: { user: { name: string | null; email: string } };
 }): AppointmentRecord {
   return {
     id: row.id,
     coachId: row.coachId,
     studentId: row.studentId,
-    studentName: displayNameFromEmail(row.student.user.email),
+    studentName: displayNameFromUser(row.student.user),
     day: row.day,
     slot: row.slot,
     mode: row.mode,

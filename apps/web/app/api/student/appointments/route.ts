@@ -2,6 +2,7 @@ import type { AppointmentDay, AppointmentMode } from "@uyanik/database";
 import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
+import { toAppointmentContract } from "@/lib/contracts/web-v6";
 import {
   createStudentAppointment,
   getCoachAppointmentSettings,
@@ -21,7 +22,7 @@ export const GET = withApiAuth(["student"], async (_req, { session }) => {
     coachId ? getCoachAppointmentSettings(coachId) : Promise.resolve(null),
   ]);
 
-  return NextResponse.json({ appointments, settings }, { status: 200 });
+  return NextResponse.json({ appointments, appts: appointments.map((item) => toAppointmentContract(item)), settings }, { status: 200 });
 });
 
 export const POST = withApiAuth(["student"], async (req, { session }) => {
@@ -61,7 +62,7 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
       topic: body.topic.trim(),
       requesterRole: "student",
     });
-    return NextResponse.json({ appointment, settings }, { status: 200 });
+    return NextResponse.json({ appointment, appt: toAppointmentContract(appointment), settings }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Request failed" },

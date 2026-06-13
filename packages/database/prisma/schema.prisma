@@ -97,6 +97,8 @@ model Branch {
 model User {
   id             String          @id
   email          String          @unique
+  name           String?
+  phone          String?
   passwordHash   String
   role           DbRole
   organizationId String
@@ -266,11 +268,23 @@ model Assignment {
   id          String             @id @default(cuid())
   title       String
   description String?
+  week        String             @default("w0")
+  topic       String?
+  source      String             @default("")
+  count       Int                @default(0)
+  odevType    String?
+  odevTypes   String[]           @default([])
+  note        String             @default("")
   type        AssignmentType     @default(homework)
   priority    AssignmentPriority @default(medium)
   status      AssignmentStatus   @default(pending)
   subject     String?
   dueDate     DateTime?
+  assignedAt  DateTime?
+  smart       Boolean            @default(false)
+  overdueAlert Boolean           @default(false)
+  quality     Boolean            @default(false)
+  feedback    String?
   coachId     String
   studentId   String
   parentId    String
@@ -541,8 +555,11 @@ model Notification {
   studentId String?
   parentId  String?
   coachId   String?
+  icon      String?
+  tone      String?
   title     String
   body      String
+  page      String?
   read      Boolean         @default(false)
   sourceKey String?         @unique
   createdAt DateTime        @default(now())

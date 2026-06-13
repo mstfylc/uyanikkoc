@@ -2,7 +2,9 @@ import { prisma } from "../client";
 import type { CoachRosterEntry } from "../types";
 import { randomUUID } from "node:crypto";
 
-function displayNameFromEmail(email: string): string {
+function displayNameFromUser(user: { name: string | null; email: string }): string {
+  if (user.name?.trim()) return user.name.trim();
+  const email = user.email;
   const local = email.split("@")[0] ?? email;
   return local.replace(/[._-]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
@@ -13,7 +15,7 @@ export async function listCoachStudents(coachId: string): Promise<CoachRosterEnt
     include: {
       student: {
         include: {
-          user: { select: { email: true } },
+          user: { select: { name: true, email: true } },
         },
       },
     },
@@ -23,7 +25,7 @@ export async function listCoachStudents(coachId: string): Promise<CoachRosterEnt
   return rows.map((row) => ({
     studentId: row.studentId,
     email: row.student.user.email,
-    displayName: displayNameFromEmail(row.student.user.email),
+    displayName: displayNameFromUser(row.student.user),
   }));
 }
 
@@ -124,6 +126,7 @@ export async function addCoachStudent(
       data: {
         id: nextId("user_parent"),
         email: parentEmail,
+        name: `${displayName} Velisi`,
         passwordHash: input.passwordHash,
         role: "PARENT",
         organizationId: coach.user.organizationId,
@@ -142,6 +145,7 @@ export async function addCoachStudent(
       data: {
         id: nextId("user_student"),
         email,
+        name: displayName,
         passwordHash: input.passwordHash,
         role: "STUDENT",
         organizationId: coach.user.organizationId,

@@ -8,6 +8,8 @@ function mapDemoUser(user: DemoUser): AuthUserRecord {
   return {
     id: user.id,
     email: user.email,
+    name: user.name ?? null,
+    phone: user.phone ?? null,
     passwordHash: user.passwordHash,
     role: user.role as DbRole,
     organizationId: user.organizationId,

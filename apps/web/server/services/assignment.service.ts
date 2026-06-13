@@ -20,7 +20,26 @@ import { coachHasStudent, resolveParentIdForStudent } from "@/server/services/ro
 export type { AssignmentCreateInput, AssignmentRecord, ParentSummaryRecord };
 
 export type CoachCreateAssignmentBody = Partial<
-  Pick<AssignmentCreateInput, "description" | "type" | "priority" | "subject" | "dueDate" | "studentId">
+  Pick<
+    AssignmentCreateInput,
+    | "description"
+    | "week"
+    | "topic"
+    | "source"
+    | "count"
+    | "odevType"
+    | "odevTypes"
+    | "note"
+    | "type"
+    | "priority"
+    | "subject"
+    | "dueDate"
+    | "smart"
+    | "overdueAlert"
+    | "quality"
+    | "feedback"
+    | "studentId"
+  >
 > & {
   title: string;
 };
@@ -123,10 +142,21 @@ export async function createCoachAssignment(
     parentId,
     branchId,
     description: body.description ?? null,
+    week: body.week,
+    topic: body.topic ?? null,
+    source: body.source ?? null,
+    count: body.count,
+    odevType: body.odevType ?? null,
+    odevTypes: body.odevTypes,
+    note: body.note ?? null,
     type: body.type,
     priority: body.priority,
     subject: body.subject ?? null,
     dueDate: body.dueDate ?? null,
+    smart: body.smart,
+    overdueAlert: body.overdueAlert,
+    quality: body.quality,
+    feedback: body.feedback ?? null,
   });
 }
 
@@ -201,9 +231,18 @@ export async function assignCoachSmartAssignment(
     studentId,
     title: preview.title,
     subject: preview.subject,
+    topic: preview.topic,
+    source: preview.source,
+    count: preview.questionCount,
+    odevType: "soru",
+    odevTypes: ["soru"],
+    note: `${preview.questionCount} soru - Konu: ${preview.topic} - Kaynak: ${preview.source}`,
     type: "practice",
     priority: preview.priority,
     dueDate: preview.dueDate,
+    smart: true,
+    overdueAlert: preview.overdueAlert,
+    quality: preview.quality === "high",
     description: [
       `${preview.questionCount} soru`,
       `Konu: ${preview.topic}`,

@@ -14,9 +14,9 @@ import {
 } from "@uyanik/shared";
 
 import * as memoryAppointments from "@/mocks/appointments";
-import { listCoachStudents, resolveParentIdForStudent } from "@/mocks/roster";
-import { getParentSummary, listAssignmentsForCoach } from "@/mocks/assignments";
-import { listExamResultsForStudent, listExamResultsForStudents } from "@/mocks/exams";
+import { listCoachStudents } from "@/mocks/roster";
+import { listAssignmentsForCoach } from "@/mocks/assignments";
+import { listExamResultsForStudents } from "@/mocks/exams";
 import { listSubjectsForStudent } from "@/mocks/topics";
 import { buildTopicSummary } from "@uyanik/database";
 
@@ -122,40 +122,55 @@ export async function setCoachAppointmentStatus(
 }
 
 export async function buildCoachReportSummary(coachId: string): Promise<CoachReportSummary> {
-  void shouldUseDatabase();
-  const roster = listCoachStudents(coachId);
-  const appointments = memoryAppointments.listAppointmentsForCoach(coachId);
+  const useDb = shouldUseDatabase();
+  const roster = useDb
+    ? await (await import("@uyanik/database")).rosterRepository.listCoachStudents(coachId)
+    : listCoachStudents(coachId);
+  const appointments = useDb
+    ? await (await import("@uyanik/database")).appointmentRepository.listAppointmentsForCoach(coachId)
+    : memoryAppointments.listAppointmentsForCoach(coachId);
   const pendingAppointments = appointments.filter((item) => item.status === "pending").length;
-  const coachAssignments = listAssignmentsForCoach(coachId);
-  const allExams = listExamResultsForStudents(roster.map((entry) => entry.studentId));
+  const coachAssignments = useDb
+    ? await (await import("@uyanik/database")).assignmentRepository.listAssignmentsForCoach(coachId)
+    : listAssignmentsForCoach(coachId);
+  const allExams = useDb
+    ? await (await import("@uyanik/database")).examRepository.listExamResultsForStudents(roster.map((entry) => entry.studentId))
+    : listExamResultsForStudents(roster.map((entry) => entry.studentId));
   const parentReports = await listReportsForCoach(coachId);
   const pendingReports = parentReports.filter((item) => item.status === "pending").length;
 
   const students = roster.map((entry) => {
-    const parentId = resolveParentIdForStudent(entry.studentId);
-    const summary = parentId ? getParentSummary(parentId) : null;
-    const exams = listExamResultsForStudent(entry.studentId).sort(
-      (left, right) => new Date(left.takenAt).getTime() - new Date(right.takenAt).getTime(),
-    );
-    const topics = listSubjectsForStudent(entry.studentId);
-    const topicSummary = buildTopicSummary(topics);
     const studentAssignments = coachAssignments.filter((item) => item.studentId === entry.studentId);
-    const assignmentRate = summary
-      ? calculateCompletionRate(summary.totalAssignments, summary.completedCount)
-      : 0;
     const overdue = countOverdueAssignments(studentAssignments);
+    const studentExams = allExams
+      .filter((exam) => exam.studentId === entry.studentId)
+      .sort((left, right) => new Date(left.takenAt).getTime() - new Date(right.takenAt).getTime());
+    const completedCount = studentAssignments.filter((assignment) => assignment.completed || assignment.status === "completed").length;
+    const assignmentRate = calculateCompletionRate(studentAssignments.length, completedCount);
     const risk = buildRulesBasedRiskBand(assignmentRate, overdue);
 
     return {
       studentId: entry.studentId,
       displayName: entry.displayName,
-      latestNet: exams[exams.length - 1]?.totalNet ?? null,
+      latestNet: studentExams[studentExams.length - 1]?.totalNet ?? null,
       assignmentRate,
-      topicRate: topicSummary.completionRate,
-      examTrend: exams.map((exam) => exam.totalNet),
+      topicRate: 0,
+      examTrend: studentExams.map((exam) => exam.totalNet),
       risk,
     };
   });
+
+  if (useDb) {
+    const { topicRepository } = await import("@uyanik/database");
+    for (const student of students) {
+      const topics = await topicRepository.listSubjectsForStudent(student.studentId);
+      student.topicRate = buildTopicSummary(topics).completionRate;
+    }
+  } else {
+    for (const student of students) {
+      student.topicRate = buildTopicSummary(listSubjectsForStudent(student.studentId)).completionRate;
+    }
+  }
 
   const nets = students.map((item) => item.latestNet).filter((value): value is number => value != null);
   const avgExamNet =

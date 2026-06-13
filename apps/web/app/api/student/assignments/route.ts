@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
+import { toOdevContract } from "@/lib/contracts/web-v6";
 import {
   completeStudentAssignment,
   listStudentAssignments,
@@ -14,7 +15,7 @@ export const GET = withApiAuth(["student"], async (_req, { session }) => {
   }
 
   const assignments = await listStudentAssignments(studentId);
-  return NextResponse.json({ assignments }, { status: 200 });
+  return NextResponse.json({ assignments, odevler: assignments.map(toOdevContract) }, { status: 200 });
 });
 
 export const PATCH = withApiAuth(["student"], async (req, { session }) => {
@@ -26,7 +27,7 @@ export const PATCH = withApiAuth(["student"], async (req, { session }) => {
   const body = (await req.json()) as {
     assignmentId?: string;
     status?: "completed";
-    result?: { correct: number; wrong: number; blank: number };
+    result?: { correct?: number; wrong?: number; blank?: number; d?: number; y?: number; b?: number };
   };
 
   if (!body.assignmentId) {
@@ -34,11 +35,15 @@ export const PATCH = withApiAuth(["student"], async (req, { session }) => {
   }
 
   if (body.result) {
-    const payload = await submitStudentAssignmentResult(body.assignmentId, studentId, body.result);
+    const payload = await submitStudentAssignmentResult(body.assignmentId, studentId, {
+      correct: body.result.correct ?? body.result.d ?? 0,
+      wrong: body.result.wrong ?? body.result.y ?? 0,
+      blank: body.result.blank ?? body.result.b ?? 0,
+    });
     if (!payload) {
       return NextResponse.json({ error: "Assignment not found" }, { status: 404 });
     }
-    return NextResponse.json(payload, { status: 200 });
+    return NextResponse.json({ ...payload, odev: toOdevContract(payload.assignment) }, { status: 200 });
   }
 
   const assignment = await completeStudentAssignment(body.assignmentId, studentId);
@@ -46,5 +51,5 @@ export const PATCH = withApiAuth(["student"], async (req, { session }) => {
     return NextResponse.json({ error: "Assignment not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ assignment }, { status: 200 });
+  return NextResponse.json({ assignment, odev: toOdevContract(assignment) }, { status: 200 });
 });

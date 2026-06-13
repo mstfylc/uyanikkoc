@@ -6,8 +6,11 @@ function mapNotification(notification: {
   studentId: string | null;
   parentId: string | null;
   coachId: string | null;
+  icon: string | null;
+  tone: string | null;
   title: string;
   body: string;
+  page: string | null;
   read: boolean;
   createdAt: Date;
 }): NotificationRecord {
@@ -16,8 +19,11 @@ function mapNotification(notification: {
     studentId: notification.studentId,
     parentId: notification.parentId,
     coachId: notification.coachId,
+    icon: notification.icon,
+    tone: notification.tone,
     title: notification.title,
     body: notification.body,
+    page: notification.page,
     read: notification.read,
     createdAt: notification.createdAt.toISOString(),
   };
@@ -52,6 +58,9 @@ export async function syncOverdueNotifications(
         parentId,
         title: "Gecikmis odev",
         body: `"${assignment.title}" odevinin son tarihi gecti.`,
+        icon: "clock",
+        tone: "warning",
+        page: "assignments",
         sourceKey,
       },
     });

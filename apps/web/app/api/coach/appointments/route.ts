@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
+import { toAppointmentContract } from "@/lib/contracts/web-v6";
 import {
   getCoachAppointmentSettings,
   listCoachAppointments,
@@ -18,7 +19,7 @@ export const GET = withApiAuth(["coach"], async (_req, { session }) => {
     listCoachAppointments(coachId),
   ]);
 
-  return NextResponse.json({ settings, appointments }, { status: 200 });
+  return NextResponse.json({ settings, appointments, appts: appointments.map((item) => toAppointmentContract(item)) }, { status: 200 });
 });
 
 export const PATCH = withApiAuth(["coach"], async (req, { session }) => {

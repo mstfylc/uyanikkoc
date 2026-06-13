@@ -9,11 +9,23 @@ function mapAssignment(assignment: {
   id: string;
   title: string;
   description: string | null;
+  week: string;
+  topic: string | null;
+  source: string;
+  count: number;
+  odevType: string | null;
+  odevTypes: string[];
+  note: string;
   type: AssignmentRecord["type"];
   priority: AssignmentRecord["priority"];
   status: AssignmentRecord["status"];
   subject: string | null;
   dueDate: Date | null;
+  assignedAt: Date | null;
+  smart: boolean;
+  overdueAlert: boolean;
+  quality: boolean;
+  feedback: string | null;
   coachId: string;
   studentId: string;
   parentId: string;
@@ -22,6 +34,12 @@ function mapAssignment(assignment: {
   updatedAt: Date;
   completed: boolean;
   completedAt: Date | null;
+  student?: {
+    user: {
+      name: string | null;
+      email: string;
+    };
+  };
   result?: {
     correct: number;
     wrong: number;
@@ -33,11 +51,24 @@ function mapAssignment(assignment: {
     id: assignment.id,
     title: assignment.title,
     description: assignment.description,
+    studentName: assignment.student?.user.name ?? assignment.student?.user.email ?? undefined,
+    week: assignment.week,
+    topic: assignment.topic,
+    source: assignment.source,
+    count: assignment.count,
+    odevType: assignment.odevType,
+    odevTypes: assignment.odevTypes,
+    note: assignment.note,
     type: assignment.type,
     priority: assignment.priority,
     status: assignment.status,
     subject: assignment.subject,
     dueDate: assignment.dueDate?.toISOString() ?? null,
+    assignedAt: assignment.assignedAt?.toISOString() ?? null,
+    smart: assignment.smart,
+    overdueAlert: assignment.overdueAlert,
+    quality: assignment.quality,
+    feedback: assignment.feedback,
     coachId: assignment.coachId,
     studentId: assignment.studentId,
     parentId: assignment.parentId,
@@ -62,15 +93,28 @@ export async function createAssignment(input: AssignmentCreateInput): Promise<As
     data: {
       title: input.title,
       description: input.description ?? null,
+      week: input.week ?? "w0",
+      topic: input.topic ?? null,
+      source: input.source ?? "",
+      count: input.count ?? 0,
+      odevType: input.odevType ?? null,
+      odevTypes: input.odevTypes ?? [],
+      note: input.note ?? "",
       type: input.type ?? "homework",
       priority: input.priority ?? "medium",
       subject: input.subject ?? null,
       dueDate: input.dueDate ? new Date(input.dueDate) : null,
+      assignedAt: input.assignedAt ? new Date(input.assignedAt) : new Date(),
+      smart: input.smart ?? false,
+      overdueAlert: input.overdueAlert ?? false,
+      quality: input.quality ?? false,
+      feedback: input.feedback ?? null,
       coachId: input.coachId,
       studentId: input.studentId,
       parentId: input.parentId,
       branchId: input.branchId,
     },
+    include: { result: true, student: { include: { user: { select: { name: true, email: true } } } } },
   });
 
   return mapAssignment(assignment);
@@ -80,7 +124,7 @@ export async function listAssignmentsForStudent(studentId: string): Promise<Assi
   const assignments = await prisma.assignment.findMany({
     where: { studentId },
     orderBy: { createdAt: "desc" },
-    include: { result: true },
+    include: { result: true, student: { include: { user: { select: { name: true, email: true } } } } },
   });
 
   return assignments.map(mapAssignment);
@@ -90,7 +134,7 @@ export async function listAssignmentsForCoach(coachId: string): Promise<Assignme
   const assignments = await prisma.assignment.findMany({
     where: { coachId },
     orderBy: { createdAt: "desc" },
-    include: { result: true },
+    include: { result: true, student: { include: { user: { select: { name: true, email: true } } } } },
   });
 
   return assignments.map(mapAssignment);
@@ -102,7 +146,7 @@ export async function completeAssignment(
 ): Promise<AssignmentRecord | null> {
   const existing = await prisma.assignment.findFirst({
     where: { id: assignmentId, studentId },
-    include: { result: true },
+    include: { result: true, student: { include: { user: { select: { name: true, email: true } } } } },
   });
 
   if (!existing || existing.status === "completed") {
@@ -116,7 +160,7 @@ export async function completeAssignment(
       completed: true,
       completedAt: new Date(),
     },
-    include: { result: true },
+    include: { result: true, student: { include: { user: { select: { name: true, email: true } } } } },
   });
 
   return mapAssignment(assignment);
@@ -161,7 +205,7 @@ export async function submitAssignmentResult(
         },
       },
     },
-    include: { result: true },
+    include: { result: true, student: { include: { user: { select: { name: true, email: true } } } } },
   });
 
   return mapAssignment(assignment);

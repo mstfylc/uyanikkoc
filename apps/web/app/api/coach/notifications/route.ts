@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
+import { toNotificationContract } from "@/lib/contracts/web-v6";
 import {
   listCoachNotifications,
   markAllCoachNotificationsRead,
@@ -14,7 +15,10 @@ export const GET = withApiAuth(["coach"], async (_req, { session }) => {
   }
 
   const result = await listCoachNotifications(coachId);
-  return NextResponse.json(result, { status: 200 });
+  return NextResponse.json(
+    { ...result, notificationQueue: result.notifications.map(toNotificationContract) },
+    { status: 200 },
+  );
 });
 
 export const PATCH = withApiAuth(["coach"], async (req, { session }) => {
@@ -39,5 +43,5 @@ export const PATCH = withApiAuth(["coach"], async (req, { session }) => {
     return NextResponse.json({ error: "Notification not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ notification }, { status: 200 });
+  return NextResponse.json({ notification, item: toNotificationContract(notification) }, { status: 200 });
 });

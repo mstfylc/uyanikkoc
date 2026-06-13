@@ -36,6 +36,8 @@ export async function findUserByEmail(email: string): Promise<AuthUserRecord | n
   return {
     id: user.id,
     email: user.email,
+    name: user.name,
+    phone: user.phone,
     passwordHash: user.passwordHash,
     role: user.role,
     organizationId: user.organizationId,
@@ -63,6 +65,8 @@ export async function findUserById(id: string): Promise<AuthUserRecord | null> {
   return {
     id: user.id,
     email: user.email,
+    name: user.name,
+    phone: user.phone,
     passwordHash: user.passwordHash,
     role: user.role,
     organizationId: user.organizationId,

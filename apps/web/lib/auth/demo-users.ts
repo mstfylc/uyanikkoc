@@ -14,6 +14,8 @@ export const DEMO_PASSWORD_HASH = hashSync(DEMO_PASSWORD, 10);
 export type DemoUser = {
   id: string;
   email: string;
+  name?: string;
+  phone?: string;
   passwordHash: string;
   role: DbRole;
   organizationId: string;

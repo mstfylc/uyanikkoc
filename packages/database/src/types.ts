@@ -9,21 +9,46 @@ export type AssignmentCreateInput = {
   parentId: string;
   branchId: string;
   description?: string | null;
+  week?: string;
+  topic?: string | null;
+  source?: string | null;
+  count?: number;
+  odevType?: string | null;
+  odevTypes?: string[];
+  note?: string | null;
   type?: AssignmentType;
   priority?: AssignmentPriority;
   subject?: string | null;
   dueDate?: string | null;
+  assignedAt?: string | null;
+  smart?: boolean;
+  overdueAlert?: boolean;
+  quality?: boolean;
+  feedback?: string | null;
 };
 
 export type AssignmentRecord = {
   id: string;
   title: string;
   description: string | null;
+  studentName?: string;
+  week: string;
+  topic: string | null;
+  source: string;
+  count: number;
+  odevType: string | null;
+  odevTypes: string[];
+  note: string;
   type: AssignmentType;
   priority: AssignmentPriority;
   status: AssignmentStatus;
   subject: string | null;
   dueDate: string | null;
+  assignedAt: string | null;
+  smart: boolean;
+  overdueAlert: boolean;
+  quality: boolean;
+  feedback: string | null;
   coachId: string;
   studentId: string;
   parentId: string;
@@ -60,8 +85,11 @@ export type NotificationRecord = {
   studentId: string | null;
   parentId: string | null;
   coachId: string | null;
+  icon: string | null;
+  tone: string | null;
   title: string;
   body: string;
+  page: string | null;
   read: boolean;
   createdAt: string;
 };
@@ -252,6 +280,8 @@ export type ExamTrendSummary = {
 export type AuthUserRecord = {
   id: string;
   email: string;
+  name?: string | null;
+  phone?: string | null;
   passwordHash: string;
   role: "STUDENT" | "COACH" | "PARENT" | "BRANCH_MANAGER" | "ORG_ADMIN";
   organizationId: string;

@@ -51,6 +51,7 @@ export async function authorizeCredentials(credentials: CredentialsInput, reques
   return {
     id: user.id,
     email: user.email,
+    name: user.name ?? null,
     role: dbRoleToAppRole[user.role],
     organizationId: user.organizationId,
     branchId: user.branchId,
@@ -88,6 +89,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       user.organizationId = user.organizationId ?? null;
+      user.name = user.name ?? null;
       user.branchId = user.branchId ?? null;
       user.studentId = user.studentId ?? null;
       user.coachId = user.coachId ?? null;
@@ -98,6 +100,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
+        token.name = user.name ?? null;
         token.organizationId = user.organizationId ?? null;
         token.branchId = user.branchId ?? null;
         token.studentId = user.studentId ?? null;
@@ -110,6 +113,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub ?? session.user.id;
+        session.user.name = token.name ?? session.user.name ?? null;
         session.user.role = token.role as typeof session.user.role;
         session.user.organizationId = token.organizationId ?? null;
         session.user.branchId = token.branchId ?? null;

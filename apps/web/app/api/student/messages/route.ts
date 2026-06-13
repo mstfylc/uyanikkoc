@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
+import { toMessagingContract } from "@/lib/contracts/web-v6";
 import { listStudentMessageThreads } from "@/server/services/message.service";
 
 export const GET = withApiAuth(["student"], async (_req, { session }) => {
@@ -10,5 +11,5 @@ export const GET = withApiAuth(["student"], async (_req, { session }) => {
   }
 
   const threads = await listStudentMessageThreads(studentId, session.user.id);
-  return NextResponse.json({ threads }, { status: 200 });
+  return NextResponse.json({ threads, msgRoot: toMessagingContract(threads, "student") }, { status: 200 });
 });

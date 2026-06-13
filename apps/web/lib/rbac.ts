@@ -11,6 +11,7 @@ export type LegacySessionRoleSnapshot = {
 export type SessionRoleSnapshot = {
   user: {
     id: string;
+    name?: string | null;
     role: AppRole;
     organizationId?: string | null;
     branchId?: string | null;
