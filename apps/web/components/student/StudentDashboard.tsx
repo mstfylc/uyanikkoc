@@ -528,10 +528,10 @@ export function StudentDashboard() {
       ) : null}
 
       <div className="grid g-4">
-        <StatCard label="Bu hafta çalışma" value="18s" icon="ki-time" tone="info" delta="+3s" />
+        <StatCard label="Bu hafta çalışma" value="18s" icon="ki-time" tone="primary" delta="+3s" />
         <StatCard label="Tamamlanan ödev" value={isLoading ? "-" : totals.completed} icon="ki-check-circle" tone="success" delta="+2" />
         <StatCard label="Bekleyen görev" value={isLoading ? "-" : totals.pending} icon="ki-notepad-edit" tone="warning" delta="1 gecikmiş" deltaDir="down" />
-        <StatCard label="Haftalık tamamlama" value={isLoading ? "-" : `${totals.completionRate}%`} icon="ki-chart-pie-simple" tone="primary" delta="+8%" />
+        <StatCard label="Haftalık tamamlama" value={isLoading ? "-" : `${totals.completionRate}%`} icon="ki-target" tone="info" delta="+8%" />
       </div>
 
       <div className="grid col-main">

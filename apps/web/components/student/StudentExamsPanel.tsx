@@ -92,6 +92,8 @@ export function StudentExamsPanel() {
         .map((exam) => exam.totalNet),
     [exams],
   );
+  const avgNet = trendNets.length ? trendNets.reduce((sum, net) => sum + net, 0) / trendNets.length : null;
+  const bestNet = trendNets.length ? Math.max(...trendNets) : null;
 
   return (
     <div className="stack rise" data-testid="student-exams-panel">
@@ -127,22 +129,12 @@ export function StudentExamsPanel() {
       <NetGainMap mode="student" />
 
       <div className="grid g-4">
+        <UkStatCard icon="ki-chart-simple" tone="primary" value={summary?.examCount ?? exams.length} label="Toplam deneme" />
+        <UkStatCard icon="ki-target" tone="info" value={avgNet != null ? formatExamNet(avgNet) : "—"} label="Ortalama net" />
+        <UkStatCard icon="ki-star" tone="success" value={bestNet != null ? formatExamNet(bestNet) : "—"} label="En yüksek net" />
         <UkStatCard
-          icon="ki-chart-simple"
-          tone="primary"
-          value={summary?.latestNet != null ? formatExamNet(summary.latestNet) : "—"}
-          label="Son deneme neti"
-        />
-        <UkStatCard icon="ki-chart-line-up" tone="info" value={summary?.examCount ?? 0} label="Toplam deneme" />
-        <UkStatCard
-          icon="ki-flag"
-          tone="success"
-          value={summary?.examType ? RESULT_EXAM_TYPE_LABELS[summary.examType] : "—"}
-          label="Son sınav türü"
-        />
-        <UkStatCard
-          icon="ki-arrow-up"
-          tone={summary?.trend === "up" ? "success" : summary?.trend === "down" ? "danger" : "warning"}
+          icon="ki-chart-line-up"
+          tone="warning"
           value={summary ? describeExamTrend(summary.trend) : "—"}
           label="Trend"
           delta={summary?.previousNet != null ? formatExamNet(summary.previousNet) : undefined}

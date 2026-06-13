@@ -98,14 +98,16 @@ export function ParentDashboard() {
   const [summary, setSummary] = useState<ParentSummary | null>(null);
   const [reports, setReports] = useState<ParentReport[]>([]);
   const [appointments, setAppointments] = useState<AppointmentRecord[]>([]);
+  const [latestExamNet, setLatestExamNet] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [summaryResponse, reportsResponse, appointmentsResponse] = await Promise.all([
+      const [summaryResponse, reportsResponse, appointmentsResponse, examsResponse] = await Promise.all([
         fetch("/api/parent/summary", { credentials: "same-origin" }),
         fetch("/api/parent/reports", { credentials: "same-origin" }),
         fetch("/api/parent/appointments", { credentials: "same-origin" }),
+        fetch("/api/parent/exams", { credentials: "same-origin" }),
       ]);
 
       if (summaryResponse.ok) {
@@ -121,6 +123,11 @@ export function ParentDashboard() {
       if (appointmentsResponse.ok) {
         const data = (await appointmentsResponse.json()) as { appointments: AppointmentRecord[] };
         setAppointments(data.appointments);
+      }
+
+      if (examsResponse.ok) {
+        const data = (await examsResponse.json()) as { exams: Array<{ totalNet: number }> };
+        setLatestExamNet(data.exams[0]?.totalNet ?? null);
       }
 
       setIsLoading(false);
@@ -151,9 +158,9 @@ export function ParentDashboard() {
             <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", fontWeight: 600, marginBottom: 6 }}>
               Merhaba 👋
             </div>
-            <h1 style={{ marginBottom: 7, fontSize: 28, fontWeight: 800, letterSpacing: "-.02em" }}>
+            <h2 style={{ marginBottom: 7 }}>
               {childName ? `Çocuğunuz ${childName}'in gelişimi` : "Çocuğunuzun gelişimi"}
-            </h1>
+            </h2>
             <p>
               Koç <b style={{ color: "#fff" }}>Dilek Emen</b> · 11. Sınıf Sayısal · Hedef YKS 2026
             </p>
@@ -171,12 +178,12 @@ export function ParentDashboard() {
         <StatCard icon="ki-target" tone="success" value={isLoading ? "-" : `${completionRate}%`} label="Bu hafta ödev tamamlama" />
         <StatCard icon="ki-notepad-edit" tone="warning" value={isLoading ? "-" : pending} label="Bekleyen ödev" />
         <StatCard
-          icon="ki-chart-line-up"
+          icon="ki-chart-simple"
           tone="primary"
-          value={latestReport ? `${latestReport.netDelta > 0 ? "+" : ""}${latestReport.netDelta}` : "-"}
-          label="Son rapor net değişimi"
+          value={latestExamNet != null ? latestExamNet.toFixed(1).replace(/\.0$/, "") : "—"}
+          label="Son deneme neti"
         />
-        <StatCard icon="ki-calendar" tone="info" value={upcomingAppointment ? "1" : "0"} label="Yaklaşan randevu" />
+        <StatCard icon="ki-flash" tone="danger" value="12" label="Çalışma serisi (gün)" />
       </div>
 
       <div className="grid col-main">

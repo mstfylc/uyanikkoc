@@ -5,8 +5,11 @@ Hedef: `apps/web/` (Next.js App Router).
 
 ## Klasörler
 
-- `uyanikkoc-web-source-v5/` — **kanonik prototip kaynağı** (doğruluk kaynağı).
-  React+Babel SPA, tüm rol/ekranların JSX'i + `src/styles.css` tam tasarım sistemi + `tokens.json`.
+- `uyanikkoc-web-claudecode-v6/` — **kanonik kaynak (doğruluk kaynağı)** + sadakat sözleşmesi.
+  React+Babel SPA, tüm rol/ekranların JSX'i + `src/styles.css` + `tokens.json`.
+  Yeni dokümanlar: `CLAUDE.md` (kalıcı talimat), `handoff/SADAKAT-SPEC-ogrenci-dashboard.md`
+  (birebir yerleşim spec'i), `handoff/TEKNIK-REHBER-ve-VERI-MODELI.md` (veri modeli + build).
+  (Kaynak `src/*.jsx` içeriği eski v5 ile birebir aynıdır; yalnızca dokümanlar güncellendi.)
 - `_handoff_web_v6_final/` — v6 görsel handoff paketi:
   - `tokens/` — renk/tipografi/spacing/radius-shadow-zindex (token-css-map.md ile)
   - `components/` — v6 modül + primitif spec'leri
