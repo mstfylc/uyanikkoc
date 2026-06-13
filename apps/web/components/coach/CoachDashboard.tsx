@@ -40,7 +40,7 @@ const riskTone: Record<string, Tone> = {
 const weekCompletion = [
   { label: "Pzt", value: 64 },
   { label: "Sal", value: 72 },
-  { label: "Car", value: 69 },
+  { label: "Çar", value: 69 },
   { label: "Per", value: 78 },
   { label: "Cum", value: 82 },
   { label: "Cmt", value: 74 },
@@ -160,7 +160,7 @@ function StudentsTable({
       risk,
       trend,
       net: trend[trend.length - 1] ?? 0,
-      last: index === 0 ? "bugun" : "2 gun once",
+      last: index === 0 ? "bugün" : "2 gün önce",
     };
   });
 
@@ -168,12 +168,12 @@ function StudentsTable({
 
   return (
     <Section
-      title="Ogrencilerim"
-      sub={`${students.length} aktif ogrenci`}
+      title="Öğrencilerim"
+      sub={`${students.length} aktif öğrenci`}
       action={
         <div className="filters">
-          <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>Tumu</button>
-          <button type="button" className={filter === "risk" ? "on" : ""} onClick={() => setFilter("risk")}>Risk altinda</button>
+          <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>Tümü</button>
+          <button type="button" className={filter === "risk" ? "on" : ""} onClick={() => setFilter("risk")}>Risk altında</button>
         </div>
       }
     >
@@ -181,7 +181,7 @@ function StudentsTable({
         <table className="tbl">
           <thead>
             <tr>
-              <th>Ogrenci</th>
+              <th>Öğrenci</th>
               <th>Tamamlama</th>
               <th>Net Trendi</th>
               <th>Durum</th>
@@ -237,13 +237,13 @@ function CoachTasks({ assignments }: { assignments: Assignment[] }) {
   const overdue = assignments.filter((assignment) => !assignment.completed && assignment.dueDate && new Date(assignment.dueDate) < new Date());
   const pending = assignments.filter((assignment) => !assignment.completed);
   const tasks = [
-    { title: `${overdue.length} gecikmis odev`, tag: "Acil", tone: "danger" as Tone, icon: "ki-information-2" },
-    { title: `${pending.length} bekleyen inceleme`, tag: "Bugun", tone: "warning" as Tone, icon: "ki-notepad-edit" },
-    { title: "Veli raporlari kontrol", tag: "Rapor", tone: "info" as Tone, icon: "ki-chart-line-up" },
+    { title: `${overdue.length} gecikmiş ödev`, tag: "Acil", tone: "danger" as Tone, icon: "ki-information-2" },
+    { title: `${pending.length} bekleyen inceleme`, tag: "Bugün", tone: "warning" as Tone, icon: "ki-notepad-edit" },
+    { title: "Veli raporları kontrol", tag: "Rapor", tone: "info" as Tone, icon: "ki-chart-line-up" },
   ];
 
   return (
-    <Section title="Aksiyon Gerektirenler" sub="Onceliklendirilmis" action={<Badge tone="danger">{tasks.length}</Badge>}>
+    <Section title="Aksiyon Gerektirenler" sub="Önceliklendirilmiş" action={<Badge tone="danger">{tasks.length}</Badge>}>
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {tasks.map((task) => (
           <Link key={task.title} href="/coach/students" className="lrow" style={{ textDecoration: "none" }}>
@@ -259,7 +259,7 @@ function CoachTasks({ assignments }: { assignments: Assignment[] }) {
         ))}
         <Link className="btn btn-primary" style={{ width: "100%", marginTop: 2 }} href="/coach/assignments/create">
           <KiIcon name="ki-plus" size={16} />
-          Yeni odev ata
+          Yeni ödev ata
         </Link>
       </div>
     </Section>
@@ -272,8 +272,8 @@ function WeeklyCompletion() {
 
   return (
     <Section
-      title="Haftalik Sinif Tamamlamasi"
-      sub="Tum ogrencilerin gunluk ortalamasi"
+      title="Haftalık Sınıf Tamamlaması"
+      sub="Tüm öğrencilerin günlük ortalaması"
       action={<div className="row" style={{ gap: 8 }}><span style={{ fontSize: 12, color: "var(--muted)", fontWeight: 600 }}>Ortalama</span><Badge tone="primary">{avg}%</Badge></div>}
     >
       <div className="card-body">
@@ -281,7 +281,7 @@ function WeeklyCompletion() {
         <hr className="hr" style={{ margin: "18px 0 16px" }} />
         <div className="grid g-4" style={{ gap: 12 }}>
           {[
-            ["success", "Mukemmel", 1],
+            ["success", "Mükemmel", 1],
             ["primary", "Normal", 1],
             ["warning", "Dikkat", 1],
             ["danger", "Kritik", 0],
@@ -304,7 +304,7 @@ function ActivityFeed({ assignments }: { assignments: Assignment[] }) {
   const latest = assignments.slice(0, 4);
 
   return (
-    <Section title="Son Aktivite" action={<Link className="link-btn" href="/coach/students">Tumu<KiIcon name="ki-arrow-right" size={14} /></Link>}>
+    <Section title="Son Aktivite" action={<Link className="link-btn" href="/coach/students">Tümü<KiIcon name="ki-arrow-right" size={14} /></Link>}>
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         {latest.length === 0 ? (
           <div style={{ padding: "20px 12px", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Aktivite yok.</div>
@@ -316,7 +316,7 @@ function ActivityFeed({ assignments }: { assignments: Assignment[] }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 13, lineHeight: 1.4 }}>
                 <b style={{ fontWeight: 700 }}>{assignment.title}</b>{" "}
-                <span style={{ color: "var(--text-2)" }}>{assignment.completed ? "tamamlandi" : "bekliyor"}</span>
+                <span style={{ color: "var(--text-2)" }}>{assignment.completed ? "tamamlandı" : "bekliyor"}</span>
               </div>
               <div style={{ fontSize: 11.5, color: "var(--faint)", marginTop: 2 }}>{new Date(assignment.createdAt).toLocaleDateString("tr-TR")}</div>
             </div>
@@ -362,21 +362,11 @@ export function CoachDashboard() {
 
   return (
     <div className="stack rise">
-      <div className="between" style={{ alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
-        <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-.02em" }}>Bugunku Kocluk Ozeti</h1>
-          <p className="muted" style={{ fontSize: 13.5, marginTop: 4 }}>
-            Ogrenci tamamlama, risk ve aksiyon takibi
-          </p>
-        </div>
-        {isLoading ? <Badge tone="muted">Yukleniyor...</Badge> : <Badge tone="success">Canli</Badge>}
-      </div>
-
       <div className="grid g-4">
-        <StatCard icon="ki-people" tone="primary" value={isLoading ? "-" : students.length} label="Toplam ogrenci" delta="+2 bu ay" />
+        <StatCard icon="ki-people" tone="primary" value={isLoading ? "-" : students.length} label="Toplam öğrenci" delta="+2 bu ay" />
         <StatCard icon="ki-target" tone="success" value={isLoading ? "-" : `${stats.completion}%`} label="Ortalama tamamlama" delta="+5%" />
-        <StatCard icon="ki-information-2" tone="danger" value={isLoading ? "-" : stats.atRisk} label="Risk altindaki ogrenci" delta="+1" deltaDir="down" />
-        <StatCard icon="ki-notepad-edit" tone="warning" value={isLoading ? "-" : stats.pending} label="Bekleyen inceleme" delta="3 bugun" deltaDir="flat" />
+        <StatCard icon="ki-information-2" tone="danger" value={isLoading ? "-" : stats.atRisk} label="Risk altındaki öğrenci" delta="+1" deltaDir="down" />
+        <StatCard icon="ki-notepad-edit" tone="warning" value={isLoading ? "-" : stats.pending} label="Bekleyen inceleme" delta="3 bugün" deltaDir="flat" />
       </div>
 
       <div className="grid col-main">
