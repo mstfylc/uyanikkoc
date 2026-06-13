@@ -103,7 +103,7 @@ export function CoachReportsPanel() {
     <div className="stack rise" data-testid="coach-reports-panel">
       <UkPageHead
         title="Raporlar"
-        sub="Sinif performansi ve veli raporlari"
+        sub="Sınıf performansı ve veli raporları"
         actions={
           <div className="hstack" style={{ gap: 8 }}>
             <button
@@ -113,15 +113,15 @@ export function CoachReportsPanel() {
               disabled={isGenerating}
             >
               <KiIcon name="ki-notepad-edit" size={16} />
-              {isGenerating ? "Olusturuluyor…" : "Rapor Olustur"}
+              {isGenerating ? "Oluşturuluyor…" : "Rapor Oluştur"}
             </button>
             {pending > 0 ? (
               <button type="button" className="btn btn-primary btn-sm" onClick={() => void approveAll()}>
                 <KiIcon name="ki-check" size={16} />
-                Tumunu onayla ({pending})
+                Tümünü onayla ({pending})
               </button>
             ) : (
-              <UkBadge tone="success">Tumu onaylandi</UkBadge>
+              <UkBadge tone="success">Tümü onaylandı</UkBadge>
             )}
           </div>
         }
@@ -133,19 +133,19 @@ export function CoachReportsPanel() {
           icon="ki-flag"
           tone="success"
           value={report ? `${report.assignmentCompletionRate}%` : "—"}
-          label="Sinif tamamlama"
+          label="Sınıf tamamlama"
         />
         <UkStatCard
           icon="ki-chart-line-up"
           tone="primary"
           value={report ? `+${report.classNetGain}` : "—"}
-          label="Sinif net artisi"
+          label="Sınıf net artışı"
         />
-        <UkStatCard icon="ki-information-2" tone="danger" value={report?.atRiskCount ?? "—"} label="Risk altinda" />
+        <UkStatCard icon="ki-information-2" tone="danger" value={report?.atRiskCount ?? "—"} label="Risk altında" />
       </div>
 
       <div className="grid g-2">
-        <UkSection title="En cok gelisen" sub="Son net trendine gore">
+        <UkSection title="En çok gelişen" sub="Son net trendine göre">
           <div className="card-body">
             {topGainer ? (
               <div className="row" style={{ gap: 10 }}>
@@ -162,7 +162,7 @@ export function CoachReportsPanel() {
             )}
           </div>
         </UkSection>
-        <UkSection title="Ilgi gerektiren" sub="Risk bandina gore">
+        <UkSection title="İlgi gerektiren" sub="Risk bandına göre">
           <div className="card-body">
             {needsAttention ? (
               <div className="row" style={{ gap: 10 }}>
@@ -175,15 +175,15 @@ export function CoachReportsPanel() {
                 </div>
               </div>
             ) : (
-              <p className="muted" style={{ fontSize: 13 }}>Risk altinda ogrenci yok</p>
+              <p className="muted" style={{ fontSize: 13 }}>Risk altında öğrenci yok</p>
             )}
           </div>
         </UkSection>
       </div>
 
       <UkSection
-        title="Sinif Net Gelisimi"
-        sub="Tum ogrencilerin ortalama neti"
+        title="Sınıf Net Gelişimi"
+        sub="Tüm öğrencilerin ortalama neti"
         action={
           report?.classNetTrend.length ? (
             <UkBadge tone="primary">
@@ -195,40 +195,40 @@ export function CoachReportsPanel() {
         <div className="card-body">
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : report?.classNetTrend.length ? (
             <UkSparkline data={report.classNetTrend} height={80} />
           ) : (
             <p className="muted" style={{ fontSize: 13 }}>
-              Trend icin yeterli deneme yok.
+              Trend için yeterli deneme yok.
             </p>
           )}
         </div>
       </UkSection>
 
       <div className="grid col-main">
-        <UkSection title="Veli Raporlari" sub={`${pending} onay bekliyor`} action={
+        <UkSection title="Veli Raporları" sub={`${pending} onay bekliyor`} action={
           <div className="filters">
-            <button type="button" className={reportFilter === "all" ? "on" : ""} onClick={() => setReportFilter("all")}>Tumu</button>
+            <button type="button" className={reportFilter === "all" ? "on" : ""} onClick={() => setReportFilter("all")}>Tümü</button>
             <button type="button" className={reportFilter === "pending" ? "on" : ""} onClick={() => setReportFilter("pending")}>Bekleyen</button>
-            <button type="button" className={reportFilter === "sent" ? "on" : ""} onClick={() => setReportFilter("sent")}>Gonderilen</button>
+            <button type="button" className={reportFilter === "sent" ? "on" : ""} onClick={() => setReportFilter("sent")}>Gönderilen</button>
           </div>
         }>
           <div className="card-body" style={{ padding: 0 }}>
             {isLoading ? (
               <p className="muted" style={{ padding: 20, fontSize: 13 }}>
-                Yukleniyor...
+                Yükleniyor...
               </p>
             ) : (
               <table className="tbl">
                 <thead>
                   <tr>
-                    <th>Ogrenci / Veli</th>
+                    <th>Öğrenci / Veli</th>
                     <th>Hafta</th>
                     <th>Tamamlama</th>
                     <th>Net</th>
-                    <th style={{ textAlign: "right" }}>Islem</th>
+                    <th style={{ textAlign: "right" }}>İşlem</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -275,14 +275,14 @@ export function CoachReportsPanel() {
                         </td>
                         <td style={{ textAlign: "right" }}>
                           {row.status === "approved" ? (
-                            <UkBadge tone="success">Onaylandi</UkBadge>
+                            <UkBadge tone="success">Onaylandı</UkBadge>
                           ) : (
                             <button
                               type="button"
                               className="btn btn-light btn-sm"
                               onClick={() => setDetailReport(row)}
                             >
-                              Onayla & Gonder
+                              Onayla & Gönder
                             </button>
                           )}
                         </td>
@@ -297,8 +297,8 @@ export function CoachReportsPanel() {
 
         <div className="stack">
           <UkSection
-            title="Haftalik Tamamlama"
-            sub="Sinif gunluk ortalamasi"
+            title="Haftalık Tamamlama"
+            sub="Sınıf günlük ortalaması"
             action={<UkBadge tone="primary">{weekAvg}%</UkBadge>}
           >
             <div className="card-body">
@@ -306,7 +306,7 @@ export function CoachReportsPanel() {
             </div>
           </UkSection>
 
-          <UkSection title="Risk Dagilimi">
+          <UkSection title="Risk Dağılımı">
             <div className="card-body subj">
               {(report?.riskDistribution ?? []).map((row) => {
                 const pct = report?.rosterCount ? Math.round((row.count / report.rosterCount) * 100) : 0;
@@ -317,7 +317,7 @@ export function CoachReportsPanel() {
                         <span className="swatch" style={{ background: `var(--${row.tone})` }} />
                         {row.label}
                       </span>
-                      <span className="spct tnum">{row.count} ogrenci</span>
+                      <span className="spct tnum">{row.count} öğrenci</span>
                     </div>
                     <div className="bar thin">
                       <span style={{ width: `${pct}%`, background: `var(--${row.tone})` }} />
