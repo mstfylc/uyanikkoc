@@ -31,7 +31,7 @@ type AssignmentItem = {
 
 const weeks = [
   { id: "w0", label: "Bu hafta", range: "3-9 Haziran" },
-  { id: "w1", label: "Gecen hafta", range: "27 Mayis-2 Haziran" },
+  { id: "w1", label: "Geçen hafta", range: "27 Mayıs-2 Haziran" },
   { id: "all", label: "Tümü", range: "Tüm zamanlar" },
 ];
 
@@ -76,7 +76,7 @@ function StatCard({
   label,
 }: {
   icon: string;
-  tone: "primary" | "success" | "warning" | "info";
+  tone: "primary" | "success" | "warning" | "info" | "danger";
   value: number | string;
   label: string;
 }) {
@@ -147,12 +147,12 @@ function ResultModal({
         <div className="modal-body" style={{ gap: 14 }}>
           {requiresResult ? (
             <>
-              <div className="muted" style={{ fontSize: 12.5 }}>Sonucu gir, sistem netini hesaplasin.</div>
+              <div className="muted" style={{ fontSize: 12.5 }}>Sonucu gir, sistem netini hesaplasın.</div>
               <div style={{ display: "flex", gap: 10 }}>
                 {[
-                  ["Dogru", correct, setCorrect, "var(--success)"],
-                  ["Yanlis", wrong, setWrong, "var(--danger)"],
-                  ["Bos", blank, setBlank, "var(--muted)"],
+                  ["Doğru", correct, setCorrect, "var(--success)"],
+                  ["Yanlış", wrong, setWrong, "var(--danger)"],
+                  ["Boş", blank, setBlank, "var(--muted)"],
                 ].map(([label, value, setter, inputColor]) => (
                   <div className="field" key={label as string} style={{ flex: 1, minWidth: 0 }}>
                     <label className="label" style={{ color: inputColor as string }}>{label as string}</label>
@@ -181,7 +181,7 @@ function ResultModal({
           )}
         </div>
         <div className="modal-foot" style={{ justifyContent: "flex-end" }}>
-          <button type="button" className="btn btn-ghost" onClick={onClose}>Vazgec</button>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Vazgeç</button>
           <button
             type="button"
             className="btn btn-primary"
@@ -239,9 +239,9 @@ function AssignmentCard({
         ) : null}
         {!open && assignment.result ? (
           <div className="row" style={{ gap: 10, marginTop: 8, fontSize: 11.5, fontWeight: 700 }}>
-            <span style={{ color: "var(--success)" }}>{assignment.result.correct} dogru</span>
+            <span style={{ color: "var(--success)" }}>{assignment.result.correct} doğru</span>
             <span style={{ color: "var(--danger)" }}>{assignment.result.wrong} yanlış</span>
-            <span className="muted">{assignment.result.blank} bos</span>
+            <span className="muted">{assignment.result.blank} boş</span>
             <Badge tone="primary">net {assignment.result.net.toFixed(2).replace(/\.00$/, "")}</Badge>
           </div>
         ) : null}
@@ -315,8 +315,11 @@ export function StudentAssignmentsPanel({ resources }: { resources: React.ReactN
     const total = assignments.length;
     const done = assignments.filter((assignment) => !isAssignmentOpen(assignment)).length;
     const pending = total - done;
+    const overdue = assignments.filter(
+      (assignment) => isAssignmentOpen(assignment) && assignment.dueDate != null && new Date(assignment.dueDate) < new Date(),
+    ).length;
     const resultCount = assignments.filter((assignment) => assignment.result).length;
-    return { total, done, pending, resultCount, rate: calculateCompletionRate(total, done) };
+    return { total, done, pending, overdue, resultCount, rate: calculateCompletionRate(total, done) };
   }, [assignments]);
 
   const shown = useMemo(() => {
@@ -338,13 +341,13 @@ export function StudentAssignmentsPanel({ resources }: { resources: React.ReactN
 
   return (
     <div className="stack rise">
-      <UkPageHead title="Ödevlerim" sub="Haftalık ödevlerini, sonuçlarını ve kaynaklarını takip et" />
+      <UkPageHead title="Ödevlerim" sub="Koçunun atadığı görevler — sonucunu gir, takip et" />
 
       <div className="grid g-4">
-        <StatCard icon="ki-notepad-edit" tone="primary" value={isLoading ? "-" : stats.total} label="Toplam ödev" />
+        <StatCard icon="ki-notepad-edit" tone="primary" value={isLoading ? "-" : stats.total} label="Toplam görev" />
         <StatCard icon="ki-check-circle" tone="success" value={isLoading ? "-" : stats.done} label="Tamamlanan" />
         <StatCard icon="ki-time" tone="warning" value={isLoading ? "-" : stats.pending} label="Bekleyen" />
-        <StatCard icon="ki-chart-pie-simple" tone="info" value={isLoading ? "-" : `${stats.rate}%`} label="Tamamlama" />
+        <StatCard icon="ki-shield-cross" tone="danger" value={isLoading ? "-" : stats.overdue} label="Gecikmiş" />
       </div>
 
       <div className="seg" style={{ width: "fit-content", flexWrap: "wrap" }}>
@@ -361,7 +364,7 @@ export function StudentAssignmentsPanel({ resources }: { resources: React.ReactN
             <h3>Atanan Ödevler</h3>
             <p className="sub">{weeks.find((item) => item.id === week)?.range} · {pending.length} bekleyen</p>
           </div>
-          <Badge tone="muted" icon="ki-chart-simple">{stats.resultCount} sonuc</Badge>
+          <Badge tone="muted" icon="ki-chart-simple">{stats.resultCount} sonuç</Badge>
         </div>
         <ul
           data-testid="assignment-list"
