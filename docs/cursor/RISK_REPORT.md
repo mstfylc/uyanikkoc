@@ -3,6 +3,7 @@
 Status: OPEN - non-design mail delivery configuration required.
 
 - Claude Design web parity blocker: none.
+- 2026-06-13 reality parity delta: `/coach/topics` source-backed fixes and browser QA passed locally; no new design was produced.
 - `CODEX_P12_COACH_TOPICS_PIXEL_PARITY_PROMPT.md` file was not present in Downloads/repo search paths; its coach-topics acceptance criteria were covered by the final audit prompt, no-new-design addendum, and canonical `coach-konu.jsx/css`.
 - No-new-design compliance: no source-absent component, color, spacing, flow, text, visual decision, or fake data was added.
 - Live V6 deploy, health, role smoke, `/coach/topics` visual QA, SmartOdev, optik ingestion, messages, and notifications smoke passed.

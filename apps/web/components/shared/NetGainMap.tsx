@@ -70,16 +70,16 @@ export function NetGainMap({ mode, studentId }: NetGainMapProps) {
 
   return (
     <UkSection
-      title="NetGainMap"
-      sub="Son iki denemeye gore net kazanim haritasi"
-      action={netGain ? <UkBadge tone={netGain.totalGain && netGain.totalGain > 0 ? "success" : "warning"}>{formatGain(netGain.totalGain)}</UkBadge> : null}
+      title="Net Kaybı Haritası"
+      sub="En hızlı net kazancı veren alanlar"
+      action={netGain ? <UkBadge tone={netGain.totalGain && netGain.totalGain > 0 ? "success" : "warning"}>≈ {formatGain(netGain.totalGain)} net potansiyel</UkBadge> : null}
     >
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {isLoading ? (
-          <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Yukleniyor...</div>
+          <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Yükleniyor...</div>
         ) : !netGain || netGain.items.length === 0 ? (
           <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-            Net kazanim icin en az bir deneme sonucu gerekli.
+            Net kazanımı için en az bir deneme sonucu gerekli.
           </div>
         ) : (
           <>
@@ -90,7 +90,7 @@ export function NetGainMap({ mode, studentId }: NetGainMapProps) {
               </div>
               <div>
                 <div className="stat-value tnum" style={{ fontSize: 22 }}>{formatGain(netGain.totalGain)}</div>
-                <div className="stat-label">Net kazanim</div>
+                <div className="stat-label">Net kazanımı</div>
               </div>
               <div>
                 <div className="stat-value tnum" style={{ fontSize: 22 }}>{netGain.examCount}</div>
@@ -125,7 +125,7 @@ export function NetGainMap({ mode, studentId }: NetGainMapProps) {
             ) : mode === "coach" ? (
               <Link href="/coach/assignments/create" className="btn btn-light btn-sm" style={{ alignSelf: "flex-start" }}>
                 <KiIcon name="ki-notepad-edit" />
-                Odev ata
+                Bu konuya ödev ata
               </Link>
             ) : null}
           </>

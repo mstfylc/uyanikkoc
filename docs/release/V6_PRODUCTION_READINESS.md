@@ -1,5 +1,15 @@
 # Uyanik Koc Web V6 - Production Readiness Check
 
+## Reality Parity Delta - 2026-06-13
+
+Status: CODE READY LOCALLY, REDEPLOY PENDING FOR THIS DELTA.
+
+- No DB migration, schema change, backend feature, CRM change, AI integration, or secret change was made.
+- `/coach/topics` was rechecked against Claude Design source/spec and fixed without producing new design.
+- Local browser QA passed: desktop 1440, mobile 390, `.ktx=1`, `.ktx table=0`, `.ktx-topic=2`, Ödev Ata modal opens, no horizontal overflow.
+- Evidence screenshots are stored in `docs/cursor/visual-checks/`.
+- Production remains healthy from the previous deployment, but this new local delta is not redeployed until the next production deploy command is run.
+
 ## Final Production Smoke Status - 2026-06-12
 
 Status: REDEPLOYED, SMOKE PASSED WITH MAIL RISK.

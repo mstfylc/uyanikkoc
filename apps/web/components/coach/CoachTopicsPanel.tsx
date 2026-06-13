@@ -213,7 +213,7 @@ export function CoachTopicsPanel() {
       .filter((group) => group.topics.length > 0);
 
     const ungrouped = filteredTopics.filter((topic) => remaining.has(topic.n));
-    return ungrouped.length > 0 ? [...groups, { name: "Diger konular", topics: ungrouped }] : groups;
+    return ungrouped.length > 0 ? [...groups, { name: "Diğer konular", topics: ungrouped }] : groups;
   }, [activePerSubj, curriculum, filteredTopics]);
   const studentRow = useMemo(
     () => buildCoachStudentRows(students, assignments, []).find((row) => row.studentId === studentId),
@@ -332,13 +332,13 @@ export function CoachTopicsPanel() {
                 <UkBadge tone="primary">{examTrack}</UkBadge>
               </div>
               <div className="muted" style={{ fontSize: 12.5 }}>
-                {examTrack === "LGS" ? "LGS 2026 hedefi" : "Hedef: YKS 2026"} · KAMP US programi
+                {examTrack === "LGS" ? "LGS 2026 hedefi" : "Hedef: YKS 2026"} · KAMP ÜS programı
               </div>
             </div>
             <div className="row" style={{ gap: 10 }}>
               <button type="button" className="btn btn-light btn-sm" onClick={() => setSchedModal(true)}>
                 <KiIcon name="ki-calendar" size={15} />
-                Okul Programi
+                Okul Programı
               </button>
               {studentRow ? (
                 <UkBadge tone={studentRow.risk === "excellent" || studentRow.risk === "normal" ? "success" : studentRow.risk === "attention" ? "warning" : "danger"}>
@@ -357,17 +357,17 @@ export function CoachTopicsPanel() {
       {studentId ? <NetGainMap mode="coach" studentId={studentId} /> : null}
 
       {studentId ? (
-        <div className="grid g-2">
+        <>
           <MistakeInsightsCard mode="coach" studentId={studentId} />
           <UkSection
-            title="Hata Frekansi"
-            sub="Deneme ve yanlis defteri verisine gore tekrar onceligi"
+            title="Hata Frekansı"
+            sub="Deneme ve yanlış defteri verisine göre tekrar önceliği"
             action={<UkBadge tone={weak.length > 0 ? "warning" : "success"}>{weak.length} odak konu</UkBadge>}
           >
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {weak.length === 0 ? (
                 <div className="muted" style={{ padding: "10px 0", textAlign: "center", fontSize: 13 }}>
-                  Tekrar bekleyen hata frekansi yok.
+                  Tekrar bekleyen hata frekansı yok.
                 </div>
               ) : (
                 weak.slice(0, 4).map((topic) => {
@@ -390,26 +390,26 @@ export function CoachTopicsPanel() {
                         <div className="lr-meta">
                           <span className="d">{topic.subj}</span>
                           <span className="d" style={{ color: "var(--danger)", fontWeight: 800 }}>
-                            {topic.yanlis} yanlis
+                            {topic.yanlis} yanlış
                           </span>
-                          <span className="d">%{topic.oran} dogru</span>
+                          <span className="d">%{topic.oran} doğru</span>
                         </div>
                       </div>
-                      <UkBadge tone="primary">Odev ata</UkBadge>
+                      <UkBadge tone="primary">Ödev ata</UkBadge>
                     </button>
                   );
                 })
               )}
             </div>
           </UkSection>
-        </div>
+        </>
       ) : null}
 
       {summary ? (
         <div className="grid g-4">
           <UkStatCard icon="ki-book-open" tone="primary" value={`${overallPct}%`} label="Genel konu tamamlama" />
           <UkStatCard icon="ki-check-circle" tone="success" value={`${doneTopics}/${totalTopics}`} label="Tamamlanan konu" />
-          <UkStatCard icon="ki-notepad-edit" tone="info" value={totalSoru.toLocaleString("tr-TR")} label="Cozulen soru" />
+          <UkStatCard icon="ki-notepad-edit" tone="info" value={totalSoru.toLocaleString("tr-TR")} label="Çözülen soru" />
           <UkStatCard
             icon="ki-chart-line-up-2"
             tone="warning"
@@ -419,9 +419,98 @@ export function CoachTopicsPanel() {
         </div>
       ) : null}
 
+      <UkSection title="Öğrenci notları" sub={`${notes.length} not`}>
+        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <form onSubmit={handleAddNote} className="stack" style={{ gap: 10 }}>
+            <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+              {(Object.keys(NOTE_KIND_LABELS) as CoachNoteKind[]).map((kind) => {
+                const meta = NOTE_KIND_LABELS[kind];
+                return (
+                  <button
+                    key={kind}
+                    type="button"
+                    className={`type-chip${noteKind === kind ? " on" : ""}`}
+                    onClick={() => setNoteKind(kind)}
+                  >
+                    <KiIcon name={meta.icon} size={13} />
+                    {meta.label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="row" style={{ gap: 8 }}>
+              <input
+                className="input"
+                style={{ flex: 1 }}
+                value={noteText}
+                onChange={(event) => setNoteText(event.target.value)}
+                placeholder="Not ekle veya uyarı yaz..."
+              />
+              <button type="submit" disabled={isSavingNote || !noteText.trim()} className="btn btn-primary">
+                <KiIcon name="ki-plus" />
+                {isSavingNote ? "Kaydediliyor..." : "Ekle"}
+              </button>
+            </div>
+          </form>
+
+          {sortedNotes.length === 0 ? (
+            <p className="muted" style={{ fontSize: 13 }}>
+              Henüz not yok.
+            </p>
+          ) : (
+            sortedNotes.map((note) => {
+              const meta = NOTE_KIND_LABELS[note.kind];
+              return (
+                <div
+                  key={note.id}
+                  className="lrow"
+                  style={{
+                    alignItems: "flex-start",
+                    borderColor: note.pinned ? "color-mix(in srgb, var(--warning) 40%, transparent)" : "var(--border)",
+                  }}
+                >
+                  <span className={`stat-icon tone-${meta.tone}`} style={{ width: 38, height: 38 }}>
+                    <KiIcon name={meta.icon} />
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, lineHeight: 1.45 }}>{note.text}</div>
+                    <div className="lr-meta">
+                      <UkBadge tone={meta.tone}>{meta.label}</UkBadge>
+                      {note.pinned ? (
+                        <span className="d" style={{ color: "var(--warning)", fontWeight: 700 }}>
+                          Sabit
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="row" style={{ gap: 2 }}>
+                    <button
+                      type="button"
+                      className="mini-btn"
+                      onClick={() => void handleNoteAction(note.id, "pin")}
+                      aria-label="Sabitle"
+                    >
+                      <KiIcon name="ki-star" size={15} />
+                    </button>
+                    <button
+                      type="button"
+                      className="mini-btn danger"
+                      onClick={() => void handleNoteAction(note.id, "delete")}
+                      aria-label="Sil"
+                    >
+                      <KiIcon name="ki-plus" size={15} style={{ transform: "rotate(45deg)" }} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </UkSection>
+
       <UkSection
-        title="Net Gelisimi"
-        sub={examTrack === "LGS" ? "Baslangic → Son net (Sayisal / Sozel)" : "Baslangic → Son net (TYT / AYT)"}
+        title="Net Gelişimi"
+        sub={examTrack === "LGS" ? "Başlangıç → Son net (Sayısal / Sözel)" : "Başlangıç → Son net (TYT / AYT)"}
         action={
           <UkBadge tone="success">
             +{totalGain} net
@@ -435,7 +524,7 @@ export function CoachTopicsPanel() {
                 <div className="row" style={{ gap: 8, marginBottom: 14 }}>
                   <UkBadge tone="primary">{grp}</UkBadge>
                   <span className="muted" style={{ fontSize: 12 }}>
-                    Net karsilastirmasi
+                    Net karşılaştırması
                   </span>
                 </div>
                 <div className="subj">
@@ -492,7 +581,7 @@ export function CoachTopicsPanel() {
 
       <div className="grid col-main">
         <UkSection
-          title="Haftalik Soru Hedefi"
+          title="Haftalık Soru Hedefi"
           sub="Öğrencin için ders bazında hedef belirle"
           action={
             <button type="button" className="btn btn-primary btn-sm" onClick={saveTargets} disabled={isSavingTargets}>
@@ -646,8 +735,8 @@ export function CoachTopicsPanel() {
 
         <UkSection
           title="Deneme Analizleri"
-          sub="En cok yanlis yapilan konular"
-          action={<UkBadge tone="danger">{weak.length} zayif konu</UkBadge>}
+          sub="En çok yanlış yapılan konular"
+          action={<UkBadge tone="danger">{weak.length} zayıf konu</UkBadge>}
         >
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {weak.map((topic) => {
@@ -668,9 +757,9 @@ export function CoachTopicsPanel() {
                         {topic.subj}
                       </span>
                       <span className="d" style={{ color: "var(--danger)", fontWeight: 700 }}>
-                        {topic.yanlis} yanlis
+                        {topic.yanlis} yanlış
                       </span>
-                      <span className="d">%{topic.oran} dogru</span>
+                      <span className="d">%{topic.oran} doğru</span>
                     </div>
                   </div>
                   <button
@@ -701,12 +790,12 @@ export function CoachTopicsPanel() {
                   className={chartMode === mode ? "on" : ""}
                   onClick={() => setChartMode(mode)}
                 >
-                  {mode === "daily" ? "Gunluk" : mode === "weekly" ? "Haftalik" : "Aylik"}
+                  {mode === "daily" ? "Günlük" : mode === "weekly" ? "Haftalık" : "Aylık"}
                 </button>
               ))}
             </div>
             <button type="button" className="btn btn-light btn-sm" onClick={() => setChartOffset((value) => value + 1)}>
-              Onceki
+              Önceki
             </button>
             <UkBadge tone="primary">{questionChart.total.toLocaleString("tr-TR")} soru</UkBadge>
           </div>
@@ -728,7 +817,7 @@ export function CoachTopicsPanel() {
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 800 }}>Konu Takibi</h2>
           <p className="muted" style={{ fontSize: 13, marginTop: 3 }}>
-            Ders rayindan sec, konu kartlarindan kaynak ve odev aksiyonunu yonet
+            Ders rayından seç, konu kartlarından kaynak ve ödev aksiyonunu yönet
           </p>
         </div>
         {activePerSubj ? (
@@ -746,7 +835,7 @@ export function CoachTopicsPanel() {
           <div className="ktx-rail-list">
             {isLoading ? (
               <p className="muted" style={{ fontSize: 13, padding: 8 }}>
-                Yukleniyor...
+                Yükleniyor...
               </p>
             ) : (
               perSubj.map((subject) => {
@@ -785,7 +874,7 @@ export function CoachTopicsPanel() {
               <div>
                 <div className="ttl">{activePerSubj.s}</div>
                 <div className="sub">
-                  {activePerSubj.done}/{activePerSubj.total} konu tamamlandi - {activePerSubj.soru} soru cozuldu
+                  {activePerSubj.done}/{activePerSubj.total} konu tamamlandı - {activePerSubj.soru} soru çözüldü
                 </div>
               </div>
               <div className="ktx-filters">
@@ -794,7 +883,7 @@ export function CoachTopicsPanel() {
                   className={`ktx-fchip${kaynakFilter === "all" ? " on" : ""}`}
                   onClick={() => setKaynakFilter("all")}
                 >
-                  Tumu
+                  Tümü
                 </button>
                 {activeKaynakList.map((source) => (
                   <button
@@ -812,7 +901,7 @@ export function CoachTopicsPanel() {
             <div className="ktx-body">
               {filteredTopics.length === 0 ? (
                 <div className="muted" style={{ padding: 18, textAlign: "center", fontSize: 13 }}>
-                  Secilen kaynakta konu yok.
+                  Seçilen kaynakta konu yok.
                 </div>
               ) : (
                 activeTopicGroups.map((group) => {
@@ -867,13 +956,13 @@ export function CoachTopicsPanel() {
                                   </div>
                                 </>
                               ) : (
-                                <span className="empty">Henuz soru yok</span>
+                                <span className="empty">Henüz soru yok</span>
                               )}
                             </div>
                             <button
                               type="button"
                               className="ktx-ata"
-                              title="Odev ata"
+                              title="Ödev ata"
                               onClick={() => setOdevModal({ open: true, subject: activePerSubj.s, topic: topic.n })}
                             >
                               <KiIcon name="ki-plus" size={16} />
@@ -889,95 +978,6 @@ export function CoachTopicsPanel() {
           </section>
         ) : null}
       </div>
-
-      <UkSection title="Öğrenci notları" sub={`${notes.length} not`}>
-        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <form onSubmit={handleAddNote} className="stack" style={{ gap: 10 }}>
-            <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
-              {(Object.keys(NOTE_KIND_LABELS) as CoachNoteKind[]).map((kind) => {
-                const meta = NOTE_KIND_LABELS[kind];
-                return (
-                  <button
-                    key={kind}
-                    type="button"
-                    className={`type-chip${noteKind === kind ? " on" : ""}`}
-                    onClick={() => setNoteKind(kind)}
-                  >
-                    <KiIcon name={meta.icon} size={13} />
-                    {meta.label}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="row" style={{ gap: 8 }}>
-              <input
-                className="input"
-                style={{ flex: 1 }}
-                value={noteText}
-                onChange={(event) => setNoteText(event.target.value)}
-                placeholder="Not ekle veya uyari yaz..."
-              />
-              <button type="submit" disabled={isSavingNote || !noteText.trim()} className="btn btn-primary">
-                <KiIcon name="ki-plus" />
-                {isSavingNote ? "Kaydediliyor..." : "Ekle"}
-              </button>
-            </div>
-          </form>
-
-          {sortedNotes.length === 0 ? (
-            <p className="muted" style={{ fontSize: 13 }}>
-              Henuz not yok.
-            </p>
-          ) : (
-            sortedNotes.map((note) => {
-              const meta = NOTE_KIND_LABELS[note.kind];
-              return (
-                <div
-                  key={note.id}
-                  className="lrow"
-                  style={{
-                    alignItems: "flex-start",
-                    borderColor: note.pinned ? "color-mix(in srgb, var(--warning) 40%, transparent)" : "var(--border)",
-                  }}
-                >
-                  <span className={`stat-icon tone-${meta.tone}`} style={{ width: 38, height: 38 }}>
-                    <KiIcon name={meta.icon} />
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, lineHeight: 1.45 }}>{note.text}</div>
-                    <div className="lr-meta">
-                      <UkBadge tone={meta.tone}>{meta.label}</UkBadge>
-                      {note.pinned ? (
-                        <span className="d" style={{ color: "var(--warning)", fontWeight: 700 }}>
-                          Sabit
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                  <div className="row" style={{ gap: 2 }}>
-                    <button
-                      type="button"
-                      className="mini-btn"
-                      onClick={() => void handleNoteAction(note.id, "pin")}
-                      aria-label="Sabitle"
-                    >
-                      <KiIcon name="ki-star" size={15} />
-                    </button>
-                    <button
-                      type="button"
-                      className="mini-btn danger"
-                      onClick={() => void handleNoteAction(note.id, "delete")}
-                      aria-label="Sil"
-                    >
-                      <KiIcon name="ki-plus" size={15} style={{ transform: "rotate(45deg)" }} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </UkSection>
 
       <CoachOdevAtaModal
         open={odevModal.open}

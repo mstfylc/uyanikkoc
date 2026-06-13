@@ -61,32 +61,37 @@ export function MistakeInsightsCard({ mode, studentId }: MistakeInsightsCardProp
     };
   }, [endpoint]);
 
-  const title = mode === "coach" ? "Yanlis Defteri Insight" : "Hata Frekansi";
-  const sub = mode === "coach" ? "Roster ogrencisinin acik/due hatalari" : "Cocugunuzun tekrar bekleyen hata alanlari";
+  const title = mode === "coach" ? "Öğrencinin Yanlış Defteri" : "Hata Frekansı";
+  const sub = mode === "coach" ? "Açık yanlışlar — konuya göre doğrudan ödev atayabilirsin" : "Çocuğunuzun tekrar bekleyen hata alanları";
 
   return (
     <UkSection
       title={title}
       sub={sub}
-      action={insights ? <UkBadge tone={insights.dueCount > 0 ? "warning" : "success"}>{insights.dueCount} tekrar</UkBadge> : null}
+      action={insights ? (
+        <span className="row" style={{ gap: 6 }}>
+          <UkBadge tone={insights.openCount > 0 ? "danger" : "success"}>{insights.openCount} açık</UkBadge>
+          {insights.dueCount > 0 ? <UkBadge tone="warning">{insights.dueCount} tekrar bekliyor</UkBadge> : null}
+        </span>
+      ) : null}
     >
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {isLoading ? (
-          <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Yukleniyor...</div>
+          <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Yükleniyor...</div>
         ) : !insights || insights.total === 0 ? (
           <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-            Kayitli hata yok.
+            Kayıtlı hata yok.
           </div>
         ) : (
           <>
             <div className="grid g-4">
               <div>
                 <div className="stat-value tnum" style={{ fontSize: 22 }}>{insights.openCount}</div>
-                <div className="stat-label">Acik hata</div>
+                <div className="stat-label">Açık hata</div>
               </div>
               <div>
                 <div className="stat-value tnum" style={{ fontSize: 22 }}>{insights.dueCount}</div>
-                <div className="stat-label">Tekrar sirasi</div>
+                <div className="stat-label">Tekrar sırası</div>
               </div>
               <div>
                 <div className="stat-value tnum" style={{ fontSize: 22 }}>{insights.closedCount}</div>
@@ -94,12 +99,12 @@ export function MistakeInsightsCard({ mode, studentId }: MistakeInsightsCardProp
               </div>
               <div>
                 <div className="stat-value tnum" style={{ fontSize: 22 }}>{insights.reviewCount}</div>
-                <div className="stat-label">Tekrar kaydi</div>
+                <div className="stat-label">Tekrar kaydı</div>
               </div>
             </div>
 
             {insights.groups.length === 0 ? (
-              <div style={{ padding: "6px 0", color: "var(--muted)", fontSize: 13 }}>Acik hata alani yok.</div>
+              <div style={{ padding: "6px 0", color: "var(--muted)", fontSize: 13 }}>Açık hata alanı yok.</div>
             ) : (
               insights.groups.map((group) => (
                 <div className="lrow" key={group.key} style={{ cursor: "default" }}>
@@ -109,12 +114,12 @@ export function MistakeInsightsCard({ mode, studentId }: MistakeInsightsCardProp
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="lr-title">{group.label}</div>
                     <div className="lr-meta">
-                      <span className="d">{group.openCount} acik</span>
+                      <span className="d">{group.openCount} açık</span>
                       <span className="d">{group.dueCount} tekrar</span>
                       {group.lastSource ? <span className="d">{group.lastSource}</span> : null}
                     </div>
                   </div>
-                  {mode === "coach" ? <UkBadge tone="primary">Odev icin aday</UkBadge> : null}
+                  {mode === "coach" ? <UkBadge tone="primary">Ödev için aday</UkBadge> : null}
                 </div>
               ))
             )}

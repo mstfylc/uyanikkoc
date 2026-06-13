@@ -1,5 +1,16 @@
 # Latest Handoff
 
+## Reality Parity Delta - 2026-06-13
+
+- Status: local code/design parity fix completed; production redeploy not rerun in this delta yet.
+- Scope: no new feature, UI concept, backend, schema, migration, dependency, CRM, or AI integration.
+- Codex yeni tasarım üretmedi; tüm UI değişiklikleri Claude Design handoff/spec/source prototype ile eşlendi. Kaynakta olmayan hiçbir component, renk, spacing, flow veya veri uydurulmadı.
+- `/coach/topics` source mapping used `SADAKAT-SPEC-koc-c-topics.md`, `src/coach-konu.jsx`, `src/coach-konu.css`, `components/net-gain-map.md`, `components/yanlis-defteri.md`, and `components/hata-frekansi.md`.
+- Fix applied: Net Kaybı Haritası, Öğrencinin Yanlış Defteri, Hata Frekansı stack full-width; Öğrenci notları moved before Net Gelişimi; `.ktx` remains primary topic view; Ödev Ata modal and visible Turkish copy normalized.
+- Browser QA passed locally with demo-memory and a local Auth.js coach cookie: desktop 1440, mobile 390, `.ktx=1`, `.ktx table=0`, `.ktx-topic=2`, modal opens, no horizontal overflow.
+- Evidence screenshots: `docs/cursor/visual-checks/desktop-light-coach-topics-reality.png`, `desktop-light-coach-topics-modal-reality.png`, `mobile-light-coach-topics-reality.png`.
+- Remaining operational risk is unchanged: production password reset email delivery needs real `RESEND_API_KEY`.
+
 ## Final Live V6 Status - 2026-06-12
 
 - Status: deployed and smoke-tested on `https://koc.uyanik.com.tr`.

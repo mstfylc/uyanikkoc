@@ -2,6 +2,14 @@
 
 Bu checklist `visual-qa/acceptance-checklist.md` maddelerinin canlı repo route düzenine uyarlanmış P0 kopyasıdır. İşaretler sonraki uygulama/QA fazlarında doldurulacak; P0'da implementation yapılmadı.
 
+## Reality Parity QA - 2026-06-13
+
+- [x] No-new-design rule rechecked: Codex yeni tasarım üretmedi; tüm UI değişiklikleri Claude Design handoff/spec/source prototype ile eşlendi. Kaynakta olmayan hiçbir component, renk, spacing, flow veya veri uydurulmadı.
+- [x] `/coach/topics` source mapping rechecked against `SADAKAT-SPEC-koc-c-topics.md`, `src/coach-konu.jsx`, `src/coach-konu.css`, `components/net-gain-map.md`, `components/yanlis-defteri.md`, and `components/hata-frekansi.md`.
+- [x] `/coach/topics` fixed order: PageHead, student strip, Net Kaybı Haritası, Öğrencinin Yanlış Defteri, Hata Frekansı, four stats, Öğrenci notları, Net Gelişimi, Haftalık Soru Hedefi + Deneme Analizleri, Soru Takibi, `.ktx`, Ödev Ata modal.
+- [x] Browser QA passed on local demo-memory server: desktop 1440 and mobile 390, `.ktx=1`, `.ktx table=0`, `.ktx-topic=2`, modal opens, no horizontal overflow.
+- [x] Evidence: `docs/cursor/visual-checks/desktop-light-coach-topics-reality.png`, `desktop-light-coach-topics-modal-reality.png`, `mobile-light-coach-topics-reality.png`.
+
 ## Final Live Browser QA - 2026-06-12
 
 - [x] Final all-areas parity pass reran after coach notifications fix: 37 live Playwright visual checks passed, 0 failed.

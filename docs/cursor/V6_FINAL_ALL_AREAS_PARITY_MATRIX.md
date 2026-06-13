@@ -1,12 +1,18 @@
 # V6 Final All Areas Parity Matrix
 
-Date: 2026-06-12
+Date: 2026-06-13
 
 No-new-design contract:
-- Codex yeni tasarim uretmedi; tum UI degisiklikleri Claude Design handoff/spec/source prototype ile eslendi.
+- Codex yeni tasarım üretmedi; tüm UI değişiklikleri Claude Design handoff/spec/source prototype ile eşlendi. Kaynakta olmayan hiçbir component, renk, spacing, flow veya veri uydurulmadı.
 - Kaynakta olmayan component, renk, spacing, flow veya veri eklenmedi.
 - PNG eksik alanlarda source prototype + spec + token dosyalari kanonik kabul edildi.
 - `CODEX_P12_COACH_TOPICS_PIXEL_PARITY_PROMPT.md` file was not present in Downloads or repo search paths; its coach-topics acceptance criteria were covered by `CODEX_FINAL_ALL_AREAS_DESIGN_PARITY_AUDIT_PROMPT.md`, `CODEX_NO_NEW_DESIGN_CONTRACT_ADDENDUM.md`, and canonical `coach-konu.jsx/css`.
+
+Reality parity delta - 2026-06-13:
+- Source check: `_handoff_web_v6_final/components/net-gain-map.md`, `components/yanlis-defteri.md`, `components/hata-frekansi.md`, `handoff/SADAKAT-SPEC-koc-c-topics.md`, `src/coach-konu.jsx`, and `src/coach-konu.css`.
+- Target check: `CoachTopicsPanel.tsx`, `CoachOdevAtaModal.tsx`, `MistakeInsightsCard.tsx`, and `NetGainMap.tsx`.
+- Applied fix: `/coach/topics` now stacks Net Kaybı Haritası -> Öğrencinin Yanlış Defteri -> Hata Frekansı as full-width blocks, places Öğrenci notları before Net Gelişimi, keeps `.ktx` as the only primary topic view, and normalizes source-backed Turkish UI copy.
+- Browser QA: local demo-memory server, Auth.js local coach cookie, desktop 1440 and mobile 390. Result: `.ktx=1`, `.ktx table=0`, `.ktx-topic=2`, modal opens, no horizontal overflow. Screenshots: `desktop-light-coach-topics-reality.png`, `desktop-light-coach-topics-modal-reality.png`, `mobile-light-coach-topics-reality.png`.
 
 | Route/Component | Source file/spec | Target file/component | Required layout blocks | Required states | Required data/API contract | Current mismatch | Fix applied | QA status |
 |---|---|---|---|---|---|---|---|---|
@@ -19,7 +25,7 @@ No-new-design contract:
 | `/student/notifications` | `src/notifications.jsx` | `NotificationsPanel.tsx`, `/api/student/notifications` | PageHead, unread badge, notification list | read, mark-all, empty/loading | Student scoped notifications | None | Shared panel supports read/mark-all | PASS: `desktop/mobile-light-student-notifications.jpg`, dark sample |
 | `/coach/dashboard` | `src/coach.jsx`, `src/coach-pages.jsx` | `CoachDashboard.tsx` | Risk/summary/action/activity cards | loading/empty/action states | Coach session scope | None | Existing v6 surface verified | PASS: `desktop/mobile-light-coach-dashboard.jpg`, dark sample |
 | `/coach/students` / detail insight | `src/roster.jsx`, `src/coach-pages.jsx` | `CoachStudentRoster.tsx`, `CoachStudentDetail.tsx`, coach student insight APIs | Roster list, selected student detail, mistake/net/assignment insight cards | loading/empty/selection | Coach sees roster students only; out-of-roster guarded | None | Existing roster guard verified in API/service design and live route | PASS: `desktop/mobile-light-coach-students.jpg` |
-| `/coach/topics` critical path | `src/coach-konu.jsx`, `src/coach-konu.css` | `CoachTopicsPanel.tsx`, `uk-design.css` | PageHead -> student strip -> NetGainMap -> CoachMistakesCard -> HataFrekansi -> 4 stats -> Net Gelisimi -> Weekly Target + Deneme Analizleri -> Soru Takibi -> `.ktx` rail/cards -> one Odev Ata modal | subject selection, source filter, topic-card status, modal open, desktop/mobile | Coach roster student scope; topic targets/assignments guarded | Previous generic table primary view closed before this audit | `.ktx` CSS/structure matched canonical source; no new layout invented | PASS: order check, `.ktx=1`, `.ktx table=0`, modal screenshot |
+| `/coach/topics` critical path | `src/coach-konu.jsx`, `src/coach-konu.css`, `SADAKAT-SPEC-koc-c-topics.md`, `components/net-gain-map.md`, `components/yanlis-defteri.md`, `components/hata-frekansi.md` | `CoachTopicsPanel.tsx`, `CoachOdevAtaModal.tsx`, `MistakeInsightsCard.tsx`, `NetGainMap.tsx`, `uk-design.css` | PageHead -> student strip -> NetGainMap -> CoachMistakesCard -> HataFrekansi -> 4 stats -> Öğrenci notları -> Net Gelişimi -> Weekly Target + Deneme Analizleri -> Soru Takibi -> `.ktx` rail/cards -> one Ödev Ata modal | subject selection, source filter, topic-card status, modal open, desktop/mobile | Coach roster student scope; topic targets/assignments guarded | Live view still had compact/grid grouping for mistake/frequency cards, Öğrenci notları after `.ktx`, and ASCII Turkish copy in visible labels/modal | Stacked source blocks full-width, moved Öğrenci notları before Net Gelişimi, kept `.ktx` as primary topic view, normalized visible Turkish copy; no new layout/color/spacing invented | PASS 2026-06-13: order check, `.ktx=1`, `.ktx table=0`, `.ktx-topic=2`, modal opens, desktop/mobile no overflow, screenshots captured |
 | `/coach/assignments` / SmartOdev | `src/coach-odev-ata.jsx`, `src/odev-store.jsx`, SmartOdev spec/flow | `CoachAssignmentsPanel.tsx`, `SmartOdevModal.tsx`, `/api/coach/smart-assignments` | Assignment panel, SmartOdev button/modal, preview card, assign action | preview loading, assign disabled/enabled, list refresh | Preview no DB write; assign uses guarded assignment create flow | None | Existing SmartOdev verified; no additional plan UI invented | PASS: `desktop/mobile-light-coach-assignments.jpg`, `modal-coach-smartodev.jpg` |
 | `/coach/messages` | `src/messaging.jsx` | `MessagesPanel.tsx`, `/api/coach/messages`, thread-state API | Channel list + thread panel | unread/read, mute/unmute, group/DM sections | Coach scoped threads | None | Existing guarded routes verified | PASS: `desktop/mobile-light-coach-messages.jpg` |
 | `/coach/notifications` | `src/notifications.jsx` | `apps/web/app/coach/notifications/page.tsx`, `NotificationsPanel.tsx`, `/api/coach/notifications` | PageHead, unread badge, notification list | read, mark-all, empty/loading | CoachId scoped notifications; DB coach scope | Missing page during first visual QA | Added coach route using existing shared notification panel; added nav item from same notification source pattern | PASS after fix: desktop/mobile/dark coach notifications screenshots |
@@ -33,7 +39,7 @@ Browser QA result:
 - 37 Playwright visual checks passed, 0 failed.
 - Desktop light and mobile light screenshots were captured for all listed student/coach/parent routes.
 - Desktop dark screenshots were captured for representative dashboard/notification routes per role.
-- Coach topics order/modal check passed: `.ktx` count 1, `.ktx table` count 0, shared `Odev Ata` modal opened.
+- Coach topics order/modal check passed again on 2026-06-13: `.ktx` count 1, `.ktx table` count 0, shared `Ödev Ata` modal opened.
 - Screenshots and machine-readable results are stored in `docs/cursor/visual-checks/`.
 
 Known non-design operational risk:

@@ -188,7 +188,7 @@ export function CoachOdevAtaModal({
           }),
         });
         if (!response.ok) {
-          throw new Error("Odev atanamadi");
+          throw new Error("Ödev atanamadı");
         }
       }
 
@@ -220,7 +220,7 @@ export function CoachOdevAtaModal({
               <KiIcon name="ki-notepad-edit" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Odev Ata</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Ödev Ata</h3>
               <div className="muted" style={{ fontSize: 12.5 }}>
                 {studentName} · derslere ve konulara soru ata
               </div>
@@ -248,13 +248,13 @@ export function CoachOdevAtaModal({
               </button>
             </div>
             <span className="muted" style={{ fontSize: 12, fontWeight: 700 }}>
-              Varsayilan {unitType === "test" ? "test" : "soru"}
+              Varsayılan {unitType === "test" ? "test" : "soru"}
             </span>
             <UkNumStepper value={defaultSoru} onChange={setDefaultSoru} step={unitType === "test" ? 1 : 10} min={0} max={500} size="sm" />
           </div>
           <label className="field" style={{ display: "grid", gap: 6 }}>
             <span className="label">
-              Kaynak <span className="muted" style={{ fontWeight: 600 }}>({activeSubject || "ders sec"})</span>
+              Kaynak <span className="muted" style={{ fontWeight: 600 }}>({activeSubject || "ders seç"})</span>
             </span>
             <select
               className="select"
@@ -348,7 +348,7 @@ export function CoachOdevAtaModal({
                       {group.topics.length} konu
                     </span>
                     <span className="muted" style={{ fontSize: 11, marginLeft: "auto" }}>
-                      {allOn ? "tumunu kaldir" : "tumunu sec"}
+                      {allOn ? "tümünü kaldır" : "tümünü seç"}
                     </span>
                   </button>
                   <div className="grp-topics">
@@ -365,7 +365,7 @@ export function CoachOdevAtaModal({
                           <button
                             type="button"
                             className={`chk sm${on ? " done" : ""}`}
-                            aria-label="Konu sec"
+                            aria-label="Konu seç"
                             onClick={(event) => {
                               event.stopPropagation();
                               toggleTopic(activeSubject, topic);
@@ -385,7 +385,7 @@ export function CoachOdevAtaModal({
                             />
                           ) : (
                             <span className="muted" style={{ fontSize: 11.5 }}>
-                              sec
+                              seç
                             </span>
                           )}
                         </div>
@@ -444,7 +444,7 @@ export function CoachOdevAtaModal({
               style={{ opacity: selectedKeys.length === 0 ? 0.5 : 1 }}
             >
               <KiIcon name={done ? "ki-check" : "ki-send"} />
-              {done ? "Atandi!" : isSubmitting ? "Ataniyor..." : "Odevi Ata"}
+              {done ? "Atandı!" : isSubmitting ? "Atanıyor..." : "Ödevi Ata"}
             </button>
           </div>
         </div>
