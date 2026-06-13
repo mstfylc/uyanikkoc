@@ -102,6 +102,13 @@ export async function listExamsForBranch(branchId: string): Promise<OnlineExamRe
     });
 }
 
+export async function deleteExam(branchId: string, examId: string): Promise<boolean> {
+  const idx = exams.findIndex((e) => e.id === examId && (e.branchId === branchId || e.branchId === "*"));
+  if (idx === -1) return false;
+  exams.splice(idx, 1);
+  return true;
+}
+
 export async function createExam(input: CreateOnlineExamInput): Promise<OnlineExamRecord> {
   const rec: StoredExam = {
     id: `oe_${seq++}`,

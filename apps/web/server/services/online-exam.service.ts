@@ -27,6 +27,11 @@ export async function listCoachExams(branchId: string): Promise<OnlineExamRecord
   return memoryOnline.listExamsForBranch(branchId);
 }
 
+export async function deleteCoachExam(branchId: string, examId: string): Promise<boolean> {
+  if (shouldUseDatabase()) return (await repo()).deleteExam(branchId, examId);
+  return memoryOnline.deleteExam(branchId, examId);
+}
+
 export async function submitOptik(input: SubmitOptikInput): Promise<OptikSubmissionRecord> {
   const submission = shouldUseDatabase() ? await (await repo()).submitOptik(input) : await memoryOnline.submitOptik(input);
   const review = await getOptikReview(input.examId, input.studentId);
