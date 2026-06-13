@@ -360,8 +360,8 @@ export function CoachTopicsPanel() {
         <div className="grid g-2">
           <MistakeInsightsCard mode="coach" studentId={studentId} />
           <UkSection
-            title="Hata Frekansi"
-            sub="Deneme ve yanlis defteri verisine gore tekrar onceligi"
+            title="Hata Frekansı"
+            sub="Deneme ve yanlış defteri verisine göre tekrar önceliği"
             action={<UkBadge tone={weak.length > 0 ? "warning" : "success"}>{weak.length} odak konu</UkBadge>}
           >
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -390,12 +390,12 @@ export function CoachTopicsPanel() {
                         <div className="lr-meta">
                           <span className="d">{topic.subj}</span>
                           <span className="d" style={{ color: "var(--danger)", fontWeight: 800 }}>
-                            {topic.yanlis} yanlis
+                            {topic.yanlis} yanlış
                           </span>
                           <span className="d">%{topic.oran} dogru</span>
                         </div>
                       </div>
-                      <UkBadge tone="primary">Odev ata</UkBadge>
+                      <UkBadge tone="primary">Ödev ata</UkBadge>
                     </button>
                   );
                 })
@@ -409,7 +409,7 @@ export function CoachTopicsPanel() {
         <div className="grid g-4">
           <UkStatCard icon="ki-book-open" tone="primary" value={`${overallPct}%`} label="Genel konu tamamlama" />
           <UkStatCard icon="ki-check-circle" tone="success" value={`${doneTopics}/${totalTopics}`} label="Tamamlanan konu" />
-          <UkStatCard icon="ki-notepad-edit" tone="info" value={totalSoru.toLocaleString("tr-TR")} label="Cozulen soru" />
+          <UkStatCard icon="ki-notepad-edit" tone="info" value={totalSoru.toLocaleString("tr-TR")} label="Çözülen soru" />
           <UkStatCard
             icon="ki-chart-line-up-2"
             tone="warning"
@@ -420,8 +420,8 @@ export function CoachTopicsPanel() {
       ) : null}
 
       <UkSection
-        title="Net Gelisimi"
-        sub={examTrack === "LGS" ? "Baslangic → Son net (Sayisal / Sozel)" : "Baslangic → Son net (TYT / AYT)"}
+        title="Net Gelişimi"
+        sub={examTrack === "LGS" ? "Başlangıç → Son net (Sayısal / Sözel)" : "Başlangıç → Son net (TYT / AYT)"}
         action={
           <UkBadge tone="success">
             +{totalGain} net
@@ -492,7 +492,7 @@ export function CoachTopicsPanel() {
 
       <div className="grid col-main">
         <UkSection
-          title="Haftalik Soru Hedefi"
+          title="Haftalık Soru Hedefi"
           sub="Öğrencin için ders bazında hedef belirle"
           action={
             <button type="button" className="btn btn-primary btn-sm" onClick={saveTargets} disabled={isSavingTargets}>
@@ -646,7 +646,7 @@ export function CoachTopicsPanel() {
 
         <UkSection
           title="Deneme Analizleri"
-          sub="En cok yanlis yapilan konular"
+          sub="En çok yanlış yapılan konular"
           action={<UkBadge tone="danger">{weak.length} zayif konu</UkBadge>}
         >
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -668,7 +668,7 @@ export function CoachTopicsPanel() {
                         {topic.subj}
                       </span>
                       <span className="d" style={{ color: "var(--danger)", fontWeight: 700 }}>
-                        {topic.yanlis} yanlis
+                        {topic.yanlis} yanlış
                       </span>
                       <span className="d">%{topic.oran} dogru</span>
                     </div>
@@ -701,7 +701,7 @@ export function CoachTopicsPanel() {
                   className={chartMode === mode ? "on" : ""}
                   onClick={() => setChartMode(mode)}
                 >
-                  {mode === "daily" ? "Gunluk" : mode === "weekly" ? "Haftalik" : "Aylik"}
+                  {mode === "daily" ? "Gunluk" : mode === "weekly" ? "Haftalık" : "Aylık"}
                 </button>
               ))}
             </div>
@@ -867,13 +867,13 @@ export function CoachTopicsPanel() {
                                   </div>
                                 </>
                               ) : (
-                                <span className="empty">Henuz soru yok</span>
+                                <span className="empty">Henüz soru yok</span>
                               )}
                             </div>
                             <button
                               type="button"
                               className="ktx-ata"
-                              title="Odev ata"
+                              title="Ödev ata"
                               onClick={() => setOdevModal({ open: true, subject: activePerSubj.s, topic: topic.n })}
                             >
                               <KiIcon name="ki-plus" size={16} />
