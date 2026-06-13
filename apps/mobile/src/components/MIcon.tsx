@@ -107,6 +107,92 @@ const ICONS: Record<string, React.ReactNode> = {
   star: (
     <Polygon points="12 2.5 14.85 8.26 21.2 9.18 16.6 13.66 17.69 19.99 12 17 6.31 19.99 7.4 13.66 2.8 9.18 9.15 8.26" />
   ),
+  check: <Polyline points="20 6 9 17 4 12" />,
+  checkCircle: (
+    <>
+      <Circle cx="12" cy="12" r="9" />
+      <Polyline points="9 12 11 14 15 10" />
+    </>
+  ),
+  chevronDown: <Polyline points="6 9 12 15 18 9" />,
+  arrowUp: (
+    <>
+      <Path d="m5 12 7-7 7 7" />
+      <Path d="M12 19V5" />
+    </>
+  ),
+  arrowDown: (
+    <>
+      <Path d="m19 12-7 7-7-7" />
+      <Path d="M12 5v14" />
+    </>
+  ),
+  trend: (
+    <>
+      <Polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+      <Polyline points="16 7 22 7 22 13" />
+    </>
+  ),
+  plus: (
+    <>
+      <Path d="M5 12h14" />
+      <Path d="M12 5v14" />
+    </>
+  ),
+  award: (
+    <>
+      <Circle cx="12" cy="8" r="6" />
+      <Path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.11" />
+    </>
+  ),
+  moon: <Path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />,
+  help: (
+    <>
+      <Circle cx="12" cy="12" r="9" />
+      <Path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <Path d="M12 17h.01" />
+    </>
+  ),
+  send: (
+    <>
+      <Path d="m22 2-7 20-4-9-9-4Z" />
+      <Path d="M22 2 11 13" />
+    </>
+  ),
+  play: (
+    <>
+      <Circle cx="12" cy="12" r="9" />
+      <Polygon points="10 8 16 12 10 16 10 8" />
+    </>
+  ),
+  edit: (
+    <>
+      <Path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <Path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </>
+  ),
+  refresh: (
+    <>
+      <Path d="M21 2v6h-6" />
+      <Path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+      <Path d="M3 22v-6h6" />
+      <Path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+    </>
+  ),
+  users: (
+    <>
+      <Path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <Circle cx="9" cy="7" r="4" />
+      <Path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+    </>
+  ),
+  ai: (
+    <>
+      <Path d="M12 2a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5Z" />
+      <Path d="M19 21H5a2 2 0 0 1-2-2v-1a7 7 0 0 1 14 0v1a2 2 0 0 1-2 2Z" />
+    </>
+  ),
+  bolt: <Path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />,
 };
 
 type MIconProps = {

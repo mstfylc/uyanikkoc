@@ -42,11 +42,11 @@ export function SubListScreen({ title, endpoint, rootKey, itemLabel, metaLabel, 
       <Stack.Screen options={{ title }} />
       <ScrollView style={styles.root} contentContainerStyle={styles.content}>
         {items.length === 0 ? (
-          <Text style={styles.empty}>Kayit bulunamadi.</Text>
+          <Text style={styles.empty}>Kayıt bulunamadı.</Text>
         ) : (
           items.map((item, index) => (
             <View key={String(item.id ?? index)} style={styles.card}>
-              <Text style={styles.cardTitle}>{String(item[itemLabel] ?? "Kayit")}</Text>
+              <Text style={styles.cardTitle}>{String(item[itemLabel] ?? "Kayıt")}</Text>
               <Text style={styles.cardMeta}>
                 {String(item[metaLabel] ?? "")}
                 {suffix}

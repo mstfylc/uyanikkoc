@@ -33,7 +33,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="assignments"
         options={{
-          title: "Odevler",
+          title: "Ödevler",
           tabBarIcon: ({ focused }) => <TabIcon name="clipboard" focused={focused} />,
         }}
       />

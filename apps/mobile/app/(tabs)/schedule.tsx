@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useAuth } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
@@ -14,9 +14,18 @@ type StudyBlock = {
   type: string;
 };
 
+const DAYS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+const DAYS_FULL = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+
+function todayDayIndex(): number {
+  const d = new Date().getDay();
+  return d === 0 ? 6 : d - 1;
+}
+
 export default function ScheduleTab() {
   const { token } = useAuth();
   const [blocks, setBlocks] = useState<StudyBlock[]>([]);
+  const [activeDay, setActiveDay] = useState(todayDayIndex());
 
   useEffect(() => {
     if (!token) return;
@@ -25,32 +34,59 @@ export default function ScheduleTab() {
       .catch(() => setBlocks([]));
   }, [token]);
 
-  const grouped = blocks.reduce<Record<string, StudyBlock[]>>((acc, block) => {
-    acc[block.day] = acc[block.day] ?? [];
-    acc[block.day].push(block);
-    return acc;
-  }, {});
+  const dayName = DAYS_FULL[activeDay] ?? "";
+  const dayBlocks = blocks.filter((b) => b.day === dayName || b.day === DAYS[activeDay]);
 
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Calisma Programi</Text>
-      <Text style={styles.sub}>Haftalik plan</Text>
-      {Object.entries(grouped).map(([day, dayBlocks]) => (
-        <View key={day} style={styles.daySection}>
-          <Text style={styles.dayTitle}>{day}</Text>
-          {dayBlocks.map((block) => (
-            <View key={block.id} style={styles.card}>
-              <View style={[styles.dot, { backgroundColor: subjectColor(block.subject) }]} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.cardTitle}>{block.subject}</Text>
-                <Text style={styles.cardMeta}>
-                  {block.time} · {block.topic} · {block.type}
-                </Text>
+      <Text style={styles.title}>Çalışma Programı</Text>
+
+      {/* Yatay gün seçici */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.daySel}
+      >
+        {DAYS.map((day, i) => {
+          const isToday = i === todayDayIndex();
+          const isActive = i === activeDay;
+          return (
+            <Pressable
+              key={day}
+              style={[styles.dayItem, isActive && styles.dayItemActive]}
+              onPress={() => setActiveDay(i)}
+            >
+              <Text style={[styles.dayShort, isActive && styles.dayShortActive]}>{day}</Text>
+              {isToday && <View style={[styles.todayDot, isActive && styles.todayDotActive]} />}
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
+      {/* Seçili gün başlığı */}
+      <Text style={styles.dayHeading}>{dayName}</Text>
+
+      {dayBlocks.length === 0 ? (
+        <View style={styles.emptyWrap}>
+          <Text style={styles.emptyText}>Bu gün için çalışma bloğu yok.</Text>
+        </View>
+      ) : (
+        dayBlocks.map((block) => (
+          <View key={block.id} style={styles.blockCard}>
+            <View style={[styles.blockStripe, { backgroundColor: subjectColor(block.subject) }]} />
+            <View style={styles.blockBody}>
+              <View style={styles.blockTop}>
+                <Text style={styles.blockSubject}>{block.subject}</Text>
+                <Text style={styles.blockTime}>{block.time}</Text>
+              </View>
+              <Text style={styles.blockTopic}>{block.topic}</Text>
+              <View style={styles.blockTypePill}>
+                <Text style={styles.blockTypeText}>{block.type}</Text>
               </View>
             </View>
-          ))}
-        </View>
-      ))}
+          </View>
+        ))
+      )}
     </ScrollView>
   );
 }
@@ -58,22 +94,62 @@ export default function ScheduleTab() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: ukColors.bg },
   content: { padding: ukSpace.lg, paddingBottom: 40 },
-  title: { fontSize: 24, fontWeight: "800", color: ukColors.text },
-  sub: { marginTop: 4, marginBottom: ukSpace.lg, color: ukColors.muted, fontWeight: "600" },
-  daySection: { marginBottom: ukSpace.lg },
-  dayTitle: { fontSize: 15, fontWeight: "800", color: ukColors.primary600, marginBottom: 10 },
-  card: {
-    flexDirection: "row",
-    gap: 12,
-    alignItems: "center",
-    backgroundColor: ukColors.surface,
+  title: { fontSize: 24, fontWeight: "800", color: ukColors.text, marginBottom: ukSpace.md },
+  daySel: { flexDirection: "row", gap: 8, paddingBottom: ukSpace.md },
+  dayItem: {
+    width: 48,
+    height: 56,
     borderRadius: ukRadius.md,
-    padding: ukSpace.md,
+    backgroundColor: ukColors.surface,
+    alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: ukColors.border,
-    marginBottom: 10,
+    gap: 6,
   },
-  dot: { width: 10, height: 10, borderRadius: 5 },
-  cardTitle: { fontSize: 14, fontWeight: "800", color: ukColors.text },
-  cardMeta: { marginTop: 4, fontSize: 12, fontWeight: "600", color: ukColors.muted },
+  dayItemActive: {
+    backgroundColor: ukColors.primary,
+    borderColor: ukColors.primary,
+  },
+  dayShort: { fontSize: 13, fontWeight: "800", color: ukColors.muted },
+  dayShortActive: { color: "#fff" },
+  todayDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: ukColors.primary,
+  },
+  todayDotActive: { backgroundColor: "#fff" },
+  dayHeading: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: ukColors.primary600,
+    marginBottom: ukSpace.md,
+  },
+  blockCard: {
+    flexDirection: "row",
+    backgroundColor: ukColors.surface,
+    borderRadius: ukRadius.md,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: ukColors.border,
+    marginBottom: 12,
+  },
+  blockStripe: { width: 6 },
+  blockBody: { flex: 1, padding: ukSpace.md },
+  blockTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  blockSubject: { fontSize: 15, fontWeight: "800", color: ukColors.text },
+  blockTime: { fontSize: 13, fontWeight: "700", color: ukColors.muted },
+  blockTopic: { marginTop: 4, fontSize: 13, fontWeight: "600", color: ukColors.muted },
+  blockTypePill: {
+    marginTop: 8,
+    alignSelf: "flex-start",
+    backgroundColor: ukColors.primarySoft,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  blockTypeText: { fontSize: 11, fontWeight: "800", color: ukColors.primary600 },
+  emptyWrap: { alignItems: "center", padding: ukSpace.xl },
+  emptyText: { color: ukColors.muted, fontWeight: "600" },
 });

@@ -16,9 +16,12 @@ import { MIcon } from "@/components/MIcon";
 import { useAuth } from "@/lib/auth";
 import { ukColors, ukRadius, ukSpace } from "@/lib/theme";
 
+type Mode = "enter" | "otp" | "register" | "forgot";
+
 export default function LoginScreen() {
   const { token, login } = useAuth();
   const [mode, setMode] = useState<"phone" | "email">("email");
+  const [step, setStep] = useState<Mode>("enter");
   const [email, setEmail] = useState("student@uyanik.local");
   const [password, setPassword] = useState("uyanik123");
   const [phone, setPhone] = useState("");
@@ -34,16 +37,18 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       if (mode === "phone") {
-        setError("Telefon/SMS girisi henuz aktif degil. E-posta ile devam edin.");
+        setError("Telefon/SMS girişi henüz aktif değil. E-posta ile devam edin.");
         return;
       }
       await login(email.trim(), password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Giris basarisiz");
+      setError(err instanceof Error ? err.message : "Giriş başarısız");
     } finally {
       setLoading(false);
     }
   }
+
+  const phoneValid = phone.replace(/\D/g, "").length >= 10;
 
   return (
     <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
@@ -52,9 +57,9 @@ export default function LoginScreen() {
           <View style={styles.markWrap}>
             <MIcon name="shield" size={28} color="#fff" />
           </View>
-          <Text style={styles.brand}>Uyanik Koc</Text>
-          <Text style={styles.heroTitle}>Hedefe giden{"\n"}yolda yanindayiz</Text>
-          <Text style={styles.heroSub}>Kocunla, odevlerinle ve denemelerinle tek yerde.</Text>
+          <Text style={styles.brand}>Uyanık Koç</Text>
+          <Text style={styles.heroTitle}>Hedefe giden{"\n"}yolda yanındayız</Text>
+          <Text style={styles.heroSub}>Koçunla, ödevlerinle ve denemelerinle tek yerde.</Text>
         </View>
 
         <View style={styles.form}>
@@ -73,7 +78,7 @@ export default function LoginScreen() {
                   placeholderTextColor={ukColors.faint}
                 />
               </View>
-              <Text style={[styles.label, { marginTop: ukSpace.md }]}>Sifre</Text>
+              <Text style={[styles.label, { marginTop: ukSpace.md }]}>Şifre</Text>
               <View style={styles.inputWrap}>
                 <MIcon name="shield" size={18} color={ukColors.muted} />
                 <TextInput
@@ -85,10 +90,24 @@ export default function LoginScreen() {
                   placeholderTextColor={ukColors.faint}
                 />
               </View>
+
+              {error ? <Text style={styles.error}>{error}</Text> : null}
+
+              <Pressable
+                style={[styles.primaryBtn, loading && styles.disabled]}
+                onPress={() => void handleLogin()}
+                disabled={loading}
+              >
+                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Giriş Yap</Text>}
+              </Pressable>
+
+              <Pressable style={styles.secondaryBtn} onPress={() => setMode("phone")}>
+                <Text style={styles.secondaryBtnText}>Telefon ile giriş</Text>
+              </Pressable>
             </>
-          ) : (
+          ) : step === "enter" ? (
             <>
-              <Text style={styles.label}>Telefon numarasi</Text>
+              <Text style={styles.label}>Telefon numarası</Text>
               <View style={styles.inputWrap}>
                 <Text style={styles.prefix}>+90</Text>
                 <TextInput
@@ -100,20 +119,65 @@ export default function LoginScreen() {
                   placeholderTextColor={ukColors.faint}
                 />
               </View>
+
+              {error ? <Text style={styles.error}>{error}</Text> : null}
+
+              <Pressable
+                style={[styles.primaryBtn, !phoneValid && styles.disabled]}
+                onPress={() => {
+                  if (phoneValid) setStep("otp");
+                }}
+                disabled={!phoneValid}
+              >
+                <Text style={styles.primaryBtnText}>SMS Kodu Gönder</Text>
+              </Pressable>
+
+              <Pressable style={styles.secondaryBtn} onPress={() => setMode("email")}>
+                <Text style={styles.secondaryBtnText}>E-posta ile giriş</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Text style={styles.label}>Doğrulama kodu</Text>
+              <Text style={styles.otpHint}>+90 {phone} numarasına gönderildi</Text>
+              <View style={styles.inputWrap}>
+                <MIcon name="shield" size={18} color={ukColors.muted} />
+                <TextInput
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  style={[styles.input, styles.otpInput]}
+                  placeholder="● ● ● ● ● ●"
+                  placeholderTextColor={ukColors.faint}
+                />
+              </View>
+
+              <Pressable style={styles.primaryBtn}>
+                <Text style={styles.primaryBtnText}>Doğrula ve Giriş Yap</Text>
+              </Pressable>
+
+              <Pressable style={styles.secondaryBtn} onPress={() => setStep("enter")}>
+                <Text style={styles.secondaryBtnText}>Geri dön</Text>
+              </Pressable>
             </>
           )}
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <View style={styles.links}>
+            <Pressable>
+              <Text style={styles.link}>Kayıt ol</Text>
+            </Pressable>
+            <Text style={styles.linkSep}>·</Text>
+            <Pressable>
+              <Text style={styles.link}>Kurumundan davet iste</Text>
+            </Pressable>
+          </View>
 
-          <Pressable style={[styles.primaryBtn, loading && styles.disabled]} onPress={() => void handleLogin()} disabled={loading}>
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Giris Yap</Text>}
-          </Pressable>
-
-          <Pressable style={styles.secondaryBtn} onPress={() => setMode(mode === "email" ? "phone" : "email")}>
-            <Text style={styles.secondaryBtnText}>
-              {mode === "email" ? "Telefon ile giris" : "E-posta ile giris"}
-            </Text>
-          </Pressable>
+          <Text style={styles.legal}>
+            Giriş yaparak{" "}
+            <Text style={styles.legalLink}>Kullanım Koşulları</Text>
+            {"'nı ve "}
+            <Text style={styles.legalLink}>Gizlilik Politikası</Text>
+            {"'nı kabul etmiş olursunuz."}
+          </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -149,6 +213,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: ukRadius.xl,
     borderTopRightRadius: ukRadius.xl,
     padding: ukSpace.lg,
+    paddingBottom: ukSpace.xl,
   },
   label: { fontSize: 13, fontWeight: "700", color: ukColors.muted, marginBottom: 8 },
   inputWrap: {
@@ -164,6 +229,8 @@ const styles = StyleSheet.create({
   },
   prefix: { fontWeight: "800", color: ukColors.text },
   input: { flex: 1, fontSize: 15, fontWeight: "600", color: ukColors.text },
+  otpInput: { letterSpacing: 8, fontSize: 18 },
+  otpHint: { color: ukColors.muted, fontSize: 13, fontWeight: "600", marginBottom: 10 },
   error: { marginTop: ukSpace.sm, color: ukColors.danger, fontSize: 13, fontWeight: "600" },
   primaryBtn: {
     marginTop: ukSpace.lg,
@@ -183,5 +250,10 @@ const styles = StyleSheet.create({
     backgroundColor: ukColors.primarySoft,
   },
   secondaryBtnText: { color: ukColors.primary600, fontSize: 14, fontWeight: "700" },
-  disabled: { opacity: 0.7 },
+  disabled: { opacity: 0.5 },
+  links: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, marginTop: ukSpace.lg },
+  link: { color: ukColors.primary600, fontWeight: "700", fontSize: 13 },
+  linkSep: { color: ukColors.faint, fontSize: 13 },
+  legal: { marginTop: ukSpace.md, color: ukColors.faint, fontSize: 11, textAlign: "center", lineHeight: 16 },
+  legalLink: { color: ukColors.primary600, fontWeight: "700" },
 });
