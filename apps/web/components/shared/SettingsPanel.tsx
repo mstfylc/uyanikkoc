@@ -78,14 +78,14 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
           { key: "profil", label: "Hesap", icon: "ki-profile-circle" },
           { key: "gorunum", label: "Görünüm", icon: "ki-setting-2" },
           { key: "bildirimler", label: "Bildirimler", icon: "ki-notification-on" },
-          { key: "gizlilik", label: "Gizlilik", icon: "ki-lock" },
+          { key: "gizlilik", label: "Gizlilik & Güvenlik", icon: "ki-lock" },
         ]
       : [
           { key: "profil", label: "Hesap", icon: "ki-profile-circle" },
           { key: "gorunum", label: "Görünüm", icon: "ki-setting-2" },
           { key: "odeme", label: "Abonelik", icon: "ki-wallet" },
           { key: "bildirimler", label: "Bildirimler", icon: "ki-notification-on" },
-          { key: "gizlilik", label: "Gizlilik", icon: "ki-lock" },
+          { key: "gizlilik", label: "Gizlilik & Güvenlik", icon: "ki-lock" },
         ];
 
   const load = useCallback(async () => {
@@ -296,9 +296,10 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
       ) : null}
 
       {tab === "profil" ? (
+        <>
         <UkSection
-          title="Profil tercihleri"
-          sub="Hesap bilgilerin ve görünüm"
+          title="Hesap Bilgileri"
+          sub="Profil bilgilerini görüntüle ve düzenle"
           action={
             <button type="button" className="btn btn-primary btn-sm" onClick={handleProfileSave}>
               <KiIcon name="ki-check" size={15} />
@@ -332,6 +333,46 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
             </div>
           </div>
         </UkSection>
+        <UkSection title="Şifre" sub="Hesap şifreni güncelle">
+          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div className="grid g-2" style={{ gap: 12 }}>
+              <div className="field">
+                <label className="label">Mevcut şifre</label>
+                <input className="input" type="password" value={passwordDraft.current} onChange={(event) => setPasswordDraft((current) => ({ ...current, current: event.target.value }))} />
+              </div>
+              <div className="field">
+                <label className="label">Yeni şifre</label>
+                <input className="input" type="password" value={passwordDraft.next} onChange={(event) => setPasswordDraft((current) => ({ ...current, next: event.target.value }))} />
+                <span className="muted" style={{ fontSize: 11.5, marginTop: 4 }}>En az 6 karakter</span>
+              </div>
+            </div>
+            <div className="field">
+              <label className="label">Yeni şifre (tekrar)</label>
+              <input className="input" type="password" value={passwordDraft.confirm} onChange={(event) => setPasswordDraft((current) => ({ ...current, confirm: event.target.value }))} />
+              {passwordDraft.confirm && passwordDraft.next !== passwordDraft.confirm ? (
+                <span style={{ fontSize: 11.5, marginTop: 4, color: "var(--danger)" }}>Şifreler eşleşmiyor</span>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm w-fit"
+              onClick={handlePasswordSave}
+              disabled={passwordDraft.next.length < 6 || passwordDraft.next !== passwordDraft.confirm}
+              style={{ opacity: passwordDraft.next.length >= 6 && passwordDraft.next === passwordDraft.confirm ? 1 : 0.5 }}
+            >
+              <KiIcon name="ki-check" size={15} />
+              Şifreyi güncelle
+            </button>
+          </div>
+        </UkSection>
+        <UkSection title="Oturum" sub="Bu cihazdaki oturumunu kapat">
+          <div className="card-body">
+            <button type="button" className="btn btn-ghost-danger btn-sm w-fit" onClick={() => void signOut({ callbackUrl: "/login" })}>
+              Çıkış Yap
+            </button>
+          </div>
+        </UkSection>
+        </>
       ) : null}
 
       {tab === "gorunum" ? (
@@ -357,44 +398,13 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
       ) : null}
 
       {tab === "gizlilik" ? (
-        <UkSection title="Gizlilik & Güvenlik" sub="Şifre ve oturum">
-          <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div className="grid g-2" style={{ gap: 12 }}>
-              <div className="field">
-                <label className="label">Mevcut şifre</label>
-                <input
-                  className="input"
-                  type="password"
-                  value={passwordDraft.current}
-                  onChange={(event) => setPasswordDraft((current) => ({ ...current, current: event.target.value }))}
-                />
+        <UkSection title="Gizlilik & Güvenlik" sub="Hesap güvenliği ve veri tercihleri">
+          <div className="card-body">
+            <div className="notice" style={{ background: "var(--surface-3)" }}>
+              <KiIcon name="ki-lock" size={18} style={{ color: "var(--primary-600)", flexShrink: 0 }} />
+              <div className="muted" style={{ fontSize: 13, lineHeight: 1.5 }}>
+                Şifre değiştirme ve oturum işlemleri <b>Hesap</b> sekmesindedir. Hesap verilerin KVKK kapsamında korunur.
               </div>
-              <div className="field">
-                <label className="label">Yeni şifre</label>
-                <input
-                  className="input"
-                  type="password"
-                  value={passwordDraft.next}
-                  onChange={(event) => setPasswordDraft((current) => ({ ...current, next: event.target.value }))}
-                />
-              </div>
-            </div>
-            <div className="field">
-              <label className="label">Yeni şifre (tekrar)</label>
-              <input
-                className="input"
-                type="password"
-                value={passwordDraft.confirm}
-                onChange={(event) => setPasswordDraft((current) => ({ ...current, confirm: event.target.value }))}
-              />
-            </div>
-            <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
-              <button type="button" className="btn btn-primary btn-sm" onClick={handlePasswordSave}>
-                Şifreyi güncelle
-              </button>
-              <button type="button" className="btn btn-ghost-danger btn-sm" onClick={() => void signOut({ callbackUrl: "/login" })}>
-                Çıkış yap
-              </button>
             </div>
           </div>
         </UkSection>
