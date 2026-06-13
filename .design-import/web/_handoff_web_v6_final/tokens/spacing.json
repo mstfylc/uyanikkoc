@@ -1,0 +1,51 @@
+{
+  "$meta": {
+    "name": "Uyanık Koç — Boşluk & Layout Tokenları (v6)",
+    "source": "indir/uyanikkoc-web-source-v5/src/styles.css",
+    "note": "ÖNEMLİ: Kaynakta açık bir 'spacing scale' tokeni YOKTUR. Boşluklar component'lerde literal px olarak yazılıdır. Aşağıdaki ölçek, kod genelinde EN SIK gözlemlenen değerlerden çıkarılmış öneri ölçektir (tokenleştirme tavsiyesi). Layout tokenları (--sidebar-w, --header-h) gerçektir."
+  },
+  "layout": {
+    "sidebar-w": { "css": "--sidebar-w", "value": "264px", "mobile": "0px (@media max-width:880px)" },
+    "header-h":  { "css": "--header-h", "value": "70px" },
+    "content-padding": { "desktop": "24px 28px", "tablet-520": "16px 12px 96px", "note": ".content; mobilde alt 96px bottom-nav payı" },
+    "grid-gap": "16px (kart ızgaralarında baskın)",
+    "card-body-gap": "8px–16px (Section card-body içi flex gap)"
+  },
+  "observed-spacing-scale": {
+    "$note": "Tokenleştirme için önerilen ad → değer eşlemesi. Codex bunları --space-* olarak tanımlayıp literal px'leri değiştirebilir; ANCAK görsel parite için kaynaktaki literal değer esas alınmalıdır.",
+    "space-1": "4px",
+    "space-2": "6px",
+    "space-3": "8px",
+    "space-4": "10px",
+    "space-5": "12px",
+    "space-6": "14px",
+    "space-7": "16px",
+    "space-8": "18px",
+    "space-9": "20px",
+    "space-10": "24px",
+    "space-12": "28px",
+    "space-16": "40px"
+  },
+  "control-heights": {
+    "$note": "Form/aksiyon kontrol yükseklikleri (gözlemlenen).",
+    "input": "~42px (default .input)",
+    "select-sm": "34px",
+    "btn": "~40px",
+    "btn-sm": "~30px",
+    "icon-btn": "36px (modal kapat), 32–40px değişken",
+    "seg": "34px (segment kontrol)",
+    "badge": "19–22px (inline rozet)",
+    "avatar": "28 / 38 / 40 / 42px (bağlama göre)",
+    "tap-target-min": "44px (@media max-width:880px · .nav-item min-height:44px)"
+  },
+  "breakpoints": {
+    "$note": "styles.css @media kırılımları — birebir.",
+    "1160": "searchbox gizlenir; .g-4 2 kolon; .col-main tek kolon",
+    "880": "MOBİL eşiği — --sidebar-w:0; .app tek kolon; .bottom-nav görünür; .nav-item min-height:44px",
+    "760": ".tb-search ve .tb-roles gizlenir; user-pop içinde rol değişimi açılır (.pop-roles görünür)",
+    "720": ".between sarmalanır; tablo padding azalır; .seg sarmalanır; çeşitli modül ızgaraları tek kolona düşer",
+    "640": ".ag-sub gizlenir; Takvimim hafta görünümü yatay kaydırılır",
+    "520": ".g-4 2 kolon; .content padding 16/12/96; modal-foot butonları tam genişlik",
+    "400": ".g-4 tek kolon; .topbar .crumb span gizlenir"
+  }
+}

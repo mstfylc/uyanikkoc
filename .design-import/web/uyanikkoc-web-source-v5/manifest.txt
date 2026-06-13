@@ -1,0 +1,78 @@
+EN GUNCEL KANONIK SURUM BUDUR: uyanikkoc-web-source-v5  (Web Uygulamasi — Ogrenci / Koc / Veli)
+
+Bu surum, onceki tum web teslimlerini birlestiren GUNCEL kaynaktir:
+  v4 (tam uygulama) + Giris Ekrani Yenileme v1 (yeni login) +
+  Mobil Uyumluluk v1 (alt navigasyon / bottom-nav + responsive duzeltme) +
+  Konu Cizelge modulu + ek moduller (konu-store, kaynak-tracker).
+
+====================================================================
+PAKET ICERIGI (manifest)  —  uyanikkoc-web-source-v5
+====================================================================
+Tum dosyalar gercek/makine-okur kaynak (text). Ekran goruntusu yok.
+Hicbir path'te bosluk veya Turkce karakter yok (ASCII).
+
+uyanik-koc-dashboard.html       Kanonik HTML prototip. Tum ekranlarin girisi.
+                                Rol secimi: Ogrenci / Koc / Veli (+ Uye ol akisi).
+                                Yeni login (cam onizleme kartlari) + mobil alt cubuk.
+tokens.json                     TEK dogruluk kaynagi token dosyasi (light + dark).
+                                Degerler styles.css :root ile BIREBIR ayni (dogrulandi).
+VERSION.md                      Surum beyani + eski kopya listesi (kanonik = bu paket).
+VALIDATION.md                   Otomatik dogrulama raporu (token paritesi vb.).
+
+src/styles.css                  TAM tasarim sistemi. :root + [data-theme=dark] degisken
+                                bloklari + tum component siniflari (.btn*, .card*, .stat*,
+                                .badge*, .topbar, .sidebar, .nav-item, .tbl, .modal*,
+                                .seg, .grid, .chip, .hero, .auth*/.auth-stage (yeni login),
+                                .bottom-nav/.bn-* (mobil alt cubuk), .medal* ...).
+src/billing.css                 Faturalandirma/abonelik stilleri (token tuketir, tanimlamaz).
+src/kaynak-tracker.css          Kaynak takip modulu stilleri.
+src/odev-ata.css                Odev atama modulu stilleri.
+src/coach-konu.css              Koc konu takibi stilleri.
+konu-cizelge/cizelge.css        Yillik konu takip cizelgesi stilleri.
+
+KAYNAK JS/JSX (React + Babel, her biri ayri <script type=text/babel>):
+src/icons.jsx                   Line-icon SVG path seti (ICON_PATHS) + Icon bileseni.
+src/logo.jsx                    Marka logo bileseni.
+src/ui.jsx                      Paylasilan UI primitifleri + React hook re-export.
+src/data.jsx                    Ortak/dashboard demo verisi.
+src/app.jsx                     Rol yonlendirme (MENUS+ROUTES), tema, shell, BottomNav (mobil).
+src/auth.jsx                    Giris (YENI login tasarimi) + Uye ol akisi.
+src/settings.jsx                Ayarlar.    src/notifications.jsx  Bildirimler.
+src/ui-actions.jsx              Toast / aksiyon yardimcilari.
+--- OGRENCI: student.jsx, student-data.jsx, student-pages.jsx, student-extra.jsx,
+             student-exam-analiz.jsx, odev-student.jsx
+--- KOC:     coach.jsx, coach-data.jsx, coach-pages.jsx, coach-pages2.jsx,
+             coach-konu.jsx, coach-odev-ata.jsx, coach-rating.jsx, roster.jsx
+--- VELI:    parent.jsx
+--- v6 YENI MODULLER (v5 sonrasi eklenenler):
+    mistakes-store.jsx     Yanlis Defteri veri+store (uk_mistakes_v1) + spaced repetition + hata frekansi.
+    yanlis-defteri.jsx     Yanlis Defteri sayfasi (mistakes) + Hata Frekansi + Sifir Hata Dongusu (odak tekrar)
+                           + MistakeBatchModal (odev/deneme -> defter) + CoachMistakesCard (koc gorunumu).
+    net-gain-map.jsx       Net Kaybi Haritasi (NetGainMap) — ogrenci/koc/veli; konu + yanlis verisinden beslenir.
+    coach-smart-odev.jsx   Akilli Odev Sistemi (SmartOdevModal) — otomatik haftalik plan onerisi.
+    student-agenda.jsx     Takvimim (TakvimimCard) — Ajanda/Hafta/Ay; odev+deneme+randevu+tekrar tek akista.
+    (Guncellenenler: messaging.jsx canli iletim+bildirim, coach-pages(.jsx/2) koc notu,
+     coach-konu.jsx mount'lar, parent.jsx icgoru kartlari, odev-student/student-exam-analiz besleme,
+     student-pages.jsx Konu Takibi yeniden tasarim, ui.jsx Section baslik fix.)
+--- MODULLER: curriculum.jsx · appointments(.jsx/-ui) · tests-store/tests-ui/manual-exam/
+              deneme-import/deneme-kayit/online-deneme/student-exam-analiz (deneme/sinav) ·
+              odev-store/kaynak-catalog/kaynak-picker/konu-store/kaynak-tracker (odev/kaynak) ·
+              billing-store/billing/billing-checkout/billing-branch (faturalandirma) ·
+              messaging/motivation-send · reports · school-schedule · support
+konu-cizelge/cizelge-data.jsx   Yillik cizelge verisi.
+konu-cizelge/cizelge-app.jsx    Cizelge uygulamasi/gorunumu.
+konu-cizelge/coach-cizelge-page.jsx   Koc cizelge sayfasi.
+konu-cizelge/(cizelge-shell.jsx, icons.jsx, styles.css)  Modul ic bagimliliklari.
+
+handoff/README.md, handoff/YENI-OZELLIKLER-v6.md, handoff/DEGISIKLIKLER.md
+                                Kanonik talimat + ekran envanteri + yeni ozellikler/veri modeli +
+                                build rehberi + onceki degisiklik gecmisi.
+
+ASSET / FONT:
+- Ikonlar: SVG path olarak src/icons.jsx (+ konu-cizelge/icons.jsx) icinde. Harici ikon dosyasi yok.
+- Font: Plus Jakarta Sans — Google Fonts (uyanik-koc-dashboard.html <head>).
+- Gorsel: CSS gradient/SVG; harici raster gorsel bagimliligi yok.
+
+CALISTIRMA: uyanik-koc-dashboard.html tarayicida ac (React/Babel CDN icin internet gerekir).
+Giris ekraninda rol sec -> bilgileri gir -> "Giris Yap". Ya da "Uye ol".
+Demo: Ogrenci elif@uyanikkoc.com · Koc dilek@uyanikkoc.com · Veli ayse@uyanikkoc.com

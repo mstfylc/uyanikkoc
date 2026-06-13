@@ -1,0 +1,77 @@
+{
+  "$entity": "NetGainMap output (türetilmiş / salt-okuma) + SmartOdev plan",
+  "$note": "Bu iki yüzey VERİ DEĞİL, türetilmiş hesaplardır. Backend'de read-only endpoint olarak sunulmalı; girdileri konu durumu + yanlış defteri + deneme trendi.",
+
+  "net-gain-map": {
+    "$source": "src/net-gain-map.jsx",
+    "input-signals": [
+      "konu tamamlanma açığı (konu-store: konuList/getCurriculum)",
+      "Yanlış Defteri kapanmamış yanlış/boş ağırlığı (getMistakes, status!=kapandi)",
+      "son 3 deneme trendi (COACH_STUDENTS.trend)",
+      "hedef nete katkı (NGM_MAXNET ders→max net)"
+    ],
+    "output": {
+      "top": "array<area> (en yüksek 3, aynı dersten en fazla 1)",
+      "rest": "array<area> (sıradaki ≤5)",
+      "totalNet": "number (top estNet toplamı, 1 ondalık)"
+    },
+    "area": {
+      "subject": "string",
+      "topic": "string",
+      "band": "string|null (TYT/AYT)",
+      "status": "enum todo|progress|done",
+      "accuracy": "int (yanlışlar düşürür)",
+      "compGap": "int 0..100 (tamamlanma açığı)",
+      "netGap": "number",
+      "trendDir": "int -1|0|1 (düşüyor/yatay/çıkıyor)",
+      "gain": "int 0..100",
+      "estNet": "number (+net potansiyel, 1 ondalık)",
+      "lever": "enum NGM_LEVER (konu|kalite|sure|tekrar)",
+      "mkCount": "int (Yanlış Defteri yanlış sayısı)"
+    },
+    "NGM_LEVER": {
+      "konu":   { "short": "konu eksiği", "tone": "info", "icon": "book" },
+      "kalite": { "short": "çözüm kalitesi", "tone": "danger", "icon": "target" },
+      "sure":   { "short": "süre yönetimi", "tone": "warning", "icon": "clock" },
+      "tekrar": { "short": "tekrar", "tone": "primary", "icon": "ai" }
+    },
+    "NGM_ERR_LEVER": { "bilgi": "konu", "islem": "kalite", "sure": "sure", "dikkat": "sure", "yorum": "kalite", "unutma": "tekrar" },
+    "gain-formula": "min(100, round(0.30*compGap + 0.28*wrongWeight + 0.18*netGapNorm + 0.14*trendPen) + mkBoost)",
+    "estNet-formula": "gain/100 * (maxNet/9) * 1.15",
+    "role-cta": { "coach": "Bu konuya ödev ata (onPick→OdevAtaModal)", "student": "Programa ekle (uk-nav schedule)", "parent": "YOK (salt-görüntüleme)" },
+    "states": { "empty": "top boş → component null (render yok)", "v2-todo": "ÖSYM katsayıları + bölüm hedefi + sıralama tahmini" }
+  },
+
+  "smart-odev": {
+    "$source": "src/coach-smart-odev.jsx",
+    "signals (_smSignals)": {
+      "sinav": "YKS|LGS",
+      "subs": "array<{subject, done, prog, total, pct}>",
+      "weak": "en zayıf 3 ders",
+      "completion": "geçen hafta ödev tamamlama %",
+      "net": "şu anki net", "netDelta": "son iki deneme farkı",
+      "goal": "'YKS 2026'|'LGS 2026'", "targetNet": "net + max(18, net*0.08)",
+      "availDays": "completion>=80?6 : >=60?5 : 4"
+    },
+    "options": {
+      "intensity": "enum SM_INTENSITY (low|mid|high) → soru aralığı 15-25/25-40/40-55, perDay 1/1/2",
+      "focus": "enum SM_FOCUS (tekrar|karma|yeni)",
+      "days": "int 1..7",
+      "source": "free|pdf|<öğrenci kaynağı>",
+      "overdueAlert": "bool",
+      "quality": "bool"
+    },
+    "plan-item (üretilen → atanan odev)": {
+      "day": "int (0-index gün)", "subject": "string", "topic": "string",
+      "type": "enum ODEV_TYPES (test hariç)", "count": "int (soru türünde)",
+      "source": "string", "status": "todo|progress|done (öneri kaynağı)"
+    },
+    "assign-output": "her item → assignments kaydı (bkz. assignments.json; smart:true, overdueAlert, quality, due=SMART_BASE+gün+1)",
+    "states": { "empty": "müfredat yoksa ilk dersten fallback 3 konu", "assigned": "buton 'Atandı!' disabled" }
+  },
+
+  "auth-scope": {
+    "net-gain-map": { "student": "kendi (CTA: programa ekle)", "coach": "öğrencinin (CTA: ödev ata)", "parent": "çocuğun (CTA yok)" },
+    "smart-odev": { "coach": "yalnız koç üretir + atar", "student/parent": "erişim YOK" }
+  }
+}

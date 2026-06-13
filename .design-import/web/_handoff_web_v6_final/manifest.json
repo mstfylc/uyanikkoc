@@ -1,0 +1,89 @@
+{
+  "$package": "_handoff_web_v6_final",
+  "name": "Uyanık Koç — Web v6 Final Görsel Handoff",
+  "version": "6.0.0",
+  "generated": "2026-06-12",
+  "purpose": "Codex'in mevcut mstfylc/uyanikkoc repo · apps/web hedefine v6 web tasarımını PIXEL-PERFECT uygulaması için final görsel + sözleşme paketi.",
+  "canonical-source": "indir/uyanikkoc-web-source-v5/ (VERSION.md · handoff/YENI-OZELLIKLER-v6.md)",
+  "target": "apps/web (Next.js App Router)",
+  "design": {
+    "font": "Plus Jakarta Sans (400–800)",
+    "themes": ["light", "dark"],
+    "theme-switch": "<html data-theme=\"dark\">",
+    "token-source": "src/styles.css :root + [data-theme=dark] (tokens.json ile birebir)"
+  },
+  "read-order": [
+    "1. README.md",
+    "2. RISKS_AND_GAPS.md  (önce oku — eksikler/tutarsızlıklar/kapsam)",
+    "3. tokens/*  → token-css-map.md",
+    "4. source-map/*  (kaynak↔hedef eşleme)",
+    "5. components/*  (v6 modül + primitif spec'leri)",
+    "6. flows/*  (uçtan uca akışlar)",
+    "7. data-contracts/*  (alanlar/enum/payload/durum/yetki)",
+    "8. visual-qa/*  (kabul + diff eşiği)",
+    "9. exports/*  (gerçek ekran referansları)"
+  ],
+  "contents": {
+    "tokens": [
+      "tokens/colors.json", "tokens/typography.json", "tokens/spacing.json",
+      "tokens/radius-shadow-zindex.json", "tokens/token-css-map.md"
+    ],
+    "components": [
+      "components/yanlis-defteri.md", "components/hata-frekansi.md", "components/zero-error-loop.md",
+      "components/net-gain-map.md", "components/smart-odev-modal.md", "components/takvimim-card.md",
+      "components/messaging-notifications.md", "components/odev-plan-item.md",
+      "components/states-nav-modal-form-table.md"
+    ],
+    "flows": [
+      "flows/01-student-mistake-add-review.md", "flows/02-odev-result-to-mistakes.md",
+      "flows/03-deneme-analiz-to-mistakes.md", "flows/04-coach-smart-odev.md",
+      "flows/05-coach-assign-from-mistakes.md", "flows/06-coach-note-send.md",
+      "flows/07-messaging-unread-read-mute.md", "flows/08-parent-insights.md"
+    ],
+    "data-contracts": [
+      "data-contracts/mistakes.json", "data-contracts/assignments.json",
+      "data-contracts/messaging.json", "data-contracts/appointments.json",
+      "data-contracts/net-gain-map_smart-odev.json", "data-contracts/auth-scope.json"
+    ],
+    "source-map": [
+      "source-map/README.md", "source-map/file-map.md", "source-map/component-map.md"
+    ],
+    "visual-qa": [
+      "visual-qa/acceptance-checklist.md", "visual-qa/allowed-diff-threshold.md"
+    ],
+    "exports": {
+      "README": "exports/README.md",
+      "captured": {
+        "student/desktop-light": ["dashboard", "mistakes", "exams", "assignments", "topics", "messages"],
+        "student/desktop-dark":  ["dashboard", "mistakes", "exams", "assignments", "topics", "messages"],
+        "coach/desktop-light":   ["dashboard", "c-assignments", "students", "messages", "reports"],
+        "coach/desktop-dark":    ["dashboard", "c-assignments", "students", "messages", "reports"],
+        "parent/desktop-light":  ["dashboard", "p-exams", "messages"],
+        "parent/desktop-dark":   ["dashboard", "p-exams", "messages"]
+      },
+      "not-captured": {
+        "reason": "Ortam kısıtı (sabit ~924px görünüm penceresi + fixed-portal serileştirme). Bkz. RISKS_AND_GAPS.md A.",
+        "missing": ["mobile-light/*", "mobile-dark/*", "modallar", "coach/c-topics"],
+        "regenerate": "exports/README.md — gerçek tarayıcı/DevTools adımları"
+      },
+      "capture-width": "~909px (kompakt masaüstü)",
+      "demo-date": "2026-06-05"
+    }
+  },
+  "v6-modules": [
+    "Yanlış Defteri + Hata Frekansı + Sıfır Hata Döngüsü",
+    "Net Kaybı Haritası",
+    "Akıllı Ödev (SmartOdevModal)",
+    "Takvimim (Ajanda/Hafta/Ay)",
+    "Mesajlaşma canlı iletim + bildirim + okunmamış/sessize",
+    "Koç geri bildirim notu (CoachNoteModal)",
+    "Koç: öğrenci yanlış defterinden ödev atama",
+    "Ödev/Deneme → Yanlış Defteri besleme (MistakeBatchModal)",
+    "Veli içgörü kartları"
+  ],
+  "critical-fixes": [
+    "apps/web/styles/uk-design.css: --muted #767A90 → #6B6F85",
+    "--surface dark: tek değer #181C2B"
+  ],
+  "scope-out": ["Admin paneli", "Native mobil app", "AI Koç tam ekranı (Yakında)", "NetGainMap v2 (ÖSYM/sıralama)"]
+}

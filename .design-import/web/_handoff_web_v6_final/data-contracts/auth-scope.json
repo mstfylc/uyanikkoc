@@ -1,0 +1,37 @@
+{
+  "$doc": "Yetki kapsamı matrisi (RBAC) — v6 yüzeyleri",
+  "$source": "src/app.jsx (MENUS/ROUTES/BOTTOM_NAV), modül role prop'ları",
+  "$auth": { "prototype": "loadAuth() · AUTH_KEY=uk_auth_v1 (remember→localStorage, aksi sessionStorage); DEMO_USERS", "backend": "telefon+SMS OTP / e-posta + rol bazlı guard" },
+  "demo-users": {
+    "student": { "name": "Elif Yıldız", "email": "elif@uyanikkoc.com" },
+    "coach": { "name": "Dilek Emen", "email": "dilek@uyanikkoc.com" },
+    "parent": { "name": "Ayşe Yıldız", "email": "ayse@uyanikkoc.com", "child": "Elif Yıldız" }
+  },
+  "routes-by-role": {
+    "student": ["dashboard", "schedule", "topics", "exams", "mistakes", "assignments", "messages", "appointments", "tests", "ai-coach(Yakında)", "motivation", "billing", "settings", "support", "profile"],
+    "coach": ["dashboard", "students", "c-topics", "c-cizelge", "c-assignments", "c-exams", "c-online", "messages", "appointments", "tests", "reports", "revenue", "settings", "support", "profile"],
+    "parent": ["dashboard", "p-exams", "p-reports", "messages", "appointments", "billing", "settings", "support", "profile"]
+  },
+  "bottom-nav": {
+    "student": ["dashboard", "schedule", "assignments", "messages", "+Menü"],
+    "coach": ["dashboard", "students", "c-assignments", "messages", "+Menü"],
+    "parent": ["dashboard", "p-exams", "messages", "appointments", "+Menü"]
+  },
+  "v6-permission-matrix": {
+    "Yanlış Defteri (mistakes)": { "student": "CRUD + tekrar", "coach": "READ + konuya ödev ata", "parent": "AGGREGATE READ (Hata Frekansı)" },
+    "Hata Frekansı": { "student": "kendi", "coach": "öğrencinin", "parent": "çocuğun (salt)" },
+    "Sıfır Hata Döngüsü": { "student": "tekrar et", "coach": "—", "parent": "—" },
+    "Net Kaybı Haritası": { "student": "READ + 'Programa ekle'", "coach": "READ + 'Ödev ata'", "parent": "READ (CTA yok)" },
+    "Akıllı Ödev": { "student": "—", "coach": "üret + ata", "parent": "—" },
+    "Takvimim": { "student": "kendi (ödev+deneme+randevu+tekrar)", "coach": "—", "parent": "—" },
+    "Ödev sonucu/feedback": { "student": "sonuç gir", "coach": "not (feedback) gönder", "parent": "READ" },
+    "Mesajlaşma": { "student": "koç DM + grupları", "coach": "tüm DM + grup yönetimi", "parent": "çocuğun koçu DM + grupları" },
+    "Bildirim": { "all": "kendi rol kuyruğu (pushNotif role bazlı)" }
+  },
+  "enforcement-notes": [
+    "Görünürlük = gönderme/işlem yetkisi; backend'de sunucu tarafı guard ZORUNLU.",
+    "Veli yalnız bağlı çocuğun read-only verisi.",
+    "Koç yalnız kendi öğrencilerinin verisi (prototipte tek koç demo).",
+    "Tema/rol/sayfa state'i uk_theme / uk_role / uk_page_<role> anahtarlarında (UI state; yetki değil)."
+  ]
+}

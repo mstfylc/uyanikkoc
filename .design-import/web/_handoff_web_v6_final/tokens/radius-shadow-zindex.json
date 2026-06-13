@@ -1,0 +1,34 @@
+{
+  "$meta": {
+    "name": "Uyanık Koç — Radius / Shadow / Z-index Tokenları (v6)",
+    "source": "indir/uyanikkoc-web-source-v5/src/styles.css + tokens.json",
+    "note": "Radius ve shadow gerçek CSS değişkenleridir. Z-index kaynakta token DEĞİLDİR (component class'larında literal). Aşağıdaki z-index ölçeği gözlemlenen değerlerdir; tokenleştirme önerilir."
+  },
+  "radius": {
+    "sm": { "css": "--r-sm", "value": "9px" },
+    "md": { "css": "--r-md", "value": "13px" },
+    "lg": { "css": "--r-lg", "value": "18px" },
+    "xl": { "css": "--r-xl", "value": "24px" },
+    "pill": "999px (literal — chip/track/badge yuvarlak uçları)",
+    "msg-bubble": "14px (kendi: 14px 14px 4px 14px / karşı: 14px 14px 14px 4px)"
+  },
+  "shadow": {
+    "sm":      { "css": "--shadow-sm", "light": "0 1px 2px rgba(24,26,40,.05), 0 1px 3px rgba(24,26,40,.04)", "dark": "0 1px 2px rgba(0,0,0,.30)" },
+    "md":      { "css": "--shadow-md", "light": "0 2px 6px rgba(24,26,40,.06), 0 8px 24px rgba(24,26,40,.06)", "dark": "0 2px 8px rgba(0,0,0,.32), 0 12px 32px rgba(0,0,0,.28)" },
+    "lg":      { "css": "--shadow-lg", "light": "0 12px 40px rgba(24,26,40,.12)", "dark": "0 18px 48px rgba(0,0,0,.45)" },
+    "primary": { "css": "--shadow-primary", "light": "0 10px 30px -8px var(--primary-glow)", "dark": "0 12px 34px -8px var(--primary-glow)" }
+  },
+  "zindex": {
+    "$note": "Kaynakta literal; tokenleştirme önerilir. Gözlemlenen ölçek:",
+    "topbar": 20,
+    "sidebar": 30,
+    "user-pop-backdrop": 40,
+    "user-pop": 50,
+    "bottom-nav": 150,
+    "sidebar-mobile": "200–210",
+    "modal-overlay": 100,
+    "search-sheet": "≥ modal",
+    "toast": 120,
+    "billing-toast-host": 9999
+  }
+}

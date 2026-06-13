@@ -1,0 +1,44 @@
+{
+  "$entity": "appointment (randevu) — v6 Takvimim/agenda kaynağı",
+  "$source": "src/appointments.jsx",
+  "$storage": { "prototype": "localStorage uk_appointments_v1", "backend": "appointments" },
+  "fields": {
+    "id": "string",
+    "student": "string",
+    "coach": "string",
+    "day": "string (kısa gün adı, ör. 'Pzt' / tam ad)",
+    "slot": "string 'HH:MM'",
+    "mode": "enum APPT_MODE (online|yuzyuze|telefon)",
+    "topic": "string",
+    "status": "enum APPT_STATUS (pending|approved|rejected|cancelled)"
+  },
+  "enums": {
+    "APPT_MODE": {
+      "online":  { "label": "Online", "icon": "ai", "tone": "info" },
+      "yuzyuze": { "label": "Yüz yüze", "icon": "users", "tone": "primary" },
+      "telefon": { "label": "Telefon", "icon": "phone", "tone": "success" }
+    },
+    "APPT_STATUS": {
+      "pending":   { "label": "Onay bekliyor", "tone": "warning" },
+      "approved":  { "label": "Onaylandı", "tone": "success" },
+      "rejected":  { "label": "Reddedildi", "tone": "danger" },
+      "cancelled": { "label": "İptal", "tone": "muted" }
+    }
+  },
+  "operations": {
+    "getAppts()": "tüm randevular",
+    "useAppts()": "reaktif",
+    "weeklyApptCount(student)": "reddedilmemiş/iptal olmayan haftalık sayı"
+  },
+  "takvimim-usage": "TakvimimCard, reddedilmemiş/iptal-olmayan randevuları 'randevu' (success, calendar) item olarak takvime ekler (student-agenda.jsx).",
+  "states": {
+    "empty": "randevu yoksa Takvimim'de görünmez; randevu sayfasında boş-durum",
+    "pending": "warning rozet 'Onay bekliyor'",
+    "loading/error": "backend: liste skeleton / onay hatası toast"
+  },
+  "auth-scope": {
+    "student": "kendi randevuları (talep + görüntüle)",
+    "coach": "öğrenci randevularını onayla/reddet",
+    "parent": "çocuğun randevuları (görüntüle)"
+  }
+}
