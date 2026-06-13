@@ -221,6 +221,7 @@ function recentFrequency(mistakes: Mistake[]) {
 export default function StudentMistakesPage() {
   const [mistakes, setMistakes] = useState<Mistake[]>([]);
   const [form, setForm] = useState(INITIAL_FORM);
+  const [addOpen, setAddOpen] = useState(false);
   const [showAllDue, setShowAllDue] = useState(false);
   const [reviewList, setReviewList] = useState<Mistake[] | null>(null);
   const [reviewIndex, setReviewIndex] = useState(0);
@@ -264,6 +265,7 @@ export default function StudentMistakesPage() {
       return;
     }
     setForm(INITIAL_FORM);
+    setAddOpen(false);
     await loadMistakes();
   }
 
@@ -329,27 +331,27 @@ export default function StudentMistakesPage() {
         title="Yanlış Defteri"
         sub="Hatalarını kaydet, sistem unutturmadan tekrar ettirsin"
         actions={
-          <a className="btn btn-primary" href="#yanlis-ekle">
+          <button type="button" className="btn btn-primary" onClick={() => setAddOpen(true)}>
             <KiIcon name="ki-plus" size={16} />
             Yanlış ekle
-          </a>
+          </button>
         }
       />
 
-      <div className="grid g-4">
+      <div className="yd-summary">
         {[
           ["ki-shield-cross", "danger", mistakes.length, "Toplam yanlış"],
           ["ki-time", "warning", openCount, "Açık · takipte"],
           ["ki-check-circle", "success", closedCount, "Kapandı · sıfır hata"],
           ["ki-technology-2", "info", due.length, "Bugün tekrar"],
         ].map(([icon, tone, value, label]) => (
-          <div key={label as string} className="card stat">
-            <div className="card-pad">
-              <span className={`stat-icon tone-${tone}`}>
-                <KiIcon name={icon as string} size={22} />
-              </span>
-              <div className="stat-value tnum">{isLoading ? "-" : value}</div>
-              <div className="stat-label">{label}</div>
+          <div key={label as string} className="yd-sum">
+            <span className={`stat-icon tone-${tone}`} style={{ width: 40, height: 40 }}>
+              <KiIcon name={icon as string} size={19} />
+            </span>
+            <div>
+              <div className="v tnum">{isLoading ? "-" : value}</div>
+              <div className="l">{label}</div>
             </div>
           </div>
         ))}
@@ -378,7 +380,8 @@ export default function StudentMistakesPage() {
       >
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {due.length === 0 ? (
-            <div style={{ padding: 18, textAlign: "center", color: "var(--muted)" }}>
+            <div className="yd-clear">
+              <KiIcon name="ki-check-circle" size={20} />
               Bugün tekrar edilecek yanlış yok — döngü temiz.
             </div>
           ) : (
@@ -464,8 +467,19 @@ export default function StudentMistakesPage() {
         </div>
       </UkSection>
 
-      <UkSection title="Yanlış ekle" sub="Ders ve konu zorunlu; fotoğraf için yalnız URL kabul edilir">
-        <form id="yanlis-ekle" className="card-body" onSubmit={(event) => void addMistake(event)} style={{ display: "grid", gap: 12 }}>
+      {addOpen ? createPortal(
+        <div className="modal-overlay" onClick={() => setAddOpen(false)}>
+          <div className="modal-panel" style={{ maxWidth: 540 }} onClick={(event) => event.stopPropagation()}>
+            <div className="modal-head">
+              <div>
+                <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Yanlış ekle</h3>
+                <div className="muted" style={{ fontSize: 12 }}>Ders ve konu zorunlu; fotoğraf için yalnız URL kabul edilir</div>
+              </div>
+              <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={() => setAddOpen(false)} aria-label="Kapat">
+                <KiIcon name="ki-cross" size={18} />
+              </button>
+            </div>
+        <form id="yanlis-ekle" className="modal-body" onSubmit={(event) => void addMistake(event)} style={{ display: "grid", gap: 12 }}>
           <div className="grid g-2">
             <label className="field">
               <span className="label">Ders</span>
@@ -514,12 +528,15 @@ export default function StudentMistakesPage() {
             </button>
           </div>
         </form>
-      </UkSection>
+          </div>
+        </div>,
+        document.body,
+      ) : null}
 
       <UkSection title="Tüm Yanlışlar" sub={`${shown.length} kayıt`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {error ? <p role="alert" className="badge badge-danger" style={{ width: "fit-content" }}>{error}</p> : null}
-          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+          <div className="yd-toolbar">
             <select className="select" value={subjectFilter} onChange={(event) => setSubjectFilter(event.target.value)} style={{ width: 160 }}>
               <option value="all">Tüm dersler</option>
               {subjects.map((subject) => <option key={subject} value={subject}>{subject}</option>)}

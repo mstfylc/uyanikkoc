@@ -1663,3 +1663,11 @@ button.triage-row:hover { background: var(--surface-2); }
   .odev-cal-cell { min-height: 46px; border-radius: 9px; padding: 4px 5px; }
   .odev-cal-num { font-size: 11px; }
 }
+
+/* Yanlış Defteri özet şeridi + araç çubuğu — kaynak: styles.css */
+.yd-summary { display: flex; flex-wrap: wrap; gap: 10px; }
+.yd-sum { flex: 1; min-width: 158px; display: flex; align-items: center; gap: 12px; padding: 13px 15px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.yd-sum .v { font-size: 21px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+.yd-sum .l { font-size: 11.5px; color: var(--muted); font-weight: 600; margin-top: 3px; }
+.yd-clear { display: flex; align-items: center; justify-content: center; gap: 9px; padding: 22px 0; color: var(--success); font-size: 13.5px; font-weight: 700; }
+.yd-toolbar { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 4px; }
