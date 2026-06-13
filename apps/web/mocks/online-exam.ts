@@ -92,6 +92,16 @@ export async function listExamsForStudent(
   });
 }
 
+export async function listExamsForBranch(branchId: string): Promise<OnlineExamRecord[]> {
+  return exams
+    .filter((e) => e.branchId === branchId || e.branchId === "*")
+    .map((e) => {
+      const { answerKey, ...rest } = e;
+      void answerKey;
+      return { ...rest, submission: null };
+    });
+}
+
 export async function createExam(input: CreateOnlineExamInput): Promise<OnlineExamRecord> {
   const rec: StoredExam = {
     id: `oe_${seq++}`,

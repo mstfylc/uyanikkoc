@@ -26,9 +26,10 @@ const COACH_NAV: UkNavItem[] = [
   { href: "/coach/dashboard", label: "Dashboard", icon: "ki-element-11" },
   { href: "/coach/students", label: "Öğrencilerim", icon: "ki-people" },
   { href: "/coach/topics", label: "Konu Takibi", icon: "ki-book-open" },
-  { href: "/coach/topics/annual", label: "Yillik Cizelge", icon: "ki-notebook", tag: "Yeni" },
+  { href: "/coach/topics/annual", label: "Yıllık Çizelge", icon: "ki-notebook", tag: "Yeni" },
   { href: "/coach/assignments", label: "Ödev & Görev", icon: "ki-notepad-edit" },
   { href: "/coach/exams", label: "Denemeler", icon: "ki-chart-simple" },
+  { href: "/coach/online-exams", label: "Online Denemeler", icon: "ki-notepad" },
   { href: "/coach/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/coach/notifications", label: "Bildirimler", icon: "ki-notification-on" },
   { href: "/coach/appointments", label: "Randevular", icon: "ki-calendar-tick" },
@@ -36,13 +37,13 @@ const COACH_NAV: UkNavItem[] = [
   { href: "/coach/feedback", label: "Geri Bildirimlerim", icon: "ki-heart" },
   { href: "/coach/reports", label: "Raporlar", icon: "ki-chart-line-up" },
   { href: "/coach/revenue", label: "Gelir & Tahsilat", icon: "ki-dollar" },
-  { href: "/coach/license", label: "Lisansim", icon: "ki-shield-tick" },
+  { href: "/coach/license", label: "Lisansım", icon: "ki-shield-tick" },
   { href: "/coach/invoices", label: "Faturalar", icon: "ki-receipt-square" },
 ];
 
 const PARENT_NAV: UkNavItem[] = [
   { href: "/parent/dashboard", label: "Genel Bakis", icon: "ki-element-11" },
-  { href: "/parent/exams", label: "Deneme Sonuclari", icon: "ki-chart-simple" },
+  { href: "/parent/exams", label: "Deneme Sonuçları", icon: "ki-chart-simple" },
   { href: "/parent/reports", label: "Gelisim Raporlari", icon: "ki-notepad-edit" },
   { href: "/parent/messages", label: "Mesajlar", icon: "ki-messages" },
   { href: "/parent/appointments", label: "Randevular", icon: "ki-calendar-tick" },

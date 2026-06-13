@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
-import { createExam } from "@/server/services/online-exam.service";
+import { createExam, listCoachExams } from "@/server/services/online-exam.service";
 
 const TYPES = ["TYT", "AYT", "LGS"] as const;
+
+export const GET = withApiAuth(["coach"], async (_req, { session }) => {
+  const branchId = session.user.branchId;
+  if (!branchId) return NextResponse.json({ error: "Branch missing" }, { status: 400 });
+  const exams = await listCoachExams(branchId);
+  return NextResponse.json({ exams }, { status: 200 });
+});
 
 export const POST = withApiAuth(["coach"], async (req, { session }) => {
   const branchId = session.user.branchId;

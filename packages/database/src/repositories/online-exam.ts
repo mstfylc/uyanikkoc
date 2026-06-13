@@ -39,6 +39,14 @@ export async function listExamsForStudent(branchId: string, studentId: string, e
   return exams.map((e) => ({ ...mapExam(e), submission: byExam.get(e.id) ?? null }));
 }
 
+export async function listExamsForBranch(branchId: string): Promise<OnlineExamRecord[]> {
+  const exams = await prisma.onlineExam.findMany({
+    where: { branchId },
+    orderBy: { createdAt: "desc" },
+  });
+  return exams.map((e) => mapExam(e));
+}
+
 export async function createExam(input: CreateOnlineExamInput): Promise<OnlineExamRecord> {
   const created = await prisma.onlineExam.create({
     data: {
