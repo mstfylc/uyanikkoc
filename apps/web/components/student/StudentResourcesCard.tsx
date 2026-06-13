@@ -51,10 +51,10 @@ function relTime(value: number | null): string | null {
   if (!value) return null;
   const days = Math.floor((Date.now() - value) / 86_400_000);
   if (days <= 0) return "bugün";
-  if (days === 1) return "dun";
+  if (days === 1) return "dün";
   if (days < 7) return `${days} gün önce`;
-  if (days < 30) return `${Math.floor(days / 7)} hafta once`;
-  return `${Math.floor(days / 30)} ay once`;
+  if (days < 30) return `${Math.floor(days / 7)} hafta önce`;
+  return `${Math.floor(days / 30)} ay önce`;
 }
 
 function sourceSubject(name: string): string {
@@ -70,7 +70,7 @@ export function StudentResourcesCard({
   apiPath = "/api/student/sources",
   defaultExam = "Tumu",
   editable = true,
-  title = "Kaynaklarim",
+  title = "Kaynaklarım",
   sub = "Elindeki kitapları katalogdan seç - koçun ödev atarken bunlardan seçebilir",
 }: StudentResourcesCardProps) {
   const [sources, setSources] = useState<string[]>([]);
@@ -214,7 +214,7 @@ export function StudentResourcesCard({
               <div className="muted" style={{ fontSize: 12 }}>
                 {editable ? (
                   <>
-                    Bilinen yayinevi kitaplarini <b style={{ color: "var(--primary-600)" }}>katalogdan</b> ekle
+                    Bilinen yayınevi kitaplarını <b style={{ color: "var(--primary-600)" }}>katalogdan</b> ekle
                   </>
                 ) : (
                   "Henüz kaynak eklenmedi."
@@ -336,7 +336,7 @@ function SelfStudyFeed({
             <span className="muted" style={{ flexShrink: 0 }}>
               {record.kind === "cozdum"
                 ? `${record.soru} soru${record.dogru != null ? ` - ${record.dogru} D` : ""}`
-                : "konu calisti"}
+                : "konu çalıştı"}
             </span>
           </span>
           <span className="row" style={{ gap: 8, flexShrink: 0 }}>
@@ -397,7 +397,7 @@ function SourceTrackerRow({
                 {meta.label}
               </UkBadge>
               {activity.soru > 0 ? <span className="d">{activity.soru.toLocaleString("tr-TR")} soru</span> : null}
-              {activity.acc != null ? <span className="d">%{activity.acc} dogru</span> : null}
+              {activity.acc != null ? <span className="d">%{activity.acc} doğru</span> : null}
               {activity.selfCount > 0 ? <span className="d">ödev harici {activity.selfSoru || activity.selfCount}</span> : null}
               {lastUsed ? <span className="d">{lastUsed}</span> : null}
             </span>
@@ -436,7 +436,7 @@ function SourceTrackerRow({
 
           <label style={{ display: "grid", gap: 7 }}>
             <span className="muted" style={{ fontSize: 11.5, fontWeight: 800, textTransform: "uppercase" }}>
-              Ilerleme
+              İlerleme
             </span>
             <span className="row" style={{ gap: 10 }}>
               <input
@@ -477,15 +477,15 @@ function SourceTrackerRow({
               />
               <button type="button" className="btn btn-primary btn-sm" onClick={() => onSelfStudy("cozdum")}>
                 <KiIcon name="ki-check-circle" size={14} />
-                Cozdum
+                Çözdüm
               </button>
               <button type="button" className="btn btn-light btn-sm" onClick={() => onSelfStudy("calistim")}>
                 <KiIcon name="ki-book-open" size={14} />
-                Calistim
+                Çalıştım
               </button>
               <button type="button" className="btn btn-light btn-sm" onClick={onRemove} style={{ marginLeft: "auto", color: "var(--danger)" }}>
                 <KiIcon name="ki-trash" size={14} />
-                Cikar
+                Çıkar
               </button>
             </div>
           </div>

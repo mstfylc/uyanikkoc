@@ -61,7 +61,7 @@ function KatalogRow({
           <b style={{ color: "var(--text-2)", fontWeight: 700 }}>{entry.p}</b>
           <span className="d">{tur.label}</span>
           <span className="d">{entry.e.join(" · ")}</span>
-          {entry.g ? <span className="d">{entry.g}. sinif</span> : null}
+          {entry.g ? <span className="d">{entry.g}. sınıf</span> : null}
           {entry.q ? <span className="d">{entry.q} soru</span> : null}
         </div>
       </div>
@@ -167,7 +167,7 @@ export function KaynakKatalogModal({
               <KiIcon name="ki-book-open" size={19} />
             </span>
             <div>
-              <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Kaynak Katalogu</h3>
+              <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Kaynak Kataloğu</h3>
               <div className="muted" style={{ fontSize: 12 }}>
                 Türkiye geneli bilinen yayınevi kitapları · {KAYNAK_CATALOG.length} kaynak
               </div>
@@ -254,7 +254,7 @@ export function KaynakKatalogModal({
         <div className="modal-body" style={{ gap: 16, padding: "16px 20px" }}>
           {Object.keys(groups).length === 0 ? (
             <div style={{ padding: "44px 0", textAlign: "center", color: "var(--muted)", fontSize: 13.5 }}>
-              Eslesen kaynak yok. Filtreyi gevset ya da ozel kaynagini serbest ekle.
+              Eşleşen kaynak yok. Filtreyi gevşet ya da özel kaynağını serbest ekle.
             </div>
           ) : (
             <>

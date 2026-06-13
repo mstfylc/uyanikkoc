@@ -10,7 +10,7 @@ import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
 import { studentSinav } from "@/lib/design/student-exam";
-import { subjectColor } from "@/lib/design/subject-colors";
+import { displaySubjectName, subjectColor } from "@/lib/design/subject-colors";
 import type { StudyBlockRecord } from "@/mocks/study-plan";
 import { SCHOOL_DAYS, SCHOOL_PERIODS } from "@/mocks/schedule";
 import { countWeeklyBlocks, countWeeklyDone, STUDY_DAYS, weeklyCompletionByDay } from "@/mocks/study-plan";
@@ -250,7 +250,7 @@ export function StudentSchedulePanel() {
                       <div className="lr-meta">
                         <span className="chip" style={{ height: 22, fontSize: 11, padding: "0 8px" }}>
                           <span className="swatch" style={{ background: color }} />
-                          {block.subject}
+                          {displaySubjectName(block.subject)}
                         </span>
                         <span className="d">{block.type}</span>
                         {status === "progress" ? (
@@ -315,7 +315,7 @@ export function StudentSchedulePanel() {
                 <tr>
                   <th>Saat</th>
                   {SCHOOL_DAYS.map((day) => (
-                    <th key={day}>{day}</th>
+                    <th key={day}>{DAY_LABELS[day] ?? day}</th>
                   ))}
                 </tr>
               </thead>
@@ -396,7 +396,7 @@ export function StudentSchedulePanel() {
                       >
                         {STUDY_DAYS.map((day) => (
                           <option key={day} value={day}>
-                            {day}
+                            {DAY_LABELS[day] ?? day}
                           </option>
                         ))}
                       </select>
@@ -429,7 +429,7 @@ export function StudentSchedulePanel() {
                       >
                         {examProfile.subjects.map((subject) => (
                           <option key={subject} value={subject}>
-                            {subject}
+                            {displaySubjectName(subject)}
                           </option>
                         ))}
                       </select>

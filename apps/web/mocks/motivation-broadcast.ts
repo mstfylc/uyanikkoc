@@ -28,7 +28,7 @@ function seedIfEmpty(): void {
       id: `mm_${seq++}`,
       studentId: "student_002",
       coachId: "coach_001",
-      body: "Geometri tekrarini kisa tutup yanlis defterine don. Iyi gidiyorsun.",
+      body: "Geometri tekrarını kısa tutup yanlış defterine dön. İyi gidiyorsun.",
       createdAt: timestamp,
     },
   );

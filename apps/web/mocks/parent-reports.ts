@@ -130,7 +130,7 @@ export function approveParentReport(id: string): ParentReportRecord | null {
   report.sentAt = new Date().toISOString();
   pushParentNotification(
     report.parentId,
-    "Yeni gelisim raporu",
+    "Yeni gelişim raporu",
     `${report.studentName} · ${report.week} · %${report.completion} (${report.netDelta})`,
   );
   return { ...report };
@@ -143,7 +143,7 @@ export function approveAllParentReports(): ParentReportRecord[] {
       report.sentAt = new Date().toISOString();
       pushParentNotification(
         report.parentId,
-        "Yeni gelisim raporu",
+        "Yeni gelişim raporu",
         `${report.studentName} · ${report.week} · %${report.completion} (${report.netDelta})`,
       );
     }
@@ -158,7 +158,7 @@ export function approveAllForCoach(coachId: string): ParentReportRecord[] {
       report.sentAt = new Date().toISOString();
       pushParentNotification(
         report.parentId,
-        "Yeni gelisim raporu",
+        "Yeni gelişim raporu",
         `${report.studentName} · ${report.week} · %${report.completion} (${report.netDelta})`,
       );
     }

@@ -8,12 +8,12 @@ import { KiIcon } from "@/components/design/KiIcon";
 const aiFeatures = [
   {
     icon: "ki-target",
-    title: "Zayif konu tespiti",
+    title: "Zayıf konu tespiti",
     desc: "Deneme ve ödev verinden en çok hata yaptığın konuları otomatik bulur.",
   },
   {
     icon: "ki-calendar",
-    title: "Akilli program",
+    title: "Akıllı program",
     desc: "Sana özel, güne ve net hedefine göre güncellenen çalışma planı.",
   },
   {
@@ -24,7 +24,7 @@ const aiFeatures = [
   {
     icon: "ki-chart-line-up",
     title: "Net tahmini",
-    desc: "Gidisatina gore sinav netini ve siralama hedefini tahmin eder.",
+    desc: "Gidişatına göre sınav netini ve sıralama hedefini tahmin eder.",
   },
 ];
 
@@ -145,7 +145,7 @@ export default function StudentAiCoachPage() {
           </div>
           <div className="row" style={{ gap: 10, opacity: 0.6, marginTop: 4 }}>
             <div className="searchbox" style={{ flex: 1, display: "flex" }}>
-              <input placeholder="Mesaj yaz... (yakinda aktif)" disabled />
+              <input placeholder="Mesaj yaz... (yakında aktif)" disabled />
             </div>
             <button type="button" className="btn btn-primary" disabled>
               <KiIcon name="ki-send" size={16} />

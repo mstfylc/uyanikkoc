@@ -6,7 +6,7 @@ export const NOTE_KIND_LABELS: Record<
   CoachNoteKind,
   { label: string; tone: "primary" | "warning" | "muted"; icon: string }
 > = {
-  meeting: { label: "Gorusme notu", tone: "primary", icon: "ki-messages" },
+  meeting: { label: "Görüşme notu", tone: "primary", icon: "ki-messages" },
   warning: { label: "Uyari", tone: "warning", icon: "ki-information-2" },
   general: { label: "Genel", tone: "muted", icon: "ki-notepad" },
 };
@@ -31,7 +31,7 @@ function seedIfEmpty() {
       id: "note_001",
       coachId: "coach_001",
       studentId: DEMO_STUDENT_ID,
-      text: "Turev konusunda gorusme yapildi. Kural tekrari icin ek kaynak verildi.",
+      text: "Türev konusunda görüşme yapıldı. Kural tekrarı için ek kaynak verildi.",
       kind: "meeting",
       pinned: false,
       createdAt: nowIso(),

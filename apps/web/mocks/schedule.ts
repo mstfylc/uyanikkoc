@@ -29,11 +29,11 @@ function seedIfEmpty(studentId: string) {
     studentId,
     attendsSchool: true,
     grid: {
-      Pzt: ["Matematik", "Matematik", "Fizik", "Turkce", "Kimya", "Beden", "", ""],
-      Sal: ["Turkce", "Biyoloji", "Biyoloji", "Matematik", "Tarih", "Din", "", ""],
-      Car: ["Fizik", "Fizik", "Matematik", "Kimya", "Turkce", "Ingilizce", "", ""],
-      Per: ["Kimya", "Matematik", "Turkce", "Biyoloji", "Cografya", "Rehberlik", "", ""],
-      Cum: ["Matematik", "Turkce", "Fizik", "Edebiyat", "Beden", "", "", ""],
+      Pzt: ["Matematik", "Matematik", "Fizik", "Türkçe", "Kimya", "Beden", "", ""],
+      Sal: ["Türkçe", "Biyoloji", "Biyoloji", "Matematik", "Tarih", "Din", "", ""],
+      Car: ["Fizik", "Fizik", "Matematik", "Kimya", "Türkçe", "İngilizce", "", ""],
+      Per: ["Kimya", "Matematik", "Türkçe", "Biyoloji", "Coğrafya", "Rehberlik", "", ""],
+      Cum: ["Matematik", "Türkçe", "Fizik", "Edebiyat", "Beden", "", "", ""],
     },
   };
 }

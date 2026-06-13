@@ -66,7 +66,7 @@ export function StudentManualExamModal({ open, onClose, onSaved }: StudentManual
       .filter((row) => row.subjectName && !Number.isNaN(row.correct) && !Number.isNaN(row.wrong));
 
     if (parsedSubjects.length === 0) {
-      setError("En az bir ders satiri gerekli.");
+      setError("En az bir ders satırı gerekli.");
       return;
     }
 
@@ -104,7 +104,7 @@ export function StudentManualExamModal({ open, onClose, onSaved }: StudentManual
       <div className="modal-panel" style={{ maxWidth: 640 }} onClick={(event) => event.stopPropagation()}>
         <div className="modal-head">
           <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800 }}>Manuel deneme girisi</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 800 }}>Manuel deneme girişi</h3>
             <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
               TYT / AYT / LGS sonucunu kaydet
             </div>
@@ -117,7 +117,7 @@ export function StudentManualExamModal({ open, onClose, onSaved }: StudentManual
           <div className="grid g-2">
             <div className="field">
               <label className="label" htmlFor="student-manual-examType">
-                Sinav turu
+                Sınav türü
               </label>
               <select
                 id="student-manual-examType"
@@ -161,7 +161,7 @@ export function StudentManualExamModal({ open, onClose, onSaved }: StudentManual
 
           <div>
             <p className="label" style={{ marginBottom: 10 }}>
-              Ders satirlari
+              Ders satırları
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {subjects.map((row, index) => (

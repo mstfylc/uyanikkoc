@@ -8,7 +8,7 @@ import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { filterSubjectsForStudentExam, studentSinav } from "@/lib/design/student-exam";
-import { subjectColor } from "@/lib/design/subject-colors";
+import { displaySubjectName, subjectColor } from "@/lib/design/subject-colors";
 import { TOPIC_EXAM_TYPE_LABELS } from "@uyanik/shared";
 import type { SubjectRecord, TopicExamType, TopicRecord, TopicTrackingSummary } from "@uyanik/database";
 
@@ -464,7 +464,7 @@ export function StudentTopicPanel() {
             >
               {examProfile.subjects.map((subject) => (
                 <option key={subject} value={subject}>
-                  {subject}
+                  {displaySubjectName(subject)}
                 </option>
               ))}
             </select>

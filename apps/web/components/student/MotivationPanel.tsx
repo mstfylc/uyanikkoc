@@ -15,13 +15,13 @@ const achievements = [
   { id: "topics-10", name: "10 Konu", desc: "10 konu tamamla", icon: "ki-book-open", color: "#5b51c9" },
   { id: "topics-25", name: "25 Konu", desc: "25 konu tamamla", icon: "ki-book-square", color: "#2f80ed" },
   { id: "exam-up", name: "Net Artışı", desc: "Denemede gelişim göster", icon: "ki-chart-line-up", color: "#10a37f" },
-  { id: "deneme-3", name: "3 Deneme", desc: "3 deneme coz", icon: "ki-notepad-edit", color: "#b7791f" },
+  { id: "deneme-3", name: "3 Deneme", desc: "3 deneme çöz", icon: "ki-notepad-edit", color: "#b7791f" },
   { id: "homework", name: "Ödev Ustası", desc: "Haftalık ödevleri bitir", icon: "ki-check-circle", color: "#14b8a6" },
   { id: "focus", name: "Odak", desc: "5 gün program takibi", icon: "ki-target", color: "#8b5cf6" },
   { id: "schedule", name: "Program", desc: "Düzenli çalışma bloğu", icon: "ki-calendar", color: "#0ea5e9" },
   { id: "star", name: "Yıldız", desc: "Koçundan olumlu geri bildirim", icon: "ki-star", color: "#eab308" },
   { id: "coach-note", name: "Koç Notu", desc: "Günlük motivasyon oku", icon: "ki-message-text", color: "#ec4899" },
-  { id: "perfect-week", name: "Mukemmel Hafta", desc: "Haftalik hedefe ulas", icon: "ki-medal-star", color: "#22c55e" },
+  { id: "perfect-week", name: "Mükemmel Hafta", desc: "Haftalık hedefe ulaş", icon: "ki-medal-star", color: "#22c55e" },
 ];
 
 type MotivationSummary = {
@@ -158,8 +158,8 @@ function TargetRankModal({
               <KiIcon name="ki-target" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Hedef Siralaman</h3>
-              <div className="muted" style={{ fontSize: 12 }}>YKS 2026 icin hedefledigin siralama</div>
+              <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Hedef Sıralaman</h3>
+              <div className="muted" style={{ fontSize: 12 }}>YKS 2026 için hedeflediğin sıralama</div>
             </div>
           </div>
           <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">
@@ -168,7 +168,7 @@ function TargetRankModal({
         </div>
         <div className="modal-body" style={{ padding: 20, gap: 14 }}>
           <div className="field">
-            <label className="label">Hedef siralama (ilk ...)</label>
+            <label className="label">Hedef sıralama (ilk ...)</label>
             <div className="input-icon">
               <input
                 className="input tnum"
@@ -178,19 +178,19 @@ function TargetRankModal({
                 onChange={(event) => setValue(event.target.value)}
                 autoFocus
               />
-              <span className="muted" style={{ fontSize: 12, fontWeight: 700 }}>. kisi</span>
+              <span className="muted" style={{ fontSize: 12, fontWeight: 700 }}>. kişi</span>
             </div>
           </div>
           <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
             {["10.000", "25.000", "50.000", "100.000"].map((preset) => (
               <button key={preset} type="button" className="chip" style={{ cursor: "pointer" }} onClick={() => setValue(preset)}>
-                Ilk {preset}
+                İlk {preset}
               </button>
             ))}
           </div>
         </div>
         <div className="modal-foot">
-          <button type="button" className="btn btn-light" onClick={onClose}>Vazgec</button>
+          <button type="button" className="btn btn-light" onClick={onClose}>Vazgeç</button>
           <button type="button" className="btn btn-primary" disabled={!clean} onClick={() => onSave(Number(clean).toLocaleString("tr-TR"))} style={{ marginLeft: "auto", opacity: clean ? 1 : 0.5 }}>
             <KiIcon name="ki-check" size={16} />
             Kaydet
@@ -257,7 +257,7 @@ export function MotivationPanel() {
           sub="Motivasyon özellikleri kapalı."
           actions={
             <button type="button" disabled={isSaving} className="btn btn-primary btn-sm" onClick={() => void toggleEnabled(true)}>
-              Motivasyonu ac
+              Motivasyonu aç
             </button>
           }
         />
@@ -303,7 +303,7 @@ export function MotivationPanel() {
             </span>
           </div>
           <div className="glass" style={{ marginTop: 18, padding: "12px 14px", fontSize: 13, lineHeight: 1.5 }}>
-            Bu hafta <b style={{ color: "#fff" }}>18 saat</b> calistin - gecen haftaya gore <b style={{ color: "#fff" }}>+3.2 saat</b>. Ayni tempoda devam!
+            Bu hafta <b style={{ color: "#fff" }}>18 saat</b> çalıştın - geçen haftaya göre <b style={{ color: "#fff" }}>+3.2 saat</b>. Aynı tempoda devam!
           </div>
         </div>
 
@@ -312,11 +312,11 @@ export function MotivationPanel() {
             <Ring value={Math.round(((90 - daysLeft) / 90) * 100)} size={148} stroke={13} color="var(--primary)" label={daysLeft} sub="gün kaldı" big />
             <div>
               <div style={{ fontSize: 13.5, fontWeight: 700 }}>20 Haz 2026 · Cumartesi</div>
-              <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>TYT oturumu 10:15'te basliyor</div>
+              <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>TYT oturumu 10:15'te başlıyor</div>
             </div>
             <button type="button" className="btn btn-light" style={{ width: "100%" }} onClick={() => setEditRank(true)}>
               <KiIcon name="ki-target" size={16} />
-              Hedef siralaman: {rank}
+              Hedef sıralaman: {rank}
               <KiIcon name="ki-setting-2" size={14} style={{ marginLeft: "auto", color: "var(--faint)" }} />
             </button>
           </div>
@@ -338,7 +338,7 @@ export function MotivationPanel() {
 
       <Section
         title="Rozetlerin"
-        sub={`${earnedCount}/${achievements.length} kazanildi`}
+        sub={`${earnedCount}/${achievements.length} kazanıldı`}
         action={<button type="button" className="link-btn">Tümü<KiIcon name="ki-arrow-right" size={14} /></button>}
       >
         <div className="card-body">

@@ -215,7 +215,7 @@ export function buildQuestionTracking(
     return {
       points,
       total: points.reduce((sum, point) => sum + point.value, 0),
-      caption: "Haftalik toplam soru",
+      caption: "Haftalık toplam soru",
     };
   }
 

@@ -18,12 +18,12 @@ const LGS = [
   "Matematik",
   "Turkce",
   "Fen Bilimleri",
-  "T.C. Inkılap Tarihi",
+  "T.C. İnkılap Tarihi",
   "Din Kulturu",
   "Ingilizce",
 ] as const;
 
-/** Zip-18: ogrencinin sinav turu ve ders listesi (auth sub / demo e-posta). */
+/** Zip-18: öğrencinin sınav türü ve ders listesi (auth sub / demo e-posta). */
 export function studentSinav(input?: {
   email?: string | null;
   studentId?: string | null;
@@ -34,7 +34,7 @@ export function studentSinav(input?: {
     return {
       kind: "LGS",
       track: "lgs",
-      label: "8. Sinif · LGS",
+      label: "8. Sınıf · LGS",
       subjects: LGS,
       defaultExamType: "LGS",
     };
@@ -44,7 +44,7 @@ export function studentSinav(input?: {
     return {
       kind: "YKS",
       track: "sozel",
-      label: "12. Sinif · Sozel",
+      label: "12. Sınıf · Sözel",
       subjects: YKS_SOZEL,
       defaultExamType: "AYT",
     };
@@ -54,7 +54,7 @@ export function studentSinav(input?: {
     return {
       kind: "YKS",
       track: "ea",
-      label: "12. Sinif · EA",
+      label: "12. Sınıf · EA",
       subjects: YKS_EA,
       defaultExamType: "AYT",
     };
@@ -63,7 +63,7 @@ export function studentSinav(input?: {
   return {
     kind: "YKS",
     track: "sayisal",
-    label: "11. Sinif · Sayisal",
+    label: "11. Sınıf · Sayısal",
     subjects: YKS_SAYISAL,
     defaultExamType: "TYT",
   };

@@ -98,7 +98,7 @@ export function OptikFormModal({ open, exam, onClose, onSubmitted }: OptikFormMo
       return;
     }
 
-    setError("Sonuc yuklenemedi.");
+    setError("Sonuç yüklenemedi.");
   }
 
   function setAnswer(index: number, option: string) {

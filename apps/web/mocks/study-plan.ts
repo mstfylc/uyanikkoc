@@ -29,7 +29,7 @@ function seedIfEmpty(studentId: string) {
   plans[studentId] = [
     { id: "sb_1", day: "Pzt", time: "16:30", subject: "Matematik", topic: "Türev", type: "Soru", status: "todo" },
     { id: "sb_2", day: "Pzt", time: "18:00", subject: "Fizik", topic: "Hareket", type: "Video", status: "done" },
-    { id: "sb_3", day: "Sal", time: "17:00", subject: "Turkce", topic: "Paragraf", type: "Soru", status: "progress" },
+    { id: "sb_3", day: "Sal", time: "17:00", subject: "Türkçe", topic: "Paragraf", type: "Soru", status: "progress" },
     { id: "sb_4", day: "Sal", time: "19:30", subject: "Kimya", topic: "Asit-Baz", type: "Konu", status: "todo" },
     { id: "sb_5", day: "Car", time: "16:00", subject: "Matematik", topic: "Integral", type: "Soru", status: "todo" },
     { id: "sb_6", day: "Per", time: "18:30", subject: "Biyoloji", topic: "Hucre", type: "Soru", status: "done" },

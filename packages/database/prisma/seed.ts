@@ -162,7 +162,7 @@ async function main() {
   const coachTaskSeed = [
     { id: "coach_task_001", text: "Mert'in haftalık programını revize et", studentId: "student_002", due: "Bugün", priority: "high" as const, done: false },
     { id: "coach_task_002", text: "Elif'in integral testini incele", studentId: "student_001", due: "Bugün", priority: "med" as const, done: false },
-    { id: "coach_task_003", text: "Haftalik raporlari hazirla", studentId: null, due: "7 Haz", priority: "med" as const, done: false },
+    { id: "coach_task_003", text: "Haftalık raporları hazırla", studentId: null, due: "7 Haz", priority: "med" as const, done: false },
     { id: "coach_task_004", text: "Deneme #6 sonuclarini analiz et", studentId: null, due: "5 Haz", priority: "low" as const, done: true },
   ];
   for (const task of coachTaskSeed) {
@@ -174,8 +174,8 @@ async function main() {
   }
 
   const announcementSeed = [
-    { id: "coach_ann_001", title: "Pazar TYT Deneme #7", body: "8 Haziran Pazar 10:00'da TYT Genel Deneme #7 var. Erken uyuyun.", audience: "Tum ogrenciler", reach: 2 },
-    { id: "coach_ann_002", title: "Deneme analizi hatirlatmasi", body: "Deneme sonrasi mutlaka yanlis analizi yapin.", audience: "Tum veliler", reach: 2 },
+    { id: "coach_ann_001", title: "Pazar TYT Deneme #7", body: "8 Haziran Pazar 10:00'da TYT Genel Deneme #7 var. Erken uyuyun.", audience: "Tüm öğrenciler", reach: 2 },
+    { id: "coach_ann_002", title: "Deneme analizi hatırlatması", body: "Deneme sonrası mutlaka yanlış analizi yapın.", audience: "Tüm veliler", reach: 2 },
   ];
   for (const announcement of announcementSeed) {
     await prisma.coachAnnouncement.upsert({
@@ -317,8 +317,8 @@ async function seedBillingPlans() {
       sortOrder: 1,
       features: [
         "Standart paketteki her sey",
-        "Veliye haftalik gelisim raporu",
-        "Sinirsiz mesajlasma (koc + ogrenci)",
+        "Veliye haftalık gelişim raporu",
+        "Sınırsız mesajlaşma (koç + öğrenci)",
         "Motivasyon ve hedef takibi",
         "Onceliklendirilmis randevu",
       ],
@@ -334,7 +334,7 @@ async function seedBillingPlans() {
       features: [
         "Plus paketteki her sey",
         "Haftada 2 birebir görüşme",
-        "Kidemli mentor eslestirmesi",
+        "Kıdemli mentor eşleştirmesi",
         "Tercih ve kariyer danismanligi",
         "7/24 oncelikli destek hatti",
       ],
@@ -477,7 +477,7 @@ async function seedExamResults() {
   const newerTakenAt = new Date("2026-06-01T10:00:00.000Z");
 
   const examOneSubjects = [
-    { subjectName: "Turkce", correct: 32, wrong: 6, net: 30.5 },
+    { subjectName: "Türkçe", correct: 32, wrong: 6, net: 30.5 },
     { subjectName: "Matematik", correct: 18, wrong: 8, net: 16 },
     { subjectName: "Fen", correct: 12, wrong: 5, net: 10.75 },
     { subjectName: "Sosyal", correct: 14, wrong: 4, net: 13 },
@@ -509,7 +509,7 @@ async function seedExamResults() {
   });
 
   const examTwoSubjects = [
-    { subjectName: "Turkce", correct: 34, wrong: 5, net: 32.75 },
+    { subjectName: "Türkçe", correct: 34, wrong: 5, net: 32.75 },
     { subjectName: "Matematik", correct: 20, wrong: 7, net: 18.25 },
     { subjectName: "Fen", correct: 13, wrong: 4, net: 12 },
     { subjectName: "Sosyal", correct: 15, wrong: 4, net: 14 },

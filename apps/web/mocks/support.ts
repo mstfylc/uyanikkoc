@@ -33,7 +33,7 @@ function seedIfEmpty(): void {
       category: "oneri",
       message: "Randevu slotlarini telefon/online olarak ayirmak istiyorum.",
       status: "answered",
-      reply: "Randevular > Musait Saatlerim bolumunde her slot icin gorusme tiplerini secebilirsiniz.",
+      reply: "Randevular > Müsait Saatlerim bölümünde her slot için görüşme tiplerini seçebilirsiniz.",
       createdAt: nowIso(18),
     },
     {
@@ -41,7 +41,7 @@ function seedIfEmpty(): void {
       userId: "user_parent_001",
       role: "parent",
       category: "hesap",
-      message: "Haftalik gelisim raporunu nereden takip edecegim?",
+      message: "Haftalık gelişim raporunu nereden takip edeceğim?",
       status: "open",
       reply: null,
       createdAt: nowIso(3),

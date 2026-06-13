@@ -67,7 +67,7 @@ function seedIfEmpty() {
       id: "msg_parent_3",
       threadId: parentThreadId,
       senderRole: "COACH",
-      body: "Bu hafta raporu onayladim; Gelisim Raporlari ekraninda gorebilirsiniz.",
+      body: "Bu hafta raporu onayladım; Gelişim Raporları ekranında görebilirsiniz.",
       createdAt: timestamp,
     },
   ];

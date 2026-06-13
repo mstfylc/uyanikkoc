@@ -32,7 +32,7 @@ function seedIfEmpty() {
       takenAt: olderTakenAt,
       totalNet: 70.25,
       subjects: [
-        { id: "exam_sub_1", subjectName: "Turkce", correct: 32, wrong: 6, net: 30.5 },
+        { id: "exam_sub_1", subjectName: "Türkçe", correct: 32, wrong: 6, net: 30.5 },
         { id: "exam_sub_2", subjectName: "Matematik", correct: 18, wrong: 8, net: 16 },
         { id: "exam_sub_3", subjectName: "Fen", correct: 12, wrong: 5, net: 10.75 },
         { id: "exam_sub_4", subjectName: "Sosyal", correct: 14, wrong: 4, net: 13 },
@@ -48,7 +48,7 @@ function seedIfEmpty() {
       takenAt: newerTakenAt,
       totalNet: 77,
       subjects: [
-        { id: "exam_sub_5", subjectName: "Turkce", correct: 34, wrong: 5, net: 32.75 },
+        { id: "exam_sub_5", subjectName: "Türkçe", correct: 34, wrong: 5, net: 32.75 },
         { id: "exam_sub_6", subjectName: "Matematik", correct: 20, wrong: 7, net: 18.25 },
         { id: "exam_sub_7", subjectName: "Fen", correct: 13, wrong: 4, net: 12 },
         { id: "exam_sub_8", subjectName: "Sosyal", correct: 15, wrong: 4, net: 14 },
@@ -64,7 +64,7 @@ function seedIfEmpty() {
       takenAt: olderTakenAt,
       totalNet: 65.5,
       subjects: [
-        { id: "exam_sub_9", subjectName: "Turkce", correct: 28, wrong: 8, net: 26 },
+        { id: "exam_sub_9", subjectName: "Türkçe", correct: 28, wrong: 8, net: 26 },
         { id: "exam_sub_10", subjectName: "Matematik", correct: 16, wrong: 9, net: 13.75 },
         { id: "exam_sub_11", subjectName: "Fen", correct: 11, wrong: 6, net: 9.5 },
         { id: "exam_sub_12", subjectName: "Sosyal", correct: 13, wrong: 5, net: 11.75 },
@@ -80,7 +80,7 @@ function seedIfEmpty() {
       takenAt: newerTakenAt,
       totalNet: 72.25,
       subjects: [
-        { id: "exam_sub_13", subjectName: "Turkce", correct: 31, wrong: 7, net: 29.25 },
+        { id: "exam_sub_13", subjectName: "Türkçe", correct: 31, wrong: 7, net: 29.25 },
         { id: "exam_sub_14", subjectName: "Matematik", correct: 18, wrong: 8, net: 16 },
         { id: "exam_sub_15", subjectName: "Fen", correct: 12, wrong: 5, net: 10.75 },
         { id: "exam_sub_16", subjectName: "Sosyal", correct: 14, wrong: 4, net: 13 },

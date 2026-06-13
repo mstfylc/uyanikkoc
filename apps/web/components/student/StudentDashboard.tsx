@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import { TakvimimCard } from "@/components/student/TakvimimCard";
+import { displaySubjectName } from "@/lib/design/subject-colors";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_TYPE_LABELS,
@@ -199,7 +200,7 @@ function PriorityGlass({
             </b>
             <p style={{ marginTop: 4, fontSize: 12.5, color: "rgba(255,255,255,.76)" }}>
               {assignment
-                ? `${assignment.subject ?? ASSIGNMENT_TYPE_LABELS[assignment.type]} · Son tarih ${formatAssignmentDueDate(assignment.dueDate)}`
+                ? `${assignment.subject ? displaySubjectName(assignment.subject) : ASSIGNMENT_TYPE_LABELS[assignment.type]} · Son tarih ${formatAssignmentDueDate(assignment.dueDate)}`
                 : "Bugün için açık öncelik bulunmuyor."}
             </p>
           </div>
@@ -263,7 +264,7 @@ function AssignmentRow({
       <button
         type="button"
         className={`chk ${open ? "" : "done"}`}
-        aria-label={open ? `${assignment.title} tamamla` : `${assignment.title} tamamlandi`}
+        aria-label={open ? `${assignment.title} tamamla` : `${assignment.title} tamamlandı`}
         onClick={() => open && onComplete(assignment.id)}
         disabled={!open}
       >
@@ -275,7 +276,7 @@ function AssignmentRow({
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="lr-title">{assignment.title}</div>
         <div className="lr-meta">
-          {assignment.subject ? <span>{assignment.subject}</span> : null}
+          {assignment.subject ? <span>{displaySubjectName(assignment.subject)}</span> : null}
           <span>{ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
           <span className="d">{formatAssignmentDueDate(assignment.dueDate)}</span>
         </div>

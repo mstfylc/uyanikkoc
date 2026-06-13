@@ -51,7 +51,7 @@ function seedIfEmpty(): void {
       id: nextId(),
       coachId: DEMO_COACH_ID,
       studentId: null,
-      text: "Haftalik raporlari hazirla",
+      text: "Haftalık raporları hazırla",
       due: "7 Haz",
       done: false,
       priority: "med",

@@ -14,7 +14,7 @@ import { DenemeKayitModal } from "@/components/student/DenemeKayitModal";
 import { OptikFormModal, OptikResultBadge } from "@/components/student/OptikFormModal";
 import { UkBadge } from "@/components/design/UkBadge";
 import { cargoBadgeLabel, cargoBadgeTone } from "@/lib/design/motivation-ui";
-import { subjectColor } from "@/lib/design/subject-colors";
+import { displaySubjectName, subjectColor } from "@/lib/design/subject-colors";
 import {
   formatExamNet,
   RESULT_EXAM_TYPE_LABELS,
@@ -289,7 +289,7 @@ export function StudentExamsPanel() {
                             <div className="between">
                               <span className="sname">
                                 <span className="swatch" style={{ background: color }} />
-                                {row.subjectName}
+                                {displaySubjectName(row.subjectName)}
                               </span>
                               <span className="spct tnum">
                                 {formatExamNet(row.net)} / {max}
@@ -317,7 +317,7 @@ export function StudentExamsPanel() {
                             <td>
                               <span className="chip" style={{ height: 22, fontSize: 11, padding: "0 8px" }}>
                                 <span className="swatch" style={{ background: subjectColor(row.subjectName) }} />
-                                {row.subjectName}
+                                {displaySubjectName(row.subjectName)}
                               </span>
                             </td>
                             <td className="tnum">{row.correct}</td>

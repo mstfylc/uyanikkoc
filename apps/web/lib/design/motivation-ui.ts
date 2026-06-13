@@ -2,7 +2,7 @@ export const MOTIVATION_TEMPLATES = [
   "Bugun attigin kucuk adim, sinav gunu en buyuk farkin olacak. Devam!",
   "Netlerin yukseliyor, tempoyu koru. Sana guveniyorum!",
   "Zorlandigin an, en cok gelistigin andir. Pes etme!",
-  "Bu hafta harika calistin — kendinle gurur duy.",
+  "Bu hafta harika çalıştın — kendinle gurur duy.",
   "Hedefe her gun bir adim daha yaklasiyorsun. Odaklan!",
 ];
 

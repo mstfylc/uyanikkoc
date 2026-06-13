@@ -3,7 +3,7 @@
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkBadge } from "@/components/design/UkBadge";
 import { UkSection } from "@/components/design/UkSection";
-import { subjectColor } from "@/lib/design/subject-colors";
+import { displaySubjectName, subjectColor } from "@/lib/design/subject-colors";
 import { formatExamNet } from "@uyanik/shared";
 import type { ExamResultRecord } from "@uyanik/database";
 
@@ -71,7 +71,7 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
     <div className="stack" style={{ gap: 16 }}>
       <UkSection
         title="Deneme analizim"
-        sub={`${selected.label ?? "Deneme"} · kisisel sonuc`}
+        sub={`${selected.label ?? "Deneme"} · kişisel sonuç`}
         action={
           exams.length > 1 ? (
             <select
@@ -101,19 +101,19 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
                 </div>
                 <div style={{ fontSize: 13, color: "rgba(255,255,255,.85)", marginTop: 4 }}>
                   {trendDelta != null && trendDelta >= 0
-                    ? `Son ${trendNets.length} denemede +${formatExamNet(trendDelta)} net gelisim`
+                    ? `Son ${trendNets.length} denemede +${formatExamNet(trendDelta)} net gelişim`
                     : "Trend verisi için birden fazla deneme gerekir"}
                 </div>
               </div>
               <div className="row" style={{ gap: 10 }}>
                 <div className="glass" style={{ padding: "10px 16px", textAlign: "center" }}>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.75)", fontWeight: 700 }}>TAHMINI PUAN</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.75)", fontWeight: 700 }}>TAHMİNİ PUAN</div>
                   <div className="tnum" style={{ fontSize: 22, fontWeight: 800 }}>
                     {projection[0]?.puan}
                   </div>
                 </div>
                 <div className="glass" style={{ padding: "10px 16px", textAlign: "center" }}>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.75)", fontWeight: 700 }}>TAHMINI SIRA</div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,.75)", fontWeight: 700 }}>TAHMİNİ SIRA</div>
                   <div className="tnum" style={{ fontSize: 22, fontWeight: 800 }}>
                     {projection[0]?.rank.toLocaleString("tr-TR")}
                   </div>
@@ -126,11 +126,11 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
             <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
               <UkBadge tone="success">
                 <KiIcon name="ki-star" size={13} />
-                En güçlü: {strongest.subjectName}
+                En güçlü: {displaySubjectName(strongest.subjectName)}
               </UkBadge>
               <UkBadge tone="danger">
                 <KiIcon name="ki-information-2" size={13} />
-                Odaklan: {weakest.subjectName}
+                Odaklan: {displaySubjectName(weakest.subjectName)}
               </UkBadge>
               {trendDelta != null ? (
                 <UkBadge tone="primary">
@@ -145,7 +145,7 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
           <div className="grid col-main">
             <div>
               <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--muted)", marginBottom: 12 }}>
-                Ders bazinda net
+                Ders bazında net
               </div>
               <div className="subj">
                 {selected.subjects.map((row) => {
@@ -157,7 +157,7 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
                       <div className="between" style={{ marginBottom: 7 }}>
                         <span className="sname">
                           <span className="swatch" style={{ background: color }} />
-                          {row.subjectName}
+                          {displaySubjectName(row.subjectName)}
                         </span>
                         <span className="tnum" style={{ fontWeight: 800, fontSize: 13 }}>
                           {formatExamNet(row.net)}
@@ -186,7 +186,7 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
                   <tbody>
                     {selected.subjects.map((row) => (
                       <tr key={row.id}>
-                        <td>{row.subjectName}</td>
+                        <td>{displaySubjectName(row.subjectName)}</td>
                         <td className="tnum" style={{ textAlign: "center" }}>
                           {row.correct}
                         </td>
@@ -213,8 +213,8 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
               <tr>
                 <th>Senaryo</th>
                 <th>Tahmini puan</th>
-                <th>Tahmini sira</th>
-                <th>Kazanim</th>
+                <th>Tahmini sıra</th>
+                <th>Kazanım</th>
               </tr>
             </thead>
             <tbody>

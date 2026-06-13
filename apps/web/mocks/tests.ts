@@ -2,7 +2,7 @@ import type { PsychTestDefinition, PsychTestQuestion, TestAssignmentRecord } fro
 
 import { DEMO_STUDENT_ID } from "@/mocks/assignments";
 
-export const LIKERT_OPTIONS = ["Hic", "Az", "Orta", "Cok", "Tamamen"] as const;
+export const LIKERT_OPTIONS = ["Hiç", "Az", "Orta", "Çok", "Tamamen"] as const;
 
 function q(text: string): PsychTestQuestion {
   return { text, kind: "likert" };
@@ -11,40 +11,40 @@ function q(text: string): PsychTestQuestion {
 export const TEST_CATALOG: PsychTestDefinition[] = [
   {
     id: "kaygi",
-    name: "Sinav Kaygisi Olcegi",
+    name: "Sınav Kaygısı Ölçeği",
     icon: "ki-information-2",
     tone: "danger",
-    description: "Sinav oncesi kaygi duzeyini olcer.",
+    description: "Sınav öncesi kaygı düzeyini ölçer.",
     questions: [
-      q("Sinavdan once kalbim hizlanir."),
-      q("Bildigim sorulari bile sinavda unuturum."),
-      q("Sinav gecesi uyumakta zorlanirim."),
-      q("Sinav sirasinda ellerim terler."),
-      q("Sonuclari dusununce gerilirim."),
+      q("Sınavdan önce kalbim hızlanır."),
+      q("Bildiğim soruları bile sınavda unuturum."),
+      q("Sınav gecesi uyumakta zorlanırım."),
+      q("Sınav sırasında ellerim terler."),
+      q("Sonuçları düşününce gerilirim."),
     ],
     bands: [
-      [0, 2, "Dusuk kaygi", "success"],
-      [2, 3.2, "Orta kaygi", "warning"],
-      [3.2, 5, "Yuksek kaygi", "danger"],
+      [0, 2, "Düşük kaygı", "success"],
+      [2, 3.2, "Orta kaygı", "warning"],
+      [3.2, 5, "Yüksek kaygı", "danger"],
     ],
   },
   {
     id: "motivasyon",
-    name: "Motivasyon Olcegi",
+    name: "Motivasyon Ölçeği",
     icon: "ki-flash",
     tone: "primary",
     description: "Çalışma motivasyonu ve hedef bağlılığı.",
     questions: [
-      q("Hedeflerime ulasacagima inaniyorum."),
-      q("Zorlandigimda pes etmem."),
-      q("Calismaya baslamak benim icin kolaydir."),
+      q("Hedeflerime ulaşacağıma inanıyorum."),
+      q("Zorlandığımda pes etmem."),
+      q("Çalışmaya başlamak benim için kolaydır."),
       q("Başarısızlık beni daha çok çalıştırır."),
-      q("Gelecegim icin heyecan duyuyorum."),
+      q("Geleceğim için heyecan duyuyorum."),
     ],
     bands: [
-      [0, 2.5, "Dusuk", "danger"],
+      [0, 2.5, "Düşük", "danger"],
       [2.5, 3.7, "Orta", "warning"],
-      [3.7, 5, "Yuksek", "success"],
+      [3.7, 5, "Yüksek", "success"],
     ],
   },
   {
@@ -52,18 +52,18 @@ export const TEST_CATALOG: PsychTestDefinition[] = [
     name: "Dikkat & Odak Testi",
     icon: "ki-target",
     tone: "warning",
-    description: "Calisirken dikkat surdurme duzeyi.",
+    description: "Çalışırken dikkat sürdürme düzeyi.",
     questions: [
-      q("Calisirken kolayca dikkatim dagilir."),
-      q("Telefonum yanimdayken odaklanamam."),
-      q("Uzun sure tek konuya calisabilirim."),
-      q("Mola sonrasi toparlanmam uzun surer."),
-      q("Gurultulu ortamda calisamam."),
+      q("Çalışırken kolayca dikkatim dağılır."),
+      q("Telefonum yanımdayken odaklanamam."),
+      q("Uzun süre tek konuya çalışabilirim."),
+      q("Mola sonrası toparlanmam uzun sürer."),
+      q("Gürültülü ortamda çalışamam."),
     ],
     bands: [
-      [0, 2.2, "Guclu odak", "success"],
+      [0, 2.2, "Güçlü odak", "success"],
       [2.2, 3.4, "Orta", "warning"],
-      [3.4, 5, "Daginik", "danger"],
+      [3.4, 5, "Dağınık", "danger"],
     ],
   },
 ];
@@ -93,7 +93,7 @@ function seedIfEmpty() {
       testId: "kaygi",
       status: "completed",
       score: 3.6,
-      band: "Yuksek kaygi",
+      band: "Yüksek kaygı",
       bandTone: "danger",
       coachNote: "Nefes egzersizi önerildi.",
       sentAt: timestamp,
@@ -138,9 +138,9 @@ export function createCustomTest(
     description: input.desc,
     questions: input.questions,
     bands: [
-      [0, 2.5, "Dusuk", "danger"],
+      [0, 2.5, "Düşük", "danger"],
       [2.5, 3.7, "Orta", "warning"],
-      [3.7, 5, "Yuksek", "success"],
+      [3.7, 5, "Yüksek", "success"],
     ],
     custom: true,
     coachId,

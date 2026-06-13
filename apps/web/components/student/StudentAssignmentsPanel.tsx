@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 
 import { KiIcon } from "@/components/design/KiIcon";
 import { UkPageHead } from "@/components/design/UkPageHead";
+import { displaySubjectName } from "@/lib/design/subject-colors";
 import {
   ASSIGNMENT_PRIORITY_LABELS,
   ASSIGNMENT_TYPE_LABELS,
@@ -138,7 +139,7 @@ function ResultModal({
             </span>
             <div>
               <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>{assignment.title}</h3>
-              <div className="muted" style={{ fontSize: 12 }}>{assignment.subject ?? "Genel"} · {ASSIGNMENT_TYPE_LABELS[assignment.type]}</div>
+              <div className="muted" style={{ fontSize: 12 }}>{displaySubjectName(assignment.subject)} · {ASSIGNMENT_TYPE_LABELS[assignment.type]}</div>
             </div>
           </div>
           <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">
@@ -224,7 +225,7 @@ function AssignmentCard({
         <div className="lr-meta">
           <span className="chip" style={{ height: 21, fontSize: 10.5, padding: "0 8px" }}>
             <span className="swatch" style={{ background: color }} />
-            {assignment.subject ?? "Genel"}
+            {displaySubjectName(assignment.subject)}
           </span>
           <span className="d">{ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
           <span className="d">{ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}</span>
