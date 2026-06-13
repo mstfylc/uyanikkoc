@@ -221,6 +221,32 @@ export async function deleteRefreshToken(tokenHash: string): Promise<void> {
   await prisma.refreshToken.deleteMany({ where: { tokenHash } });
 }
 
+export async function purgeExpiredAuthArtifacts(now: Date): Promise<{
+  refreshTokens: number;
+  passwordResetTokens: number;
+  otpChallenges: number;
+  total: number;
+}> {
+  const [refreshTokens, passwordResetTokens, otpChallenges] = await prisma.$transaction([
+    prisma.refreshToken.deleteMany({
+      where: { expiresAt: { lte: now } },
+    }),
+    prisma.passwordResetToken.deleteMany({
+      where: { expiresAt: { lte: now } },
+    }),
+    prisma.otpChallenge.deleteMany({
+      where: { expiresAt: { lte: now } },
+    }),
+  ]);
+
+  return {
+    refreshTokens: refreshTokens.count,
+    passwordResetTokens: passwordResetTokens.count,
+    otpChallenges: otpChallenges.count,
+    total: refreshTokens.count + passwordResetTokens.count + otpChallenges.count,
+  };
+}
+
 export async function upsertDeviceToken(input: {
   userId: string;
   token: string;
