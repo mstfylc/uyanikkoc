@@ -341,7 +341,7 @@ export default function StudentMistakesPage() {
           ["ki-shield-cross", "danger", mistakes.length, "Toplam yanlış"],
           ["ki-time", "warning", openCount, "Açık · takipte"],
           ["ki-check-circle", "success", closedCount, "Kapandı · sıfır hata"],
-          ["ki-calendar-tick", "info", due.length, "Bugün tekrar"],
+          ["ki-technology-2", "info", due.length, "Bugün tekrar"],
         ].map(([icon, tone, value, label]) => (
           <div key={label as string} className="card stat">
             <div className="card-pad">
