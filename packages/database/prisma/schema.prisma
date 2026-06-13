@@ -256,6 +256,7 @@ model ParentProfile {
   userId        String           @unique
   user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   children      StudentProfile[]
+  assignments   Assignment[]
   notifications Notification[]
 
   @@map("parent_profiles")
@@ -280,6 +281,7 @@ model Assignment {
   updatedAt   DateTime           @updatedAt
   coach       CoachProfile       @relation("CoachAssignments", fields: [coachId], references: [id], onDelete: Cascade)
   student     StudentProfile     @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
+  parent      ParentProfile      @relation(fields: [parentId], references: [id], onDelete: Restrict)
   branch      Branch             @relation(fields: [branchId], references: [id], onDelete: Cascade)
   result      AssignmentResult?
 
