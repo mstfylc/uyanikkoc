@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { UkBadge } from "@/components/design/UkBadge";
 import { UkBarChart } from "@/components/design/UkBarChart";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
@@ -18,6 +19,9 @@ import type { SchoolScheduleRecord } from "@uyanik/database";
 
 const DAY_INDEX = new Date().getDay();
 const TODAY_LABEL = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"][DAY_INDEX] ?? "Pzt";
+const DAYS_FULL: Record<string, string> = {
+  Pzt: "Pazartesi", Sal: "Salı", Çar: "Çarşamba", Per: "Perşembe", Cum: "Cuma", Cmt: "Cumartesi", Paz: "Pazar",
+};
 
 export function StudentSchedulePanel() {
   const { data: session } = useSession();
@@ -34,6 +38,7 @@ export function StudentSchedulePanel() {
   const [studyPlan, setStudyPlan] = useState<StudyBlockRecord[]>([]);
   const [activeDay, setActiveDay] = useState(TODAY_LABEL);
   const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [view, setView] = useState<"gun" | "hafta">("gun");
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [savingCell, setSavingCell] = useState<string | null>(null);
@@ -181,13 +186,84 @@ export function StudentSchedulePanel() {
         title="Çalışma Programı"
         sub="Koçunla planladığın haftalık çalışma takvimi"
         actions={
-          <button type="button" className="btn btn-primary btn-sm" onClick={() => setBlockModalOpen(true)}>
-            <KiIcon name="ki-plus" />
-            Çalışma bloğu ekle
-          </button>
+          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+            <div className="seg" role="tablist" aria-label="Görünüm">
+              <button type="button" className={view === "gun" ? "on" : ""} onClick={() => setView("gun")}>
+                <KiIcon name="ki-calendar" size={15} />
+                Gün
+              </button>
+              <button type="button" className={view === "hafta" ? "on" : ""} onClick={() => setView("hafta")}>
+                <KiIcon name="ki-element-11" size={15} />
+                Hafta
+              </button>
+            </div>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => setBlockModalOpen(true)}>
+              <KiIcon name="ki-plus" />
+              Çalışma bloğu ekle
+            </button>
+          </div>
         }
       />
 
+      {view === "hafta" ? (
+        <UkSection title="Haftanın Tümü" sub="Tüm haftalık çalışma programın tek bakışta" action={<UkBadge tone="muted">{countWeeklyBlocks(studyPlan)} blok</UkBadge>}>
+          <div className="card-body" style={{ padding: 0, overflowX: "auto" }}>
+            {(() => {
+              const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + (m || 0); };
+              const all = studyPlan;
+              const startH = Math.min(9, ...all.map((b) => Math.floor(toMin(b.time) / 60)));
+              const endH = Math.max(18, ...all.map((b) => Math.ceil((toMin(b.time) + 60) / 60)));
+              const HOUR = 56;
+              const gridH = (endH - startH) * HOUR;
+              const hours = Array.from({ length: endH - startH + 1 }, (_, i) => startH + i);
+              return (
+                <div className="wk-cal" style={{ minWidth: 760 }}>
+                  <div className="wk-corner" />
+                  {STUDY_DAYS.map((d) => (
+                    <div key={d} className={`wk-dayhead${d === TODAY_LABEL ? " today" : ""}`}>
+                      <span>{d}</span>
+                      {d === TODAY_LABEL ? <span className="wk-todaydot" /> : null}
+                    </div>
+                  ))}
+                  <div className="wk-gutter" style={{ height: gridH }}>
+                    {hours.map((h) => <div key={h} className="wk-hour" style={{ height: HOUR }}><span>{String(h).padStart(2, "0")}:00</span></div>)}
+                  </div>
+                  {STUDY_DAYS.map((d) => (
+                    <div key={d} className={`wk-col${d === TODAY_LABEL ? " today" : ""}`} style={{ height: gridH }}>
+                      {hours.slice(0, -1).map((h) => <div key={h} className="wk-line" style={{ top: (h - startH) * HOUR }} />)}
+                      {studyPlan.filter((b) => b.day === d).map((b) => {
+                        const status = b.status ?? "todo";
+                        const top = (toMin(b.time) - startH * 60) / 60 * HOUR;
+                        const color = subjectColor(b.subject);
+                        const done = status === "done";
+                        const prog = status === "progress";
+                        return (
+                          <button
+                            key={b.id}
+                            type="button"
+                            className={`wk-block${done ? " done" : ""}`}
+                            style={{ top, height: HOUR - 6, background: `color-mix(in srgb, ${color} 14%, var(--surface))`, borderColor: color }}
+                            title={`${b.time} · ${b.topic}`}
+                            onClick={() => { if (done) return; void advanceStudyBlock(b.id, prog ? "finish" : "start"); }}
+                          >
+                            <span className="wk-block-bar" style={{ background: color }} />
+                            <span className="wk-block-in">
+                              <span className="wk-block-time tnum">{b.time}</span>
+                              <span className="wk-block-topic">{b.topic}</span>
+                              <span className="wk-block-subj" style={{ color }}>{done ? "✓ " : prog ? "● " : ""}{b.subject}</span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+        </UkSection>
+      ) : (
+        <>
       <div className="grid g-4">
         <UkStatCard icon="ki-calendar" tone="primary" value={countWeeklyBlocks(studyPlan)} label="Bu hafta plan" />
         <UkStatCard icon="ki-check-circle" tone="success" value={countWeeklyDone(studyPlan)} label="Tamamlanan blok" />
@@ -199,7 +275,7 @@ export function StudentSchedulePanel() {
         </div>
       </UkSection>
 
-      <UkSection title="Günlük çalışma planı" sub="Bugün için önerilen bloklar">
+      <UkSection title={DAYS_FULL[activeDay] ?? activeDay} sub={`${dayBlocks.length} çalışma bloğu`} action={activeDay === TODAY_LABEL ? <UkBadge tone="primary">Bugün</UkBadge> : null}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div className="filters" style={{ flexWrap: "wrap" }}>
             {STUDY_DAYS.map((day) => (
@@ -213,6 +289,10 @@ export function StudentSchedulePanel() {
                 {day === TODAY_LABEL ? " · bugün" : ""}
               </button>
             ))}
+            <button type="button" onClick={() => setView("hafta")} title="Haftanın tamamını gör">
+              <KiIcon name="ki-element-11" size={14} />
+              Tüm hafta
+            </button>
           </div>
 
           {isLoading ? (
@@ -280,6 +360,8 @@ export function StudentSchedulePanel() {
           )}
         </div>
       </UkSection>
+        </>
+      )}
 
       <div className="card">
         <div className="card-pad between">
