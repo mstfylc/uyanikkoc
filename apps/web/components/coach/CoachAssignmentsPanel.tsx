@@ -37,7 +37,7 @@ type AssignmentItem = {
 
 const WEEK_OPTIONS = [
   { id: "w0", label: "Bu hafta" },
-  { id: "w1", label: "Gecen hafta" },
+  { id: "w1", label: "Geçen hafta" },
 ];
 
 function weekIdForDate(iso: string): string {
@@ -133,11 +133,11 @@ export function CoachAssignmentsPanel() {
             </select>
             <button type="button" className="btn btn-light btn-sm" disabled={!smartStudent} onClick={() => setSmartOpen(true)}>
               <KiIcon name="ki-abstract-26" size={16} />
-              SmartOdev
+              Akıllı Ödev
             </button>
             <Link href="/coach/assignments/create" className="btn btn-primary btn-sm">
               <KiIcon name="ki-plus" size={16} />
-              Yeni ödev
+              Ödev Ata
             </Link>
           </div>
         }
@@ -164,20 +164,20 @@ export function CoachAssignmentsPanel() {
       <div className="grid g-4">
         <UkStatCard icon="ki-notepad-edit" tone="primary" value={total} label="Atanan ödev" />
         <UkStatCard icon="ki-flag" tone="success" value={`${rate}%`} label="Tamamlanma" />
-        <UkStatCard icon="ki-chart-simple" tone="info" value={completed} label="Sonuc girilen" />
-        <UkStatCard icon="ki-information-2" tone="danger" value={overdue} label="Gecikmis" />
+        <UkStatCard icon="ki-chart-simple" tone="info" value={completed} label="Sonuç girilen" />
+        <UkStatCard icon="ki-information-2" tone="danger" value={overdue} label="Gecikmiş" />
       </div>
 
       <UkSection
         title="Atanan Ödevler"
-        sub={`${shown.length} gorev`}
+        sub={`${shown.length} görev`}
         action={
           <div className="filters">
             {[
               ["all", "Tümü"],
               ["pending", "Bekleyen"],
               ["done", "Tamamlanan"],
-              ["result", "Sonuclu"],
+              ["result", "Sonuçlu"],
             ].map(([key, label]) => (
               <button
                 key={key}
