@@ -9,6 +9,7 @@ import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { CoachNoteModal } from "@/components/coach/CoachNoteModal";
 import { SmartOdevModal } from "@/components/coach/SmartOdevModal";
 import { StudentResourcesCard } from "@/components/student/StudentResourcesCard";
 import {
@@ -54,6 +55,7 @@ export function CoachAssignmentsPanel() {
   const [filter, setFilter] = useState<"all" | "pending" | "done" | "result">("all");
   const [studentFilter, setStudentFilter] = useState("all");
   const [smartOpen, setSmartOpen] = useState(false);
+  const [noteTarget, setNoteTarget] = useState<{ studentId: string; studentName: string; title: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -248,7 +250,17 @@ export function CoachAssignmentsPanel() {
                     ) : null}
                   </div>
                   {assignment.completed ? (
-                    <UkBadge tone="success">{ASSIGNMENT_STATUS_LABELS[assignment.status]}</UkBadge>
+                    <div className="row" style={{ gap: 8, flexShrink: 0 }}>
+                      <UkBadge tone="success">{ASSIGNMENT_STATUS_LABELS[assignment.status]}</UkBadge>
+                      <button
+                        type="button"
+                        className="btn btn-light btn-sm"
+                        onClick={() => setNoteTarget({ studentId: assignment.studentId, studentName, title: assignment.title })}
+                      >
+                        <KiIcon name="ki-message-text" size={14} />
+                        Not gönder
+                      </button>
+                    </div>
                   ) : (
                     <UkBadge tone={overdueItem ? "danger" : "warning"} dot>
                       {overdueItem ? "Gecikti" : "Bekliyor"}
@@ -273,6 +285,15 @@ export function CoachAssignmentsPanel() {
           editable
         />
       )}
+
+      <CoachNoteModal
+        open={Boolean(noteTarget)}
+        studentId={noteTarget?.studentId ?? null}
+        studentName={noteTarget?.studentName ?? ""}
+        context={noteTarget?.title}
+        onClose={() => setNoteTarget(null)}
+        onSent={() => void load()}
+      />
 
       {smartStudent ? (
         <SmartOdevModal
