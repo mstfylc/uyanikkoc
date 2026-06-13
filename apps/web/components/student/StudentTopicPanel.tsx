@@ -273,8 +273,8 @@ export function StudentTopicPanel() {
                           key={topic.id}
                           type="button"
                           title={`${topic.name} · ${statusLabel(status)}`}
-                          aria-label={`${topic.name} · ${statusLabel(status)}`}
-                          onClick={() => void cycleTopicStatus(topic)}
+                          aria-label={`${subject.name} dersini aç — ${topic.name} · ${statusLabel(status)}`}
+                          onClick={() => setActiveSubjectId(subject.id)}
                           style={{
                             width: 22,
                             height: 22,
@@ -306,41 +306,19 @@ export function StudentTopicPanel() {
           </div>
         </UkSection>
       ) : activeSubject ? (
-        <div className="grid col-rail">
-          <div className="card" style={{ overflow: "hidden", alignSelf: "start" }}>
-            <div className="card-head">
-              <h3>Dersler</h3>
-            </div>
-            <div style={{ padding: 10, display: "flex", flexDirection: "column", gap: 4 }}>
-              {subjects.map((subject) => {
-                const color = subjectColor(subject.name);
-                const done = subject.topics.filter((topic) => topic.progress.completed).length;
-                const total = subject.topics.length;
-                const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-                const on = subject.id === activeSubject.id;
-
-                return (
-                  <button
-                    key={subject.id}
-                    type="button"
-                    className="user-card"
-                    style={{ background: on ? "var(--surface-3)" : "none", borderRadius: 11 }}
-                    onClick={() => setActiveSubjectId(subject.id)}
-                  >
-                    <span
-                      className="swatch"
-                      style={{ width: 10, height: 10, borderRadius: 4, background: color, flexShrink: 0 }}
-                    />
-                    <div className="user-meta" style={{ flex: 1 }}>
-                      <b style={{ fontSize: 13, color: on ? color : "var(--text)" }}>{subject.name}</b>
-                      <span style={{ fontSize: 11 }}>
-                        {done}/{total} konu · %{pct}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+        <>
+          <div className="seg" style={{ width: "fit-content", flexWrap: "wrap" }}>
+            {subjects.map((subject) => (
+              <button
+                key={subject.id}
+                type="button"
+                className={subject.id === activeSubject.id ? "on" : ""}
+                onClick={() => setActiveSubjectId(subject.id)}
+              >
+                <span className="swatch" style={{ background: subjectColor(subject.name) }} />
+                {subject.name}
+              </button>
+            ))}
           </div>
 
           <UkSection
@@ -462,7 +440,7 @@ export function StudentTopicPanel() {
               ) : null}
             </div>
           </UkSection>
-        </div>
+        </>
       ) : null}
 
       <UkSection title="Yeni ders alanı">
