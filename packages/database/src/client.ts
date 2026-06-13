@@ -6,9 +6,36 @@ const globalStore = globalThis as typeof globalThis & {
 
 export const prisma = globalStore.__uyanikPrisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") {
-  globalStore.__uyanikPrisma = prisma;
+globalStore.__uyanikPrisma = prisma;
+
+function getDatabaseHost(value: string | undefined): string | null {
+  if (!value?.trim()) {
+    return null;
+  }
+
+  try {
+    return new URL(value).host;
+  } catch {
+    return null;
+  }
 }
+
+function warnIfProductionDatabaseIsUnpooled(): void {
+  if (process.env.NODE_ENV !== "production") {
+    return;
+  }
+
+  const host = getDatabaseHost(process.env.DATABASE_URL);
+  if (!host || host.includes("-pooler")) {
+    return;
+  }
+
+  console.warn(
+    "DATABASE_URL should use the pooled endpoint in production runtime. Use the direct/unpooled URL only for migrations.",
+  );
+}
+
+warnIfProductionDatabaseIsUnpooled();
 
 export function useMemoryStore(): boolean {
   const flag = process.env.DEMO_AUTH_ALLOW_IN_MEMORY;

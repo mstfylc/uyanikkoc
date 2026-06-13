@@ -52,4 +52,5 @@ packages/*     → shared, database, contracts, tokens, ui-web, config
 - CRM ayrı sunucu/DB — bu repoda CRM kodu yok.
 - Metronic asset'leri lisanslı; `apps/web/public/assets/metronic/` gitignore'da, lokal kopyalanır.
 - Production'da `DEMO_AUTH_ALLOW_IN_MEMORY=false` zorunlu (bkz. `AGENTS.md`).
+- Production runtime `DATABASE_URL` pooled endpoint olmalıdır (Neon host `-pooler` içerir); Prisma migrate/backup için direct/unpooled URL kullanılır.
 - Cursor faz planı: `docs/cursor/CURSOR_PROMPT_LIST.md`
