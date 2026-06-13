@@ -72,7 +72,7 @@ export function ReportDetailModal({ open, report, onClose, onApprove }: ReportDe
               <div className="tnum" style={{ fontSize: 22, fontWeight: 800 }}>{report.netDelta}</div>
             </div>
             <div className="card card-pad">
-              <div className="muted" style={{ fontSize: 11.5 }}>Calisma saati</div>
+              <div className="muted" style={{ fontSize: 11.5 }}>Çalışma saati</div>
               <div className="tnum" style={{ fontSize: 22, fontWeight: 800 }}>{detail.hours}s</div>
             </div>
           </div>

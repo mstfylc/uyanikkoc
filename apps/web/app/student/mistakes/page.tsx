@@ -28,9 +28,9 @@ type Mistake = {
 };
 
 const ERROR_LABELS: Record<ErrorType, { label: string; tone: "danger" | "info" | "warning" | "primary" | "muted" }> = {
-  bilgi: { label: "Bilgi eksigi", tone: "danger" },
-  islem: { label: "Islem hatasi", tone: "info" },
-  sure: { label: "Sure", tone: "warning" },
+  bilgi: { label: "Bilgi eksiği", tone: "danger" },
+  islem: { label: "İşlem hatası", tone: "info" },
+  sure: { label: "Süre", tone: "warning" },
   dikkat: { label: "Dikkat", tone: "primary" },
   yorum: { label: "Yorum", tone: "info" },
   unutma: { label: "Unutma", tone: "muted" },
@@ -39,15 +39,15 @@ const ERROR_LABELS: Record<ErrorType, { label: string; tone: "danger" | "info" |
 const QUESTION_LABELS: Record<QuestionType, string> = {
   yeninesil: "Yeni nesil",
   klasik: "Klasik",
-  islem: "Islem",
+  islem: "İşlem",
   yorum: "Yorum",
   grafik: "Grafik / Tablo",
 };
 
 const STATUS_LABELS: Record<MistakeStatus, { label: string; tone: "warning" | "info" | "success" }> = {
-  acik: { label: "Acik", tone: "warning" },
+  acik: { label: "Açık", tone: "warning" },
   tekrar: { label: "Tekrar edildi", tone: "info" },
-  kapandi: { label: "Kapandi", tone: "success" },
+  kapandi: { label: "Kapandı", tone: "success" },
 };
 
 const INITIAL_FORM = {
@@ -120,7 +120,7 @@ function ZeroErrorReviewModal({
             <div>
               <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Odak Tekrar</h3>
               <div className="muted" style={{ fontSize: 12 }}>
-                {item ? `${index + 1} / ${list.length} - sifir hata dongusu` : "Tamamlandi"}
+                {item ? `${index + 1} / ${list.length} · sıfır hata döngüsü` : "Tamamlandı"}
               </div>
             </div>
           </div>
@@ -147,17 +147,17 @@ function ZeroErrorReviewModal({
               <div style={{ padding: 12, borderRadius: 13, background: "var(--surface-3)", color: "var(--text-2)", fontSize: 13 }}>
                 {item.note ? (
                   <>
-                    <strong style={{ color: "var(--text)" }}>Cozum notun</strong>
+                    <strong style={{ color: "var(--text)" }}>Çözüm notun</strong>
                     <div style={{ marginTop: 5 }}>{item.note}</div>
                   </>
                 ) : (
-                  "Bu yanlista not yok - dogru cozumu zihninden gecir, sonra isaretle."
+                  "Bu yanlışta not yok — doğru çözümü zihninden geçir, sonra işaretle."
                 )}
               </div>
               <div className="between" style={{ gap: 10, flexWrap: "wrap" }}>
                 <div className="row" style={{ gap: 8 }}>
                   <StageDots stage={item.stage} />
-                  <span className="muted" style={{ fontSize: 12 }}>{item.nextDue ? `${item.nextDue} tekrari` : "son tekrar"}</span>
+                  <span className="muted" style={{ fontSize: 12 }}>{item.nextDue ? `${item.nextDue} tekrarı` : "son tekrar"}</span>
                 </div>
                 {item.source ? <span className="muted" style={{ fontSize: 12 }}>Kaynak: {item.source}</span> : null}
               </div>
@@ -168,7 +168,7 @@ function ZeroErrorReviewModal({
                 <KiIcon name="ki-check-circle" size={28} />
               </span>
               <h3 style={{ fontSize: 18, fontWeight: 850 }}>Tekrar turu bitti</h3>
-              <p className="muted" style={{ marginTop: 6 }}>{reviewed} yanlisi tekrar ettin. Bir sonraki aralikta sistem otomatik hatirlatacak.</p>
+              <p className="muted" style={{ marginTop: 6 }}>{reviewed} yanlışı tekrar ettin. Bir sonraki aralıkta sistem otomatik hatırlatacak.</p>
             </div>
           )}
         </div>
@@ -208,12 +208,12 @@ function recentFrequency(mistakes: Mistake[]) {
   const total = recent.length;
   const diagnosis =
     total === 0
-      ? "Bu donemde kayitli yanlis yok."
+      ? "Bu dönemde kayıtlı yanlış yok."
       : byType.bilgi / total > 0.45
-        ? "Agirlikli bilgi eksigi - once konu tekrari gerekiyor."
+        ? "Ağırlıklı bilgi eksiği — önce konu tekrarı gerekiyor."
         : (byType.islem + byType.sure) / total >= 0.5
-          ? "Asil sorun konu bilmemek degil; cozum disiplini ve sure yonetimi."
-          : "Dikkat ve daginik hatalar one cikiyor - kontrollu cozum sart.";
+          ? "Asıl sorun konu bilmemek değil; çözüm disiplini ve süre yönetimi."
+          : "Dikkat ve dağınık hatalar öne çıkıyor — kontrollü çözüm şart.";
   const topTopics = Array.from(byTopic.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3);
   return { total, byType, ranked, diagnosis, topTopics };
 }
@@ -221,6 +221,7 @@ function recentFrequency(mistakes: Mistake[]) {
 export default function StudentMistakesPage() {
   const [mistakes, setMistakes] = useState<Mistake[]>([]);
   const [form, setForm] = useState(INITIAL_FORM);
+  const [addOpen, setAddOpen] = useState(false);
   const [showAllDue, setShowAllDue] = useState(false);
   const [reviewList, setReviewList] = useState<Mistake[] | null>(null);
   const [reviewIndex, setReviewIndex] = useState(0);
@@ -237,7 +238,7 @@ export default function StudentMistakesPage() {
     setError(null);
     const response = await fetch("/api/student/mistakes", { credentials: "same-origin" });
     if (!response.ok) {
-      setError("Yanlis Defteri yuklenemedi.");
+      setError("Yanlış Defteri yüklenemedi.");
       setIsLoading(false);
       return;
     }
@@ -260,10 +261,11 @@ export default function StudentMistakesPage() {
     });
     if (!response.ok) {
       const data = (await response.json().catch(() => ({}))) as { error?: string };
-      setError(data.error ?? "Yanlis kaydedilemedi.");
+      setError(data.error ?? "Yanlış kaydedilemedi.");
       return;
     }
     setForm(INITIAL_FORM);
+    setAddOpen(false);
     await loadMistakes();
   }
 
@@ -299,7 +301,7 @@ export default function StudentMistakesPage() {
       credentials: "same-origin",
     });
     if (!response.ok) {
-      setError("Yanlis silinemedi.");
+      setError("Yanlış silinemedi.");
       return;
     }
     await loadMistakes();
@@ -326,38 +328,38 @@ export default function StudentMistakesPage() {
   return (
     <div className="stack rise">
       <UkPageHead
-        title="Yanlis Defteri"
-        sub="Hatalarini kaydet, sistem unutturmadan tekrar ettirsin"
+        title="Yanlış Defteri"
+        sub="Hatalarını kaydet, sistem unutturmadan tekrar ettirsin"
         actions={
-          <a className="btn btn-primary" href="#yanlis-ekle">
+          <button type="button" className="btn btn-primary" onClick={() => setAddOpen(true)}>
             <KiIcon name="ki-plus" size={16} />
-            Yanlis ekle
-          </a>
+            Yanlış ekle
+          </button>
         }
       />
 
-      <div className="grid g-4">
+      <div className="yd-summary">
         {[
-          ["ki-shield-cross", "danger", mistakes.length, "Toplam yanlis"],
-          ["ki-time", "warning", openCount, "Acik takipte"],
-          ["ki-check-circle", "success", closedCount, "Kapandi"],
-          ["ki-calendar-tick", "info", due.length, "Bugun tekrar"],
+          ["ki-shield-cross", "danger", mistakes.length, "Toplam yanlış"],
+          ["ki-time", "warning", openCount, "Açık · takipte"],
+          ["ki-check-circle", "success", closedCount, "Kapandı · sıfır hata"],
+          ["ki-technology-2", "info", due.length, "Bugün tekrar"],
         ].map(([icon, tone, value, label]) => (
-          <div key={label as string} className="card stat">
-            <div className="card-pad">
-              <span className={`stat-icon tone-${tone}`}>
-                <KiIcon name={icon as string} size={22} />
-              </span>
-              <div className="stat-value tnum">{isLoading ? "-" : value}</div>
-              <div className="stat-label">{label}</div>
+          <div key={label as string} className="yd-sum">
+            <span className={`stat-icon tone-${tone}`} style={{ width: 40, height: 40 }}>
+              <KiIcon name={icon as string} size={19} />
+            </span>
+            <div>
+              <div className="v tnum">{isLoading ? "-" : value}</div>
+              <div className="l">{label}</div>
             </div>
           </div>
         ))}
       </div>
 
       <UkSection
-        title="Sifir Hata Dongusu"
-        sub={due.length ? "Bugun tekrar edilecekler" : "1 -> 3 -> 7 -> 21 gun otomatik tekrar takvimi"}
+        title="Sıfır Hata Döngüsü"
+        sub={due.length ? "Bugün tekrar edilecekler — bitirince bir sonraki aralığa geçer" : "1 → 3 → 7 → 21 gün otomatik tekrar takvimi"}
         action={due.length ? (
           <div className="row" style={{ gap: 8 }}>
             <Badge tone="warning">{due.length} tekrar</Badge>
@@ -378,8 +380,9 @@ export default function StudentMistakesPage() {
       >
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {due.length === 0 ? (
-            <div style={{ padding: 18, textAlign: "center", color: "var(--muted)" }}>
-              Bugun tekrar edilecek yanlis yok - dongu temiz.
+            <div className="yd-clear">
+              <KiIcon name="ki-check-circle" size={20} />
+              Bugün tekrar edilecek yanlış yok — döngü temiz.
             </div>
           ) : (
             visibleDue.map((item) => (
@@ -403,13 +406,13 @@ export default function StudentMistakesPage() {
           )}
           {due.length > 5 ? (
             <button type="button" className="btn btn-light btn-sm" onClick={() => setShowAllDue((value) => !value)} style={{ width: "fit-content" }}>
-              {showAllDue ? "Daha az goster" : `+${due.length - 5} tekrar daha goster`}
+              {showAllDue ? "Daha az göster" : `+${due.length - 5} tekrar daha göster`}
             </button>
           ) : null}
         </div>
       </UkSection>
 
-      <UkSection title="Hata Frekansi" sub="Son 14 gunde hangi tur hatayi daha cok yapiyorsun" action={<Badge tone="primary">{frequency.total} yanlis</Badge>}>
+      <UkSection title="Hata Frekansı" sub="Son 14 günde hangi tür hatayı daha çok yapıyorsun" action={<Badge tone="primary">{frequency.total} yanlis</Badge>}>
         <div className="card-body" style={{ display: "grid", gap: 14 }}>
           <div className="row" style={{ gap: 10, alignItems: "flex-start" }}>
             <span className="lr-icon" style={{ color: "var(--primary)" }}>
@@ -419,14 +422,14 @@ export default function StudentMistakesPage() {
               <strong style={{ color: "var(--text)" }}>
                 {frequency.ranked.length
                   ? frequency.ranked.map(([type, count]) => `${count} ${ERROR_LABELS[type].label}`).join(", ")
-                  : "Henuz yanlis eklenmedi."}
+                  : "Henüz yanlış eklenmedi."}
               </strong>{" "}
               {frequency.diagnosis}
             </div>
           </div>
           {frequency.total === 0 ? (
             <div style={{ padding: 18, textAlign: "center", color: "var(--muted)" }}>
-              Ilk yanlisini ekleyince burada hata tipi dagilimin cikacak.
+              İlk yanlışını ekleyince burada hata tipi dağılımın çıkacak.
             </div>
           ) : (
             <div className="grid g-2">
@@ -451,7 +454,7 @@ export default function StudentMistakesPage() {
                 ))}
               </div>
               <div style={{ display: "grid", gap: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 800 }}>En sik yanlis konular</div>
+                <div style={{ fontSize: 12, fontWeight: 800 }}>En sık yanlış konular</div>
                 {frequency.topTopics.map(([topic, count]) => (
                   <div key={topic} className="between" style={{ gap: 10 }}>
                     <span className="muted" style={{ fontSize: 12.5 }}>{topic}</span>
@@ -464,8 +467,19 @@ export default function StudentMistakesPage() {
         </div>
       </UkSection>
 
-      <UkSection title="Yanlis ekle" sub="Ders ve konu zorunlu; fotograf icin yalniz URL kabul edilir">
-        <form id="yanlis-ekle" className="card-body" onSubmit={(event) => void addMistake(event)} style={{ display: "grid", gap: 12 }}>
+      {addOpen ? createPortal(
+        <div className="modal-overlay" onClick={() => setAddOpen(false)}>
+          <div className="modal-panel" style={{ maxWidth: 540 }} onClick={(event) => event.stopPropagation()}>
+            <div className="modal-head">
+              <div>
+                <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Yanlış ekle</h3>
+                <div className="muted" style={{ fontSize: 12 }}>Ders ve konu zorunlu; fotoğraf için yalnız URL kabul edilir</div>
+              </div>
+              <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={() => setAddOpen(false)} aria-label="Kapat">
+                <KiIcon name="ki-cross" size={18} />
+              </button>
+            </div>
+        <form id="yanlis-ekle" className="modal-body" onSubmit={(event) => void addMistake(event)} style={{ display: "grid", gap: 12 }}>
           <div className="grid g-2">
             <label className="field">
               <span className="label">Ders</span>
@@ -488,7 +502,7 @@ export default function StudentMistakesPage() {
               </select>
             </label>
             <label className="field">
-              <span className="label">Soru turu</span>
+              <span className="label">Soru türü</span>
               <select className="select" value={form.qType} onChange={(event) => setForm({ ...form, qType: event.target.value as QuestionType })}>
                 {Object.entries(QUESTION_LABELS).map(([key, value]) => <option key={key} value={key}>{value}</option>)}
               </select>
@@ -499,49 +513,52 @@ export default function StudentMistakesPage() {
             <input className="input" value={form.source} onChange={(event) => setForm({ ...form, source: event.target.value })} />
           </label>
           <label className="field">
-            <span className="label">Cozum notu</span>
+            <span className="label">Çözüm notu</span>
             <textarea className="input" value={form.note} onChange={(event) => setForm({ ...form, note: event.target.value })} style={{ minHeight: 72 }} />
           </label>
           <label className="field">
-            <span className="label">Fotograf URL</span>
+            <span className="label">Fotoğraf URL</span>
             <input className="input" value={form.photoUrl} onChange={(event) => setForm({ ...form, photoUrl: event.target.value })} placeholder="https://..." />
           </label>
           <div className="between" style={{ gap: 10, flexWrap: "wrap" }}>
-            <span className="muted" style={{ fontSize: 12 }}>Tekrar takvimi: 1 - 3 - 7 - 21 gun</span>
+            <span className="muted" style={{ fontSize: 12 }}>Tekrar takvimi: 1 → 3 → 7 → 21 gün</span>
             <button type="submit" className="btn btn-primary">
               <KiIcon name="ki-plus" size={16} />
               Deftere ekle
             </button>
           </div>
         </form>
-      </UkSection>
+          </div>
+        </div>,
+        document.body,
+      ) : null}
 
-      <UkSection title="Tum Yanlislar" sub={`${shown.length} kayit`}>
+      <UkSection title="Tüm Yanlışlar" sub={`${shown.length} kayıt`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {error ? <p role="alert" className="badge badge-danger" style={{ width: "fit-content" }}>{error}</p> : null}
-          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+          <div className="yd-toolbar">
             <select className="select" value={subjectFilter} onChange={(event) => setSubjectFilter(event.target.value)} style={{ width: 160 }}>
-              <option value="all">Tum dersler</option>
+              <option value="all">Tüm dersler</option>
               {subjects.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
             </select>
             <select className="select" value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)} style={{ width: 160 }}>
-              <option value="all">Tum hata tipleri</option>
+              <option value="all">Tüm hata tipleri</option>
               {Object.entries(ERROR_LABELS).map(([key, value]) => <option key={key} value={key}>{value.label}</option>)}
             </select>
             <select className="select" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} style={{ width: 160 }}>
-              <option value="all">Tum durumlar</option>
+              <option value="all">Tüm durumlar</option>
               {Object.entries(STATUS_LABELS).map(([key, value]) => <option key={key} value={key}>{value.label}</option>)}
             </select>
           </div>
           {isLoading ? (
-            <p className="muted">Yukleniyor...</p>
+            <p className="muted">Yükleniyor...</p>
           ) : shown.length === 0 ? (
-            <div style={{ padding: 24, textAlign: "center", color: "var(--muted)" }}>Bu filtrede yanlis yok.</div>
+            <div style={{ padding: 24, textAlign: "center", color: "var(--muted)" }}>Bu filtrede yanlış yok.</div>
           ) : (
             shown.map((item) => (
               <div key={item.id} className="lrow" style={{ alignItems: "flex-start" }}>
                 {item.photoUrl ? (
-                  <button type="button" className="lr-icon" style={{ padding: 0, overflow: "hidden" }} onClick={() => setLightboxUrl(item.photoUrl)} aria-label="Fotografi ac">
+                  <button type="button" className="lr-icon" style={{ padding: 0, overflow: "hidden" }} onClick={() => setLightboxUrl(item.photoUrl)} aria-label="Fotoğrafı aç">
                     <img src={item.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   </button>
                 ) : (

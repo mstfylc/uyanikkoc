@@ -82,6 +82,7 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
   const body = (await req.json()) as {
     day?: string;
     time?: string;
+    endTime?: string;
     subject?: string;
     topic?: string;
     type?: string;
@@ -102,6 +103,7 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
   const block = await addStudentStudyBlock(studentId, {
     day,
     time,
+    endTime: body.endTime?.trim() || undefined,
     subject,
     topic,
     type: body.type?.trim() || "Soru",

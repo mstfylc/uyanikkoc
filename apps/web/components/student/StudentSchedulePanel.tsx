@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useSession } from "next-auth/react";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { UkBadge } from "@/components/design/UkBadge";
 import { UkBarChart } from "@/components/design/UkBarChart";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
@@ -13,11 +14,14 @@ import { studentSinav } from "@/lib/design/student-exam";
 import { subjectColor } from "@/lib/design/subject-colors";
 import type { StudyBlockRecord } from "@/mocks/study-plan";
 import { SCHOOL_DAYS, SCHOOL_PERIODS } from "@/mocks/schedule";
-import { countWeeklyBlocks, countWeeklyDone, STUDY_DAYS, weeklyCompletionByDay } from "@/mocks/study-plan";
+import { countWeeklyBlocks, STUDY_DAYS, weeklyCompletionByDay } from "@/mocks/study-plan";
 import type { SchoolScheduleRecord } from "@uyanik/database";
 
 const DAY_INDEX = new Date().getDay();
-const TODAY_LABEL = ["Paz", "Pzt", "Sal", "Car", "Per", "Cum", "Cmt"][DAY_INDEX] ?? "Pzt";
+const TODAY_LABEL = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"][DAY_INDEX] ?? "Pzt";
+const DAYS_FULL: Record<string, string> = {
+  Pzt: "Pazartesi", Sal: "Salı", Çar: "Çarşamba", Per: "Perşembe", Cum: "Cuma", Cmt: "Cumartesi", Paz: "Pazar",
+};
 
 export function StudentSchedulePanel() {
   const { data: session } = useSession();
@@ -34,16 +38,19 @@ export function StudentSchedulePanel() {
   const [studyPlan, setStudyPlan] = useState<StudyBlockRecord[]>([]);
   const [activeDay, setActiveDay] = useState(TODAY_LABEL);
   const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [view, setView] = useState<"gun" | "hafta">("gun");
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [savingCell, setSavingCell] = useState<string | null>(null);
   const [blockDraft, setBlockDraft] = useState({
     day: TODAY_LABEL,
     time: "17:00",
+    endTime: "18:00",
     subject: "Matematik",
     topic: "",
     type: "Soru",
     source: "",
+    soru: "",
     correct: "",
     wrong: "",
   });
@@ -142,7 +149,7 @@ export function StudentSchedulePanel() {
     setBlockError(null);
 
     if (!blockDraft.topic.trim()) {
-      setBlockError("Konu adi gerekli.");
+      setBlockError("Konu adı gerekli.");
       return;
     }
 
@@ -154,6 +161,7 @@ export function StudentSchedulePanel() {
       body: JSON.stringify({
         day: blockDraft.day,
         time: blockDraft.time,
+        endTime: blockDraft.endTime || undefined,
         subject: blockDraft.subject,
         topic: blockDraft.topic,
         type: blockDraft.type,
@@ -179,41 +187,104 @@ export function StudentSchedulePanel() {
     <div className="stack rise" data-testid="student-schedule-panel">
       <UkPageHead
         title="Çalışma Programı"
-        sub={`${examProfile.label} · günlük plan`}
+        sub="Koçunla planladığın haftalık çalışma takvimi"
         actions={
-          <button type="button" className="btn btn-primary btn-sm" onClick={() => setBlockModalOpen(true)}>
-            <KiIcon name="ki-plus" />
-            Blok ekle
-          </button>
+          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+            <div className="seg" role="tablist" aria-label="Görünüm">
+              <button type="button" className={view === "gun" ? "on" : ""} onClick={() => setView("gun")}>
+                <KiIcon name="ki-calendar" size={15} />
+                Gün
+              </button>
+              <button type="button" className={view === "hafta" ? "on" : ""} onClick={() => setView("hafta")}>
+                <KiIcon name="ki-element-11" size={15} />
+                Hafta
+              </button>
+            </div>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => setBlockModalOpen(true)}>
+              <KiIcon name="ki-plus" />
+              Çalışma bloğu ekle
+            </button>
+          </div>
         }
       />
 
-      <div className="grid g-4">
-        <UkStatCard icon="ki-calendar" tone="primary" value={countWeeklyBlocks(studyPlan)} label="Bu hafta plan" />
-        <UkStatCard icon="ki-check-circle" tone="success" value={countWeeklyDone(studyPlan)} label="Tamamlanan blok" />
+      {view === "hafta" ? (
+        <UkSection title="Haftanın Tümü" sub="Tüm haftalık çalışma programın tek bakışta" action={<UkBadge tone="muted">{countWeeklyBlocks(studyPlan)} blok</UkBadge>}>
+          <div className="card-body" style={{ padding: 0, overflowX: "auto" }}>
+            {(() => {
+              const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + (m || 0); };
+              const all = studyPlan;
+              const startH = Math.min(9, ...all.map((b) => Math.floor(toMin(b.time) / 60)));
+              const endMin = (b: StudyBlockRecord) => (b.endTime ? toMin(b.endTime) : toMin(b.time) + 60);
+              const endH = Math.max(18, ...all.map((b) => Math.ceil(endMin(b) / 60)));
+              const HOUR = 56;
+              const gridH = (endH - startH) * HOUR;
+              const hours = Array.from({ length: endH - startH + 1 }, (_, i) => startH + i);
+              return (
+                <div className="wk-cal" style={{ minWidth: 760 }}>
+                  <div className="wk-corner" />
+                  {STUDY_DAYS.map((d) => (
+                    <div key={d} className={`wk-dayhead${d === TODAY_LABEL ? " today" : ""}`}>
+                      <span>{d}</span>
+                      {d === TODAY_LABEL ? <span className="wk-todaydot" /> : null}
+                    </div>
+                  ))}
+                  <div className="wk-gutter" style={{ height: gridH }}>
+                    {hours.map((h) => <div key={h} className="wk-hour" style={{ height: HOUR }}><span>{String(h).padStart(2, "0")}:00</span></div>)}
+                  </div>
+                  {STUDY_DAYS.map((d) => (
+                    <div key={d} className={`wk-col${d === TODAY_LABEL ? " today" : ""}`} style={{ height: gridH }}>
+                      {hours.slice(0, -1).map((h) => <div key={h} className="wk-line" style={{ top: (h - startH) * HOUR }} />)}
+                      {studyPlan.filter((b) => b.day === d).map((b) => {
+                        const status = b.status ?? "todo";
+                        const top = (toMin(b.time) - startH * 60) / 60 * HOUR;
+                        const blockH = Math.max(26, (endMin(b) - toMin(b.time)) / 60 * HOUR - 3);
+                        const color = subjectColor(b.subject);
+                        const done = status === "done";
+                        const prog = status === "progress";
+                        return (
+                          <button
+                            key={b.id}
+                            type="button"
+                            className={`wk-block${done ? " done" : ""}`}
+                            style={{ top, height: blockH, background: `color-mix(in srgb, ${color} 14%, var(--surface))`, borderColor: color }}
+                            title={`${b.time}${b.endTime ? `–${b.endTime}` : ""} · ${b.topic}`}
+                            onClick={() => { if (done) return; void advanceStudyBlock(b.id, prog ? "finish" : "start"); }}
+                          >
+                            <span className="wk-block-bar" style={{ background: color }} />
+                            <span className="wk-block-in">
+                              <span className="wk-block-time tnum">{b.time}</span>
+                              <span className="wk-block-topic">{b.topic}</span>
+                              <span className="wk-block-subj" style={{ color }}>{done ? "✓ " : prog ? "● " : ""}{b.subject}</span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+        </UkSection>
+      ) : (
+        <>
+      <div className="seg" style={{ width: "fit-content", flexWrap: "wrap" }}>
+        {STUDY_DAYS.map((day) => (
+          <button key={day} type="button" className={activeDay === day ? "on" : ""} onClick={() => setActiveDay(day)}>
+            {day}
+            {day === TODAY_LABEL ? <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--primary)", display: "inline-block", marginLeft: 5 }} /> : null}
+          </button>
+        ))}
+        <button type="button" onClick={() => setView("hafta")} title="Haftanın tamamını gör">
+          <KiIcon name="ki-element-11" size={14} />
+          Tüm hafta
+        </button>
       </div>
 
-      <UkSection title="Haftalık tamamlama" sub="Gün bazında plan ilerlemesi">
-        <div className="card-body">
-          <UkBarChart data={weeklyChart} max={100} />
-        </div>
-      </UkSection>
-
-      <UkSection title="Günlük çalışma planı" sub="Bugün için önerilen bloklar">
-        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div className="filters" style={{ flexWrap: "wrap" }}>
-            {STUDY_DAYS.map((day) => (
-              <button
-                key={day}
-                type="button"
-                className={activeDay === day ? "on" : ""}
-                onClick={() => setActiveDay(day)}
-              >
-                {day}
-                {day === TODAY_LABEL ? " · bugün" : ""}
-              </button>
-            ))}
-          </div>
+      <div className="grid col-main">
+      <UkSection title={DAYS_FULL[activeDay] ?? activeDay} sub={`${dayBlocks.length} çalışma bloğu`} action={activeDay === TODAY_LABEL ? <UkBadge tone="primary">Bugün</UkBadge> : null}>
+        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
@@ -232,8 +303,9 @@ export function StudentSchedulePanel() {
                   ((block as StudyBlockRecord & { done?: boolean }).done ? "done" : "todo");
                 return (
                   <div key={block.id} className={`lrow${status === "done" ? " done" : ""}`}>
-                    <span className="tnum muted" style={{ width: 48, fontWeight: 700, fontSize: 12.5 }}>
+                    <span className="tnum muted" style={{ width: 56, fontWeight: 700, fontSize: 12, lineHeight: 1.3, textAlign: "center" }}>
                       {block.time}
+                      {block.endTime ? <><br />{block.endTime}</> : null}
                     </span>
                     <span
                       className="lr-icon"
@@ -280,6 +352,21 @@ export function StudentSchedulePanel() {
           )}
         </div>
       </UkSection>
+
+      <div className="stack">
+        <div className="grid g-2">
+          <UkStatCard icon="ki-time" tone="primary" value={`${countWeeklyBlocks(studyPlan)}s`} label="Bu hafta plan" />
+          <UkStatCard icon="ki-calendar" tone="info" value={countWeeklyBlocks(studyPlan)} label="Toplam blok" />
+        </div>
+        <UkSection title="Haftalık Çalışma" sub="Günlük tamamlanan saat">
+          <div className="card-body">
+            <UkBarChart data={weeklyChart} max={100} />
+          </div>
+        </UkSection>
+      </div>
+      </div>
+        </>
+      )}
 
       <div className="card">
         <div className="card-pad between">
@@ -382,35 +469,27 @@ export function StudentSchedulePanel() {
                   </button>
                 </div>
                 <form onSubmit={handleAddBlock} className="modal-body" style={{ gap: 14 }}>
+                  <div className="field">
+                    <label className="label" htmlFor="block-day">Gün</label>
+                    <select
+                      id="block-day"
+                      className="select"
+                      value={blockDraft.day}
+                      onChange={(event) => setBlockDraft((current) => ({ ...current, day: event.target.value }))}
+                    >
+                      {STUDY_DAYS.map((day) => (
+                        <option key={day} value={day}>{day}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="grid g-2">
                     <div className="field">
-                      <label className="label" htmlFor="block-day">
-                        Gün
-                      </label>
-                      <select
-                        id="block-day"
-                        className="select"
-                        value={blockDraft.day}
-                        onChange={(event) => setBlockDraft((current) => ({ ...current, day: event.target.value }))}
-                      >
-                        {STUDY_DAYS.map((day) => (
-                          <option key={day} value={day}>
-                            {day}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="label" htmlFor="block-time">Başlangıç</label>
+                      <input id="block-time" className="input" type="time" value={blockDraft.time} onChange={(event) => setBlockDraft((current) => ({ ...current, time: event.target.value }))} />
                     </div>
                     <div className="field">
-                      <label className="label" htmlFor="block-time">
-                        Saat
-                      </label>
-                      <input
-                        id="block-time"
-                        className="input"
-                        type="time"
-                        value={blockDraft.time}
-                        onChange={(event) => setBlockDraft((current) => ({ ...current, time: event.target.value }))}
-                      />
+                      <label className="label" htmlFor="block-end">Bitiş</label>
+                      <input id="block-end" className="input" type="time" value={blockDraft.endTime} onChange={(event) => setBlockDraft((current) => ({ ...current, endTime: event.target.value }))} />
                     </div>
                   </div>
                   <div className="grid g-2">
@@ -434,20 +513,14 @@ export function StudentSchedulePanel() {
                       </select>
                     </div>
                     <div className="field">
-                      <label className="label" htmlFor="block-type">
-                        Tur
-                      </label>
-                      <select
-                        id="block-type"
-                        className="select"
-                        value={blockDraft.type}
-                        onChange={(event) => setBlockDraft((current) => ({ ...current, type: event.target.value }))}
-                      >
-                        <option value="Soru">Soru</option>
-                        <option value="Video">Video</option>
-                        <option value="Konu">Konu</option>
-                        <option value="Deneme">Deneme</option>
-                      </select>
+                      <span className="label">Tür</span>
+                      <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+                        {([["Soru", "Soru çözümü"], ["Konu", "Konu tekrarı"], ["Deneme", "Deneme"], ["Video", "Video ders"]] as Array<[string, string]>).map(([val, lbl]) => (
+                          <button key={val} type="button" className={`type-chip${blockDraft.type === val ? " on" : ""}`} onClick={() => setBlockDraft((current) => ({ ...current, type: val }))}>
+                            {lbl}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   <div className="field">
@@ -457,16 +530,16 @@ export function StudentSchedulePanel() {
                     <input
                       id="block-topic"
                       className="input"
-                      placeholder="Ornek: Turev uygulamalari"
+                      placeholder="Örnek: Türev uygulamaları"
                       value={blockDraft.topic}
                       onChange={(event) => setBlockDraft((current) => ({ ...current, topic: event.target.value }))}
                     />
                   </div>
-                  {blockDraft.type === "Soru" ? (
+                  {blockDraft.type === "Soru" || blockDraft.type === "Deneme" ? (
                     <>
                       <div className="field">
                         <label className="label" htmlFor="block-source">
-                          Kaynak
+                          Kaynak <span className="muted">(kitabın)</span>
                         </label>
                         <select
                           id="block-source"
@@ -474,41 +547,42 @@ export function StudentSchedulePanel() {
                           value={blockDraft.source}
                           onChange={(event) => setBlockDraft((current) => ({ ...current, source: event.target.value }))}
                         >
-                          <option value="">Kaynak sec (opsiyonel)</option>
+                          <option value="">Kaynak seç (opsiyonel)</option>
                           {studentSources.map((source) => (
                             <option key={source} value={source}>
                               {source}
                             </option>
                           ))}
+                          <option value="__other">Diğer / listede yok</option>
                         </select>
+                        {studentSources.length === 0 ? (
+                          <span className="muted" style={{ fontSize: 11.5, marginTop: 4 }}>Henüz kaynağın yok. &quot;Ödevlerim → Kaynaklarım&quot;dan kitap ekleyebilirsin.</span>
+                        ) : null}
                       </div>
-                      <div className="grid g-2">
-                        <div className="field">
-                          <label className="label" htmlFor="block-correct">
-                            Dogru
-                          </label>
-                          <input
-                            id="block-correct"
-                            className="input tnum"
-                            type="number"
-                            min={0}
-                            value={blockDraft.correct}
-                            onChange={(event) => setBlockDraft((current) => ({ ...current, correct: event.target.value }))}
-                          />
+                      <div className="field">
+                        <span className="label">Soru çözümü (opsiyonel)</span>
+                        <div className="grid g-3">
+                          <input className="input tnum" type="number" min={0} placeholder="Soru" value={blockDraft.soru} onChange={(event) => setBlockDraft((current) => ({ ...current, soru: event.target.value }))} />
+                          <input className="input tnum" type="number" min={0} placeholder="Doğru" value={blockDraft.correct} onChange={(event) => setBlockDraft((current) => ({ ...current, correct: event.target.value }))} />
+                          <input className="input tnum" type="number" min={0} placeholder="Yanlış" value={blockDraft.wrong} onChange={(event) => setBlockDraft((current) => ({ ...current, wrong: event.target.value }))} />
                         </div>
-                        <div className="field">
-                          <label className="label" htmlFor="block-wrong">
-                            Yanlis
-                          </label>
-                          <input
-                            id="block-wrong"
-                            className="input tnum"
-                            type="number"
-                            min={0}
-                            value={blockDraft.wrong}
-                            onChange={(event) => setBlockDraft((current) => ({ ...current, wrong: event.target.value }))}
-                          />
-                        </div>
+                        {(() => {
+                          const so = Number(blockDraft.soru) || 0;
+                          const co = Number(blockDraft.correct) || 0;
+                          const ya = Number(blockDraft.wrong) || 0;
+                          const over = so > 0 && co + ya > so;
+                          const bos = Math.max(0, so - co - ya);
+                          const net = Math.max(0, co - ya / 4);
+                          return (
+                            <div style={{ marginTop: 8 }}>
+                              <div className="between" style={{ padding: "8px 12px", background: "var(--surface-3)", borderRadius: 10 }}>
+                                <span className="muted" style={{ fontSize: 12.5, fontWeight: 700 }}>Boş: <b className="tnum">{bos}</b></span>
+                                <span style={{ fontSize: 12.5, fontWeight: 700 }}>Net: <b className="tnum" style={{ color: "var(--primary)" }}>{net.toFixed(2).replace(/\.00$/, "")}</b></span>
+                              </div>
+                              {over ? <span style={{ fontSize: 11.5, color: "var(--danger)", marginTop: 5, display: "block" }}>Doğru + yanlış, soru sayısını aşamaz.</span> : null}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </>
                   ) : null}
@@ -519,7 +593,7 @@ export function StudentSchedulePanel() {
                   ) : null}
                   <div className="row" style={{ gap: 10, justifyContent: "flex-end" }}>
                     <button type="button" className="btn btn-light" onClick={() => setBlockModalOpen(false)}>
-                      Iptal
+                      Vazgeç
                     </button>
                     <button type="submit" className="btn btn-primary" disabled={isSavingBlock}>
                       {isSavingBlock ? "Ekleniyor..." : "Ekle"}

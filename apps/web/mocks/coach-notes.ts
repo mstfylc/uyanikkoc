@@ -6,8 +6,8 @@ export const NOTE_KIND_LABELS: Record<
   CoachNoteKind,
   { label: string; tone: "primary" | "warning" | "muted"; icon: string }
 > = {
-  meeting: { label: "Gorusme notu", tone: "primary", icon: "ki-messages" },
-  warning: { label: "Uyari", tone: "warning", icon: "ki-information-2" },
+  meeting: { label: "Görüşme notu", tone: "primary", icon: "ki-messages" },
+  warning: { label: "Uyarı", tone: "warning", icon: "ki-information-2" },
   general: { label: "Genel", tone: "muted", icon: "ki-notepad" },
 };
 

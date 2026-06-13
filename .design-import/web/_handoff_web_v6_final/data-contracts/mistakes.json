@@ -1,0 +1,67 @@
+{
+  "$entity": "mistake (Yanlış Defteri kaydı)",
+  "$source": "src/mistakes-store.jsx",
+  "$storage": { "prototype": "localStorage uk_mistakes_v1", "backend": "mistakes tablosu" },
+  "$demo-today": "2026-06-05 (MIS_TODAY)",
+  "fields": {
+    "id": { "type": "string", "note": "prototip: 'mk'+timestamp; backend: uuid" },
+    "student": { "type": "string", "note": "öğrenci adı/id (backend'de student_id)" },
+    "createdAt": { "type": "number (epoch ms)", "required": true },
+    "subject": { "type": "string", "required": true, "note": "ders (SUBJECT_COLORS anahtarı)" },
+    "topic": { "type": "string", "required": true, "note": "konu (müfredattan)" },
+    "subtopic": { "type": "string", "default": "" },
+    "errorType": { "type": "enum HATA_TIPI", "required": true, "default": "islem" },
+    "source": { "type": "string", "default": "", "note": "kaynak adı (bağımsız metin)" },
+    "qType": { "type": "enum SORU_TURU", "default": "klasik" },
+    "note": { "type": "string", "default": "" },
+    "photo": { "type": "string|null (dataURL)", "default": null, "note": "prototip ~520px JPEG dataURL; backend: object storage URL" },
+    "status": { "type": "enum TEKRAR_DURUM", "default": "acik" },
+    "stage": { "type": "int 0..4", "default": 0, "note": "tamamlanan tekrar sayısı; 4 = kapandı" },
+    "nextDue": { "type": "string 'YYYY-MM-DD' | null", "note": "sıradaki tekrar günü; kapandıysa null" },
+    "history": { "type": "array<{ymd:string, at:number}>", "default": [], "note": "tekrar damgaları" }
+  },
+  "enums": {
+    "HATA_TIPI": {
+      "bilgi":  { "label": "Bilgi eksiği", "short": "Bilgi", "tone": "danger", "icon": "book" },
+      "islem":  { "label": "İşlem hatası", "short": "İşlem", "tone": "info", "icon": "notebook" },
+      "sure":   { "label": "Süre", "short": "Süre", "tone": "warning", "icon": "clock" },
+      "dikkat": { "label": "Dikkat", "short": "Dikkat", "tone": "primary", "icon": "target" },
+      "yorum":  { "label": "Yorum", "short": "Yorum", "tone": "info", "icon": "ai" },
+      "unutma": { "label": "Unutma", "short": "Unutma", "tone": "muted", "icon": "clock" }
+    },
+    "SORU_TURU": { "yeninesil": "Yeni nesil", "klasik": "Klasik", "islem": "İşlem", "yorum": "Yorum", "grafik": "Grafik / Tablo" },
+    "TEKRAR_DURUM": {
+      "acik":    { "label": "Açık", "tone": "warning", "icon": "clock" },
+      "tekrar":  { "label": "Tekrar edildi", "tone": "info", "icon": "ai" },
+      "kapandi": { "label": "Kapandı", "tone": "success", "icon": "checkCircle" }
+    },
+    "MIS_INTERVALS": [1, 3, 7, 21]
+  },
+  "operations": {
+    "getMistakes(student)": "öğrencinin tüm yanlışları (student null → hepsi)",
+    "addMistake(data)": "yeni: status=acik, stage=0, nextDue=bugün+1",
+    "updateMistake(id, patch)": "kısmi güncelle",
+    "removeMistake(id)": "sil",
+    "reviewMistake(id)": "stage++; <4 ise tekrar+nextDue, =4 ise kapandi+null",
+    "dueMistakes(student)": "status!=kapandi && nextDue<=bugün (nextDue artan)",
+    "mistakeFrequency(student, days=14)": "→ { days, total, byType, ranked, diagnosis, topTopics[] }"
+  },
+  "sample-payload": {
+    "id": "mk1000", "student": "Elif Yıldız", "createdAt": 1748908800000,
+    "subject": "Matematik", "topic": "Problemler", "subtopic": "Yaş problemi",
+    "errorType": "islem", "source": "Apotemi TYT Matematik", "qType": "yorum",
+    "note": "", "photo": null, "status": "acik", "stage": 0, "nextDue": "2026-06-05", "history": []
+  },
+  "states": {
+    "empty": "getMistakes() boş → özet 0; ZeroErrorLoop temiz; HataFrekansi placeholder/gizli",
+    "loading": "backend: liste gelene kadar skeleton; prototipte anlık",
+    "error": "backend: kayıt başarısız → modal açık + hata toast; prototip try/catch sessiz",
+    "due-empty": "dueMistakes() boş → 'döngü temiz'",
+    "closed": "stage=4 → kapandı; tekrar listesinde görünmez"
+  },
+  "auth-scope": {
+    "student": "kendi yanlışlarını CRUD + tekrar",
+    "coach": "kendi öğrencisinin yanlışlarını OKU (CoachMistakesCard) + konuya ödev ata; ekleyemez/silemez",
+    "parent": "çocuğunun yanlış AGGREGATE'ini OKU (HataFrekansi) — kayıt detayını/editi YOK"
+  }
+}

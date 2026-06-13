@@ -84,15 +84,16 @@ export function StudentTestsPanel() {
 
   return (
     <div className="stack rise" data-testid="student-tests-panel">
-      <UkPageHead title="Testlerim" sub="Koçun tarafından gönderilen envanter testleri" />
+      <UkPageHead title="Testlerim" sub="Koçunun gönderdiği envanter ve testler" />
 
       <div className="grid g-4">
-        <UkStatCard icon="ki-time" tone="warning" value={pending.length} label="Bekleyen test" />
+        <UkStatCard icon="ki-notepad" tone="primary" value={assignments.length} label="Gönderilen test" />
+        <UkStatCard icon="ki-time" tone="warning" value={pending.length} label="Bekleyen" />
         <UkStatCard icon="ki-check-circle" tone="success" value={completed.length} label="Tamamlanan" />
-        <UkStatCard icon="ki-notepad-edit" tone="primary" value={assignments.length} label="Toplam test" />
+        <UkStatCard icon="ki-star" tone="info" value={catalog.length} label="Test türü" />
       </div>
 
-      <UkSection title="Bekleyen testler" sub={`${pending.length} test`}>
+      <UkSection title="Yapılacak Testler" sub={`${pending.length} bekleyen`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
@@ -100,7 +101,7 @@ export function StudentTestsPanel() {
             </p>
           ) : pending.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Bekleyen test yok.
+              Bekleyen test yok 🎉
             </p>
           ) : (
             pending.map((assignment) => {
@@ -117,7 +118,7 @@ export function StudentTestsPanel() {
                     </div>
                   </div>
                   <button type="button" className="btn btn-primary btn-sm" onClick={() => openTest(assignment)}>
-                    Basla
+                    Testi Çöz
                   </button>
                 </div>
               );
@@ -126,13 +127,10 @@ export function StudentTestsPanel() {
         </div>
       </UkSection>
 
-      <UkSection title="Tamamlanan testler" sub={`${completed.length} test`}>
+      {completed.length > 0 ? (
+      <UkSection title="Tamamlanan Testler" sub={`${completed.length} sonuç`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {completed.length === 0 ? (
-            <p className="muted" style={{ fontSize: 13 }}>
-              Henuz tamamlanan test yok.
-            </p>
-          ) : (
+          {
             completed.map((assignment) => {
               const test = catalog.find((t) => t.id === assignment.testId);
               return (
@@ -153,13 +151,14 @@ export function StudentTestsPanel() {
                       ) : null}
                     </div>
                   </div>
-                  <UkBadge tone="success">Tamamlandi</UkBadge>
+                  <UkBadge tone="success">Tamamlandı</UkBadge>
                 </div>
               );
             })
-          )}
+          }
         </div>
       </UkSection>
+      ) : null}
 
       {activeTest && activeAssignment && mounted
         ? createPortal(

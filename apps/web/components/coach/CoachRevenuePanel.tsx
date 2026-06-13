@@ -53,15 +53,15 @@ export function CoachRevenuePanel() {
   }, [filter, subscribers, overdue]);
 
   function exportCsv() {
-    const rows = [["Ogrenci", "Veli", "Plan", "Donem", "Aylik", "Durum", "Sonraki"]];
+    const rows = [["Öğrenci", "Veli", "Plan", "Dönem", "Aylık", "Durum", "Sonraki"]];
     subscribers.forEach((item) => {
       rows.push([
         item.studentName,
         item.parentName,
         PLAN_NAMES[item.planId] ?? item.planId,
-        item.cycle === "annual" ? "Yillik" : "Aylik",
+        item.cycle === "annual" ? "Yillik" : "Aylık",
         String(item.monthlyAmount),
-        item.status === "paid" ? "Odendi" : item.status === "pending" ? "Bekliyor" : "Basarisiz",
+        item.status === "paid" ? "Odendi" : item.status === "pending" ? "Bekliyor" : "Başarısız",
         item.nextDays < 0 ? `${-item.nextDays} gun gecikti` : `${item.nextDays} gun`,
       ]);
     });
@@ -76,7 +76,7 @@ export function CoachRevenuePanel() {
     <div className="stack rise" data-testid="coach-revenue-panel">
       <UkPageHead
         title="Gelir & Tahsilat"
-        sub="Subenin abonelik geliri, tahsilat durumu ve platform ucreti"
+        sub="Şubenin abonelik geliri, tahsilat durumu ve platform ücreti"
         actions={
           <button type="button" className="btn btn-light" onClick={exportCsv}>
             <KiIcon name="ki-cloud-download" size={16} />
@@ -86,14 +86,14 @@ export function CoachRevenuePanel() {
       />
 
       <div className="grid g-4">
-        <UkStatCard icon="ki-dollar" tone="primary" value={formatTRY(mrr)} label="Aylik tekrarli gelir" delta="+%7,1" />
+        <UkStatCard icon="ki-dollar" tone="primary" value={formatTRY(mrr)} label="Aylık tekrarlı gelir" delta="+%7,1" />
         <UkStatCard icon="ki-people" tone="success" value={`${active}/${subscribers.length}`} label="Aktif abonelik" />
         <UkStatCard icon="ki-information-2" tone="warning" value={formatTRY(overdueTotal)} label="Bekleyen tahsilat" />
-        <UkStatCard icon="ki-office-bag" tone="info" value={formatTRY(view?.platformFee ?? 0)} label="Platform ucreti" />
+        <UkStatCard icon="ki-office-bag" tone="info" value={formatTRY(view?.platformFee ?? 0)} label="Platform ücreti" />
       </div>
 
       <div className="rev-split">
-        <UkSection title="Aylik Gelir Trendi" sub="Son 6 ay · sube toplam tahsilati">
+        <UkSection title="Aylık Gelir Trendi" sub="Son 6 ay · şube toplam tahsilatı">
           <div className="card-body">
             <div className="rev-bars">
               {trend.map((item, index) => (
@@ -143,7 +143,7 @@ export function CoachRevenuePanel() {
                 <b>1 Temmuz 2026</b>
               </div>
               <div className="plat-row">
-                <span className="muted">Odeme yontemi</span>
+                <span className="muted">Ödeme yöntemi</span>
                 <b className="row" style={{ gap: 6 }}>
                   <CardBrandBadge brand="mastercard" size="sm" /> •5571
                 </b>
@@ -158,8 +158,8 @@ export function CoachRevenuePanel() {
       </div>
 
       <UkSection
-        title="Ogrenci Tahsilatlari"
-        sub="Abonelik bazinda tahsilat durumu"
+        title="Öğrenci Tahsilatları"
+        sub="Abonelik bazında tahsilat durumu"
         action={
           <div className="seg" style={{ width: "fit-content" }}>
             <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>
@@ -178,10 +178,10 @@ export function CoachRevenuePanel() {
           <table className="tbl" style={{ minWidth: 680 }}>
             <thead>
               <tr>
-                <th>Ogrenci</th>
+                <th>Öğrenci</th>
                 <th>Veli</th>
                 <th>Plan</th>
-                <th style={{ textAlign: "right" }}>Aylik</th>
+                <th style={{ textAlign: "right" }}>Aylık</th>
                 <th style={{ textAlign: "center" }}>Sonraki</th>
                 <th style={{ textAlign: "center" }}>Durum</th>
                 <th />
@@ -190,7 +190,7 @@ export function CoachRevenuePanel() {
             <tbody>
               {list.map((item) => {
                 const tone = item.status === "paid" ? "success" : item.status === "pending" ? "warning" : "danger";
-                const label = item.status === "paid" ? "Odendi" : item.status === "pending" ? "Yaklasiyor" : "Basarisiz";
+                const label = item.status === "paid" ? "Odendi" : item.status === "pending" ? "Yaklasiyor" : "Başarısız";
                 const overdueDays = item.nextDays < 0;
                 return (
                   <tr key={item.studentName}>
@@ -210,7 +210,7 @@ export function CoachRevenuePanel() {
                         <span className="plan-dot" style={{ background: planColor(item.planId) }} />
                         <span style={{ fontSize: 12.5, fontWeight: 600 }}>{PLAN_NAMES[item.planId] ?? item.planId}</span>
                         <span className="muted" style={{ fontSize: 11 }}>
-                          {item.cycle === "annual" ? "Yillik" : "Aylik"}
+                          {item.cycle === "annual" ? "Yillik" : "Aylık"}
                         </span>
                       </div>
                     </td>

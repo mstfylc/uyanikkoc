@@ -1,0 +1,63 @@
+{
+  "$entity": "messaging + notifications",
+  "$source": "src/messaging.jsx, src/notifications.jsx",
+  "$storage": { "messages": "localStorage uk_msg_v1 → messages/threads", "notifications": "localStorage uk_notif_v2 → notifications" },
+  "msg-root": {
+    "groups": "array<group>",
+    "threads": "{ [channelId]: array<message> }",
+    "unread": "{ [role '::' channelId]: int }"
+  },
+  "group": {
+    "id": "string ('g'+timestamp)",
+    "name": "string",
+    "desc": "string",
+    "members": "array<string> (kişi adları)",
+    "kind": "enum student|parent|mixed|custom"
+  },
+  "message": {
+    "from": "string (gönderen adı)",
+    "role": "enum coach|student|parent",
+    "t": "string (metin)",
+    "time": "string 'HH:MM'"
+  },
+  "channelId": {
+    "dm": "'dm:'+kişiAdı (birebir)",
+    "group": "grup id (g1, g2, …)"
+  },
+  "notification": {
+    "icon": "string (ör. 'message')",
+    "tone": "enum tone (info, …)",
+    "title": "string",
+    "desc": "string",
+    "page": "string (tıklayınca gidilecek rota, ör. 'messages')",
+    "$note": "pushNotif(role, item) ile role kuyruğuna eklenir; NotifBell rozetler"
+  },
+  "operations": {
+    "channelsFor(me, role, msg)": "role'e göre görünür kanallar (görünürlük=gönderme yetkisi)",
+    "sendMsg(channelId, from, role, text, opts?)": "mesaj + alıcı unread++ + (opts.silent değilse) pushNotif",
+    "channelUnread(role, channelId)": "okunmamış sayı",
+    "markChannelRead(role, channelId)": "okundu → sıfırla",
+    "createGroup / updateGroupMembers / deleteGroup": "koç grup yönetimi",
+    "_msgRecipientRoles(channelId, senderRole)": "alıcı rolleri (DM: karşı taraf; grup: üye rolleri − gönderen)"
+  },
+  "sample-payload": {
+    "group": { "id": "g1", "name": "YKS Sayısal Grubu", "desc": "11. sınıf sayısal öğrenciler", "members": ["Elif Yıldız", "Mert Demir", "Can Aydın"], "kind": "student" },
+    "message": { "from": "Dilek Emen", "role": "coach", "t": "Elif, paragrafa biraz daha ağırlık verelim bu hafta.", "time": "11:02" },
+    "unread": { "student::dm:Elif Yıldız": 2 },
+    "notification": { "icon": "message", "tone": "info", "title": "Dilek Emen'dan mesaj", "desc": "📌 Türev ödevi — Eline sağlık…", "page": "messages" }
+  },
+  "states": {
+    "empty": "kanal yok → 'Mesajlar — Henüz sohbet yok'",
+    "read": "unread=0 → rozet yok, normal ağırlık",
+    "unread": "unread>0 → .chan-unread rozet + bold + saat primary-600",
+    "muted": "oturum içi muted set → otomatik yanıt yok, çan danger",
+    "typing": "DM otomatik yanıt öncesi .msg-typing (3 nokta) — yalnız DM",
+    "loading/error": "backend: thread skeleton / gönderim hatası → mesaj 'gönderilemedi' işareti (prototipte yok)"
+  },
+  "auth-scope": {
+    "coach": "tüm öğrenci+veli DM'leri + tüm gruplar; grup oluştur/üye yönet/sil",
+    "student": "yalnız koçuyla DM + üyesi olduğu gruplar",
+    "parent": "yalnız çocuğun koçuyla DM + üyesi olduğu gruplar",
+    "$enforce": "Görünürlük = gönderme yetkisi. Backend'de kanal erişimi sunucuda zorunlu kılınmalı; otomatik-yanıt simülasyonu kaldırılır (gerçek karşı taraf)."
+  }
+}

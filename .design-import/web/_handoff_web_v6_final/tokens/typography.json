@@ -1,0 +1,39 @@
+{
+  "$meta": {
+    "name": "Uyanık Koç — Tipografi Tokenları (v6)",
+    "source": "indir/uyanikkoc-web-source-v5/src/styles.css + bileşen inline stilleri",
+    "note": "Kaynakta tek tipografi değişkeni vardır (--font). Boyut/ağırlık ölçeği component inline stillerinden gözlemlenmiştir; aşağıdaki ölçek 'gözlemlenen' kanonik değerlerdir, uydurma değildir."
+  },
+  "font-family": {
+    "sans": {
+      "css": "--font",
+      "value": "\"Plus Jakarta Sans\", -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+      "loader": "Google Fonts — Plus Jakarta Sans wght 400;500;600;700;800",
+      "import": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    }
+  },
+  "font-features": {
+    "body": "font-feature-settings: \"ss01\", \"cv01\"",
+    "numbers": ".tnum { font-variant-numeric: tabular-nums; } — tüm sayısal istatistiklerde kullanılır"
+  },
+  "weights": {
+    "regular": 400,
+    "medium": 500,
+    "semibold": 600,
+    "bold": 700,
+    "extrabold": 800
+  },
+  "scale": {
+    "$note": "px cinsinden gözlemlenen değerler. Yarım px değerleri (13.5px gibi) kaynakta bilinçlidir, korunmalıdır.",
+    "stat-value":     { "size": "var (28-40px)", "weight": 800, "use": "Stat kartı büyük sayısı (.stat-icon yanı), --tnum" },
+    "page-title":     { "size": "~22px", "weight": 800, "use": "PageHead başlığı" },
+    "section-title":  { "size": "~16px", "weight": 800, "use": "Section / modal başlığı (h3)" },
+    "card-title":     { "size": "14px", "weight": 700, "use": "Liste satırı / sohbet başlığı" },
+    "body":           { "size": "13.5px", "weight": 400, "line-height": 1.5, "use": "Mesaj balonu, paragraf gövdesi" },
+    "body-strong":    { "size": "13.5px", "weight": 700, "use": "Sohbet kanal adı" },
+    "label-meta":     { "size": "12px", "weight": 600, "use": "muted alt başlık / form label" },
+    "badge":          { "size": "11px", "weight": 700, "use": "badge / chip metni" },
+    "micro":          { "size": "10.5px", "weight": 800, "letter-spacing": ".04em-.06em", "text-transform": "uppercase", "use": "nav-label, kicker, hf başlığı" }
+  },
+  "components-hint": "Tüm metin boyutları px'tir; rem'e geçişte 16px tabanı kullanın (13.5px = .84375rem). Yarım-px boyutları koruyun veya en yakın 0.5px'e yuvarlayın."
+}

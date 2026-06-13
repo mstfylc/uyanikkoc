@@ -61,7 +61,7 @@ export function MistakeInsightsCard({ mode, studentId }: MistakeInsightsCardProp
     };
   }, [endpoint]);
 
-  const title = mode === "coach" ? "Yanlis Defteri Insight" : "Hata Frekansi";
+  const title = mode === "coach" ? "Yanlış Defteri İçgörüsü" : "Hata Frekansi";
   const sub = mode === "coach" ? "Roster ogrencisinin acik/due hatalari" : "Cocugunuzun tekrar bekleyen hata alanlari";
 
   return (

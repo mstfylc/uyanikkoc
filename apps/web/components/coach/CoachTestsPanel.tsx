@@ -68,8 +68,8 @@ export function CoachTestsPanel() {
   return (
     <div className="stack rise" data-testid="coach-tests-panel">
       <UkPageHead
-        title="Envanter ve Testler"
-        sub="Psikolojik testleri ogrencilere gonder"
+        title="Envanter & Testler"
+        sub="Psikolojik ve yetenek testleri oluştur, gönder, sonuçları analiz et"
         actions={
           <div className="row" style={{ gap: 8 }}>
             <button type="button" className="btn btn-light" onClick={() => setBuilderOpen(true)}>
@@ -85,13 +85,13 @@ export function CoachTestsPanel() {
       />
 
       <div className="grid g-4">
-        <UkStatCard icon="ki-star" tone="primary" value={catalog.length} label="Test katalogu" />
-        <UkStatCard icon="ki-send" tone="info" value={assignments.length} label="Gonderilen test" />
+        <UkStatCard icon="ki-notepad" tone="primary" value={catalog.length} label="Test türü" />
+        <UkStatCard icon="ki-send" tone="info" value={assignments.length} label="Gönderilen" />
         <UkStatCard icon="ki-check-circle" tone="success" value={completed} label="Tamamlanan" />
         <UkStatCard icon="ki-time" tone="warning" value={pending} label="Bekleyen" />
       </div>
 
-      <UkSection title="Test katalogu" sub={`${catalog.length} test`}>
+      <UkSection title="Test Kataloğu" sub={`${catalog.length} test`}>
         <div className="card-body grid g-4">
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
@@ -118,7 +118,7 @@ export function CoachTestsPanel() {
         </div>
       </UkSection>
 
-      <UkSection title="Gonderilen testler" sub={`${assignments.length} atama`}>
+      <UkSection title="Gönderilen Testler" sub={`${assignments.length} kayıt`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {assignments.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
@@ -154,7 +154,7 @@ export function CoachTestsPanel() {
                           onChange={(event) =>
                             setNoteDrafts((current) => ({ ...current, [assignment.id]: event.target.value }))
                           }
-                          placeholder="Koc notu"
+                          placeholder="Koç notu"
                           autoFocus
                         />
                         <button
@@ -186,7 +186,7 @@ export function CoachTestsPanel() {
                         }}
                       >
                         <KiIcon name="ki-notepad-edit" size={14} />
-                        {assignment.coachNote?.trim() ? assignment.coachNote : "Koc notu ekle..."}
+                        {assignment.coachNote?.trim() ? assignment.coachNote : "Koç notu ekle..."}
                       </button>
                     )}
                   </div>

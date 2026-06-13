@@ -20,8 +20,8 @@ export function SuperOverview() {
     return (
       <div className="stack rise">
         <UkPageHead
-          title="Platform Genel BakÄ±ÅŸ"
-          sub="UyanÄ±k KoÃ§ â€” tÃ¼m kurumlar, koÃ§lar ve abonelik geliri tek ekranda"
+          title="Platform Genel Bakış"
+          sub="Uyanık Koç — tüm kurumlar, koçlar ve abonelik geliri tek ekranda"
         />
         <div className="card card-pad muted">Yükleniyor...</div>
       </div>

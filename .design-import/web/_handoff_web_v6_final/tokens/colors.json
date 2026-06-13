@@ -1,0 +1,66 @@
+{
+  "$meta": {
+    "name": "Uyanık Koç — Renk Tokenları (v6)",
+    "source": "indir/uyanikkoc-web-source-v5/src/styles.css (:root + [data-theme=dark]) — tokens.json ile birebir doğrulandı",
+    "themes": ["light", "dark"],
+    "note": "Değerler styles.css içindeki CSS değişkenleriyle BİREBİR aynıdır. Hiçbir renk uydurulmamıştır. Tema değişimi <html data-theme=\"dark\"> ile yapılır.",
+    "color-model": "hex / rgba (kaynakta yazıldığı gibi)"
+  },
+  "brand": {
+    "primary":      { "light": "#534AB7", "dark": "#8079E6", "css": "--primary" },
+    "primary-600":  { "light": "#463DA6", "dark": "#6E66D6", "css": "--primary-600" },
+    "primary-700":  { "light": "#3A3290", "dark": "#5E56C4", "css": "--primary-700" },
+    "primary-300":  { "light": "#8E87D6", "dark": "#A39CF0", "css": "--primary-300" },
+    "primary-soft": { "light": "#EEEDF9", "dark": "#232238", "css": "--primary-soft" },
+    "primary-glow": { "light": "rgba(83, 74, 183, 0.28)", "dark": "rgba(128, 121, 230, 0.30)", "css": "--primary-glow" }
+  },
+  "semantic": {
+    "success":      { "light": "#0F6E56", "dark": "#34D399", "css": "--success" },
+    "success-soft": { "light": "#E4F1EC", "dark": "#14271F", "css": "--success-soft" },
+    "warning":      { "light": "#B26A12", "dark": "#F0B45E", "css": "--warning" },
+    "warning-soft": { "light": "#FAEFDE", "dark": "#2A2113", "css": "--warning-soft" },
+    "danger":       { "light": "#A32D2D", "dark": "#F87171", "css": "--danger" },
+    "danger-soft":  { "light": "#F8E8E8", "dark": "#2C1818", "css": "--danger-soft" },
+    "info":         { "light": "#2F6BD6", "dark": "#6BA0F0", "css": "--info" },
+    "info-soft":    { "light": "#E6EEFA", "dark": "#141E2E", "css": "--info-soft" }
+  },
+  "neutral": {
+    "bg":            { "light": "#F4F5FA", "dark": "#0B0E18", "css": "--bg" },
+    "bg-grad-a":     { "light": "#F1F1FA", "dark": "#0C0F1B", "css": "--bg-grad-a" },
+    "bg-grad-b":     { "light": "#F6F6FB", "dark": "#0A0D16", "css": "--bg-grad-b" },
+    "surface":       { "light": "#FFFFFF", "dark": "#181C2B", "css": "--surface" },
+    "surface-2":     { "light": "#FAFAFD", "dark": "#1F2435", "css": "--surface-2" },
+    "surface-3":     { "light": "#F3F4F9", "dark": "#282E43", "css": "--surface-3" },
+    "border":        { "light": "#E8E9F2", "dark": "#2E3450", "css": "--border" },
+    "border-strong": { "light": "#DCDEEA", "dark": "#3C4366", "css": "--border-strong" },
+    "text":          { "light": "#181A24", "dark": "#F3F4FB", "css": "--text" },
+    "text-2":        { "light": "#45485A", "dark": "#C9CDDF", "css": "--text-2" },
+    "muted":         { "light": "#6B6F85", "dark": "#969BB4", "css": "--muted" },
+    "faint":         { "light": "#A2A6B8", "dark": "#6E7391", "css": "--faint" },
+    "ring":          { "light": "rgba(83, 74, 183, 0.16)", "dark": "rgba(128, 121, 230, 0.22)", "css": "--ring" }
+  },
+  "subjects": {
+    "$note": "Ders renkleri tek değerlidir (her iki temada aynı). Kaynak: src/data.jsx · SUBJECT_COLORS. JS sabiti olarak kullanılır (CSS değişkeni değil). UI'da konu/ders rozeti, net-gain-map swatch'leri, ödev kartı renk noktası burada gelir.",
+    "Matematik": "#534AB7",
+    "Fizik": "#2F6BD6",
+    "Kimya": "#0F6E56",
+    "Biyoloji": "#3A9D6A",
+    "Türkçe": "#B26A12",
+    "Tarih": "#A3582D",
+    "Geometri": "#7A4AD6",
+    "Edebiyat": "#9A3D7A",
+    "Fen Bilimleri": "#0F6E56",
+    "T.C. İnkılap Tarihi": "#A3582D",
+    "Din Kültürü": "#B26A12",
+    "İngilizce": "#2F6BD6"
+  },
+  "tone-map": {
+    "$note": "Component'ler renk yerine 'tone' anahtarı taşır (badge badge-<tone>, stat-icon tone-<tone>). Bir tone → ana renk + soft varyantı çiftine çözülür.",
+    "primary": ["--primary", "--primary-soft"],
+    "success": ["--success", "--success-soft"],
+    "warning": ["--warning", "--warning-soft"],
+    "danger": ["--danger", "--danger-soft"],
+    "info": ["--info", "--info-soft"],
+    "muted": ["--muted", "--surface-3"]
+  }
+}

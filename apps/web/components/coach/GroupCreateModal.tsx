@@ -65,7 +65,7 @@ export function GroupCreateModal({ open, students, onClose, onCreated }: GroupCr
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError("Grup olusturulamadi.");
+      setError("Grup oluşturulamadı.");
       return;
     }
 
@@ -86,8 +86,8 @@ export function GroupCreateModal({ open, students, onClose, onCreated }: GroupCr
               <KiIcon name="ki-people" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Grup olustur</h3>
-              <div className="muted" style={{ fontSize: 12.5 }}>Ogrenci ve velileri gruba ekle</div>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Grup oluştur</h3>
+              <div className="muted" style={{ fontSize: 12.5 }}>Öğrenci ve velileri gruba ekle</div>
             </div>
           </div>
           <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">
@@ -125,7 +125,7 @@ export function GroupCreateModal({ open, students, onClose, onCreated }: GroupCr
               Iptal
             </button>
             <button type="submit" disabled={isSubmitting} className="btn btn-primary">
-              {isSubmitting ? "Olusturuluyor..." : "Grup olustur"}
+              {isSubmitting ? "Oluşturuluyor..." : "Grup oluştur"}
             </button>
           </div>
         </form>

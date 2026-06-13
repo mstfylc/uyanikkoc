@@ -99,7 +99,7 @@ export function CoachExamEntryForm() {
 
   return (
     <div className="stack rise">
-      <UkPageHead title="Deneme Girisi" sub="Ogrenci adina TYT/AYT/LGS sonucu kaydet" />
+      <UkPageHead title="Deneme Girisi" sub="Öğrenci adına TYT/AYT/LGS sonucu kaydet" />
 
       <UkSection title="Manuel sonuc">
         <form
@@ -197,7 +197,7 @@ export function CoachExamEntryForm() {
                   <input
                     type="number"
                     min={0}
-                    placeholder="Yanlis"
+                    placeholder="Yanlış"
                     value={row.wrong}
                     onChange={(event) => updateSubject(index, "wrong", event.target.value)}
                     className="input"

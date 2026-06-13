@@ -70,7 +70,7 @@ export function CoachStudentsTable({ rows, isLoading }: CoachStudentsTableProps)
 
   return (
     <UkSection
-      title="Ogrencilerim"
+      title="Öğrencilerim"
       sub={`${rows.length} aktif ogrenci`}
       action={
         <div className="filters">

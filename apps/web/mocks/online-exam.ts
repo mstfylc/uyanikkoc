@@ -92,6 +92,23 @@ export async function listExamsForStudent(
   });
 }
 
+export async function listExamsForBranch(branchId: string): Promise<OnlineExamRecord[]> {
+  return exams
+    .filter((e) => e.branchId === branchId || e.branchId === "*")
+    .map((e) => {
+      const { answerKey, ...rest } = e;
+      void answerKey;
+      return { ...rest, submission: null };
+    });
+}
+
+export async function deleteExam(branchId: string, examId: string): Promise<boolean> {
+  const idx = exams.findIndex((e) => e.id === examId && (e.branchId === branchId || e.branchId === "*"));
+  if (idx === -1) return false;
+  exams.splice(idx, 1);
+  return true;
+}
+
 export async function createExam(input: CreateOnlineExamInput): Promise<OnlineExamRecord> {
   const rec: StoredExam = {
     id: `oe_${seq++}`,

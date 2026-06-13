@@ -214,7 +214,7 @@ export function SuperSettings() {
                     <span className="muted" style={{ fontSize: 12 }}>{member.email} · {member.status === "invited" ? "henuz katilmadi" : `son giris ${timeAgo(member.lastActive)}`}</span>
                   </div>
                   {editable ? (
-                    <select className="input" style={{ width: 168, height: 36, fontSize: 12.5 }} value={member.access} onChange={(e) => void mutate({ kind: "setAdminAccess", memberId: member.id, access: e.target.value as AdminAccess }).then(() => toast("Rol guncellendi", { icon: "ki-shield-tick" }))}>
+                    <select className="input" style={{ width: 168, height: 36, fontSize: 12.5 }} value={member.access} onChange={(e) => void mutate({ kind: "setAdminAccess", memberId: member.id, access: e.target.value as AdminAccess }).then(() => toast("Rol güncellendi", { icon: "ki-shield-tick" }))}>
                       <option value="full">Tam yetki</option>
                       <option value="support">Destek yetkilisi</option>
                     </select>

@@ -1,0 +1,84 @@
+{
+  "$entity": "assignment / odev (+ sources, self-study)",
+  "$source": "src/odev-store.jsx, src/coach-smart-odev.jsx",
+  "$storage": {
+    "odev": "localStorage uk_odevler_v1 → backend assignments",
+    "sources": "localStorage uk_sources_v2 → student_sources",
+    "self-study": "localStorage uk_selfstudy_v1 → self_study"
+  },
+  "$demo-today": "2026-06-05 (ODEV_TODAY)",
+  "odev": {
+    "fields": {
+      "id": { "type": "string" },
+      "student": { "type": "string", "required": true },
+      "week": { "type": "enum WEEKS", "note": "w0=Bu hafta … w3" },
+      "subject": { "type": "string", "required": true },
+      "topic": { "type": "string", "required": true },
+      "source": { "type": "string", "note": "kaynak etiketi (bağımsız)" },
+      "count": { "type": "int", "note": "soru hedefi (soru/test türünde)" },
+      "type": { "type": "enum ODEV_TYPES", "required": true },
+      "types": { "type": "array<enum ODEV_TYPES> (opsiyonel)", "note": "çoklu tür" },
+      "note": { "type": "string" },
+      "due": { "type": "string 'YYYY-MM-DD'" },
+      "status": { "type": "enum", "values": ["pending", "done"], "default": "pending" },
+      "result": { "type": "{ d:int, y:int, b:int } | null", "note": "D/Y/B; net = d - y/4" },
+      "feedback": { "type": "string (opsiyonel)", "note": "koç notu (CoachNoteModal)" },
+      "assignedAt": { "type": "number epoch ms" },
+      "smart": { "type": "bool (opsiyonel)", "note": "Akıllı Ödev üretimi" },
+      "overdueAlert": { "type": "bool (smart)" },
+      "quality": { "type": "bool (smart)", "note": "doğruluk+süre ölçümü" }
+    },
+    "enums": {
+      "ODEV_TYPES": {
+        "soru":  { "label": "Soru Çözümü", "icon": "notebook", "needsResult": true },
+        "video": { "label": "Video İzleme", "icon": "ai", "needsResult": false },
+        "konu":  { "label": "Konu Çalışması", "icon": "book", "needsResult": false },
+        "test":  { "label": "Deneme/Test", "icon": "chart", "needsResult": true, "fixed": true }
+      },
+      "WEEKS": [
+        { "id": "w0", "label": "Bu hafta", "range": "2 – 8 Haz" },
+        { "id": "w1", "label": "Geçen hafta", "range": "26 May – 1 Haz" },
+        { "id": "w2", "label": "2 hafta önce", "range": "19 – 25 May" },
+        { "id": "w3", "label": "3 hafta önce", "range": "12 – 18 May" }
+      ],
+      "EXAM_SORU": { "YKS": 120, "LGS": 90, "$note": "Deneme/Test sabit soru sayısı (öğretmen değiştiremez)" }
+    },
+    "sample-payload": {
+      "id": "o1", "student": "Elif Yıldız", "week": "w0", "subject": "Matematik", "topic": "Türev",
+      "source": "Apotemi AYT Matematik Soru Bankası", "count": 40, "type": "soru",
+      "note": "Karma test, süreli çöz", "due": "2026-06-06", "status": "done",
+      "result": { "d": 31, "y": 6, "b": 3 }, "assignedAt": 1748908800000
+    },
+    "operations": {
+      "getOdevler()": "tüm ödevler",
+      "addOdevler(list)": "toplu ekle (Akıllı Ödev / OdevAtaModal)",
+      "updateOdev(id, patch)": "ör. {status:'done', result}, {feedback}",
+      "useOdevler()": "reaktif"
+    }
+  },
+  "sources": {
+    "$note": "öğrencinin kendi kaynak listesi",
+    "item": { "name": "string", "status": "enum KAYNAK_DURUM (beklemede|aktif|bitti)", "progress": "int 0..100" },
+    "KAYNAK_DURUM": {
+      "beklemede": { "label": "Beklemede", "tone": "muted", "icon": "clock" },
+      "aktif":     { "label": "Aktif", "tone": "info", "icon": "book" },
+      "bitti":     { "label": "Tamamlandı", "tone": "success", "icon": "checkCircle" }
+    },
+    "operations": "getSources / getSourceItems / addSource / removeSource / updateSource / useSources / sourceActivity"
+  },
+  "self-study": {
+    "$note": "ödev harici çalışma (uk_selfstudy_v1)",
+    "entry": { "id": "string", "book": "string", "kind": "enum cozdum|calistim", "soru": "int", "dogru": "int|null", "subject": "string", "date": "number epoch ms" }
+  },
+  "states": {
+    "empty": "öğrencide ödev yok → 'Bu hafta atanmış ödev yok' / günlük planda teşvik metni",
+    "overdue": "status!=done && due<bugün → danger 'Gecikti'",
+    "done-no-result": "needsResult=false → result null, 'Tamamlandı'",
+    "loading/error": "backend: skeleton / kaydetme hatası toast"
+  },
+  "auth-scope": {
+    "student": "kendi ödevlerini görür + sonuç girer (status/result)",
+    "coach": "öğrencilerine ödev atar (add) + not (feedback) + sonuçları görür",
+    "parent": "çocuğunun ödev özetini OKU (salt-görüntüleme)"
+  }
+}

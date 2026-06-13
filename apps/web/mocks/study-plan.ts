@@ -76,6 +76,7 @@ export function addStudyBlock(
   input: {
     day: string;
     time: string;
+    endTime?: string;
     subject: string;
     topic: string;
     type: string;
@@ -91,6 +92,7 @@ export function addStudyBlock(
     id: `sb_${Date.now()}`,
     day: input.day,
     time: input.time,
+    endTime: input.endTime?.trim() || undefined,
     subject: input.subject.trim(),
     topic: input.topic.trim(),
     type: input.type.trim() || "Soru",

@@ -23,7 +23,6 @@ function formatCategoryNet(value: number): string {
 
 export function ParentExamsPanel() {
   const [exams, setExams] = useState<ExamResultRecord[]>([]);
-  const [summary, setSummary] = useState<ExamTrendSummary | null>(null);
   const [childName, setChildName] = useState("Öğrenci");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,7 +35,6 @@ export function ParentExamsPanel() {
         childName?: string;
       };
       setExams(data.exams);
-      setSummary(data.summary);
       if (data.childName) {
         setChildName(data.childName);
       }
@@ -63,10 +61,10 @@ export function ParentExamsPanel() {
   if (!isLoading && exams.length === 0) {
     return (
       <div className="stack rise" data-testid="parent-exams-panel">
-        <UkPageHead title="Deneme Sonuclari" sub={childName} />
+        <UkPageHead title="Deneme Sonuçları" sub={childName} />
         <div className="card">
           <div className="card-pad" style={{ padding: 40, textAlign: "center", color: "var(--muted)", fontSize: 13.5 }}>
-            Henuz aciklanmis deneme sonucu yok.
+            Henüz açıklanmış deneme sonucu yok.
           </div>
         </div>
       </div>
@@ -76,7 +74,7 @@ export function ParentExamsPanel() {
   return (
     <div className="stack rise" data-testid="parent-exams-panel">
       <UkPageHead
-        title="Deneme Sonuclari"
+        title="Deneme Sonuçları"
         sub={`${childName} · ${latestSession?.name ?? "Deneme"}`}
       />
 
@@ -97,13 +95,13 @@ export function ParentExamsPanel() {
           icon="ki-chart-line-up"
           tone="info"
           value={studentRow?.rank ? studentRow.rank.toLocaleString("tr-TR") : "—"}
-          label="Siralama"
+          label="Sıralama"
         />
         <UkStatCard
           icon="ki-people"
           tone="warning"
           value={latestSession?.students.length ?? 1}
-          label="Katilan"
+          label="Katılan"
         />
       </div>
 
@@ -147,7 +145,7 @@ export function ParentExamsPanel() {
       </UkSection>
 
       {exams.length > 1 ? (
-        <UkSection title="Önceki denemeler" sub={`${exams.length} kayıt · son: ${summary?.examType ?? "TYT"}`}>
+        <UkSection title="Tüm Denemeler" sub="Çocuğunuzun içe aktarılan denemelerdeki ilerlemesi">
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {exams.slice(1, 5).map((exam) => (
               <div key={exam.id} className="between">

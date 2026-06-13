@@ -1,0 +1,62 @@
+UYANIK KOC — WEB UYGULAMASI · CLAUDE CODE HANDOFF (kanonik kaynak)
+====================================================================
+Bu paket, web uygulamasinin GUNCEL ve TEK kaynagidir. Eski surumler/paketler
+DAHIL DEGILDIR. Amac: Claude Code'un bu tasarimi gercek koda BIREBIR uygulamasi.
+
+Tum dosyalar gercek/makine-okur kaynak (text, UTF-8). Path'lerde bosluk/Turkce karakter yok (ASCII).
+DIKKAT: Bu ASCII kurali sadece DOSYA ADLARI icindir. ARAYUZ METINLERI TAM TURKCE'dir (ç ğ ı İ ö ş ü)
+ve dogruluk kaynagi .jsx dosyalaridir. Kodlarken Turkce karakterleri ASCII'ye dusurme (bkz. CLAUDE.md).
+
+KOK
+  CLAUDE.md                     Claude Code icin kalici talimatlar (once oku).
+  uyanik-koc-dashboard.html     Kanonik HTML prototip — tum ekranlarin girisi.
+  tokens.json                   Token tek dogruluk kaynagi (light + dark). styles.css :root ile birebir.
+  VALIDATION.md                 Token paritesi dogrulama raporu.
+  manifest.txt                  Bu dosya.
+
+handoff/
+  README.md                     Kanonik talimat + ekran/rota envanteri + dosya haritasi + mimari.
+  SADAKAT-SPEC-ogrenci-dashboard.md   Ornek ekranin birebir yerlesim spec'i (duzen/sira/metin).
+  TEKNIK-REHBER-ve-VERI-MODELI.md   Veri modelleri + store API + entegrasyon + gercek koda gecis rehberi.
+
+CSS (token tuketir, styles.css disinda token TANIMLAMAZ)
+  src/styles.css                TAM tasarim sistemi. :root + [data-theme=dark] + tum component siniflari.
+  src/billing.css               Faturalandirma/abonelik stilleri.
+  src/kaynak-tracker.css        Kaynak takip modulu stilleri.
+  src/odev-ata.css              Odev atama modulu stilleri.
+  src/coach-konu.css            Koc konu takibi stilleri.
+  konu-cizelge/cizelge.css      Yillik konu takip cizelgesi stilleri.
+  konu-cizelge/styles.css       Cizelge modulu ic stilleri.
+
+KAYNAK JS/JSX (React + Babel, her biri ayri <script type=text/babel>)
+  SISTEM:   src/icons.jsx, logo.jsx, ui.jsx, data.jsx, app.jsx, auth.jsx,
+            settings.jsx, notifications.jsx, ui-actions.jsx
+  OGRENCI:  student.jsx, student-data.jsx, student-pages.jsx, student-extra.jsx,
+            student-exam-analiz.jsx, odev-student.jsx, student-agenda.jsx
+  KOC:      coach.jsx, coach-data.jsx, coach-pages.jsx, coach-pages2.jsx,
+            coach-konu.jsx, coach-odev-ata.jsx, coach-smart-odev.jsx, coach-rating.jsx, roster.jsx
+  VELI:     parent.jsx
+  PAYLASILAN MODULLER:
+            mistakes-store.jsx, yanlis-defteri.jsx   (Yanlis Defteri + Hata Frekansi + Sifir Hata Dongusu)
+            net-gain-map.jsx                          (Net Kaybi Haritasi)
+            curriculum.jsx, konu-store.jsx
+            kaynak-catalog.jsx, kaynak-picker.jsx, kaynak-tracker.jsx
+            odev-store.jsx
+            appointments.jsx, appointments-ui.jsx
+            tests-store.jsx, tests-ui.jsx, manual-exam.jsx
+            deneme-import.jsx, deneme-kayit.jsx, online-deneme.jsx
+            messaging.jsx, motivation-send.jsx, reports.jsx, school-schedule.jsx, support.jsx
+            billing-store.jsx, billing.jsx, billing-checkout.jsx, billing-branch.jsx
+  YILLIK CIZELGE:
+            konu-cizelge/cizelge-data.jsx, cizelge-app.jsx, coach-cizelge-page.jsx,
+            cizelge-shell.jsx, icons.jsx
+
+ASSET / FONT
+  Ikonlar: SVG path (src/icons.jsx + konu-cizelge/icons.jsx). Harici ikon dosyasi yok.
+  Font: Plus Jakarta Sans — Google Fonts (HTML <head>).
+  Gorsel: CSS gradient/SVG; harici raster gorsel bagimliligi yok.
+
+CALISTIRMA
+  uyanik-koc-dashboard.html tarayicida ac (React/Babel CDN icin internet gerekir).
+  Giris ekraninda rol sec -> "Demo bilgileriyle doldur" -> "Giris Yap".
+  Demo: Ogrenci elif@uyanikkoc.com · Koc dilek@uyanikkoc.com · Veli ayse@uyanikkoc.com

@@ -363,6 +363,7 @@ export type StudyBlockRecord = {
   id: string;
   day: string;
   time: string;
+  endTime?: string;
   subject: string;
   topic: string;
   type: string;

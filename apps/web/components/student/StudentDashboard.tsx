@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState } from "react";
 
 import { KiIcon } from "@/components/design/KiIcon";
@@ -31,10 +32,10 @@ type Tone = "primary" | "success" | "warning" | "danger" | "info" | "muted";
 type FilterKey = "open" | "done" | "all";
 
 const subjectProgress = [
-  { name: "Turkce", pct: 74, color: "#5b51c9", meta: "Paragraf + dil bilgisi" },
+  { name: "Türkçe", pct: 74, color: "#5b51c9", meta: "Paragraf + dil bilgisi" },
   { name: "Matematik", pct: 68, color: "#2f80ed", meta: "Problem ve temel kavramlar" },
-  { name: "Fen Bilimleri", pct: 63, color: "#10a37f", meta: "Haftalik tekrar onerildi" },
-  { name: "Sosyal Bilgiler", pct: 82, color: "#b7791f", meta: "Guclu alan" },
+  { name: "Fen Bilimleri", pct: 63, color: "#10a37f", meta: "Haftalık tekrar önerildi" },
+  { name: "Sosyal Bilgiler", pct: 82, color: "#b7791f", meta: "Güçlü alan" },
 ];
 
 const examTrend = [72, 81, 86, 94, 103, 110];
@@ -165,7 +166,7 @@ function BarChart({ values }: { values: number[] }) {
   const peak = Math.max(...values);
 
   return (
-    <div className="chart" aria-label="Deneme basari grafigi">
+    <div className="chart" aria-label="Deneme başarı grafiği">
       {values.map((value, index) => (
         <div key={`${value}-${index}`} className={`col ${value === peak ? "peak" : ""}`}>
           <div className="track">
@@ -193,19 +194,19 @@ function PriorityGlass({
             <KiIcon name="ki-notepad-edit" size={20} />
           </span>
           <div style={{ minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,.76)" }}>Bugunun onceligi</p>
+            <p style={{ margin: 0, fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".05em", color: "rgba(255,255,255,.7)" }}>Bugünün önceliği</p>
             <b style={{ display: "block", fontSize: 15.5, marginTop: 2 }}>
               {isLoading ? "Yükleniyor..." : assignment?.title ?? "Acil ödev yok"}
             </b>
             <p style={{ marginTop: 4, fontSize: 12.5, color: "rgba(255,255,255,.76)" }}>
               {assignment
                 ? `${assignment.subject ?? ASSIGNMENT_TYPE_LABELS[assignment.type]} · Son tarih ${formatAssignmentDueDate(assignment.dueDate)}`
-                : "Bugun icin acik oncelik bulunmuyor."}
+                : "Bugün için açık öncelik bulunmuyor."}
             </p>
           </div>
         </div>
         <Link href="/student/assignments" className="btn btn-sm btn-white">
-          Basla <KiIcon name="ki-arrow-right" size={15} />
+          Başla <KiIcon name="ki-arrow-right" size={15} />
         </Link>
       </div>
     </div>
@@ -213,36 +214,39 @@ function PriorityGlass({
 }
 
 function StreakCard() {
-  const days = ["P", "S", "C", "P", "C", "C", "P"];
+  const days = ["P", "S", "Ç", "P", "C", "C", "P"];
+  const state = ["on", "on", "on", "on", "on", "today", ""];
 
   return (
     <div className="card" style={{ height: "100%" }}>
       <div className="card-pad" style={{ height: "100%", display: "flex", flexDirection: "column", gap: 18 }}>
         <div className="between">
-          <span className="stat-icon tone-warning">
-            <KiIcon name="ki-flash" size={22} />
-          </span>
+          <div className="row" style={{ gap: 8, alignItems: "center" }}>
+            <span className="stat-icon tone-warning" style={{ width: 38, height: 38 }}>
+              <KiIcon name="ki-flash" size={20} />
+            </span>
+            <h3 style={{ margin: 0, fontSize: 13.5, fontWeight: 700 }}>Çalışma Serisi</h3>
+          </div>
           <Badge tone="warning" icon="ki-flash">
             Aktif
           </Badge>
         </div>
-        <div>
-          <h3 style={{ margin: 0, fontSize: 16 }}>Calisma Serisi</h3>
-          <p className="muted" style={{ fontSize: 12.5, marginTop: 3 }}>Duzenli calisma ritmin</p>
+        <div className="row" style={{ alignItems: "flex-end", gap: 12 }}>
+          <div className="streak-num tnum" style={{ color: "var(--warning)" }}>12</div>
+          <div style={{ paddingBottom: 6 }}>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>gün üst üste</div>
+            <div className="muted" style={{ fontSize: 12 }}>Rekorun: 21 gün</div>
+          </div>
         </div>
-        <div className="streak-num tnum">12</div>
         <div className="dots">
           {days.map((day, index) => (
-            <i key={`${day}-${index}`} className={index < 5 ? (index === 4 ? "today" : "on") : ""}>
+            <i key={`${day}-${index}`} className={state[index]}>
               {day}
             </i>
           ))}
         </div>
-        <div className="lrow" style={{ padding: 12, marginTop: "auto" }}>
-          <div>
-            <b className="lr-title">Harika gidiyorsun!</b>
-            <p className="muted" style={{ fontSize: 12, marginTop: 3 }}>Bugunku gorevi bitir, seriyi koru.</p>
-          </div>
+        <div className="mt-auto" style={{ fontSize: 12.5, color: "var(--text-2)", lineHeight: 1.5, background: "var(--surface-3)", padding: "11px 13px", borderRadius: 11 }}>
+          <b style={{ color: "var(--warning)" }}>Harika gidiyorsun!</b> Bugünü de tamamlarsan rekorun 13 güne çıkacak. 💪
         </div>
       </div>
     </div>
@@ -306,7 +310,7 @@ function Assignments({
   return (
     <Section
       title="Ödevlerim"
-      sub={`${pending} bekleyen gorev`}
+      sub={`${pending} bekleyen görev`}
       action={
         <div className="filters">
           <button type="button" className={filter === "open" ? "on" : ""} onClick={() => setFilter("open")}>Bekleyen</button>
@@ -319,14 +323,14 @@ function Assignments({
         {isLoading ? (
           <p className="muted" style={{ fontSize: 13 }}>Yükleniyor...</p>
         ) : filtered.length === 0 ? (
-          <p className="muted" style={{ fontSize: 13 }}>Bu filtrede ödev yok.</p>
+          <p className="muted" style={{ fontSize: 13, textAlign: "center", padding: "26px 0" }}>Bu görünümde görev yok 🎉</p>
         ) : (
           filtered.slice(0, 5).map((assignment) => (
             <AssignmentRow key={assignment.id} assignment={assignment} onComplete={onComplete} />
           ))
         )}
         <Link href="/student/assignments" className="link-btn" style={{ alignSelf: "flex-start", marginTop: 2 }}>
-          Tümünu Gor <KiIcon name="ki-arrow-right" size={14} />
+          Tümünü Gör <KiIcon name="ki-arrow-right" size={14} />
         </Link>
       </div>
     </Section>
@@ -335,7 +339,15 @@ function Assignments({
 
 function SubjectProgress() {
   return (
-    <Section title="Ders Ilerlemesi" sub="Konu tamamlama oranlarin">
+    <Section
+      title="Ders İlerlemesi"
+      sub="Konu tamamlama oranların"
+      action={
+        <Link href="/student/topics" className="link-btn">
+          Detay <KiIcon name="ki-arrow-right" size={14} />
+        </Link>
+      }
+    >
       <div className="card-body subj">
         {subjectProgress.map((subject) => (
           <div key={subject.name} className="subj-row">
@@ -363,7 +375,7 @@ function ExamPerformance() {
 
   return (
     <Section
-      title="Deneme Performansi"
+      title="Deneme Performansı"
       sub="Son 6 TYT denemesi"
       action={<Badge tone="success" icon="ki-arrow-up">Net +{last - first}</Badge>}
     >
@@ -372,6 +384,7 @@ function ExamPerformance() {
           <div>
             <div className="stat-value tnum" style={{ fontSize: 34 }}>{last}</div>
             <p className="muted" style={{ fontSize: 12.5 }}>Son deneme neti</p>
+
           </div>
           <Delta value="+8 net" />
         </div>
@@ -379,7 +392,7 @@ function ExamPerformance() {
         <hr className="hr" />
         <div>
           <div className="between" style={{ marginBottom: 8 }}>
-            <b style={{ fontSize: 13 }}>Deneme basari yuzdesi</b>
+            <b style={{ fontSize: 13 }}>Deneme başarı yüzdesi</b>
             <span className="muted tnum" style={{ fontSize: 12 }}>73%</span>
           </div>
           <BarChart values={examTrend.map((value) => Math.round((value / 120) * 100))} />
@@ -392,8 +405,8 @@ function ExamPerformance() {
 function UpcomingExams() {
   return (
     <Section
-      title="Yaklasan Denemeler"
-      sub="Planlanan sinav ve taramalar"
+      title="Yaklaşan Denemeler"
+      sub="Planlanan sınav ve taramalar"
       action={<Link href="/student/exams" className="btn btn-light btn-sm">Takvim</Link>}
     >
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -429,10 +442,10 @@ function AiBand() {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <h3 style={{ fontSize: 16, margin: 0 }}>AI Koç</h3>
-          <Badge tone="warning">Yakında</Badge>
+          <Badge tone="primary">Yakında</Badge>
         </div>
         <p className="muted" style={{ fontSize: 13, marginTop: 4 }}>
-          Kisisel yapay zeka kocun; zayif konularini analiz edip sana ozel program cikaracak.
+          Kişisel yapay zekâ koçun; zayıf konularını analiz edip sana özel program çıkaracak.
         </p>
       </div>
       <Link href="/student/ai-coach" className="btn btn-sm btn-light">
@@ -443,6 +456,8 @@ function AiBand() {
 }
 
 export function StudentDashboard() {
+  const { data: session } = useSession();
+  const firstName = (session?.user?.name ?? "").trim().split(" ")[0] || "Öğrenci";
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -495,11 +510,11 @@ export function StudentDashboard() {
         <div className="hero">
           <div className="between" style={{ alignItems: "flex-start", gap: 16 }}>
             <div>
-              <h2>Gunaydin</h2>
-              <p style={{ marginTop: 6 }}>Bugun {totals.pending} gorevin var. Hedefin net, ritmin guclu.</p>
-              <p style={{ marginTop: 10 }}>YKS hazirlik · Koçun Dilek Emen</p>
+              <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", fontWeight: 600, marginBottom: 6 }}>Günaydın 👋</div>
+              <h2>{firstName}, bugün {isLoading ? 0 : totals.pending} görevin var</h2>
+              <p style={{ marginTop: 7 }}>Hedef <b style={{ color: "#fff" }}>YKS 2026</b> · Koçun Dilek Emen</p>
             </div>
-            <Badge tone="muted" icon="ki-award">12. sinif</Badge>
+            <Badge tone="muted" icon="ki-award">11. Sınıf · Sayısal</Badge>
           </div>
           <PriorityGlass assignment={priorityAssignment} isLoading={isLoading} />
         </div>
@@ -513,23 +528,23 @@ export function StudentDashboard() {
       ) : null}
 
       <div className="grid g-4">
-        <StatCard label="Bu hafta calisma" value="18s" icon="ki-time" tone="info" delta="+3s" />
+        <StatCard label="Bu hafta çalışma" value="18s" icon="ki-time" tone="primary" delta="+3s" />
         <StatCard label="Tamamlanan ödev" value={isLoading ? "-" : totals.completed} icon="ki-check-circle" tone="success" delta="+2" />
-        <StatCard label="Bekleyen gorev" value={isLoading ? "-" : totals.pending} icon="ki-notepad-edit" tone="warning" delta="1 gecikmis" deltaDir="down" />
-        <StatCard label="Haftalik tamamlama" value={isLoading ? "-" : `${totals.completionRate}%`} icon="ki-chart-pie-simple" tone="primary" delta="+8%" />
+        <StatCard label="Bekleyen görev" value={isLoading ? "-" : totals.pending} icon="ki-notepad-edit" tone="warning" delta="1 gecikmiş" deltaDir="down" />
+        <StatCard label="Haftalık tamamlama" value={isLoading ? "-" : `${totals.completionRate}%`} icon="ki-target" tone="info" delta="+8%" />
       </div>
 
       <div className="grid col-main">
         <Assignments assignments={assignments} isLoading={isLoading} onComplete={handleComplete} />
-        <TakvimimCard />
+        <SubjectProgress />
       </div>
+
+      <TakvimimCard />
 
       <div className="grid col-main">
-        <SubjectProgress />
         <ExamPerformance />
+        <UpcomingExams />
       </div>
-
-      <UpcomingExams />
 
       <AiBand />
     </div>

@@ -113,7 +113,7 @@ export function CoachExamStudentDetailModal({
                   <tr>
                     <th>Ders</th>
                     <th style={{ textAlign: "center" }}>Dogru</th>
-                    <th style={{ textAlign: "center" }}>Yanlis</th>
+                    <th style={{ textAlign: "center" }}>Yanlış</th>
                     <th style={{ textAlign: "center" }}>Bos</th>
                     <th style={{ textAlign: "right" }}>Net</th>
                   </tr>

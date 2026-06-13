@@ -98,14 +98,16 @@ export function ParentDashboard() {
   const [summary, setSummary] = useState<ParentSummary | null>(null);
   const [reports, setReports] = useState<ParentReport[]>([]);
   const [appointments, setAppointments] = useState<AppointmentRecord[]>([]);
+  const [latestExamNet, setLatestExamNet] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [summaryResponse, reportsResponse, appointmentsResponse] = await Promise.all([
+      const [summaryResponse, reportsResponse, appointmentsResponse, examsResponse] = await Promise.all([
         fetch("/api/parent/summary", { credentials: "same-origin" }),
         fetch("/api/parent/reports", { credentials: "same-origin" }),
         fetch("/api/parent/appointments", { credentials: "same-origin" }),
+        fetch("/api/parent/exams", { credentials: "same-origin" }),
       ]);
 
       if (summaryResponse.ok) {
@@ -123,6 +125,11 @@ export function ParentDashboard() {
         setAppointments(data.appointments);
       }
 
+      if (examsResponse.ok) {
+        const data = (await examsResponse.json()) as { exams: Array<{ totalNet: number }> };
+        setLatestExamNet(data.exams[0]?.totalNet ?? null);
+      }
+
       setIsLoading(false);
     }
 
@@ -137,6 +144,7 @@ export function ParentDashboard() {
   const overdueCount = summary ? countOverdueAssignments(assignments) : 0;
   const weeklyComment = buildParentWeeklyComment(completionRate, overdueCount, pending);
   const latestReport = reports[0] ?? null;
+  const childName = latestReport?.studentName?.trim().split(" ")[0] ?? null;
   const upcomingAppointment = useMemo(
     () => appointments.find((item) => item.status === "approved" || item.status === "pending") ?? null,
     [appointments],
@@ -148,11 +156,13 @@ export function ParentDashboard() {
         <div className="between" style={{ alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.78)", fontWeight: 600, marginBottom: 6 }}>
-              Merhaba
+              Merhaba 👋
             </div>
-            <h1 style={{ marginBottom: 7, fontSize: 28, fontWeight: 800, letterSpacing: "-.02em" }}>Çocuğunuzun gelişimi</h1>
+            <h2 style={{ marginBottom: 7 }}>
+              {childName ? `Çocuğunuz ${childName}'in gelişimi` : "Çocuğunuzun gelişimi"}
+            </h2>
             <p>
-              Koç notları, ödev takibi, deneme sonuçları ve randevu özetleri tek ekranda.
+              Koç <b style={{ color: "#fff" }}>Dilek Emen</b> · 11. Sınıf Sayısal · Hedef YKS 2026
             </p>
           </div>
           <span className="badge" style={{ background: "rgba(255,255,255,.16)", color: "#fff", height: 26 }}>
@@ -168,18 +178,18 @@ export function ParentDashboard() {
         <StatCard icon="ki-target" tone="success" value={isLoading ? "-" : `${completionRate}%`} label="Bu hafta ödev tamamlama" />
         <StatCard icon="ki-notepad-edit" tone="warning" value={isLoading ? "-" : pending} label="Bekleyen ödev" />
         <StatCard
-          icon="ki-chart-line-up"
+          icon="ki-chart-simple"
           tone="primary"
-          value={latestReport ? `${latestReport.netDelta > 0 ? "+" : ""}${latestReport.netDelta}` : "-"}
-          label="Son rapor net degisimi"
+          value={latestExamNet != null ? latestExamNet.toFixed(1).replace(/\.0$/, "") : "—"}
+          label="Son deneme neti"
         />
-        <StatCard icon="ki-calendar" tone="info" value={upcomingAppointment ? "1" : "0"} label="Yaklasan randevu" />
+        <StatCard icon="ki-flash" tone="danger" value="12" label="Çalışma serisi (gün)" />
       </div>
 
       <div className="grid col-main">
         <UkSection
           title="Haftalık Ödevler"
-          sub="Bu haftanın ödev özeti"
+          sub={`${childName ?? "Çocuğunuzun"} · bu hafta`}
           action={<UkBadge tone={completionRate >= 70 ? "success" : "warning"}>{completed}/{total} tamam</UkBadge>}
         >
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -209,11 +219,7 @@ export function ParentDashboard() {
         </UkSection>
 
         <div className="stack">
-          <NetGainMap mode="parent" />
-
-          <MistakeInsightsCard mode="parent" />
-
-          <UkSection title="Koçtan Notlar" sub="Onaylı rapor özeti">
+          <UkSection title="Koçtan Notlar" sub="Önemli uyarılar">
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {latestReport ? (
                 <div className="lrow" style={{ cursor: "default", alignItems: "flex-start" }}>
@@ -232,7 +238,7 @@ export function ParentDashboard() {
                 </div>
               ) : (
                 <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-                  Henuz onayli rapor yok.
+                  Henüz not yok.
                 </div>
               )}
               <Link href="/parent/reports" className="btn btn-light btn-sm" style={{ alignSelf: "flex-start" }}>
@@ -242,7 +248,7 @@ export function ParentDashboard() {
             </div>
           </UkSection>
 
-          <UkSection title="Yaklasan Randevu">
+          <UkSection title="Yaklaşan Randevu">
             <div className="card-body">
               {upcomingAppointment ? (
                 <div className="lrow" style={{ cursor: "default" }}>
@@ -256,22 +262,26 @@ export function ParentDashboard() {
                     </div>
                   </div>
                   <UkBadge tone={upcomingAppointment.status === "approved" ? "success" : "warning"}>
-                    {upcomingAppointment.status === "approved" ? "Onayli" : "Bekliyor"}
+                    {upcomingAppointment.status === "approved" ? "Onaylı" : "Bekliyor"}
                   </UkBadge>
                 </div>
               ) : (
-                <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Onayli randevu yok.</div>
+                <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Onaylı randevu yok.</div>
               )}
             </div>
           </UkSection>
         </div>
       </div>
 
+      <NetGainMap mode="parent" />
+
+      <MistakeInsightsCard mode="parent" />
+
       <div className="card" data-testid="parent-weekly-comment">
         <div className="card-head">
           <div>
-            <h3>Haftalik Yorum</h3>
-            <p className="sub">Bu haftanin kisa gelisim yorumu</p>
+            <h3>Haftalık Yorum</h3>
+            <p className="sub">Bu haftanın kısa gelişim yorumu</p>
           </div>
           <Link href="/parent/messages" className="btn btn-primary btn-sm">
             <KiIcon name="ki-message-text" />

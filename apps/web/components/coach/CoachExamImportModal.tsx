@@ -61,7 +61,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
       const buffer = await file.arrayBuffer();
       const result = await parseDenemeXlsx(buffer, file.name);
       if (result.students.length === 0) {
-        throw new Error("Dosyada ogrenci satiri bulunamadi.");
+        throw new Error("Dosyada öğrenci satırı bulunamadı.");
       }
       setParsed(result);
       setExamName(result.name);
@@ -75,7 +75,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
 
   async function submitExams(exams: ReturnType<typeof parseCsvExamImport>) {
     if (exams.length === 0) {
-      setError("Gecerli satir bulunamadi.");
+      setError("Geçerli satır bulunamadı.");
       return;
     }
 
@@ -90,7 +90,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
 
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
-      setError(data.error ?? "Import basarisiz.");
+      setError(data.error ?? "İçe aktarma başarısız.");
       return;
     }
 
@@ -109,7 +109,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
     });
 
     if (exams.length === 0) {
-      setError("Roster ile eslesen ogrenci bulunamadi.");
+      setError("Roster ile eşleşen öğrenci bulunamadı.");
       return;
     }
 
@@ -139,7 +139,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
               <KiIcon name="ki-chart-pie-simple" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Deneme Sonucu Ice Aktar</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Deneme Sonucu İçe Aktar</h3>
               <div className="muted" style={{ fontSize: 12.5 }}>
                 Excel (.xlsx) veya CSV ile toplu sonuc yukle
               </div>
@@ -233,7 +233,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
                       <tr>
                         <th>#</th>
                         <th>Ad Soyad</th>
-                        <th>Sube</th>
+                        <th>Şube</th>
                         {parsed.previewColumns.map((column) => (
                           <th key={column} style={{ textAlign: "center" }}>
                             {column}

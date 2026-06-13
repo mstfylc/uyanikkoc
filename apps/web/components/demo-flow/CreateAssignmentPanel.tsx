@@ -62,7 +62,7 @@ function validateForm(input: {
   }
 
   if (input.description.length > 500) {
-    return "Aciklama en fazla 500 karakter olabilir.";
+    return "Açıklama en fazla 500 karakter olabilir.";
   }
 
   if (input.dueDate) {
@@ -137,7 +137,7 @@ export function CreateAssignmentPanel() {
 
     if (!student) {
       setIsSubmitting(false);
-      setError("Odev atanacak ogrenci bulunamadi.");
+      setError("Ödev atanacak öğrenci bulunamadı.");
       return;
     }
 
@@ -159,7 +159,7 @@ export function CreateAssignmentPanel() {
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError("Odev olusturulamadi.");
+      setError("Ödev oluşturulamadı.");
       return;
     }
 
@@ -191,7 +191,7 @@ export function CreateAssignmentPanel() {
         </div>
 
         <div className="field">
-          <label htmlFor="description">Aciklama</label>
+          <label htmlFor="description">Açıklama</label>
           <textarea
             id="description"
             name="description"
@@ -273,7 +273,7 @@ export function CreateAssignmentPanel() {
           className="btn btn-primary"
           style={{ width: "fit-content" }}
         >
-          {isSubmitting ? "Kaydediliyor..." : isLoadingStudents ? "Ogrenciler yukleniyor..." : "Odevi kaydet"}
+          {isSubmitting ? "Kaydediliyor..." : isLoadingStudents ? "Öğrenciler yükleniyor..." : "Odevi kaydet"}
         </button>
       </form>
 

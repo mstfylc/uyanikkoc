@@ -1,9 +1,26 @@
 import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
-import { createExam } from "@/server/services/online-exam.service";
+import { createExam, deleteCoachExam, listCoachExams } from "@/server/services/online-exam.service";
 
 const TYPES = ["TYT", "AYT", "LGS"] as const;
+
+export const GET = withApiAuth(["coach"], async (_req, { session }) => {
+  const branchId = session.user.branchId;
+  if (!branchId) return NextResponse.json({ error: "Branch missing" }, { status: 400 });
+  const exams = await listCoachExams(branchId);
+  return NextResponse.json({ exams }, { status: 200 });
+});
+
+export const DELETE = withApiAuth(["coach"], async (req, { session }) => {
+  const branchId = session.user.branchId;
+  if (!branchId) return NextResponse.json({ error: "Branch missing" }, { status: 400 });
+  const examId = req.nextUrl.searchParams.get("id")?.trim();
+  if (!examId) return NextResponse.json({ error: "id required" }, { status: 400 });
+  const ok = await deleteCoachExam(branchId, examId);
+  if (!ok) return NextResponse.json({ error: "not found" }, { status: 404 });
+  return NextResponse.json({ ok: true }, { status: 200 });
+});
 
 export const POST = withApiAuth(["coach"], async (req, { session }) => {
   const branchId = session.user.branchId;

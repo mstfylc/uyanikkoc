@@ -16,7 +16,6 @@ import { UkBadge } from "@/components/design/UkBadge";
 import { cargoBadgeLabel, cargoBadgeTone } from "@/lib/design/motivation-ui";
 import { subjectColor } from "@/lib/design/subject-colors";
 import {
-  describeExamTrend,
   formatExamNet,
   RESULT_EXAM_TYPE_LABELS,
 } from "@uyanik/shared";
@@ -92,12 +91,14 @@ export function StudentExamsPanel() {
         .map((exam) => exam.totalNet),
     [exams],
   );
+  const avgNet = trendNets.length ? trendNets.reduce((sum, net) => sum + net, 0) / trendNets.length : null;
+  const bestNet = trendNets.length ? Math.max(...trendNets) : null;
 
   return (
     <div className="stack rise" data-testid="student-exams-panel">
       <UkPageHead
         title="Denemeler"
-        sub="Deneme sonuçların ve performans trendi"
+        sub="Deneme sonuçların ve net analizin"
         actions={
           <div className="row" style={{ gap: 8 }}>
             <button type="button" className="btn btn-light btn-sm" onClick={() => setKayitOpen(true)}>
@@ -106,7 +107,7 @@ export function StudentExamsPanel() {
             </button>
             <button type="button" className="btn btn-primary btn-sm" onClick={() => setManualOpen(true)}>
               <KiIcon name="ki-plus" />
-              Manuel Gir
+              Sonuç gir
             </button>
           </div>
         }
@@ -114,7 +115,7 @@ export function StudentExamsPanel() {
 
       <div className="seg" style={{ width: "fit-content" }}>
         <button type="button" className={tab === "results" ? "on" : ""} onClick={() => setTab("results")}>
-          Sonuclar
+          Sonuçlar
         </button>
         <button type="button" className={tab === "online" ? "on" : ""} onClick={() => setTab("online")}>
           Online Deneme
@@ -124,31 +125,14 @@ export function StudentExamsPanel() {
         </button>
       </div>
 
-      <div className="grid g-4">
-        <UkStatCard
-          icon="ki-chart-simple"
-          tone="primary"
-          value={summary?.latestNet != null ? formatExamNet(summary.latestNet) : "—"}
-          label="Son deneme neti"
-        />
-        <UkStatCard icon="ki-chart-line-up" tone="info" value={summary?.examCount ?? 0} label="Toplam deneme" />
-        <UkStatCard
-          icon="ki-flag"
-          tone="success"
-          value={summary?.examType ? RESULT_EXAM_TYPE_LABELS[summary.examType] : "—"}
-          label="Son sinav turu"
-        />
-        <UkStatCard
-          icon="ki-arrow-up"
-          tone={summary?.trend === "up" ? "success" : summary?.trend === "down" ? "danger" : "warning"}
-          value={summary ? describeExamTrend(summary.trend) : "—"}
-          label="Trend"
-          delta={summary?.previousNet != null ? formatExamNet(summary.previousNet) : undefined}
-          deltaDir={summary?.trend === "down" ? "down" : "up"}
-        />
-      </div>
-
       <NetGainMap mode="student" />
+
+      <div className="grid g-4">
+        <UkStatCard icon="ki-chart-simple" tone="primary" value={summary?.examCount ?? exams.length} label="Toplam deneme" />
+        <UkStatCard icon="ki-target" tone="info" value={avgNet != null ? formatExamNet(avgNet) : "—"} label="Ortalama net" />
+        <UkStatCard icon="ki-star" tone="success" value={bestNet != null ? formatExamNet(bestNet) : "—"} label="En yüksek net" />
+        <UkStatCard icon="ki-chart-line-up" tone="warning" value="—" label="Sıralama tahmini" />
+      </div>
 
       {tab === "analysis" ? (
         <StudentExamAnalysis exams={exams} selected={selected} onSelect={setSelectedId} />
@@ -165,8 +149,8 @@ export function StudentExamsPanel() {
             <div style={{ flex: 1 }}>
               <b style={{ fontSize: 13.5 }}>Online deneme nasıl çalışır?</b>
               <div className="muted" style={{ fontSize: 12.5 }}>
-                Deneme kitapcigin kargoyla gelir. Cozdukten sonra optik formu buradan online doldur, netin aninda
-                hesaplansin.
+                Deneme kitapçığın kargoyla gelir. Çözdükten sonra optik formu buradan online doldur, netin anında
+                hesaplansın.
               </div>
             </div>
           </div>
@@ -206,7 +190,7 @@ export function StudentExamsPanel() {
                       <div className="row" style={{ gap: 8 }}>
                         <OptikResultBadge submission={exam.submission} />
                         <button type="button" className="btn btn-light btn-sm" onClick={() => setOptikExam(exam)}>
-                          Optigi Gor
+                          Optiği Gör
                         </button>
                       </div>
                     ) : (
@@ -224,15 +208,19 @@ export function StudentExamsPanel() {
       ) : (
         <>
           {trendNets.length > 1 ? (
-            <UkSection title="Net trendi" sub="Kronolojik deneme performansi">
+            <UkSection
+              title="Net Gelişimi"
+              sub="Son denemelerdeki TYT netlerin"
+              action={<UkBadge tone="success">+{formatExamNet((trendNets.at(-1) ?? 0) - (trendNets[0] ?? 0))} net</UkBadge>}
+            >
               <div className="card-body">
-                <UkSparkline data={trendNets} height={72} />
+                <UkSparkline data={trendNets} height={84} />
               </div>
             </UkSection>
           ) : null}
 
           <div className="grid col-main">
-            <UkSection title="Deneme listesi" sub={`${exams.length} kayıt`}>
+            <UkSection title="Deneme Geçmişi" sub={`${exams.length} sonuç`}>
               <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {isLoading ? (
                   <p className="muted" style={{ fontSize: 13 }}>
@@ -240,7 +228,7 @@ export function StudentExamsPanel() {
                   </p>
                 ) : exams.length === 0 ? (
                   <p className="muted" style={{ fontSize: 13 }}>
-                    Henuz deneme sonucu yok.
+                    Henüz deneme sonucu yok.
                   </p>
                 ) : (
                   exams.map((exam) => {
@@ -273,11 +261,11 @@ export function StudentExamsPanel() {
               </div>
             </UkSection>
 
-            <UkSection title="Ders detayi" sub={selected ? selected.label ?? "Secili deneme" : "Deneme secin"}>
+            <UkSection title="Net Dağılımı" sub={selected ? selected.label ?? "Seçili deneme" : "Deneme seçin"}>
               <div className="card-body">
                 {!selected ? (
                   <p className="muted" style={{ fontSize: 13 }}>
-                    Detay icin bir deneme secin.
+                    Detay için bir deneme seçin.
                   </p>
                 ) : (
                   <>
@@ -308,8 +296,8 @@ export function StudentExamsPanel() {
                       <thead>
                         <tr>
                           <th>Ders</th>
-                          <th>Dogru</th>
-                          <th>Yanlis</th>
+                          <th>Doğru</th>
+                          <th>Yanlış</th>
                           <th>Net</th>
                         </tr>
                       </thead>

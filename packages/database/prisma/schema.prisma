@@ -930,6 +930,7 @@ model StudyBlock {
   studentId String
   day       String
   time      String
+  endTime   String?
   subject   String
   topic     String
   type      String

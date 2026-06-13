@@ -182,7 +182,7 @@ export function StudentManualExamModal({ open, onClose, onSaved }: StudentManual
                   <input
                     type="number"
                     min={0}
-                    placeholder="Yanlis"
+                    placeholder="Yanlış"
                     value={row.wrong}
                     onChange={(event) => updateSubject(index, "wrong", event.target.value)}
                     className="input"
