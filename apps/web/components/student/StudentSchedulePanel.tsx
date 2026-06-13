@@ -45,6 +45,7 @@ export function StudentSchedulePanel() {
   const [blockDraft, setBlockDraft] = useState({
     day: TODAY_LABEL,
     time: "17:00",
+    endTime: "18:00",
     subject: "Matematik",
     topic: "",
     type: "Soru",
@@ -160,6 +161,7 @@ export function StudentSchedulePanel() {
       body: JSON.stringify({
         day: blockDraft.day,
         time: blockDraft.time,
+        endTime: blockDraft.endTime || undefined,
         subject: blockDraft.subject,
         topic: blockDraft.topic,
         type: blockDraft.type,
@@ -213,7 +215,8 @@ export function StudentSchedulePanel() {
               const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + (m || 0); };
               const all = studyPlan;
               const startH = Math.min(9, ...all.map((b) => Math.floor(toMin(b.time) / 60)));
-              const endH = Math.max(18, ...all.map((b) => Math.ceil((toMin(b.time) + 60) / 60)));
+              const endMin = (b: StudyBlockRecord) => (b.endTime ? toMin(b.endTime) : toMin(b.time) + 60);
+              const endH = Math.max(18, ...all.map((b) => Math.ceil(endMin(b) / 60)));
               const HOUR = 56;
               const gridH = (endH - startH) * HOUR;
               const hours = Array.from({ length: endH - startH + 1 }, (_, i) => startH + i);
@@ -235,6 +238,7 @@ export function StudentSchedulePanel() {
                       {studyPlan.filter((b) => b.day === d).map((b) => {
                         const status = b.status ?? "todo";
                         const top = (toMin(b.time) - startH * 60) / 60 * HOUR;
+                        const blockH = Math.max(26, (endMin(b) - toMin(b.time)) / 60 * HOUR - 3);
                         const color = subjectColor(b.subject);
                         const done = status === "done";
                         const prog = status === "progress";
@@ -243,8 +247,8 @@ export function StudentSchedulePanel() {
                             key={b.id}
                             type="button"
                             className={`wk-block${done ? " done" : ""}`}
-                            style={{ top, height: HOUR - 6, background: `color-mix(in srgb, ${color} 14%, var(--surface))`, borderColor: color }}
-                            title={`${b.time} · ${b.topic}`}
+                            style={{ top, height: blockH, background: `color-mix(in srgb, ${color} 14%, var(--surface))`, borderColor: color }}
+                            title={`${b.time}${b.endTime ? `–${b.endTime}` : ""} · ${b.topic}`}
                             onClick={() => { if (done) return; void advanceStudyBlock(b.id, prog ? "finish" : "start"); }}
                           >
                             <span className="wk-block-bar" style={{ background: color }} />
@@ -299,8 +303,9 @@ export function StudentSchedulePanel() {
                   ((block as StudyBlockRecord & { done?: boolean }).done ? "done" : "todo");
                 return (
                   <div key={block.id} className={`lrow${status === "done" ? " done" : ""}`}>
-                    <span className="tnum muted" style={{ width: 48, fontWeight: 700, fontSize: 12.5 }}>
+                    <span className="tnum muted" style={{ width: 56, fontWeight: 700, fontSize: 12, lineHeight: 1.3, textAlign: "center" }}>
                       {block.time}
+                      {block.endTime ? <><br />{block.endTime}</> : null}
                     </span>
                     <span
                       className="lr-icon"
@@ -464,35 +469,27 @@ export function StudentSchedulePanel() {
                   </button>
                 </div>
                 <form onSubmit={handleAddBlock} className="modal-body" style={{ gap: 14 }}>
+                  <div className="field">
+                    <label className="label" htmlFor="block-day">Gün</label>
+                    <select
+                      id="block-day"
+                      className="select"
+                      value={blockDraft.day}
+                      onChange={(event) => setBlockDraft((current) => ({ ...current, day: event.target.value }))}
+                    >
+                      {STUDY_DAYS.map((day) => (
+                        <option key={day} value={day}>{day}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="grid g-2">
                     <div className="field">
-                      <label className="label" htmlFor="block-day">
-                        Gün
-                      </label>
-                      <select
-                        id="block-day"
-                        className="select"
-                        value={blockDraft.day}
-                        onChange={(event) => setBlockDraft((current) => ({ ...current, day: event.target.value }))}
-                      >
-                        {STUDY_DAYS.map((day) => (
-                          <option key={day} value={day}>
-                            {day}
-                          </option>
-                        ))}
-                      </select>
+                      <label className="label" htmlFor="block-time">Başlangıç</label>
+                      <input id="block-time" className="input" type="time" value={blockDraft.time} onChange={(event) => setBlockDraft((current) => ({ ...current, time: event.target.value }))} />
                     </div>
                     <div className="field">
-                      <label className="label" htmlFor="block-time">
-                        Saat
-                      </label>
-                      <input
-                        id="block-time"
-                        className="input"
-                        type="time"
-                        value={blockDraft.time}
-                        onChange={(event) => setBlockDraft((current) => ({ ...current, time: event.target.value }))}
-                      />
+                      <label className="label" htmlFor="block-end">Bitiş</label>
+                      <input id="block-end" className="input" type="time" value={blockDraft.endTime} onChange={(event) => setBlockDraft((current) => ({ ...current, endTime: event.target.value }))} />
                     </div>
                   </div>
                   <div className="grid g-2">

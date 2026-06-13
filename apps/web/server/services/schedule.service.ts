@@ -62,6 +62,7 @@ export async function addStudentStudyBlock(
   input: {
     day: string;
     time: string;
+    endTime?: string;
     subject: string;
     topic: string;
     type: string;

@@ -12,6 +12,7 @@ function mapBlock(block: {
   id: string;
   day: string;
   time: string;
+  endTime: string | null;
   subject: string;
   topic: string;
   type: string;
@@ -23,6 +24,7 @@ function mapBlock(block: {
 }): StudyBlockRecord {
   return {
     id: block.id,
+    endTime: block.endTime ?? undefined,
     day: block.day,
     time: block.time,
     subject: block.subject,
@@ -118,6 +120,7 @@ export async function addStudyBlock(
   input: {
     day: string;
     time: string;
+    endTime?: string;
     subject: string;
     topic: string;
     type: string;
@@ -133,6 +136,7 @@ export async function addStudyBlock(
       studentId,
       day: input.day,
       time: input.time,
+      endTime: input.endTime?.trim() || null,
       subject: input.subject.trim(),
       topic: input.topic.trim(),
       type: input.type.trim() || "Soru",
