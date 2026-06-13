@@ -204,6 +204,17 @@
 - `MessagesPanel` thread acilinca okundu isaretler; mute toggle ve unread/sessiz badge gosterir.
 - Memory mode icin service-level thread state parity eklendi; production memory guard degistirilmedi.
 
+## DB Hardening Kapanis - 2026-06-13
+
+- P-DB-2 `codex/p-db-2-token-cleanup` main'e alindi: expired RefreshToken, PasswordResetToken ve OtpChallenge cleanup repository fonksiyonu + worker job export + unit/repository testleri.
+- P-DB-1 `codex/p-db-1-composite-indexes` main'e alindi: `assignments(studentId,status)`, `exam_results(studentId,takenAt)`, `notifications(studentId,read,createdAt)`, `messages(threadId,createdAt)` composite indexleri.
+- Vercel auth build blocker cozuldu: branch preview env icin `AUTH_SECRET` ve `NEXTAUTH_SECRET` eklendi; production env'de auth secret varligi build/deploy ile dogrulandi.
+- Testler: `pnpm db:generate` OK, `pnpm typecheck` OK, `pnpm lint` OK, `pnpm test:unit` OK, `pnpm --filter @uyanik/web build` OK.
+- Backup/snapshot: production DB icin repo disi JSON snapshot alindi (`C:\Users\musta\db-backups\uyanikkoc-json\uyanikkoc_pre_pdb1_20260613_220922.json`, sha256 `ec102642491fd2124b477dbcbfaff1db057c28c7613a7d19f7bf165bfdd5dcc7`, 55 tablo).
+- Production migration: `20260613203000_hot_path_composite_indexes` direct Neon URL ile uygulandi; 36 migration up to date.
+- Deploy: Vercel production deploy `dpl_3nHzn5oQacyVsEXjufH1rmDzu4nX` READY ve `https://koc.uyanik.com.tr` alias OK.
+- Smoke: `/api/health` status/authSecret/database OK; demo student/coach/parent login + dashboard 200; `runTokenCleanupJob` import/cağrilabilirlik OK.
+
 ## Sonraki Adim
 
-P10: Coach notifications DB scope veya v6 visual acceptance cleanup.
+DB hardening P-DB-1/P-DB-2 kapandi. P-DB-3/P-OPS-1/P-TEST-1'e gecilmedi.
