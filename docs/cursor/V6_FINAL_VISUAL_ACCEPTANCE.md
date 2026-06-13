@@ -9,6 +9,7 @@ Bu checklist `visual-qa/acceptance-checklist.md` maddelerinin canlı repo route 
 - [x] `/coach/topics` fixed order: PageHead, student strip, Net Kaybı Haritası, Öğrencinin Yanlış Defteri, Hata Frekansı, four stats, Öğrenci notları, Net Gelişimi, Haftalık Soru Hedefi + Deneme Analizleri, Soru Takibi, `.ktx`, Ödev Ata modal.
 - [x] Browser QA passed on local demo-memory server: desktop 1440 and mobile 390, `.ktx=1`, `.ktx table=0`, `.ktx-topic=2`, modal opens, no horizontal overflow.
 - [x] Evidence: `docs/cursor/visual-checks/desktop-light-coach-topics-reality.png`, `desktop-light-coach-topics-modal-reality.png`, `mobile-light-coach-topics-reality.png`.
+- [x] Production redeployed from `641f19c`; live `/api/health` returned `{"status":"ok","authSecret":"ok"}`.
 
 ## Final Live Browser QA - 2026-06-12
 
