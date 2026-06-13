@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { MIcon } from "@/components/MIcon";
+import { ScreenScroll } from "@/components/ScreenScroll";
 import { useAuth } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
 import { subjectColor, ukColors, ukRadius, ukSpace } from "@/lib/theme";
@@ -53,14 +54,14 @@ export default function HomeTab() {
   const firstName = user?.email.split("@")[0] ?? "Ogrenci";
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+    <ScreenScroll>
       <View style={styles.head}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{firstName.slice(0, 2).toUpperCase()}</Text>
         </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.hi}>Iyi calismalar,</Text>
-          <Text style={styles.name}>{firstName}</Text>
+        <View style={styles.headText}>
+          <Text style={styles.hi} numberOfLines={1}>Iyi calismalar,</Text>
+          <Text style={styles.name} numberOfLines={1}>{firstName}</Text>
         </View>
         <Pressable style={styles.iconBtn}>
           <MIcon name="bell" size={20} color={ukColors.text} />
@@ -104,9 +105,9 @@ export default function HomeTab() {
         {pending.slice(0, 3).map((item) => (
           <View key={item.id} style={styles.card}>
             <View style={[styles.dot, { backgroundColor: subjectColor(item.subject ?? "Matematik") }]} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.cardMeta}>{item.subject ?? "Genel"} · {item.dueDate ?? "Tarih yok"}</Text>
+            <View style={styles.cardBody}>
+              <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
+              <Text style={styles.cardMeta} numberOfLines={1}>{item.subject ?? "Genel"} · {item.dueDate ?? "Tarih yok"}</Text>
             </View>
           </View>
         ))}
@@ -130,7 +131,7 @@ export default function HomeTab() {
           ))}
         </View>
       </Section>
-    </ScrollView>
+    </ScreenScroll>
   );
 }
 
@@ -161,9 +162,8 @@ function Section({
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: ukColors.bg },
-  content: { padding: ukSpace.lg, paddingBottom: 40 },
   head: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: ukSpace.lg },
+  headText: { flex: 1, minWidth: 0 },
   avatar: {
     width: 46,
     height: 46,
@@ -244,6 +244,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dot: { width: 10, height: 10, borderRadius: 5 },
+  cardBody: { flex: 1, minWidth: 0 },
   cardTitle: { fontSize: 14, fontWeight: "800", color: ukColors.text },
   cardMeta: { marginTop: 4, fontSize: 12, fontWeight: "600", color: ukColors.muted },
   quickGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },

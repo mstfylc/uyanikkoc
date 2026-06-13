@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
+import { ScreenScroll } from "@/components/ScreenScroll";
 import { useAuth } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
 import { subjectColor, ukColors, ukRadius, ukSpace } from "@/lib/theme";
@@ -32,7 +33,7 @@ export default function ScheduleTab() {
   }, {});
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+    <ScreenScroll>
       <Text style={styles.title}>Calisma Programi</Text>
       <Text style={styles.sub}>Haftalik plan</Text>
       {Object.entries(grouped).map(([day, dayBlocks]) => (
@@ -41,9 +42,9 @@ export default function ScheduleTab() {
           {dayBlocks.map((block) => (
             <View key={block.id} style={styles.card}>
               <View style={[styles.dot, { backgroundColor: subjectColor(block.subject) }]} />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.cardTitle}>{block.subject}</Text>
-                <Text style={styles.cardMeta}>
+              <View style={styles.cardBody}>
+                <Text style={styles.cardTitle} numberOfLines={1}>{block.subject}</Text>
+                <Text style={styles.cardMeta} numberOfLines={1}>
                   {block.time} · {block.topic} · {block.type}
                 </Text>
               </View>
@@ -51,13 +52,11 @@ export default function ScheduleTab() {
           ))}
         </View>
       ))}
-    </ScrollView>
+    </ScreenScroll>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: ukColors.bg },
-  content: { padding: ukSpace.lg, paddingBottom: 40 },
   title: { fontSize: 24, fontWeight: "800", color: ukColors.text },
   sub: { marginTop: 4, marginBottom: ukSpace.lg, color: ukColors.muted, fontWeight: "600" },
   daySection: { marginBottom: ukSpace.lg },
@@ -74,6 +73,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dot: { width: 10, height: 10, borderRadius: 5 },
+  cardBody: { flex: 1, minWidth: 0 },
   cardTitle: { fontSize: 14, fontWeight: "800", color: ukColors.text },
   cardMeta: { marginTop: 4, fontSize: 12, fontWeight: "600", color: ukColors.muted },
 });

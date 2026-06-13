@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
+import { ScreenScroll } from "@/components/ScreenScroll";
 import { useAuth } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
 import { subjectColor, ukColors, ukRadius, ukSpace } from "@/lib/theme";
@@ -26,15 +27,15 @@ export default function AssignmentsTab() {
   }, [token]);
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+    <ScreenScroll>
       <Text style={styles.title}>Odevlerim</Text>
       <Text style={styles.sub}>{assignments.length} kayit</Text>
       {assignments.map((item) => (
         <View key={item.id} style={styles.card}>
           <View style={[styles.dot, { backgroundColor: subjectColor(item.subject ?? "Matematik") }]} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.cardTitle}>{item.title}</Text>
-            <Text style={styles.cardMeta}>
+          <View style={styles.cardBody}>
+            <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
+            <Text style={styles.cardMeta} numberOfLines={1}>
               {item.subject ?? "Genel"} · {item.dueDate ?? "Tarih yok"}
             </Text>
           </View>
@@ -43,13 +44,11 @@ export default function AssignmentsTab() {
           </Text>
         </View>
       ))}
-    </ScrollView>
+    </ScreenScroll>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: ukColors.bg },
-  content: { padding: ukSpace.lg, paddingBottom: 40 },
   title: { fontSize: 24, fontWeight: "800", color: ukColors.text },
   sub: { marginTop: 4, marginBottom: ukSpace.lg, color: ukColors.muted, fontWeight: "600" },
   card: {
@@ -64,9 +63,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dot: { width: 10, height: 10, borderRadius: 5 },
+  cardBody: { flex: 1, minWidth: 0 },
   cardTitle: { fontSize: 14, fontWeight: "800", color: ukColors.text },
   cardMeta: { marginTop: 4, fontSize: 12, fontWeight: "600", color: ukColors.muted },
-  status: { fontSize: 12, fontWeight: "800" },
+  status: { fontSize: 12, fontWeight: "800", flexShrink: 0 },
   done: { color: ukColors.success },
   pending: { color: ukColors.warning },
 });

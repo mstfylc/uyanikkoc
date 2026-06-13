@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Redirect } from "expo-router";
 
 import { MIcon } from "@/components/MIcon";
@@ -18,6 +19,7 @@ import { ukColors, ukRadius, ukSpace } from "@/lib/theme";
 
 export default function LoginScreen() {
   const { token, login } = useAuth();
+  const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<"phone" | "email">("email");
   const [email, setEmail] = useState("student@uyanik.local");
   const [password, setPassword] = useState("uyanik123");
@@ -48,7 +50,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <View style={styles.hero}>
+        <View style={[styles.hero, { paddingTop: insets.top + ukSpace.xl }]}>
           <View style={styles.markWrap}>
             <MIcon name="shield" size={28} color="#fff" />
           </View>
@@ -57,7 +59,7 @@ export default function LoginScreen() {
           <Text style={styles.heroSub}>Kocunla, odevlerinle ve denemelerinle tek yerde.</Text>
         </View>
 
-        <View style={styles.form}>
+        <View style={[styles.form, { paddingBottom: insets.bottom + ukSpace.lg }]}>
           {mode === "email" ? (
             <>
               <Text style={styles.label}>E-posta</Text>
@@ -124,7 +126,6 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: ukColors.bg },
   scroll: { flexGrow: 1 },
   hero: {
-    paddingTop: 72,
     paddingHorizontal: ukSpace.lg,
     paddingBottom: ukSpace.xl,
     backgroundColor: ukColors.primary,
