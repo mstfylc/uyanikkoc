@@ -1,6 +1,8 @@
 import type { AppointmentRecord, AssignmentRecord, MessageThreadRecord, NotificationRecord } from "@uyanik/database";
 
 type ResultLike = { correct: number; wrong: number; blank: number; net: number };
+type ContractOdevType = "soru" | "video" | "konu" | "test";
+type ContractWeek = "w0" | "w1" | "w2" | "w3";
 
 type MistakeLike = {
   id: string;
@@ -27,6 +29,8 @@ const ASSIGNMENT_TYPE_TO_ODEV: Record<string, "soru" | "video" | "konu" | "test"
   reading: "konu",
   other: "konu",
 };
+const ODEV_TYPES = new Set<ContractOdevType>(["soru", "video", "konu", "test"]);
+const WEEKS = new Set<ContractWeek>(["w0", "w1", "w2", "w3"]);
 
 function ymd(value: string | null): string {
   return value ? value.slice(0, 10) : "";
@@ -37,11 +41,7 @@ function epoch(value: string | null | undefined): number {
 }
 
 export function toOdevContract(item: AssignmentRecord) {
-  const odevType = (item.odevType ?? ASSIGNMENT_TYPE_TO_ODEV[item.type] ?? "soru") as
-    | "soru"
-    | "video"
-    | "konu"
-    | "test";
+  const odevType = item.odevType ?? ASSIGNMENT_TYPE_TO_ODEV[item.type] ?? "soru";
   const result = item.result as ResultLike | null | undefined;
 
   return {
@@ -50,7 +50,7 @@ export function toOdevContract(item: AssignmentRecord) {
     studentId: item.studentId,
     week: item.week,
     subject: item.subject ?? "Genel",
-    topic: item.topic ?? item.title,
+    topic: item.topic || item.title,
     source: item.source,
     count: item.count,
     type: odevType,
@@ -94,18 +94,23 @@ export function fromOdevContract(body: {
 }) {
   const topic = body.topic?.trim() || body.title?.trim() || "Ödev";
   const count = Number.isFinite(body.count) ? Math.max(0, Math.round(body.count ?? 0)) : 0;
-  const odevType = body.type?.trim() || "soru";
+  const rawType = body.type?.trim();
+  const odevType = ODEV_TYPES.has(rawType as ContractOdevType) ? (rawType as ContractOdevType) : "soru";
+  const week = WEEKS.has(body.week as ContractWeek) ? (body.week as ContractWeek) : "w0";
+  const types = (body.types ?? []).filter((type): type is ContractOdevType =>
+    ODEV_TYPES.has(type as ContractOdevType),
+  );
 
   return {
     title: body.title?.trim() || topic,
     studentId: body.studentId,
-    week: body.week ?? "w0",
+    week,
     subject: body.subject ?? "Genel",
     topic,
     source: body.source ?? "",
     count,
     odevType,
-    odevTypes: body.types?.length ? body.types : [odevType],
+    odevTypes: types.length ? types : [odevType],
     note: body.note ?? "",
     dueDate: body.dueDate ?? body.due ?? null,
     description: body.note ?? null,

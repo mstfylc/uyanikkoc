@@ -36,6 +36,20 @@ enum AssignmentStatus {
   cancelled
 }
 
+enum AssignmentWeek {
+  w0
+  w1
+  w2
+  w3
+}
+
+enum OdevType {
+  soru
+  video
+  konu
+  test
+}
+
 enum TopicExamType {
   TYT
   AYT
@@ -268,11 +282,11 @@ model Assignment {
   id          String             @id @default(cuid())
   title       String
   description String?
-  week        String             @default("w0")
-  topic       String?
+  week        AssignmentWeek     @default(w0)
+  topic       String             @default("")
   source      String             @default("")
   count       Int                @default(0)
-  odevType    String?
+  odevType    OdevType           @default(soru)
   odevTypes   String[]           @default([])
   note        String             @default("")
   type        AssignmentType     @default(homework)

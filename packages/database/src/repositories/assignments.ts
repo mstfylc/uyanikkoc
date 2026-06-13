@@ -9,11 +9,11 @@ function mapAssignment(assignment: {
   id: string;
   title: string;
   description: string | null;
-  week: string;
-  topic: string | null;
+  week: AssignmentRecord["week"];
+  topic: string;
   source: string;
   count: number;
-  odevType: string | null;
+  odevType: AssignmentRecord["odevType"];
   odevTypes: string[];
   note: string;
   type: AssignmentRecord["type"];
@@ -94,10 +94,10 @@ export async function createAssignment(input: AssignmentCreateInput): Promise<As
       title: input.title,
       description: input.description ?? null,
       week: input.week ?? "w0",
-      topic: input.topic ?? null,
+      topic: input.topic ?? "",
       source: input.source ?? "",
       count: input.count ?? 0,
-      odevType: input.odevType ?? null,
+      odevType: input.odevType ?? "soru",
       odevTypes: input.odevTypes ?? [],
       note: input.note ?? "",
       type: input.type ?? "homework",

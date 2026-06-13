@@ -1,6 +1,8 @@
 export type AssignmentType = "homework" | "exam_prep" | "reading" | "practice" | "other";
 export type AssignmentPriority = "low" | "medium" | "high";
 export type AssignmentStatus = "pending" | "in_progress" | "completed" | "cancelled";
+export type AssignmentWeek = "w0" | "w1" | "w2" | "w3";
+export type AssignmentOdevType = "soru" | "video" | "konu" | "test";
 
 export type AssignmentCreateInput = {
   title: string;
@@ -9,11 +11,11 @@ export type AssignmentCreateInput = {
   parentId: string;
   branchId: string;
   description?: string | null;
-  week?: string;
-  topic?: string | null;
+  week?: AssignmentWeek;
+  topic?: string;
   source?: string | null;
   count?: number;
-  odevType?: string | null;
+  odevType?: AssignmentOdevType;
   odevTypes?: string[];
   note?: string | null;
   type?: AssignmentType;
@@ -32,11 +34,11 @@ export type AssignmentRecord = {
   title: string;
   description: string | null;
   studentName?: string;
-  week: string;
-  topic: string | null;
+  week: AssignmentWeek;
+  topic: string;
   source: string;
   count: number;
-  odevType: string | null;
+  odevType: AssignmentOdevType;
   odevTypes: string[];
   note: string;
   type: AssignmentType;

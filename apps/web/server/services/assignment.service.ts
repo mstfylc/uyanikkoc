@@ -44,6 +44,31 @@ export type CoachCreateAssignmentBody = Partial<
   title: string;
 };
 
+export type CoachCreateAssignmentBatchItem = {
+  title?: string;
+  studentId?: string;
+  student?: string;
+  week?: string;
+  subject?: string;
+  topic?: string;
+  source?: string;
+  count?: number;
+  type?: string;
+  types?: string[];
+  note?: string;
+  due?: string;
+  dueDate?: string;
+  smart?: boolean;
+  overdueAlert?: boolean;
+  quality?: boolean;
+  feedback?: string;
+};
+
+export type CoachCreateAssignmentBatchBody = {
+  studentIds: string[];
+  items: CoachCreateAssignmentBatchItem[];
+};
+
 export type SmartAssignmentPreview = {
   studentId: string;
   title: string;
@@ -143,10 +168,10 @@ export async function createCoachAssignment(
     branchId,
     description: body.description ?? null,
     week: body.week,
-    topic: body.topic ?? null,
+    topic: body.topic ?? body.title,
     source: body.source ?? null,
     count: body.count,
-    odevType: body.odevType ?? null,
+    odevType: body.odevType ?? "soru",
     odevTypes: body.odevTypes,
     note: body.note ?? null,
     type: body.type,
@@ -158,6 +183,21 @@ export async function createCoachAssignment(
     quality: body.quality,
     feedback: body.feedback ?? null,
   });
+}
+
+export async function createCoachAssignmentBatch(
+  coachId: string,
+  branchId: string,
+  studentIds: string[],
+  items: CoachCreateAssignmentBody[],
+): Promise<AssignmentRecord[]> {
+  const created: AssignmentRecord[] = [];
+  for (const studentId of studentIds) {
+    for (const item of items) {
+      created.push(await createCoachAssignment(coachId, branchId, { ...item, studentId }));
+    }
+  }
+  return created;
 }
 
 function addDaysYmd(days: number): string {
