@@ -91,7 +91,11 @@ Kodlarken `ç ğ ı İ ö ş ü`'yu ASCII'ye düşürme; detay → `CLAUDE.md`.
 
 ## Handoff dosyaları (bu sürüm)
 - **`handoff/README.md`** — bu belge (kanonik talimat + envanter + dosya haritası + mimari).
-- **`handoff/SADAKAT-SPEC-ogrenci-dashboard.md`** — örnek ekranın birebir yerleşim spec'i (düzen/sıra).
+- **`handoff/ENVANTER-HARITASI.md`** — istenen her öğenin gerçek kaynağı (rota/modal/panel/alt-sekme).
+- **`handoff/SADAKAT-SPEC-INDEX.md`** — tüm ekran-bazlı birebir yerleşim spec'lerinin indeksi
+  (`SADAKAT-SPEC-<rol>-<ekran>.md`; 25+ ekran, 3 rol + ortak). Sapma kilitleme belgeleri.
+- **`handoff/QA-CAPTURE-RECETESI.md`** — PNG curated set (`exports/`) + tam matris için
+  boot-direct + DevTools "Capture full size screenshot" reçetesi (light/dark × desktop/mobile + modaller).
 - **`handoff/TEKNIK-REHBER-ve-VERI-MODELI.md`** — modüllerin veri modeli + store API + entegrasyon
   + **gerçek koda geçiş (build) rehberi**. *(En kritik teknik belge.)*
 - Kök: `CLAUDE.md` (Claude Code kalıcı talimatları) · `VALIDATION.md` (token paritesi) ·
