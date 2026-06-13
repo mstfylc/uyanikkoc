@@ -14,7 +14,7 @@ import { studentSinav } from "@/lib/design/student-exam";
 import { subjectColor } from "@/lib/design/subject-colors";
 import type { StudyBlockRecord } from "@/mocks/study-plan";
 import { SCHOOL_DAYS, SCHOOL_PERIODS } from "@/mocks/schedule";
-import { countWeeklyBlocks, countWeeklyDone, STUDY_DAYS, weeklyCompletionByDay } from "@/mocks/study-plan";
+import { countWeeklyBlocks, STUDY_DAYS, weeklyCompletionByDay } from "@/mocks/study-plan";
 import type { SchoolScheduleRecord } from "@uyanik/database";
 
 const DAY_INDEX = new Date().getDay();
@@ -49,6 +49,7 @@ export function StudentSchedulePanel() {
     topic: "",
     type: "Soru",
     source: "",
+    soru: "",
     correct: "",
     wrong: "",
   });
@@ -264,36 +265,22 @@ export function StudentSchedulePanel() {
         </UkSection>
       ) : (
         <>
-      <div className="grid g-4">
-        <UkStatCard icon="ki-calendar" tone="primary" value={countWeeklyBlocks(studyPlan)} label="Bu hafta plan" />
-        <UkStatCard icon="ki-check-circle" tone="success" value={countWeeklyDone(studyPlan)} label="Tamamlanan blok" />
+      <div className="seg" style={{ width: "fit-content", flexWrap: "wrap" }}>
+        {STUDY_DAYS.map((day) => (
+          <button key={day} type="button" className={activeDay === day ? "on" : ""} onClick={() => setActiveDay(day)}>
+            {day}
+            {day === TODAY_LABEL ? <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--primary)", display: "inline-block", marginLeft: 5 }} /> : null}
+          </button>
+        ))}
+        <button type="button" onClick={() => setView("hafta")} title="Haftanın tamamını gör">
+          <KiIcon name="ki-element-11" size={14} />
+          Tüm hafta
+        </button>
       </div>
 
-      <UkSection title="Haftalık tamamlama" sub="Gün bazında plan ilerlemesi">
-        <div className="card-body">
-          <UkBarChart data={weeklyChart} max={100} />
-        </div>
-      </UkSection>
-
+      <div className="grid col-main">
       <UkSection title={DAYS_FULL[activeDay] ?? activeDay} sub={`${dayBlocks.length} çalışma bloğu`} action={activeDay === TODAY_LABEL ? <UkBadge tone="primary">Bugün</UkBadge> : null}>
-        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div className="filters" style={{ flexWrap: "wrap" }}>
-            {STUDY_DAYS.map((day) => (
-              <button
-                key={day}
-                type="button"
-                className={activeDay === day ? "on" : ""}
-                onClick={() => setActiveDay(day)}
-              >
-                {day}
-                {day === TODAY_LABEL ? " · bugün" : ""}
-              </button>
-            ))}
-            <button type="button" onClick={() => setView("hafta")} title="Haftanın tamamını gör">
-              <KiIcon name="ki-element-11" size={14} />
-              Tüm hafta
-            </button>
-          </div>
+        <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
@@ -360,6 +347,19 @@ export function StudentSchedulePanel() {
           )}
         </div>
       </UkSection>
+
+      <div className="stack">
+        <div className="grid g-2">
+          <UkStatCard icon="ki-time" tone="primary" value={`${countWeeklyBlocks(studyPlan)}s`} label="Bu hafta plan" />
+          <UkStatCard icon="ki-calendar" tone="info" value={countWeeklyBlocks(studyPlan)} label="Toplam blok" />
+        </div>
+        <UkSection title="Haftalık Çalışma" sub="Günlük tamamlanan saat">
+          <div className="card-body">
+            <UkBarChart data={weeklyChart} max={100} />
+          </div>
+        </UkSection>
+      </div>
+      </div>
         </>
       )}
 
@@ -516,20 +516,14 @@ export function StudentSchedulePanel() {
                       </select>
                     </div>
                     <div className="field">
-                      <label className="label" htmlFor="block-type">
-                        Tür
-                      </label>
-                      <select
-                        id="block-type"
-                        className="select"
-                        value={blockDraft.type}
-                        onChange={(event) => setBlockDraft((current) => ({ ...current, type: event.target.value }))}
-                      >
-                        <option value="Soru">Soru</option>
-                        <option value="Video">Video</option>
-                        <option value="Konu">Konu</option>
-                        <option value="Deneme">Deneme</option>
-                      </select>
+                      <span className="label">Tür</span>
+                      <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+                        {([["Soru", "Soru çözümü"], ["Konu", "Konu tekrarı"], ["Deneme", "Deneme"], ["Video", "Video ders"]] as Array<[string, string]>).map(([val, lbl]) => (
+                          <button key={val} type="button" className={`type-chip${blockDraft.type === val ? " on" : ""}`} onClick={() => setBlockDraft((current) => ({ ...current, type: val }))}>
+                            {lbl}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   <div className="field">
@@ -544,11 +538,11 @@ export function StudentSchedulePanel() {
                       onChange={(event) => setBlockDraft((current) => ({ ...current, topic: event.target.value }))}
                     />
                   </div>
-                  {blockDraft.type === "Soru" ? (
+                  {blockDraft.type === "Soru" || blockDraft.type === "Deneme" ? (
                     <>
                       <div className="field">
                         <label className="label" htmlFor="block-source">
-                          Kaynak
+                          Kaynak <span className="muted">(kitabın)</span>
                         </label>
                         <select
                           id="block-source"
@@ -562,35 +556,36 @@ export function StudentSchedulePanel() {
                               {source}
                             </option>
                           ))}
+                          <option value="__other">Diğer / listede yok</option>
                         </select>
+                        {studentSources.length === 0 ? (
+                          <span className="muted" style={{ fontSize: 11.5, marginTop: 4 }}>Henüz kaynağın yok. &quot;Ödevlerim → Kaynaklarım&quot;dan kitap ekleyebilirsin.</span>
+                        ) : null}
                       </div>
-                      <div className="grid g-2">
-                        <div className="field">
-                          <label className="label" htmlFor="block-correct">
-                            Doğru
-                          </label>
-                          <input
-                            id="block-correct"
-                            className="input tnum"
-                            type="number"
-                            min={0}
-                            value={blockDraft.correct}
-                            onChange={(event) => setBlockDraft((current) => ({ ...current, correct: event.target.value }))}
-                          />
+                      <div className="field">
+                        <span className="label">Soru çözümü (opsiyonel)</span>
+                        <div className="grid g-3">
+                          <input className="input tnum" type="number" min={0} placeholder="Soru" value={blockDraft.soru} onChange={(event) => setBlockDraft((current) => ({ ...current, soru: event.target.value }))} />
+                          <input className="input tnum" type="number" min={0} placeholder="Doğru" value={blockDraft.correct} onChange={(event) => setBlockDraft((current) => ({ ...current, correct: event.target.value }))} />
+                          <input className="input tnum" type="number" min={0} placeholder="Yanlış" value={blockDraft.wrong} onChange={(event) => setBlockDraft((current) => ({ ...current, wrong: event.target.value }))} />
                         </div>
-                        <div className="field">
-                          <label className="label" htmlFor="block-wrong">
-                            Yanlış
-                          </label>
-                          <input
-                            id="block-wrong"
-                            className="input tnum"
-                            type="number"
-                            min={0}
-                            value={blockDraft.wrong}
-                            onChange={(event) => setBlockDraft((current) => ({ ...current, wrong: event.target.value }))}
-                          />
-                        </div>
+                        {(() => {
+                          const so = Number(blockDraft.soru) || 0;
+                          const co = Number(blockDraft.correct) || 0;
+                          const ya = Number(blockDraft.wrong) || 0;
+                          const over = so > 0 && co + ya > so;
+                          const bos = Math.max(0, so - co - ya);
+                          const net = Math.max(0, co - ya / 4);
+                          return (
+                            <div style={{ marginTop: 8 }}>
+                              <div className="between" style={{ padding: "8px 12px", background: "var(--surface-3)", borderRadius: 10 }}>
+                                <span className="muted" style={{ fontSize: 12.5, fontWeight: 700 }}>Boş: <b className="tnum">{bos}</b></span>
+                                <span style={{ fontSize: 12.5, fontWeight: 700 }}>Net: <b className="tnum" style={{ color: "var(--primary)" }}>{net.toFixed(2).replace(/\.00$/, "")}</b></span>
+                              </div>
+                              {over ? <span style={{ fontSize: 11.5, color: "var(--danger)", marginTop: 5, display: "block" }}>Doğru + yanlış, soru sayısını aşamaz.</span> : null}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </>
                   ) : null}
