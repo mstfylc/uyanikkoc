@@ -224,7 +224,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
 
   return (
     <div className="stack rise" data-testid={`settings-panel-${role}`}>
-      <UkPageHead title="Ayarlar" sub="Hesap ve mufredat yapilandirmasi" />
+      <UkPageHead title="Ayarlar" sub={role === "coach" ? "Hesap, görünüm ve müfredat yapılandırması" : "Hesap ve görünüm ayarların"} />
 
       <div className="seg" style={{ width: "fit-content", flexWrap: "wrap" }}>
         {tabs.map((item) => (
@@ -298,7 +298,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
       {tab === "profil" ? (
         <UkSection
           title="Profil tercihleri"
-          sub="Hesap bilgilerin ve gorunum"
+          sub="Hesap bilgilerin ve görünüm"
           action={
             <button type="button" className="btn btn-primary btn-sm" onClick={handleProfileSave}>
               <KiIcon name="ki-check" size={15} />
@@ -345,7 +345,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
                   className={theme === choice ? "on" : ""}
                   onClick={() => handleThemeChange(choice)}
                 >
-                  {choice === "light" ? "Acik" : choice === "dark" ? "Koyu" : "Sistem"}
+                  {choice === "light" ? "Açık" : choice === "dark" ? "Koyu" : "Sistem"}
                 </button>
               ))}
             </div>
@@ -361,7 +361,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div className="grid g-2" style={{ gap: 12 }}>
               <div className="field">
-                <label className="label">Mevcut sifre</label>
+                <label className="label">Mevcut şifre</label>
                 <input
                   className="input"
                   type="password"
@@ -370,7 +370,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
                 />
               </div>
               <div className="field">
-                <label className="label">Yeni sifre</label>
+                <label className="label">Yeni şifre</label>
                 <input
                   className="input"
                   type="password"
@@ -380,7 +380,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
               </div>
             </div>
             <div className="field">
-              <label className="label">Yeni sifre (tekrar)</label>
+              <label className="label">Yeni şifre (tekrar)</label>
               <input
                 className="input"
                 type="password"

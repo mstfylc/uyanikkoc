@@ -74,7 +74,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError("Destek talebi gonderilemedi.");
+      setError("Destek talebi gönderilemedi.");
       return;
     }
 
@@ -86,13 +86,13 @@ export function SupportPanel({ role }: SupportPanelProps) {
 
   return (
     <div className="stack rise" data-testid="support-panel">
-      <UkPageHead title="Destek" sub="Sik sorulan sorular, yardim ve iletisim" />
+      <UkPageHead title="Destek" sub="Sık sorulan sorular, yardım ve iletişim" />
 
       <div className="grid g-3">
         {[
-          { icon: "ki-message-text", title: "Canli Destek", desc: "Hafta ici 09:00 – 18:00", tone: "primary" },
+          { icon: "ki-message-text", title: "Canlı Destek", desc: "Hafta içi 09:00 – 18:00", tone: "primary" },
           { icon: "ki-notification-on", title: "E-posta", desc: "destek@uyanikkoc.com", tone: "info" },
-          { icon: "ki-technology-2", title: "Yardim Merkezi", desc: "Rehber ve videolar", tone: "success" },
+          { icon: "ki-technology-2", title: "Yardım Merkezi", desc: "Rehber ve videolar", tone: "success" },
         ].map((item) => (
           <div key={item.title} className="card">
             <div className="card-pad" style={{ display: "flex", gap: 13, alignItems: "center" }}>
@@ -111,11 +111,11 @@ export function SupportPanel({ role }: SupportPanelProps) {
       </div>
 
       <div className="grid col-main">
-        <UkSection title="Sık Sorulan Sorular" sub="En çok merak edilenler">
+        <UkSection title="Sık Sorulan Sorular" sub="Ara veya kategoriye göre filtrele">
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <input
               className="input"
-              placeholder="SSS ara..."
+              placeholder="Soru ara…"
               value={faqSearch}
               onChange={(event) => {
                 setFaqSearch(event.target.value);
@@ -142,7 +142,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
               ))}
             </div>
             {filteredFaq.length === 0 ? (
-              <p className="muted" style={{ fontSize: 13 }}>Eşleşen soru bulunamadı.</p>
+              <p className="muted" style={{ fontSize: 13 }}>Aradığın için sonuç yok. Aşağıdan destek talebi oluşturabilirsin.</p>
             ) : (
               filteredFaq.map((item, index) => {
               const active = openFaq === index;
@@ -178,7 +178,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
           </div>
         </UkSection>
 
-        <UkSection title="Destek Talebi Olustur" sub="Sorununu ilet, ekibimiz donus yapsin">
+        <UkSection title="Destek Talebi Oluştur" sub="Sorununu ilet, ekibimiz dönüş yapsın">
           <form onSubmit={handleSubmit} className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div className="field">
               <label className="label">Konu</label>
@@ -197,7 +197,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
             </div>
             <div className="field">
               <label className="label" htmlFor="support-message">
-                Mesajin
+                Mesajın
               </label>
               <textarea
                 id="support-message"
@@ -217,7 +217,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
               {isSubmitting ? "Gönderiliyor..." : sent ? "Talebin alındı" : "Gönder"}
             </button>
             {sent ? (
-              <UkBadge tone="success">En gec 24 saat icinde donus yapilacak</UkBadge>
+              <UkBadge tone="success">En geç 24 saat içinde dönüş yapılacak</UkBadge>
             ) : null}
             {error ? (
               <UkBadge tone="danger">{error}</UkBadge>
@@ -234,7 +234,7 @@ export function SupportPanel({ role }: SupportPanelProps) {
             </p>
           ) : tickets.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Henuz destek talebi yok.
+              Henüz destek talebi yok.
             </p>
           ) : (
             tickets.map((ticket) => (
