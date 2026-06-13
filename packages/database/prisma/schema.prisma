@@ -288,6 +288,7 @@ model Assignment {
   @@index([parentId])
   @@index([branchId])
   @@index([status])
+  @@index([studentId, status], map: "assignments_student_status_idx")
   @@map("assignments")
 }
 
@@ -475,6 +476,7 @@ model ExamResult {
 
   @@index([studentId])
   @@index([takenAt])
+  @@index([studentId, takenAt], map: "exam_results_student_taken_idx")
   @@map("exam_results")
 }
 
@@ -549,6 +551,7 @@ model Notification {
   @@index([studentId])
   @@index([parentId])
   @@index([coachId])
+  @@index([studentId, read, createdAt], map: "notifications_student_read_created_idx")
   @@map("notifications")
 }
 
@@ -580,6 +583,7 @@ model Message {
   thread     MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
   @@index([threadId])
+  @@index([threadId, createdAt], map: "messages_thread_created_idx")
   @@map("messages")
 }
 
