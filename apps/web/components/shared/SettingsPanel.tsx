@@ -8,6 +8,7 @@ import { CurriculumEditor } from "@/components/coach/CurriculumEditor";
 import { BillingPanel } from "@/components/shared/BillingPanel";
 import { NotificationSettingsPanel } from "@/components/shared/NotificationSettingsPanel";
 import { KiIcon } from "@/components/design/KiIcon";
+import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { TOPIC_EXAM_TYPE_LABELS } from "@uyanik/shared";
@@ -67,6 +68,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
   const [toast, setToast] = useState<string | null>(null);
   const [theme, setTheme] = useState<ThemeChoice>("system");
   const [passwordDraft, setPasswordDraft] = useState({ current: "", next: "", confirm: "" });
+  const [visibility, setVisibility] = useState({ coachStreak: true, parentProgress: true });
 
   const email = session?.user?.email ?? "—";
   const name = session?.user?.name ?? email.split("@")[0] ?? "Kullanici";
@@ -398,16 +400,58 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
       ) : null}
 
       {tab === "gizlilik" ? (
-        <UkSection title="Gizlilik & Güvenlik" sub="Hesap güvenliği ve veri tercihleri">
-          <div className="card-body">
-            <div className="notice" style={{ background: "var(--surface-3)" }}>
-              <KiIcon name="ki-lock" size={18} style={{ color: "var(--primary-600)", flexShrink: 0 }} />
-              <div className="muted" style={{ fontSize: 13, lineHeight: 1.5 }}>
-                Şifre değiştirme ve oturum işlemleri <b>Hesap</b> sekmesindedir. Hesap verilerin KVKK kapsamında korunur.
+        <div className="stack">
+          <UkSection title="Oturum & Cihazlar" sub="Hesabının açık olduğu cihazlar">
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div className="lrow">
+                <span className="lr-icon" style={{ background: "var(--surface-3)" }}>
+                  <KiIcon name="ki-shield-tick" size={18} />
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="lr-title">Bu cihaz · Tarayıcı</div>
+                  <div className="lr-meta"><span className="d">Son etkinlik: şimdi</span></div>
+                </div>
+                <UkBadge tone="success">Bu cihaz</UkBadge>
+              </div>
+              <button type="button" className="btn btn-light btn-sm w-fit" onClick={() => showToast("Diğer oturumlar kapatıldı")}>
+                Diğer oturumları kapat
+              </button>
+            </div>
+          </UkSection>
+
+          <UkSection title="Veri & Gizlilik (KVKK)" sub="Verilerin ve onayların">
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+                <button type="button" className="btn btn-light btn-sm" onClick={() => showToast("Veri indirme talebin alındı")}>
+                  <KiIcon name="ki-cloud-download" size={14} />
+                  Verilerimi indir
+                </button>
+                <button type="button" className="btn btn-ghost btn-sm">Açık rıza / aydınlatma metni</button>
+              </div>
+              <button type="button" className="btn btn-light btn-sm w-fit" style={{ color: "var(--danger)" }} onClick={() => showToast("Hesap silme talebin alındı (KVKK)")}>
+                <KiIcon name="ki-trash" size={14} />
+                Hesabı sil
+              </button>
+            </div>
+          </UkSection>
+
+          <UkSection title="Görünürlük tercihleri" sub="Profilinin koç/veli tarafından görünürlüğü">
+            <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div className="between">
+                <span style={{ fontSize: 13.5, fontWeight: 600 }}>Çalışma serisini koça göster</span>
+                <button type="button" className={`switch${visibility.coachStreak ? " on" : ""}`} aria-label="Çalışma serisini koça göster" onClick={() => setVisibility((v) => ({ ...v, coachStreak: !v.coachStreak }))}>
+                  <span />
+                </button>
+              </div>
+              <div className="between">
+                <span style={{ fontSize: 13.5, fontWeight: 600 }}>İlerlememi velime göster</span>
+                <button type="button" className={`switch${visibility.parentProgress ? " on" : ""}`} aria-label="İlerlememi velime göster" onClick={() => setVisibility((v) => ({ ...v, parentProgress: !v.parentProgress }))}>
+                  <span />
+                </button>
               </div>
             </div>
-          </div>
-        </UkSection>
+          </UkSection>
+        </div>
       ) : null}
 
       {tab === "odeme" && (role === "student" || role === "parent") ? (
