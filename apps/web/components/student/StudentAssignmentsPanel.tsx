@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { MistakeBatchModal } from "@/components/student/MistakeBatchModal";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import {
@@ -528,6 +529,7 @@ export function StudentAssignmentsPanel({ resources }: { resources: React.ReactN
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
   const [view, setView] = useState<ViewMode>("gunluk");
   const [activeAssignment, setActiveAssignment] = useState<AssignmentItem | null>(null);
+  const [batchTarget, setBatchTarget] = useState<{ subject: string; count: number; source: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -562,8 +564,12 @@ export function StudentAssignmentsPanel({ resources }: { resources: React.ReactN
       return;
     }
 
+    const saved = assignments.find((item) => item.id === assignmentId);
     setActiveAssignment(null);
     await loadAssignments();
+    if (result && result.wrong > 0) {
+      setBatchTarget({ subject: saved?.subject ?? "Genel", count: result.wrong, source: saved?.title ?? "Ödev sonucu" });
+    }
   }
 
   const stats = useMemo(() => {
@@ -626,6 +632,14 @@ export function StudentAssignmentsPanel({ resources }: { resources: React.ReactN
       {resources}
 
       <ResultModal assignment={activeAssignment} onClose={() => setActiveAssignment(null)} onSave={(id, result) => void saveResult(id, result)} />
+
+      <MistakeBatchModal
+        open={Boolean(batchTarget)}
+        subject={batchTarget?.subject ?? ""}
+        count={batchTarget?.count ?? 0}
+        source={batchTarget?.source ?? ""}
+        onClose={() => setBatchTarget(null)}
+      />
     </div>
   );
 }
