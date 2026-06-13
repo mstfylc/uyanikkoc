@@ -1,6 +1,12 @@
 # Uyanık Koç — Cursor Aşamalı Prompt Listesi
 
-Cursor bu dosyayı okuyabilir; fakat **yalnızca istenen PROMPT'u uygular, kısa rapor verir ve durur**. Amaç: token tüketimini azaltmak, raporları yönetilebilir tutmak ve projeyi şişirmeden ilerletmek.
+Cursor bu dosyayı okuyabilir. **Görev bütünlüğüne göre bir oturumda birden çok PROMPT zincirlenip uygulanabilir**; her PROMPT kendi mantıksal commit'i ve kısa raporu ile kapanır. Amaç: token tüketimini azaltmak, raporları yönetilebilir tutmak ve projeyi şişirmeden ilerletmek. Sınır artık katı dosya/prompt sayısı değil; sınır **güvenliktir** (bkz. "Riskte dur").
+
+## Aktif sertleştirme seti
+
+Canlı kullanıcı testi öncesi DB/operasyon iyileştirme prompt'ları ayrı dosyada:
+**`docs/cursor/CURSOR_DB_HARDENING_PROMPTS.md`** (sıra: P-DB-1 → P-DB-2 →
+P-DB-3 → P-OPS-1 → P-TEST-1). Bağımsız commit'lenir; aynı oturumda zincirlenebilir.
 
 ## Kısa rapor zorunluluğu
 
@@ -40,7 +46,7 @@ Bu üç dosya sayesinde dış incelemede tüm repo tekrar taranmaz. Önce `LATES
 ## Sabit kurallar
 
 - Her fazda sadece `Oku` listesindeki dosyaları incele; tüm repoyu tarama.
-- Faz başına en fazla 8-10 dosya değiştir; aşılacaksa `RISK REPORT` ver ve dur.
+- Dosya/prompt sayısı katı sınır değildir; değişikliği mantıksal commit'lere böl ve görevin gerektirdiği kadar PROMPT uygula. Yalnızca gerçekten riskli/destructive değişikliklerde `RISK REPORT` ver ve dur.
 - Yeni ekran şişmesi yapma; önce mevcut koç → öğrenci → veli akışını güçlendir.
 - AI Koç canlı entegrasyonu yapma; yalnızca `Yakında` yüzeyi kalacak.
 - Production ortamda demo-memory store çalışamaz.
@@ -51,7 +57,7 @@ Bu üç dosya sayesinde dış incelemede tüm repo tekrar taranmaz. Önce `LATES
 
 ## Riskte dur
 
-Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration, auth/RBAC belirsizliği, korumasız API route, yeni external servis/major dependency, production-demo ayar karışması, 10+ dosya değişikliği, test sebebi belirsiz fail, Vercel/self-host kararını etkileyen deploy değişikliği, secret/lisanslı asset riski.
+Aşağıdaki durumda kod yazmayı bırak: destructive Prisma migration (DROP/ALTER COLUMN/RENAME, veri kaybı), auth/RBAC belirsizliği, korumasız API route, yeni external servis/major dependency, production-demo ayar karışması, test sebebi belirsiz fail, Vercel/self-host kararını etkileyen deploy değişikliği, secret/lisanslı asset riski. (Not: yüksek dosya sayısı tek başına durma sebebi değildir — riskli/belirsiz olması gerekir.)
 
 ---
 

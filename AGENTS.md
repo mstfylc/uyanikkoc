@@ -22,8 +22,8 @@ Codex / Cursor agent'ları bu repoda çalışırken aşağıdaki kurallara uyar.
 
 ## Çalışma biçimi
 
-- Faz planı: `docs/cursor/CURSOR_PROMPT_LIST.md` — yalnızca istenen prompt uygulanır
-- Faz başına max 8–10 dosya değişikliği; aşılırsa `RISK REPORT` ver ve dur
+- Faz planı: `docs/cursor/CURSOR_PROMPT_LIST.md` — görev bütünlüğüne göre bir oturumda birden çok prompt zincirlenip uygulanabilir; her prompt kendi mantıksal commit'iyle kapanır
+- Dosya sayısı katı sınır değildir; değişikliği mantıksal commit'lere böl. Yalnızca gerçekten riskli/destructive değişikliklerde (veri kaybı, auth/RBAC belirsizliği, deploy kararı) `RISK REPORT` ver ve dur
 - Mock/memory veri yalnızca `apps/web/mocks/` veya `apps/web/fixtures/` altında
 - Test/typecheck geçmeden commit atma
 - Generated dosyalar commit etme: `.next`, `.turbo`, `node_modules`, `*.tsbuildinfo`
