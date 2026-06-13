@@ -216,7 +216,7 @@ export function CurriculumEditor({ curriculum, isSaving, onSave, onReset }: Curr
 
         <UkSection
           title={`${active} — Konu Gruplari`}
-          sub="Alt kirilimlari ve konulari duzenle"
+          sub="Alt kırılımları ve konuları düzenle"
           action={
             <button type="button" className="btn btn-primary btn-sm" disabled={isSaving} onClick={addGroup}>
               <KiIcon name="ki-plus" size={15} />

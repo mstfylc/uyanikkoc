@@ -51,7 +51,7 @@ export function CoachRatingCard() {
   return (
     <UkSection
       title="Koçunu Değerlendir"
-      sub="Goruslerin kocunun gelisimine yardimci olur"
+      sub="Görüşlerin koçunun gelişimine yardımcı olur"
       action={
         rating && !editing ? <UkBadge tone="success">Gonderildi</UkBadge> : null
       }

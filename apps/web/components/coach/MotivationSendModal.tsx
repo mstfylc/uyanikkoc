@@ -123,7 +123,7 @@ export function MotivationSendModal({ open, onClose, onSent }: MotivationSendMod
             </span>
             <div>
               <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Motivasyon Gonder</h3>
-              <div className="muted" style={{ fontSize: 12 }}>Ogrencilerine moral ve hatirlatma yolla</div>
+              <div className="muted" style={{ fontSize: 12 }}>Öğrencilerine moral ve hatırlatma yolla</div>
             </div>
           </div>
           <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">

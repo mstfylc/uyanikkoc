@@ -59,7 +59,7 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
     }
 
     setIsSubmitting(true);
-    await onSubmit({ day, slot, mode, topic: topic.trim() || "Genel gorusme" });
+    await onSubmit({ day, slot, mode, topic: topic.trim() || "Genel görüşme" });
     setIsSubmitting(false);
     setDone(true);
     setTimeout(() => {
@@ -99,7 +99,7 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
         </div>
         <div className="modal-body" style={{ gap: 14 }}>
           <div className="field">
-            <label className="label">Gorusme turu</label>
+            <label className="label">Görüşme türü</label>
             <div className="seg" style={{ width: "fit-content" }}>
               {settings.allowOnline ? (
                 <button

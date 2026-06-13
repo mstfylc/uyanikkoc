@@ -12,9 +12,9 @@ type NotificationsPanelProps = {
 };
 
 const ROLE_SUB: Record<NotificationsPanelProps["role"], string> = {
-  student: "Odev hatirlatmalari ve guncellemeler",
-  coach: "Ogrenci aksiyonlari, sistem ve kocluk guncellemeleri",
-  parent: "Odev hatirlatmalari ve cocuk guncellemeleri",
+  student: "Ödev hatırlatmaları ve güncellemeler",
+  coach: "Öğrenci aksiyonları, sistem ve koçluk güncellemeleri",
+  parent: "Ödev hatırlatmaları ve çocuk güncellemeleri",
 };
 
 export function NotificationsPanel({ role }: NotificationsPanelProps) {
@@ -85,11 +85,11 @@ export function NotificationsPanel({ role }: NotificationsPanelProps) {
         </div>
       ) : null}
 
-      <UkSection title="TÃ¼m bildirimler" sub={`${notifications.length} kayÄ±t`}>
+      <UkSection title="Tüm bildirimler" sub={`${notifications.length} kayıt`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              YÃ¼kleniyor...
+              Yükleniyor...
             </p>
           ) : notifications.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>

@@ -185,7 +185,7 @@ export function BillingCheckoutModal({
             <div className="co-ok">
               <KiIcon name="ki-check" size={34} />
             </div>
-            <h3>Odeme basarili</h3>
+            <h3>Ödeme başarılı</h3>
             <p className="muted">
               {plan.name} ({cycle === "annual" ? "Yıllık" : "Aylık"}) aboneliğin aktif. Makbuzun fatura geçmişine
               eklendi.
@@ -199,7 +199,7 @@ export function BillingCheckoutModal({
                   <KiIcon name="ki-lock" size={18} />
                 </span>
                 <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 800 }}>Guvenli Odeme</h3>
+                  <h3 style={{ fontSize: 16, fontWeight: 800 }}>Güvenli Ödeme</h3>
                   <div className="muted" style={{ fontSize: 12 }}>256-bit SSL · iyzico altyapisi</div>
                 </div>
               </div>

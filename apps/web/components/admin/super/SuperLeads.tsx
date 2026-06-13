@@ -196,7 +196,7 @@ function LeadDetailModal({ lead, onClose }: { lead: DemoRequest; onClose: () => 
       </Field>
 
       <div>
-        <div className="muted" style={{ fontSize: 11.5, fontWeight: 800, marginBottom: 9, textTransform: "uppercase" }}>Gorusme notlari</div>
+        <div className="muted" style={{ fontSize: 11.5, fontWeight: 800, marginBottom: 9, textTransform: "uppercase" }}>Görüşme notları</div>
         <div className="row" style={{ alignItems: "flex-start", gap: 8, marginBottom: 12 }}>
           <textarea className="input" rows={2} value={note} onChange={(e) => setNote(e.target.value)} style={{ flex: 1 }} />
           <button type="button" className="btn btn-primary" disabled={!note.trim()} onClick={() => { void addNote(note.trim()); setNote(""); }}><Icon name="plus" size={16} />Ekle</button>
@@ -381,7 +381,7 @@ export function SuperLeads() {
       return;
     }
     downloadCSV("yeni-uyelikler.csv", [
-      ["Uye", "Tur", "Sehir", "Plan", "Islem", "Tutar", "Yontem", "Tarih"],
+      ["Uye", "Tur", "Sehir", "Plan", "Islem", "Tutar", "Yöntem", "Tarih"],
       ...data.signups.map((item) => [item.name, item.kind, item.city, planName(item), SIGNUP_META[item.type].label, item.amount, item.method, fmtShort(item.at)]),
     ]);
   }
@@ -423,7 +423,7 @@ export function SuperLeads() {
               <div className="searchbox" style={{ maxWidth: 260 }}><Icon name="search" size={17} /><input placeholder="Talep ara..." value={query} onChange={(e) => setQuery(e.target.value)} /></div>
             </div>
             <div className="stack">{visible.map((lead) => <DemoCard key={lead.id} lead={lead} onOpen={() => setOpenId(lead.id)} onLost={() => setLostId(lead.id)} />)}</div>
-            {visible.length === 0 ? <EmptyState icon="clipboard" title="Talep bulunamadi" sub="Filtre veya aramayi degistir" /> : null}
+            {visible.length === 0 ? <EmptyState icon="clipboard" title="Talep bulunamadı" sub="Filtre veya aramayi degistir" /> : null}
           </div>
           <div className="stack">
             <div className="card">
@@ -447,7 +447,7 @@ export function SuperLeads() {
           <div className="card-head"><div><h3>Son uyelikler & satin almalar</h3><p className="sub">{data.signups.length} islem · {tl(data.revenue)}</p></div></div>
           <div className="card-body" style={{ padding: 0, overflowX: "auto" }}>
             <table className="tbl" style={{ minWidth: 760 }}>
-              <thead><tr><th>Uye</th><th>Plan</th><th>Islem</th><th>Yontem</th><th>Tarih</th><th style={{ textAlign: "right" }}>Tutar</th></tr></thead>
+              <thead><tr><th>Uye</th><th>Plan</th><th>Islem</th><th>Yöntem</th><th>Tarih</th><th style={{ textAlign: "right" }}>Tutar</th></tr></thead>
               <tbody>
                 {data.signups.slice().sort((a, b) => b.at - a.at).map((item) => {
                   const meta = SIGNUP_META[item.type];

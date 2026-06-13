@@ -119,7 +119,7 @@ export function SmartOdevModal({ open, studentId, studentName, onClose, onAssign
                 <KiIcon name="ki-information-2" size={18} style={{ color: "var(--primary-600)", flexShrink: 0 }} />
                 <div style={{ fontSize: 13 }}>
                   Kaynak: {preview.source} - Konu: {preview.topic}
-                  {preview.overdueAlert ? " - tekrar oncelikli" : ""}
+                  {preview.overdueAlert ? " · tekrar öncelikli" : ""}
                 </div>
               </div>
               <div className="grid g-4">

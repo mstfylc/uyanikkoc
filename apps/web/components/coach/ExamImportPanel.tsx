@@ -33,7 +33,7 @@ export function ExamImportPanel() {
 
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
-      setError(data.error ?? "Import basarisiz.");
+      setError(data.error ?? "İçe aktarma başarısız.");
       return;
     }
 

@@ -48,7 +48,7 @@ const TABS: Array<{ key: BillingTab; label: string; icon: string }> = [
   { key: "sub", label: "Aboneliğim", icon: "ki-star" },
   { key: "plans", label: "Paketler", icon: "ki-flash" },
   { key: "invoices", label: "Faturalar", icon: "ki-receipt-square" },
-  { key: "methods", label: "Odeme Yontemleri", icon: "ki-wallet" },
+  { key: "methods", label: "Ödeme Yöntemleri", icon: "ki-wallet" },
 ];
 
 export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
@@ -266,7 +266,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                       <span className="plan-dot" style={{ background: planColor(activePlan.id), width: 12, height: 12 }} />
                       <h2 style={{ fontSize: 22, fontWeight: 800 }}>{activePlan.name}</h2>
                       {canceled ? (
-                        <UkBadge tone="danger">Iptal edildi</UkBadge>
+                        <UkBadge tone="danger">İptal edildi</UkBadge>
                       ) : (
                         <UkBadge tone="success">
                           <span className="dot-live" />
@@ -406,7 +406,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                         <th>Fatura No</th>
                         <th>Tarih</th>
                         <th>Plan</th>
-                        <th>Yontem</th>
+                        <th>Yöntem</th>
                         <th style={{ textAlign: "right" }}>Tutar</th>
                         <th style={{ textAlign: "center" }}>Durum</th>
                         <th />

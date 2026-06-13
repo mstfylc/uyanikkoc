@@ -53,15 +53,15 @@ export function CoachRevenuePanel() {
   }, [filter, subscribers, overdue]);
 
   function exportCsv() {
-    const rows = [["Ogrenci", "Veli", "Plan", "Donem", "Aylik", "Durum", "Sonraki"]];
+    const rows = [["Öğrenci", "Veli", "Plan", "Dönem", "Aylık", "Durum", "Sonraki"]];
     subscribers.forEach((item) => {
       rows.push([
         item.studentName,
         item.parentName,
         PLAN_NAMES[item.planId] ?? item.planId,
-        item.cycle === "annual" ? "Yillik" : "Aylik",
+        item.cycle === "annual" ? "Yillik" : "Aylık",
         String(item.monthlyAmount),
-        item.status === "paid" ? "Odendi" : item.status === "pending" ? "Bekliyor" : "Basarisiz",
+        item.status === "paid" ? "Odendi" : item.status === "pending" ? "Bekliyor" : "Başarısız",
         item.nextDays < 0 ? `${-item.nextDays} gun gecikti` : `${item.nextDays} gun`,
       ]);
     });
@@ -143,7 +143,7 @@ export function CoachRevenuePanel() {
                 <b>1 Temmuz 2026</b>
               </div>
               <div className="plat-row">
-                <span className="muted">Odeme yontemi</span>
+                <span className="muted">Ödeme yöntemi</span>
                 <b className="row" style={{ gap: 6 }}>
                   <CardBrandBadge brand="mastercard" size="sm" /> •5571
                 </b>
@@ -178,10 +178,10 @@ export function CoachRevenuePanel() {
           <table className="tbl" style={{ minWidth: 680 }}>
             <thead>
               <tr>
-                <th>Ogrenci</th>
+                <th>Öğrenci</th>
                 <th>Veli</th>
                 <th>Plan</th>
-                <th style={{ textAlign: "right" }}>Aylik</th>
+                <th style={{ textAlign: "right" }}>Aylık</th>
                 <th style={{ textAlign: "center" }}>Sonraki</th>
                 <th style={{ textAlign: "center" }}>Durum</th>
                 <th />
@@ -190,7 +190,7 @@ export function CoachRevenuePanel() {
             <tbody>
               {list.map((item) => {
                 const tone = item.status === "paid" ? "success" : item.status === "pending" ? "warning" : "danger";
-                const label = item.status === "paid" ? "Odendi" : item.status === "pending" ? "Yaklasiyor" : "Basarisiz";
+                const label = item.status === "paid" ? "Odendi" : item.status === "pending" ? "Yaklasiyor" : "Başarısız";
                 const overdueDays = item.nextDays < 0;
                 return (
                   <tr key={item.studentName}>
@@ -210,7 +210,7 @@ export function CoachRevenuePanel() {
                         <span className="plan-dot" style={{ background: planColor(item.planId) }} />
                         <span style={{ fontSize: 12.5, fontWeight: 600 }}>{PLAN_NAMES[item.planId] ?? item.planId}</span>
                         <span className="muted" style={{ fontSize: 11 }}>
-                          {item.cycle === "annual" ? "Yillik" : "Aylik"}
+                          {item.cycle === "annual" ? "Yillik" : "Aylık"}
                         </span>
                       </div>
                     </td>

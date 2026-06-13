@@ -94,13 +94,13 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
   }
 
   if (!summary) {
-    return <p className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>Ogrenci bulunamadi.</p>;
+    return <p className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>Öğrenci bulunamadı.</p>;
   }
 
   return (
     <div className="stack rise" data-testid="coach-student-detail">
       <UkPageHead
-        title="Ogrenci Detay"
+        title="Öğrenci Detayı"
         sub={studentId}
         actions={
           <Link href="/coach/dashboard" className="btn btn-light btn-sm">
@@ -188,7 +188,7 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
           </div>
         </UkSection>
 
-        <UkSection title="Motivasyon gonder" sub="Ogrenciye gunluk not">
+        <UkSection title="Motivasyon gonder" sub="Öğrenciye günlük not">
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <textarea
               className="input"

@@ -154,7 +154,7 @@ export function CoachTestsPanel() {
                           onChange={(event) =>
                             setNoteDrafts((current) => ({ ...current, [assignment.id]: event.target.value }))
                           }
-                          placeholder="Koc notu"
+                          placeholder="Koç notu"
                           autoFocus
                         />
                         <button
@@ -186,7 +186,7 @@ export function CoachTestsPanel() {
                         }}
                       >
                         <KiIcon name="ki-notepad-edit" size={14} />
-                        {assignment.coachNote?.trim() ? assignment.coachNote : "Koc notu ekle..."}
+                        {assignment.coachNote?.trim() ? assignment.coachNote : "Koç notu ekle..."}
                       </button>
                     )}
                   </div>

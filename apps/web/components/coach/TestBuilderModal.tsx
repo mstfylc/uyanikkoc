@@ -73,7 +73,7 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError("Test olusturulamadi.");
+      setError("Test oluşturulamadı.");
       return;
     }
 
@@ -98,7 +98,7 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
               <KiIcon name="ki-notepad-edit" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Ozel test olustur</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Özel test oluştur</h3>
               <div className="muted" style={{ fontSize: 12.5 }}>Likert, evet/hayir, olcek veya secenekli sorular</div>
             </div>
           </div>
@@ -117,7 +117,7 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
             <input className="input" value={name} onChange={(event) => setName(event.target.value)} />
           </div>
           <div className="field">
-            <label className="label">Aciklama</label>
+            <label className="label">Açıklama</label>
             <input className="input" value={desc} onChange={(event) => setDesc(event.target.value)} />
           </div>
 
@@ -183,7 +183,7 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
               Iptal
             </button>
             <button type="submit" disabled={isSubmitting} className="btn btn-primary">
-              {isSubmitting ? "Kaydediliyor..." : "Testi olustur"}
+              {isSubmitting ? "Kaydediliyor..." : "Testi oluştur"}
             </button>
           </div>
         </form>

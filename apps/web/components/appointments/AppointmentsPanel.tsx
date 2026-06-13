@@ -27,7 +27,7 @@ const STATUS_LABELS: Record<AppointmentStatus, { label: string; tone: "warning" 
   pending: { label: "Bekliyor", tone: "warning" },
   approved: { label: "Onaylandi", tone: "success" },
   rejected: { label: "Reddedildi", tone: "danger" },
-  cancelled: { label: "Iptal", tone: "muted" },
+  cancelled: { label: "İptal", tone: "muted" },
 };
 
 const MODE_LABELS: Record<AppointmentMode, string> = {
