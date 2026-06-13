@@ -416,7 +416,7 @@ export function SuperLeads() {
           <div className="stack">
             <div className="between" style={{ flexWrap: "wrap", gap: 10 }}>
               <div className="seg">
-                {([{ key: "all", label: "Tumu" }, { key: "new", label: "Yeni" }, { key: "contacted", label: "Iletisimde" }, { key: "scheduled", label: "Planlandi" }, { key: "converted", label: "Dondu" }, { key: "lost", label: "Kayip" }] as const).map((item) => (
+                {([{ key: "all", label: "Tümü" }, { key: "new", label: "Yeni" }, { key: "contacted", label: "Iletisimde" }, { key: "scheduled", label: "Planlandi" }, { key: "converted", label: "Dondu" }, { key: "lost", label: "Kayip" }] as const).map((item) => (
                   <button key={item.key} type="button" className={status === item.key ? "on" : ""} onClick={() => setStatus(item.key)}> {item.label}</button>
                 ))}
               </div>
