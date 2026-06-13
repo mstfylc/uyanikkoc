@@ -1,0 +1,43 @@
+EN GUNCEL KANONIK SURUM: uyanikkoc-mobil-claudecode-v1  (Ogrenci Mobil — Claude Code handoff, RN/Expo)
+
+Urun: Uyanik Koc OGRENCI MOBIL uygulamasi (React Native/Expo hedefli). Web/Admin'den AYRI urun;
+tasarim sistemi web v6 ile ORTAK (marka #534AB7, Plus Jakarta Sans). Tum dosyalar UTF-8.
+Dosya ADLARI ASCII; ARAYUZ METINLERI TAM TURKCE (kodlarken ASCII'ye dusurme — CLAUDE.md).
+
+DIKKAT: Prototip tabani v3; bazi v6 ogrenci ekranlari henuz YOK (bkz. handoff/V6-HIZALAMA-PLANI.md).
+
+KOK
+  CLAUDE.md                    Claude Code kalici talimatlari (once oku).
+  uyanik-koc-mobil.html        Cihaz-cerceveli HTML prototip (iOS/Android, Tweaks ile tema/cihaz/rol).
+  theme.ts                     RN/Expo TOKEN KOPRUSU (palette light/dark, typography, spacing, radius,
+                               elevation iOS+Android, devices). TEK dogruluk kaynagi, tokens.json ile birebir.
+  tokens.json                  Token (light+dark) — web v6 ile ortak.
+  VALIDATION.md                Saglik/parite raporu.
+  manifest.txt                 Bu dosya.
+
+handoff/
+  README.md                    Kanonik talimat + navigasyon + handoff listesi.
+  V6-HIZALAMA-PLANI.md         v3 prototip -> v6 ogrenci paritesi: durum tablosu + yeni ekran yonergesi.
+  EKRANLAR-v3.md               v3 ekran listesi & navigasyon (mevcut ekranlar).
+  SADAKAT-SPEC-INDEX.md        Ekran-bazli spec indeksi (mevcut = spec+PNG; v6-yeni = build-spec).
+  SADAKAT-SPEC-mobil-<ekran>.md Ekran spec'leri.
+  data-contracts.md            Native token oturumu (NextAuth paralel) + veri modulu eslemesi + push/foto.
+  RISKS_AND_GAPS.md            Sinirlar (sadece ogrenci, tek sube, AI Koc Yakinda, veri uydurma yok) + v3->v6 boslugu.
+
+mobile/ (prototip kaynak + tasarim sistemi)
+  uk-mobile.css                Prototip stilleri (token tuketir).
+  ios-frame.jsx, android-frame.jsx  Cihaz cerceveleri (prototip; uretimde RN ekran + safe-area).
+  tweaks-panel.jsx             Prototip Tweaks (tema/cihaz/rol/aksan/font/radius).
+  uk-data.jsx                  Ogrenci verisi + M_ICONS (SVG path ikon seti -> RN react-native-svg).
+  uk-avatar.jsx                Avatar.
+  uk-screens.jsx               Login, Ana Sayfa (home), Odevler (odevler) + ResultSheet.
+  uk-screens2.jsx              Denemeler, Program, Profil.
+  uk-screens3.jsx              Alt ekranlar: Konu Takibi, Kaynaklarim, Randevular, Mesajlar, Motivasyon.
+  uk-v4.jsx                    Destek + ek bilesenler.
+  uk-app.jsx                   Router + TabBar + SubRouter (navigasyon kabugu).
+  (uk-parent.jsx, uk-coach*.jsx, uk-data-parent/coach.jsx  -> VELI/KOC referansi; PORT KAPSAMI DISI.)
+
+exports/mobil/                 Referans PNG (iOS 390x844 + Android 360x800 × light/dark) — v3 ekranlari.
+
+CALISTIRMA: uyanik-koc-mobil.html tarayicida ac. Tweaks > Gorunum > rol "Ogrenci".
+FONT: Plus Jakarta Sans (Google Fonts; RN'de expo-font). IKON: SVG path (uk-data.jsx M_ICONS).
