@@ -40,10 +40,10 @@ async function main() {
 
   await prisma.branch.upsert({
     where: { id: KAMPUS_KOC_BRANCH_ID },
-    update: { name: "Kadikoy Subesi", organizationId: KAMPUS_KOC_ORG_ID },
+    update: { name: "Kadıköy Şubesi", organizationId: KAMPUS_KOC_ORG_ID },
     create: {
       id: KAMPUS_KOC_BRANCH_ID,
-      name: "Kadikoy Subesi",
+      name: "Kadıköy Şubesi",
       organizationId: KAMPUS_KOC_ORG_ID,
     },
   });
@@ -189,7 +189,7 @@ async function main() {
     { id: "coach_task_001", text: "Mert'in haftalık programını revize et", studentId: "student_002", due: "Bugün", priority: "high" as const, done: false },
     { id: "coach_task_002", text: "Elif'in integral testini incele", studentId: "student_001", due: "Bugün", priority: "med" as const, done: false },
     { id: "coach_task_003", text: "Haftalık raporları hazırla", studentId: null, due: "7 Haz", priority: "med" as const, done: false },
-    { id: "coach_task_004", text: "Deneme #6 sonuclarini analiz et", studentId: null, due: "5 Haz", priority: "low" as const, done: true },
+    { id: "coach_task_004", text: "Deneme #6 sonuçlarını analiz et", studentId: null, due: "5 Haz", priority: "low" as const, done: true },
   ];
   for (const task of coachTaskSeed) {
     await prisma.coachTask.upsert({
@@ -362,11 +362,11 @@ async function seedBillingPlans() {
       popular: true,
       sortOrder: 1,
       features: [
-        "Standart paketteki her sey",
+        "Standart paketteki her şey",
         "Veliye haftalık gelişim raporu",
         "Sınırsız mesajlaşma (koç + öğrenci)",
         "Motivasyon ve hedef takibi",
-        "Onceliklendirilmis randevu",
+        "Önceliklendirilmiş randevu",
       ],
     },
     {
@@ -378,11 +378,11 @@ async function seedBillingPlans() {
       popular: false,
       sortOrder: 2,
       features: [
-        "Plus paketteki her sey",
+        "Plus paketteki her şey",
         "Haftada 2 birebir görüşme",
         "Kıdemli mentor eşleştirmesi",
-        "Tercih ve kariyer danismanligi",
-        "7/24 oncelikli destek hatti",
+        "Tercih ve kariyer danışmanlığı",
+        "7/24 öncelikli destek hattı",
       ],
     },
   ];
@@ -455,14 +455,14 @@ async function seedFaz2Skeletons() {
     update: {
       studentId: "student_001",
       parentId: null,
-      title: "Hos geldin",
+      title: "Hoş geldin",
       body: "Uyanık Koç alpha bildirim iskeleti.",
       read: false,
     },
     create: {
       id: "notification_seed_001",
       studentId: "student_001",
-      title: "Hos geldin",
+      title: "Hoş geldin",
       body: "Uyanık Koç alpha bildirim iskeleti.",
       sourceKey: "welcome:student_001",
     },
@@ -500,7 +500,7 @@ async function seedFaz2Skeletons() {
     where: { id: "template_seed_001" },
     update: {
       coachId: "coach_001",
-      title: "Matematik tekrar (sablon)",
+      title: "Matematik tekrar (şablon)",
       description: "Günlük matematik tekrar seti",
       type: "homework",
       priority: "medium",
@@ -509,7 +509,7 @@ async function seedFaz2Skeletons() {
     create: {
       id: "template_seed_001",
       coachId: "coach_001",
-      title: "Matematik tekrar (sablon)",
+      title: "Matematik tekrar (şablon)",
       description: "Günlük matematik tekrar seti",
       type: "homework",
       priority: "medium",
@@ -595,6 +595,8 @@ async function seedRichDemoData() {
   await seedRichExamsAndOptik();
   await seedRichCoachAndParentFlows();
   await seedRichBillingAndSupport();
+  await seedRichRoster();
+  await seedRichExtraExams();
 }
 
 async function seedRichAssignments() {
@@ -1110,6 +1112,301 @@ async function seedRichCoachAndParentFlows() {
     update: { coachId: "coach_001", studentId: "student_001", studentName: "Elif Yıldız", testId: "custom_test_demo_001", status: "completed", score: 3.4, band: "Orta", bandTone: "warning", coachNote: "Sınav öncesi rutin planlandı.", sentAt: daysAgo(5), completedAt: daysAgo(4) },
     create: { id: "test_assignment_demo_001", coachId: "coach_001", studentId: "student_001", studentName: "Elif Yıldız", testId: "custom_test_demo_001", status: "completed", score: 3.4, band: "Orta", bandTone: "warning", coachNote: "Sınav öncesi rutin planlandı.", sentAt: daysAgo(5), completedAt: daysAgo(4) },
   });
+}
+
+type RosterSeed = {
+  n: string;
+  studentName: string;
+  parentName: string;
+  studentPhone: string;
+  parentPhone: string;
+  examType: "TYT" | "AYT" | "LGS";
+  trend: Array<[number, number]>;
+  completion: number;
+  netDelta: string;
+  risk: null | { text: string; kind: "warning" | "danger" };
+};
+
+const DEMO_ROSTER: RosterSeed[] = [
+  {
+    n: "003",
+    studentName: "Zeynep Kaya",
+    parentName: "Hülya Kaya",
+    studentPhone: "0534 661 20 11",
+    parentPhone: "0534 661 20 12",
+    examType: "TYT",
+    trend: [[26, 71.5], [19, 74.25], [12, 78], [4, 82.75]],
+    completion: 84,
+    netDelta: "+4.8",
+    risk: null,
+  },
+  {
+    n: "004",
+    studentName: "Burak Şahin",
+    parentName: "Kemal Şahin",
+    studentPhone: "0537 902 44 50",
+    parentPhone: "0537 902 44 51",
+    examType: "TYT",
+    trend: [[26, 64], [19, 60.5], [12, 58.25], [4, 55]],
+    completion: 38,
+    netDelta: "-3.4",
+    risk: { text: "Son 3 denemede net düşüşte; program bloğu tamamlama oranı %40 altında.", kind: "danger" },
+  },
+  {
+    n: "005",
+    studentName: "Ece Aydın",
+    parentName: "Nalan Aydın",
+    studentPhone: "0535 118 73 09",
+    parentPhone: "0535 118 73 10",
+    examType: "AYT",
+    trend: [[8, 49.5], [2, 53.25]],
+    completion: 66,
+    netDelta: "+3.8",
+    risk: { text: "Yeni katıldı; ilk hafta uyum süreci, yakından takip.", kind: "warning" },
+  },
+  {
+    n: "006",
+    studentName: "Can Öztürk",
+    parentName: "Murat Öztürk",
+    studentPhone: "0532 540 18 77",
+    parentPhone: "0532 540 18 78",
+    examType: "TYT",
+    trend: [[26, 68.5], [19, 69.25], [12, 70], [4, 71.5]],
+    completion: 71,
+    netDelta: "+1.6",
+    risk: null,
+  },
+];
+
+async function seedRichRoster() {
+  for (const r of DEMO_ROSTER) {
+    const userStudentId = `user_student_${r.n}`;
+    const userParentId = `user_parent_${r.n}`;
+    const studentId = `student_${r.n}`;
+    const parentId = `parent_${r.n}`;
+
+    await prisma.user.upsert({
+      where: { id: userParentId },
+      update: {
+        email: `parent${r.n}@uyanik.local`,
+        name: r.parentName,
+        phone: r.parentPhone,
+        passwordHash: DEMO_PASSWORD_HASH,
+        role: "PARENT",
+        organizationId: DEMO_ORG_ID,
+        branchId: DEMO_BRANCH_ID,
+      },
+      create: {
+        id: userParentId,
+        email: `parent${r.n}@uyanik.local`,
+        name: r.parentName,
+        phone: r.parentPhone,
+        passwordHash: DEMO_PASSWORD_HASH,
+        role: "PARENT",
+        organizationId: DEMO_ORG_ID,
+        branchId: DEMO_BRANCH_ID,
+      },
+    });
+    await prisma.parentProfile.upsert({
+      where: { id: parentId },
+      update: { userId: userParentId },
+      create: { id: parentId, userId: userParentId },
+    });
+
+    await prisma.user.upsert({
+      where: { id: userStudentId },
+      update: {
+        email: `student${r.n}@uyanik.local`,
+        name: r.studentName,
+        phone: r.studentPhone,
+        passwordHash: DEMO_PASSWORD_HASH,
+        role: "STUDENT",
+        organizationId: DEMO_ORG_ID,
+        branchId: DEMO_BRANCH_ID,
+      },
+      create: {
+        id: userStudentId,
+        email: `student${r.n}@uyanik.local`,
+        name: r.studentName,
+        phone: r.studentPhone,
+        passwordHash: DEMO_PASSWORD_HASH,
+        role: "STUDENT",
+        organizationId: DEMO_ORG_ID,
+        branchId: DEMO_BRANCH_ID,
+      },
+    });
+    await prisma.studentProfile.upsert({
+      where: { id: studentId },
+      update: { userId: userStudentId, parentId },
+      create: { id: studentId, userId: userStudentId, parentId },
+    });
+
+    await prisma.coachStudent.upsert({
+      where: { coachId_studentId: { coachId: "coach_001", studentId } },
+      update: {},
+      create: { id: `coach_student_${studentId}`, coachId: "coach_001", studentId },
+    });
+
+    for (const [index, [agoN, net]] of r.trend.entries()) {
+      const examId = `exam_roster_${r.n}_${index + 1}`;
+      await prisma.examResult.upsert({
+        where: { id: examId },
+        update: {
+          studentId,
+          examType: r.examType,
+          label: `${r.examType} Deneme ${index + 1}`,
+          takenAt: daysAgo(agoN),
+          totalNet: net,
+        },
+        create: {
+          id: examId,
+          studentId,
+          examType: r.examType,
+          label: `${r.examType} Deneme ${index + 1}`,
+          takenAt: daysAgo(agoN),
+          totalNet: net,
+        },
+      });
+    }
+
+    await prisma.assignment.upsert({
+      where: { id: `assignment_roster_${r.n}_done` },
+      update: {},
+      create: {
+        id: `assignment_roster_${r.n}_done`,
+        title: "Haftalık soru seti",
+        description: "Konu tekrarı için süreli soru çözümü.",
+        week: "w0",
+        topic: "Karma Tekrar",
+        source: "Soru Bankası",
+        count: 30,
+        odevType: "soru",
+        odevTypes: ["soru"],
+        note: "Süreli çöz.",
+        type: "practice",
+        priority: "medium",
+        status: "completed",
+        subject: "Matematik",
+        dueDate: daysAgo(2, 19),
+        assignedAt: daysAgo(4, 19),
+        coachId: "coach_001",
+        studentId,
+        parentId,
+        branchId: DEMO_BRANCH_ID,
+        completed: true,
+        completedAt: daysAgo(2, 19),
+      },
+    });
+    await prisma.assignment.upsert({
+      where: { id: `assignment_roster_${r.n}_pending` },
+      update: {},
+      create: {
+        id: `assignment_roster_${r.n}_pending`,
+        title: "Deneme yanlış analizi",
+        description: "Son denemedeki yanlışları deftere işle.",
+        week: "w0",
+        topic: "Deneme Analizi",
+        source: `${r.examType} Deneme`,
+        count: 0,
+        odevType: "konu",
+        odevTypes: ["konu"],
+        note: "Yanlışları Yanlış Defteri'ne ekle.",
+        type: "exam_prep",
+        priority: r.risk ? "high" : "medium",
+        status: "pending",
+        subject: "Genel",
+        dueDate: daysFromNow(2, 20),
+        assignedAt: daysAgo(1, 20),
+        coachId: "coach_001",
+        studentId,
+        parentId,
+        branchId: DEMO_BRANCH_ID,
+        completed: false,
+        completedAt: null,
+      },
+    });
+
+    if (r.risk) {
+      const noteKind = r.risk.kind === "danger" ? "warning" : r.risk.kind;
+      await prisma.coachStudentNote.upsert({
+        where: { id: `coach_note_roster_${r.n}` },
+        update: { coachId: "coach_001", studentId, text: r.risk.text, kind: noteKind, pinned: true },
+        create: { id: `coach_note_roster_${r.n}`, coachId: "coach_001", studentId, text: r.risk.text, kind: noteKind, pinned: true },
+      });
+    }
+
+    await prisma.parentReport.upsert({
+      where: { coachId_studentId_week: { coachId: "coach_001", studentId, week: "3-9 Haziran" } },
+      update: {
+        parentId,
+        studentName: r.studentName,
+        parentName: r.parentName,
+        completion: r.completion,
+        netDelta: r.netDelta,
+        status: "pending",
+        sentAt: null,
+      },
+      create: {
+        id: `parent_report_roster_${r.n}`,
+        coachId: "coach_001",
+        studentId,
+        parentId,
+        studentName: r.studentName,
+        parentName: r.parentName,
+        week: "3-9 Haziran",
+        completion: r.completion,
+        netDelta: r.netDelta,
+        status: "pending",
+        sentAt: null,
+      },
+    });
+  }
+}
+
+async function seedRichExtraExams() {
+  await prisma.examResult.upsert({
+    where: { id: "exam_demo_tyt_4" },
+    update: {
+      studentId: "student_001",
+      examType: "TYT",
+      label: "TYT Deneme 4",
+      takenAt: daysAgo(2),
+      totalNet: 85.5,
+    },
+    create: {
+      id: "exam_demo_tyt_4",
+      studentId: "student_001",
+      examType: "TYT",
+      label: "TYT Deneme 4",
+      takenAt: daysAgo(2),
+      totalNet: 85.5,
+    },
+  });
+
+  const mert: Array<[string, number, number]> = [
+    ["exam_demo_lgs_0", 18, 68.5],
+    ["exam_demo_lgs_2", 1, 60.75],
+  ];
+  for (const [id, agoN, net] of mert) {
+    await prisma.examResult.upsert({
+      where: { id },
+      update: {
+        studentId: "student_002",
+        examType: "LGS",
+        label: "LGS Mini Deneme",
+        takenAt: daysAgo(agoN),
+        totalNet: net,
+      },
+      create: {
+        id,
+        studentId: "student_002",
+        examType: "LGS",
+        label: "LGS Mini Deneme",
+        takenAt: daysAgo(agoN),
+        totalNet: net,
+      },
+    });
+  }
 }
 
 async function seedRichBillingAndSupport() {

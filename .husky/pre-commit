@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+node scripts/check-turkce.mjs || exit 1

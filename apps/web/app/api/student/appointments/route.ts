@@ -44,7 +44,7 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
 
   const coachId = await resolveCoachIdForStudent(studentId);
   if (!coachId) {
-    return NextResponse.json({ error: "Atanmis koc bulunamadi" }, { status: 404 });
+    return NextResponse.json({ error: "Atanmış koç bulunamadı" }, { status: 404 });
   }
 
   const roster = await listCoachRoster(coachId);
@@ -55,7 +55,7 @@ export const POST = withApiAuth(["student"], async (req, { session }) => {
     const appointment = await createStudentAppointment({
       coachId,
       studentId,
-      studentName: entry?.displayName ?? "Ogrenci",
+      studentName: entry?.displayName ?? "Öğrenci",
       day: body.day,
       slot: body.slot,
       mode: body.mode,

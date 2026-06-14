@@ -19,7 +19,7 @@ export const GET = withApiAuth(["coach"], async (req, { session }) => {
 
   const studentId = req.nextUrl.searchParams.get("studentId")?.trim() ?? "";
   if (!studentId || !(await coachHasStudent(coachId, studentId))) {
-    return NextResponse.json({ error: "Ogrenci bulunamadi." }, { status: 404 });
+    return NextResponse.json({ error: "Öğrenci bulunamadı." }, { status: 404 });
   }
 
   const record = await getCoachTopicTargets(coachId, studentId);
@@ -39,7 +39,7 @@ export const POST = withApiAuth(["coach"], async (req, { session }) => {
   const studentId = typeof body.studentId === "string" ? body.studentId.trim() : "";
 
   if (!studentId || !(await coachHasStudent(coachId, studentId))) {
-    return NextResponse.json({ error: "Ogrenci bulunamadi." }, { status: 404 });
+    return NextResponse.json({ error: "Öğrenci bulunamadı." }, { status: 404 });
   }
 
   const record = await saveCoachTopicTargets(coachId, studentId, parseTargets(body.targets));

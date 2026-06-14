@@ -39,12 +39,12 @@ export const POST = withApiAuth(["parent"], async (req, { session }) => {
 
   const studentId = await resolveStudentIdForParent(parentId);
   if (!studentId) {
-    return NextResponse.json({ error: "Ogrenci profili bulunamadi" }, { status: 404 });
+    return NextResponse.json({ error: "Öğrenci profili bulunamadı" }, { status: 404 });
   }
 
   const coachId = await resolveCoachIdForStudent(studentId);
   if (!coachId) {
-    return NextResponse.json({ error: "Atanmis koc bulunamadi" }, { status: 404 });
+    return NextResponse.json({ error: "Atanmış koç bulunamadı" }, { status: 404 });
   }
 
   const body = (await req.json()) as {
@@ -67,7 +67,7 @@ export const POST = withApiAuth(["parent"], async (req, { session }) => {
       {
         coachId,
         studentId,
-        studentName: entry?.displayName ?? "Ogrenci",
+        studentName: entry?.displayName ?? "Öğrenci",
         day: body.day,
         slot: body.slot,
         mode: body.mode,

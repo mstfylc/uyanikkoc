@@ -13,14 +13,14 @@ export const GET = withApiAuth(["parent"], async (_req, { session }) => {
 
   const studentId = await resolveStudentIdForParent(parentId);
   if (!studentId) {
-    return NextResponse.json({ exams: [], summary: null, childName: "Ogrenci" }, { status: 200 });
+    return NextResponse.json({ exams: [], summary: null, childName: "Öğrenci" }, { status: 200 });
   }
 
   const result = await listStudentExams(studentId);
   const coachId = await resolveCoachIdForStudent(studentId);
   const roster = coachId ? await listCoachRoster(coachId) : [];
   const childName =
-    roster.find((entry) => entry.studentId === studentId)?.displayName ?? "Ogrenci";
+    roster.find((entry) => entry.studentId === studentId)?.displayName ?? "Öğrenci";
 
   return NextResponse.json({ ...result, childName }, { status: 200 });
 });
