@@ -38,7 +38,7 @@ type AssignmentItem = {
 
 const WEEK_OPTIONS = [
   { id: "w0", label: "Bu hafta" },
-  { id: "w1", label: "Gecen hafta" },
+  { id: "w1", label: "Geçen hafta" },
 ];
 
 function weekIdForDate(iso: string): string {
@@ -184,7 +184,7 @@ export function CoachAssignmentsPanel() {
 
       <UkSection
         title="Atanan Ödevler"
-        sub={`${shown.length} gorev`}
+        sub={`${shown.length} görev`}
         action={
           <div className="filters">
             {[
