@@ -38,7 +38,7 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
   });
 
   test("koç ödev oluşturur, öğrenci görür ve tamamlar", async ({ page }) => {
-    const assignmentTitle = `E2E Odev ${Date.now()}`;
+    const assignmentTitle = `E2E Ödev ${Date.now()}`;
 
     await login(page, "coach@uyanik.local");
     await page.goto("/coach/assignments/create");
@@ -55,9 +55,22 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
     await expect(page.getByTestId("assignment-list")).toContainText(assignmentTitle, {
       timeout: 15_000,
     });
-    await page.getByRole("listitem").filter({ hasText: assignmentTitle }).getByRole("button", { name: "Tamamla" }).click();
+    const assignmentItem = page.getByRole("listitem").filter({ hasText: assignmentTitle });
+    const resultButton = assignmentItem.getByRole("button", { name: "Sonuç Gir" });
+    if (await resultButton.isVisible()) {
+      await resultButton.click();
+      const resultModal = page.locator(".modal-panel").filter({ hasText: "Sonucu gir" });
+      await expect(resultModal).toBeVisible({ timeout: 15_000 });
+      const inputs = resultModal.locator("input");
+      await inputs.nth(0).fill("18");
+      await inputs.nth(1).fill("4");
+      await inputs.nth(2).fill("2");
+      await resultModal.getByRole("button", { name: "Sonucu Kaydet" }).click();
+    } else {
+      await assignmentItem.getByRole("button", { name: "Tamamla" }).click();
+    }
     await expect(page.getByRole("listitem").filter({ hasText: assignmentTitle })).toContainText(
-      "(Tamamlandi)",
+      "(Tamamlandı)",
       { timeout: 15_000 },
     );
 

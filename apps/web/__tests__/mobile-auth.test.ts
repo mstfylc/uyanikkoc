@@ -23,7 +23,7 @@ describe("mobile-auth: OTP (memory mode)", () => {
     expect(res.accessToken).toBeTruthy();
     expect(res.refreshToken).toBeTruthy();
     expect(res.user.role).toBe("student");
-    expect(res.user.avatarInitials).toBe("KD");
+    expect(res.user.avatarInitials).toBe("EY");
     spy.mockRestore();
   });
 

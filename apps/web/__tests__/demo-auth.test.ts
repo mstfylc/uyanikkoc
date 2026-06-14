@@ -13,10 +13,26 @@ describe("demo auth users", () => {
     expect(compareSync(DEMO_PASSWORD, DEMO_PASSWORD_HASH)).toBe(true);
   });
 
-  it("kaldirilan local demo hesaplari listede yoktur", () => {
-    for (const email of ["admin@uyanik.local", "coach@uyanik.local", "student@uyanik.local", "parent@uyanik.local"]) {
-      expect(demoUsers.some((entry) => entry.email === email)).toBe(false);
-    }
+  it("ana demo hesaplari seed ile hizalidir", () => {
+    expect(demoUsers.find((entry) => entry.email === "student@uyanik.local")).toMatchObject({
+      name: "Elif Yıldız",
+      role: "STUDENT",
+      studentId: "student_001",
+    });
+    expect(demoUsers.find((entry) => entry.email === "coach@uyanik.local")).toMatchObject({
+      name: "Dilek Emen",
+      role: "COACH",
+      coachId: "coach_001",
+    });
+    expect(demoUsers.find((entry) => entry.email === "parent@uyanik.local")).toMatchObject({
+      name: "Ayşe Yıldız",
+      role: "PARENT",
+      parentId: "parent_001",
+    });
+    expect(demoUsers.find((entry) => entry.email === "admin@uyanik.local")).toMatchObject({
+      name: "Sistem Yöneticisi",
+      role: "ORG_ADMIN",
+    });
   });
 
   it("super admin demo hesabi vardir", () => {
