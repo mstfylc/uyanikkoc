@@ -598,6 +598,7 @@ async function seedRichDemoData() {
   await seedRichRoster();
   await seedRichExtraExams();
   await seedLiveDemoCoachRosterMirror();
+  await deleteLegacyLocalCoachForLiveDemo();
 }
 
 async function seedRichAssignments() {
@@ -1425,11 +1426,13 @@ async function seedLiveDemoCoachRosterMirror() {
     select: { studentId: true },
     orderBy: { createdAt: "asc" },
   });
-  for (const row of sourceRoster) {
+  const liveDemoStudents = await prisma.studentProfile.findMany({ select: { id: true } });
+  const studentIds = new Set([...sourceRoster.map((row) => row.studentId), ...liveDemoStudents.map((student) => student.id)]);
+  for (const studentId of studentIds) {
     await prisma.coachStudent.upsert({
-      where: { coachId_studentId: { coachId: targetCoachId, studentId: row.studentId } },
+      where: { coachId_studentId: { coachId: targetCoachId, studentId } },
       update: {},
-      create: { id: `coach_student_live_demo_${row.studentId}`, coachId: targetCoachId, studentId: row.studentId },
+      create: { id: `coach_student_live_demo_${studentId}`, coachId: targetCoachId, studentId },
     });
   }
 
@@ -1547,6 +1550,18 @@ async function seedLiveDemoCoachRosterMirror() {
       },
     });
   }
+}
+
+async function deleteLegacyLocalCoachForLiveDemo() {
+  const liveDemoCoach = await prisma.user.findUnique({
+    where: { email: "demo.koc@uyanikkoc.com" },
+    select: { id: true },
+  });
+  if (!liveDemoCoach) {
+    return;
+  }
+
+  await prisma.user.deleteMany({ where: { email: "coach@uyanik.local" } });
 }
 
 async function seedRichBillingAndSupport() {
