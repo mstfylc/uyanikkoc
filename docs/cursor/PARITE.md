@@ -1,6 +1,6 @@
 # PARITE — UI port kanıt durumu
 
-Son güncelleme: 2026-06-14 (görsel parite — logo, Akıllı Ödev)
+Son güncelleme: 2026-06-14 (Codex muhafız `5cbfcf7` + görsel parite)
 
 | Ekran / modal | Referans | Durum | Kanıt |
 |---------------|----------|-------|-------|
@@ -32,3 +32,4 @@ Son güncelleme: 2026-06-14 (görsel parite — logo, Akıllı Ödev)
 - `defaultAll` toplu atama sayfasında ve filtre "Tümü" modunda varsayılan: tüm öğrenciler seçili.
 - `components/demo-flow/*` kullanılmıyor (ölü kod); metinleri v2 grep kapanışı için düzeltildi.
 - `CoachAssignmentsPanel` / Akıllı Ödev modal için referans HTML ayrı dosya değil; kanıt = `coach-smart-odev.jsx` port + `.sm-*` / `.btn-smart` CSS + batch atama.
+- Codex `5cbfcf7`: `scripts/check-turkce.mjs` + `turkish-encoding.test.ts` + pre-commit hook; API fallback Türkçe + genişletilmiş Prisma seed.

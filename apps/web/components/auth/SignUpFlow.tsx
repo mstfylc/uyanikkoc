@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { UkLogoGlyph } from "@/components/design/UkLogo";
 
 type SignUpRole = "student" | "coach";
 
@@ -34,7 +35,7 @@ export function SignUpFlow() {
         <div className="auth-art-inner">
           <div className="row" style={{ gap: 12 }}>
             <span className="logo-mark" style={{ width: 44, height: 44, borderRadius: 13 }}>
-              <KiIcon name="ki-flash text-white text-xl" />
+              <UkLogoGlyph size={24} className="text-white" />
             </span>
             <div className="logo-text">
               <b style={{ fontSize: 19, color: "#fff" }}>Uyanık Koç</b>
