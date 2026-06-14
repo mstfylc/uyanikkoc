@@ -1,6 +1,7 @@
 "use client";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { UkLogoGlyph } from "@/components/design/UkLogo";
 import { UkSparkline } from "@/components/design/UkSparkline";
 import { yonetimLoginRoleHint } from "@/lib/rbac";
 import { signIn } from "next-auth/react";
@@ -125,7 +126,7 @@ export function LoginForm() {
         <div className="auth-art-inner">
           <div className="auth-brand">
             <span className="auth-logo">
-              <KiIcon name="ki-flash text-white text-xl" size={27} />
+              <UkLogoGlyph size={27} className="text-white" />
             </span>
             <div className="auth-brand-text">
               <b>Uyanık Koç</b>

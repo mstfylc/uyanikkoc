@@ -140,8 +140,8 @@ export function CoachAssignmentsPanel() {
                 </option>
               ))}
             </select>
-            <button type="button" className="btn btn-light btn-sm" disabled={!smartStudent} onClick={() => setSmartOpen(true)}>
-              <KiIcon name="ki-abstract-26" size={16} />
+            <button type="button" className="btn btn-smart btn-sm" disabled={!smartStudent} onClick={() => setSmartOpen(true)}>
+              <KiIcon name="ki-technology-2" size={16} />
               Akıllı Ödev
             </button>
             <button
@@ -151,7 +151,7 @@ export function CoachAssignmentsPanel() {
               onClick={() => setOdevOpen(true)}
             >
               <KiIcon name="ki-plus" size={16} />
-              Yeni ödev
+              Ödev Ata
             </button>
           </div>
         }

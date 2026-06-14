@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { KiIcon } from "@/components/design/KiIcon";
+import { UkLogoGlyph } from "@/components/design/UkLogo";
 import { UkAvatar } from "@/components/design/UkAvatar";
 import {
   dashboardHref,
@@ -110,7 +111,7 @@ export function Sidebar({ role }: SidebarProps) {
     <aside className="sidebar theme-fade">
       <div className="sidebar-logo">
         <span className="logo-mark">
-          <KiIcon name="ki-flash" size={18} className="text-white" />
+          <UkLogoGlyph size={18} className="text-white" />
         </span>
         <span className="logo-text">
           <b>Uyanık Koç</b>
