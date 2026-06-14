@@ -101,6 +101,10 @@ export async function applyAdminMutation(
   ctx: AdminSnapshotContext = {},
   role: AppRole = "admin",
 ): Promise<AdminSnapshot> {
+  if (process.env.NODE_ENV === "production" && m.kind === "resetDemo") {
+    throw new AdminMutationError("resetDemo is disabled in production");
+  }
+
   await loadDbAdminState();
 
   const scopeError = assertMutationAllowed(m, ctx, role);

@@ -45,7 +45,6 @@ const BRANCH_ALLOWED: AdminMutation["kind"][] = [
   "setOrgCampaignStatus",
   "deleteOrgCampaign",
   "toggleOrgCampaignBranch",
-  "resetDemo",
 ];
 
 const COACH_ALLOWED: AdminMutation["kind"][] = [

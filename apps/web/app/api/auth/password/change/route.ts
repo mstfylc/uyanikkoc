@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { withApiAuth } from "@/lib/auth/api-guard";
+import { passwordPolicyMessage } from "@/lib/auth/password-policy";
 import { changeOwnPassword } from "@/server/services/password-change.service";
 
 function str(value: unknown): string {
@@ -24,7 +25,7 @@ export const POST = withApiAuth(["admin", "branch", "coach", "student", "parent"
   }
 
   if (result === "invalid_new") {
-    return NextResponse.json({ error: "Yeni sifre en az 6 karakter olmali." }, { status: 400 });
+    return NextResponse.json({ error: passwordPolicyMessage() }, { status: 400 });
   }
 
   if (result === "not_available") {

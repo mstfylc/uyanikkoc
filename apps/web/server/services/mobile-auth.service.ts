@@ -12,6 +12,13 @@ import { generateRefreshToken, hashRefreshToken, refreshExpiry, signAccess } fro
 import { shouldUseDatabase } from "@/lib/data/env";
 import { resolveUserByEmail } from "@/lib/auth/resolve-user";
 import {
+  assertAuthNotRateLimited,
+  AuthRateLimitError,
+  clearAuthFailures,
+  normalizeRateLimitEmail,
+  recordAuthFailure,
+} from "@/server/services/auth-rate-limit.service";
+import {
   accessSecret,
   demoStudentRecord,
   findDemoUserById,
@@ -187,11 +194,30 @@ export async function verifyOtpCode(phoneRaw: string, codeInput: string): Promis
   return issueTokens(record, phone);
 }
 
-export async function loginEmail(email: string, password: string): Promise<AuthResult> {
-  const record = await resolveUserByEmail(email);
-  if (!record) throw new MobileAuthError(401, "E-posta veya sifre hatali", "invalid_credentials");
+export async function loginEmail(email: string, password: string, ip = "unknown"): Promise<AuthResult> {
+  const normalizedEmail = normalizeRateLimitEmail(email);
+  try {
+    await assertAuthNotRateLimited({ scope: "web_login", email: normalizedEmail, ip });
+  } catch (error) {
+    if (error instanceof AuthRateLimitError) {
+      throw new MobileAuthError(429, "Çok sık deneme, biraz bekle", "too_many_requests", {
+        retryAfterMs: error.retryAfterMs,
+      });
+    }
+    throw error;
+  }
+
+  const record = await resolveUserByEmail(normalizedEmail);
+  if (!record) {
+    await recordAuthFailure({ scope: "web_login", email: normalizedEmail, ip });
+    throw new MobileAuthError(401, "E-posta veya sifre hatali", "invalid_credentials");
+  }
   const ok = await compare(password, record.passwordHash);
-  if (!ok) throw new MobileAuthError(401, "E-posta veya sifre hatali", "invalid_credentials");
+  if (!ok) {
+    await recordAuthFailure({ scope: "web_login", email: normalizedEmail, ip });
+    throw new MobileAuthError(401, "E-posta veya sifre hatali", "invalid_credentials");
+  }
+  await clearAuthFailures({ scope: "web_login", email: normalizedEmail, ip });
   return issueTokens(record);
 }
 

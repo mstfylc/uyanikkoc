@@ -11,11 +11,11 @@ import { demoUsers, type DemoUser } from "@/lib/auth/demo-users";
 export function accessSecret(): string {
   const secret = process.env.JWT_ACCESS_SECRET?.trim();
   if (secret) return secret;
-  const authSecret = (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET)?.trim();
-  if (authSecret) return authSecret;
   if (process.env.NODE_ENV === "production") {
     throw new Error("JWT_ACCESS_SECRET is required in production");
   }
+  const authSecret = (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET)?.trim();
+  if (authSecret) return authSecret;
   return "dev-access-secret-change-me";
 }
 
@@ -23,11 +23,11 @@ export function accessSecret(): string {
 export function otpPepper(): string {
   const pepper = process.env.OTP_PEPPER?.trim();
   if (pepper) return pepper;
-  const authSecret = (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET)?.trim();
-  if (authSecret) return authSecret;
   if (process.env.NODE_ENV === "production") {
     throw new Error("OTP_PEPPER is required in production");
   }
+  const authSecret = (process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET)?.trim();
+  if (authSecret) return authSecret;
   return "dev-otp-pepper-change-me";
 }
 

@@ -3,6 +3,7 @@ import { hash } from "bcryptjs";
 
 import { shouldUseDatabase } from "@/lib/data/env";
 import { demoUsers } from "@/lib/auth/demo-users";
+import { isPasswordAllowed } from "@/lib/auth/password-policy";
 import { sendPasswordResetMail } from "./mail.service";
 import {
   assertAuthNotRateLimited,
@@ -109,7 +110,7 @@ export async function requestPasswordReset(
 }
 
 export async function confirmPasswordReset(token: string, password: string): Promise<boolean> {
-  if (password.length < 6) {
+  if (!isPasswordAllowed(password)) {
     return false;
   }
 

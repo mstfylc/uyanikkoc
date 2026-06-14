@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { isPasswordAllowed, passwordPolicyMessage } from "@/lib/auth/password-policy";
 import { confirmPasswordReset } from "@/server/services/password-reset.service";
 
 function str(value: unknown): string {
@@ -11,8 +12,8 @@ export async function POST(req: Request) {
   const token = str(body.token);
   const password = str(body.password);
 
-  if (!token || password.length < 6) {
-    return NextResponse.json({ error: "Token veya sifre gecersiz." }, { status: 400 });
+  if (!token || !isPasswordAllowed(password)) {
+    return NextResponse.json({ error: `Token geçersiz veya ${passwordPolicyMessage()}` }, { status: 400 });
   }
 
   const ok = await confirmPasswordReset(token, password);

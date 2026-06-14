@@ -84,6 +84,10 @@ describe("assertProductionMemoryPolicy", () => {
 });
 
 describe("assertProductionAuthEnv", () => {
+  const strongAuthSecret = "auth-secret-32-characters-minimum-value";
+  const strongJwtSecret = "jwt-access-secret-32-characters-minimum-value";
+  const strongOtpPepper = "otp-pepper-32-characters-minimum-value";
+
   it("does not require a secret in development", () => {
     vi.stubEnv("NODE_ENV", "development");
     vi.stubEnv("AUTH_SECRET", "");
@@ -98,10 +102,30 @@ describe("assertProductionAuthEnv", () => {
     expect(() => assertProductionAuthEnv()).toThrow(/AUTH_SECRET or NEXTAUTH_SECRET is required/);
   });
 
-  it("does not throw in production when a secret exists", () => {
+  it("rejects weak production auth secrets", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("AUTH_SECRET", "test-secret");
     vi.stubEnv("NEXTAUTH_SECRET", "");
+    vi.stubEnv("JWT_ACCESS_SECRET", strongJwtSecret);
+    vi.stubEnv("OTP_PEPPER", strongOtpPepper);
+    expect(() => assertProductionAuthEnv()).toThrow(/AUTH_SECRET or NEXTAUTH_SECRET must be at least 32/);
+  });
+
+  it("requires distinct mobile and OTP production secrets", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("AUTH_SECRET", strongAuthSecret);
+    vi.stubEnv("NEXTAUTH_SECRET", "");
+    vi.stubEnv("JWT_ACCESS_SECRET", strongAuthSecret);
+    vi.stubEnv("OTP_PEPPER", strongOtpPepper);
+    expect(() => assertProductionAuthEnv()).toThrow(/JWT_ACCESS_SECRET must be different/);
+  });
+
+  it("does not throw in production when all required secrets are strong and distinct", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("AUTH_SECRET", strongAuthSecret);
+    vi.stubEnv("NEXTAUTH_SECRET", "");
+    vi.stubEnv("JWT_ACCESS_SECRET", strongJwtSecret);
+    vi.stubEnv("OTP_PEPPER", strongOtpPepper);
     expect(() => assertProductionAuthEnv()).not.toThrow();
   });
 });

@@ -69,6 +69,9 @@ const authRepository = {
     }),
   ),
   findUserById: vi.fn(),
+  countRecentLoginAttempts: vi.fn(() => Promise.resolve(0)),
+  recordLoginAttempt: vi.fn(() => Promise.resolve()),
+  clearLoginAttempts: vi.fn(() => Promise.resolve()),
   upsertDeviceToken: vi.fn(),
   deleteDeviceToken: vi.fn(),
 };
@@ -85,6 +88,7 @@ beforeEach(() => {
   challenges.clear();
   refreshTokens.clear();
   vi.clearAllMocks();
+  authRepository.countRecentLoginAttempts.mockResolvedValue(0);
   vi.resetModules();
   vi.stubEnv("DATABASE_URL", "postgresql://mobile-auth-db-test");
   vi.stubEnv("DEMO_AUTH_ALLOW_IN_MEMORY", "false");
@@ -132,5 +136,15 @@ describe("mobile-auth DB OTP store", () => {
     if (challenge) challenge.expiresAt = new Date(Date.now() - 1000);
 
     await expect(verifyOtpCode("0555 444 55 66", lastSmsCode(spy))).rejects.toMatchObject({ status: 410, code: "otp_expired" });
+  });
+
+  it("rate limits mobile email login attempts", async () => {
+    authRepository.countRecentLoginAttempts.mockResolvedValueOnce(5);
+    const { loginEmail } = await import("@/server/services/mobile-auth.service");
+
+    await expect(loginEmail("student@db.test", "wrong", "203.0.113.10")).rejects.toMatchObject({
+      status: 429,
+      code: "too_many_requests",
+    });
   });
 });

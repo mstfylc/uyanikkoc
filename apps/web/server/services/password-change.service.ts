@@ -1,5 +1,6 @@
 import { compare, hash } from "bcryptjs";
 
+import { isPasswordAllowed } from "@/lib/auth/password-policy";
 import { shouldUseDatabase } from "@/lib/data/env";
 
 export async function changeOwnPassword(input: {
@@ -7,7 +8,7 @@ export async function changeOwnPassword(input: {
   currentPassword: string;
   newPassword: string;
 }): Promise<"changed" | "invalid_current" | "invalid_new" | "not_available"> {
-  if (input.newPassword.trim().length < 6) {
+  if (!isPasswordAllowed(input.newPassword)) {
     return "invalid_new";
   }
 

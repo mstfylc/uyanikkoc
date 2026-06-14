@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { clientIpFromHeaders } from "@/server/services/auth-rate-limit.service";
 import { loginEmail, MobileAuthError } from "@/server/services/mobile-auth.service";
 
 export async function POST(req: Request) {
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await loginEmail(email, password);
+    const result = await loginEmail(email, password, clientIpFromHeaders(req.headers));
     if (result.user.role !== "student") {
       return NextResponse.json({ error: "Mobile app currently supports student accounts only" }, { status: 403 });
     }
