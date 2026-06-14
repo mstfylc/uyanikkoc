@@ -82,20 +82,22 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
   test("koc konu takibi kaynaklar ve yillik cizelge ile acilir", async ({ page }) => {
     await login(page, "coach@uyanik.local");
     await page.goto("/coach/topics");
-    await expect(page.getByRole("heading", { name: "Konu Takibi" })).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByRole("button", { name: /Tekrar/ })).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText("Sütun toplamı")).toBeVisible({ timeout: 20_000 });
-    await page.getByRole("button", { name: "Liste" }).click();
-    await expect(page.getByRole("columnheader", { name: "Kaynaklar" })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("heading", { name: "Konu Takibi", level: 1 })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("heading", { name: "Net Kaybı Haritası" })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("heading", { name: "Öğrencinin Yanlış Defteri" })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("heading", { name: "Hata Frekansı" })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("heading", { name: "Soru Takibi" })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("complementary").filter({ hasText: "Dersler" })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("button", { name: "Ödev ata" }).first()).toBeVisible({ timeout: 20_000 });
   });
 
   test("ogrenci kaynak katalogu books_clean verisini kullanir", async ({ page }) => {
     await login(page, "student@uyanik.local");
     await page.goto("/student/assignments");
-    await expect(page.getByText("Kaynaklarim")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Kaynaklarım")).toBeVisible({ timeout: 20_000 });
     await page.getByRole("button", { name: "Katalogdan ekle" }).click();
-    await expect(page.getByText("Turkiye geneli bilinen yayinevi kitaplari")).toContainText("9108 kaynak", { timeout: 20_000 });
-    await page.getByPlaceholder("Kitap veya yayinevi ara...").fill("ZORU 7 BANKASI");
+    await expect(page.getByText("Türkiye geneli bilinen yayınevi kitapları")).toContainText("9108 kaynak", { timeout: 20_000 });
+    await page.getByPlaceholder("Kitap veya yayınevi ara...").fill("ZORU 7 BANKASI");
     await expect(page.locator(".modal-body")).toContainText("ZORU 7 BANKASI", { timeout: 20_000 });
   });
 });
