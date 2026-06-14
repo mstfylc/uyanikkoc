@@ -597,6 +597,7 @@ async function seedRichDemoData() {
   await seedRichBillingAndSupport();
   await seedRichRoster();
   await seedRichExtraExams();
+  await seedLiveDemoCoachRosterMirror();
 }
 
 async function seedRichAssignments() {
@@ -1404,6 +1405,145 @@ async function seedRichExtraExams() {
         label: "LGS Mini Deneme",
         takenAt: daysAgo(agoN),
         totalNet: net,
+      },
+    });
+  }
+}
+
+async function seedLiveDemoCoachRosterMirror() {
+  const liveDemoCoach = await prisma.user.findUnique({
+    where: { email: "demo.koc@uyanikkoc.com" },
+    include: { coachProfile: true },
+  });
+  const targetCoachId = liveDemoCoach?.coachProfile?.id;
+  if (!targetCoachId || targetCoachId === "coach_001") {
+    return;
+  }
+
+  const sourceRoster = await prisma.coachStudent.findMany({
+    where: { coachId: "coach_001" },
+    select: { studentId: true },
+    orderBy: { createdAt: "asc" },
+  });
+  for (const row of sourceRoster) {
+    await prisma.coachStudent.upsert({
+      where: { coachId_studentId: { coachId: targetCoachId, studentId: row.studentId } },
+      update: {},
+      create: { id: `coach_student_live_demo_${row.studentId}`, coachId: targetCoachId, studentId: row.studentId },
+    });
+  }
+
+  const sourceReports = await prisma.parentReport.findMany({ where: { coachId: "coach_001" } });
+  for (const report of sourceReports) {
+    await prisma.parentReport.upsert({
+      where: {
+        coachId_studentId_week: {
+          coachId: targetCoachId,
+          studentId: report.studentId,
+          week: report.week,
+        },
+      },
+      update: {
+        parentId: report.parentId,
+        studentName: report.studentName,
+        parentName: report.parentName,
+        completion: report.completion,
+        netDelta: report.netDelta,
+        status: report.status,
+        sentAt: report.sentAt,
+      },
+      create: {
+        id: `parent_report_live_demo_${report.studentId}_${report.week.replace(/[^a-z0-9]/gi, "_")}`,
+        coachId: targetCoachId,
+        studentId: report.studentId,
+        parentId: report.parentId,
+        studentName: report.studentName,
+        parentName: report.parentName,
+        week: report.week,
+        completion: report.completion,
+        netDelta: report.netDelta,
+        status: report.status,
+        sentAt: report.sentAt,
+      },
+    });
+  }
+
+  const sourceAssignments = await prisma.assignment.findMany({ where: { coachId: "coach_001" } });
+  for (const assignment of sourceAssignments) {
+    await prisma.assignment.upsert({
+      where: { id: `assignment_live_demo_${assignment.id}` },
+      update: {
+        title: assignment.title,
+        description: assignment.description,
+        week: assignment.week,
+        topic: assignment.topic,
+        source: assignment.source,
+        count: assignment.count,
+        odevType: assignment.odevType,
+        odevTypes: assignment.odevTypes,
+        note: assignment.note,
+        type: assignment.type,
+        priority: assignment.priority,
+        status: assignment.status,
+        subject: assignment.subject,
+        dueDate: assignment.dueDate,
+        assignedAt: assignment.assignedAt,
+        smart: assignment.smart,
+        overdueAlert: assignment.overdueAlert,
+        quality: assignment.quality,
+        feedback: assignment.feedback,
+        completed: assignment.completed,
+        completedAt: assignment.completedAt,
+      },
+      create: {
+        id: `assignment_live_demo_${assignment.id}`,
+        title: assignment.title,
+        description: assignment.description,
+        week: assignment.week,
+        topic: assignment.topic,
+        source: assignment.source,
+        count: assignment.count,
+        odevType: assignment.odevType,
+        odevTypes: assignment.odevTypes,
+        note: assignment.note,
+        type: assignment.type,
+        priority: assignment.priority,
+        status: assignment.status,
+        subject: assignment.subject,
+        dueDate: assignment.dueDate,
+        assignedAt: assignment.assignedAt,
+        smart: assignment.smart,
+        overdueAlert: assignment.overdueAlert,
+        quality: assignment.quality,
+        feedback: assignment.feedback,
+        coachId: targetCoachId,
+        studentId: assignment.studentId,
+        parentId: assignment.parentId,
+        branchId: assignment.branchId,
+        completed: assignment.completed,
+        completedAt: assignment.completedAt,
+      },
+    });
+  }
+
+  const sourceNotes = await prisma.coachStudentNote.findMany({ where: { coachId: "coach_001" } });
+  for (const note of sourceNotes) {
+    await prisma.coachStudentNote.upsert({
+      where: { id: `coach_note_live_demo_${note.id}` },
+      update: {
+        coachId: targetCoachId,
+        studentId: note.studentId,
+        text: note.text,
+        kind: note.kind,
+        pinned: note.pinned,
+      },
+      create: {
+        id: `coach_note_live_demo_${note.id}`,
+        coachId: targetCoachId,
+        studentId: note.studentId,
+        text: note.text,
+        kind: note.kind,
+        pinned: note.pinned,
       },
     });
   }
