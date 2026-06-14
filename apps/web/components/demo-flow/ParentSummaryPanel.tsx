@@ -16,7 +16,7 @@ export function ParentSummaryPanel() {
     async function loadSummary() {
       const response = await fetch("/api/parent/summary", { credentials: "same-origin" });
       if (!response.ok) {
-        setError("Ozet yuklenemedi.");
+        setError("Özet yüklenemedi.");
         return;
       }
 
@@ -32,12 +32,12 @@ export function ParentSummaryPanel() {
   }
 
   if (!summary) {
-    return <p data-testid="summary-loading">Ozet yukleniyor...</p>;
+    return <p data-testid="summary-loading">Özet yükleniyor...</p>;
   }
 
   return (
     <section data-testid="parent-summary">
-      <p>Toplam odev: {summary.totalAssignments}</p>
+      <p>Toplam ödev: {summary.totalAssignments}</p>
       <p>Tamamlanan: {summary.completedCount}</p>
       <p>Bekleyen: {summary.pendingCount}</p>
     </section>

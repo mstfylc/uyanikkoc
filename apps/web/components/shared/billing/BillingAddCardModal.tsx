@@ -173,7 +173,7 @@ export function BillingAddCardModal({ open, onClose, onSaved }: BillingAddCardMo
             style={{ opacity: canSave ? 1 : 0.5, marginLeft: "auto" }}
           >
             <KiIcon name="ki-check" size={16} />
-            {isSaving ? "Kaydediliyor..." : "Karti Kaydet"}
+            {isSaving ? "Kaydediliyor..." : "Kartı Kaydet"}
           </button>
         </div>
       </div>

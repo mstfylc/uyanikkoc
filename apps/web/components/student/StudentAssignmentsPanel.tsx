@@ -149,7 +149,7 @@ function ResultModal({
         <div className="modal-body" style={{ gap: 14 }}>
           {requiresResult ? (
             <>
-              <div className="muted" style={{ fontSize: 12.5 }}>Sonucu gir, sistem netini hesaplasın.</div>
+              <div className="muted" style={{ fontSize: 12.5 }}>Sonuçu gir, sistem netini hesaplasın.</div>
               <div style={{ display: "flex", gap: 10 }}>
                 {[
                   ["Doğru", correct, setCorrect, "var(--success)"],
@@ -192,7 +192,7 @@ function ResultModal({
             style={{ opacity: valid ? 1 : 0.5 }}
           >
             <KiIcon name="ki-check-circle" size={16} />
-            {requiresResult ? "Sonucu Kaydet" : "Tamamlandı"}
+            {requiresResult ? "Sonuçu Kaydet" : "Tamamlandı"}
           </button>
         </div>
       </div>

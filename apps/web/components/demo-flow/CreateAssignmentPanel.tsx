@@ -20,20 +20,20 @@ type CoachStudent = {
 };
 
 const TYPE_OPTIONS: { value: AssignmentType; label: string }[] = [
-  { value: "homework", label: "Odev" },
-  { value: "exam_prep", label: "Sinav hazirligi" },
+  { value: "homework", label: "Ödev" },
+  { value: "exam_prep", label: "Sınav hazırlığı" },
   { value: "reading", label: "Okuma" },
-  { value: "practice", label: "Alistirma" },
-  { value: "other", label: "Diger" },
+  { value: "practice", label: "Alıştırma" },
+  { value: "other", label: "Diğer" },
 ];
 
 const PRIORITY_OPTIONS: { value: AssignmentPriority; label: string }[] = [
-  { value: "low", label: "Dusuk" },
+  { value: "low", label: "Düşük" },
   { value: "medium", label: "Orta" },
-  { value: "high", label: "Yuksek" },
+  { value: "high", label: "Yüksek" },
 ];
 
-const SUBJECT_OPTIONS = ["Matematik", "Fizik", "Kimya", "Biyoloji", "Turkce", "Tarih", "Cografya"];
+const SUBJECT_OPTIONS = ["Matematik", "Fizik", "Kimya", "Biyoloji", "Türkçe", "Tarih", "Coğrafya"];
 
 const TYPE_LABELS: Record<AssignmentType, string> = Object.fromEntries(
   TYPE_OPTIONS.map((option) => [option.value, option.label]),
@@ -58,24 +58,24 @@ function validateForm(input: {
 }): string | null {
   const title = input.title.trim();
   if (title.length < 2) {
-    return "Baslik en az 2 karakter olmali.";
+    return "Başlık en az 2 karakter olmalı.";
   }
 
   if (input.description.length > 500) {
-    return "Aciklama en fazla 500 karakter olabilir.";
+    return "Açıklama en fazla 500 karakter olabilir.";
   }
 
   if (input.dueDate) {
     const parsed = new Date(input.dueDate);
     if (Number.isNaN(parsed.getTime())) {
-      return "Son tarih gecersiz.";
+      return "Son tarih geçersiz.";
     }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     parsed.setHours(0, 0, 0, 0);
     if (parsed < today) {
-      return "Son tarih bugunden once olamaz.";
+      return "Son tarih bugünden önce olamaz.";
     }
   }
 
@@ -137,7 +137,7 @@ export function CreateAssignmentPanel() {
 
     if (!student) {
       setIsSubmitting(false);
-      setError("Odev atanacak ogrenci bulunamadi.");
+      setError("Ödev atanacak öğrenci bulunamadı.");
       return;
     }
 
@@ -159,7 +159,7 @@ export function CreateAssignmentPanel() {
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError("Odev olusturulamadi.");
+      setError("Ödev oluşturulamadı.");
       return;
     }
 
@@ -177,7 +177,7 @@ export function CreateAssignmentPanel() {
     <section className="stack">
       <form onSubmit={handleSubmit} className="stack" style={{ gap: 14 }}>
         <div className="field">
-          <label htmlFor="title">Baslik *</label>
+          <label htmlFor="title">Başlık *</label>
           <input
             id="title"
             name="title"
@@ -185,26 +185,26 @@ export function CreateAssignmentPanel() {
             required
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Matematik tekrar odevi"
+            placeholder="Matematik tekrar ödevi"
             className="input"
           />
         </div>
 
         <div className="field">
-          <label htmlFor="description">Aciklama</label>
+          <label htmlFor="description">Açıklama</label>
           <textarea
             id="description"
             name="description"
             rows={3}
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="Odev detaylari..."
+            placeholder="Ödev detayları..."
             className="textarea"
           />
         </div>
 
         <div className="field">
-          <label htmlFor="type">Tur</label>
+          <label htmlFor="type">Tür</label>
           <select
             id="type"
             name="type"
@@ -221,7 +221,7 @@ export function CreateAssignmentPanel() {
         </div>
 
         <div className="field">
-          <label htmlFor="priority">Oncelik</label>
+          <label htmlFor="priority">Öncelik</label>
           <select
             id="priority"
             name="priority"
@@ -246,7 +246,7 @@ export function CreateAssignmentPanel() {
             onChange={(event) => setSubject(event.target.value)}
             className="select"
           >
-            <option value="">Seciniz</option>
+            <option value="">Seçiniz</option>
             {SUBJECT_OPTIONS.map((option) => (
               <option key={option} value={option}>
                 {option}
@@ -273,7 +273,7 @@ export function CreateAssignmentPanel() {
           className="btn btn-primary"
           style={{ width: "fit-content" }}
         >
-          {isSubmitting ? "Kaydediliyor..." : isLoadingStudents ? "Ogrenciler yukleniyor..." : "Odevi kaydet"}
+          {isSubmitting ? "Kaydediliyor..." : isLoadingStudents ? "Öğrenciler yükleniyor..." : "Ödevi kaydet"}
         </button>
       </form>
 
@@ -289,14 +289,14 @@ export function CreateAssignmentPanel() {
           className="card"
         >
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <b>Olusturuldu: {created.title}</b>
+          <b>Oluşturuldu: {created.title}</b>
           <dl className="stack" style={{ gap: 6, fontSize: 13, margin: 0 }}>
             <div>
-              <dt className="muted" style={{ display: "inline" }}>Tur: </dt>
+              <dt className="muted" style={{ display: "inline" }}>Tür: </dt>
               <dd style={{ display: "inline", margin: 0 }}>{TYPE_LABELS[created.type]}</dd>
             </div>
             <div>
-              <dt className="muted" style={{ display: "inline" }}>Oncelik: </dt>
+              <dt className="muted" style={{ display: "inline" }}>Öncelik: </dt>
               <dd style={{ display: "inline", margin: 0 }}>{PRIORITY_LABELS[created.priority]}</dd>
             </div>
             <div>
@@ -309,7 +309,7 @@ export function CreateAssignmentPanel() {
             </div>
             {created.description ? (
               <div>
-                <dt className="muted">Aciklama: </dt>
+                <dt className="muted">Açıklama: </dt>
                 <dd style={{ margin: 0 }}>{created.description}</dd>
               </div>
             ) : null}

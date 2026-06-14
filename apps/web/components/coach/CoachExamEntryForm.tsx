@@ -208,7 +208,7 @@ export function CoachExamEntryForm() {
           </div>
 
           <button type="submit" disabled={isSubmitting} className="btn btn-primary w-fit">
-            {isSubmitting ? "Kaydediliyor..." : "Sonucu kaydet"}
+            {isSubmitting ? "Kaydediliyor..." : "Sonuçu kaydet"}
           </button>
 
           {error ? (

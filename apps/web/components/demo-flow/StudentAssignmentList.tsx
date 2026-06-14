@@ -34,7 +34,7 @@ export function StudentAssignmentList() {
 
     const response = await fetch("/api/student/assignments", { credentials: "same-origin" });
     if (!response.ok) {
-      setError("Odev listesi yuklenemedi.");
+      setError("Ödev listesi yüklenemedi.");
       setIsLoading(false);
       return;
     }
@@ -57,7 +57,7 @@ export function StudentAssignmentList() {
     });
 
     if (!response.ok) {
-      setError("Odev tamamlanamadi.");
+      setError("Ödev tamamlanamadı.");
       return;
     }
 
@@ -65,7 +65,7 @@ export function StudentAssignmentList() {
   }
 
   if (isLoading) {
-    return <p className="muted">Yukleniyor...</p>;
+    return <p className="muted">Yükleniyor...</p>;
   }
 
   if (error) {
@@ -79,7 +79,7 @@ export function StudentAssignmentList() {
   if (assignments.length === 0) {
     return (
       <p data-testid="empty-assignments" className="muted">
-        Henuz odev yok.
+        Henüz ödev yok.
       </p>
     );
   }
@@ -99,8 +99,8 @@ export function StudentAssignmentList() {
               <b className="lr-title" style={{ fontSize: 13.5 }}>{assignment.title}</b>
               <div className="muted" style={{ display: "flex", flexWrap: "wrap", gap: "4px 10px", fontSize: 12, marginTop: 5 }}>
                 <span>Durum: {ASSIGNMENT_STATUS_LABELS[assignment.status]}</span>
-                <span>Oncelik: {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}</span>
-                <span>Tur: {ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
+                <span>Öncelik: {ASSIGNMENT_PRIORITY_LABELS[assignment.priority]}</span>
+                <span>Tür: {ASSIGNMENT_TYPE_LABELS[assignment.type]}</span>
                 {assignment.subject ? <span>Ders: {assignment.subject}</span> : null}
                 <span>Son tarih: {formatAssignmentDueDate(assignment.dueDate)}</span>
               </div>
@@ -111,7 +111,7 @@ export function StudentAssignmentList() {
               </button>
             ) : (
               <span data-testid={`completed-${assignment.id}`} className="badge badge-success" style={{ height: 24, flexShrink: 0 }}>
-                Tamamlandi
+                Tamamlandı
               </span>
             )}
           </li>

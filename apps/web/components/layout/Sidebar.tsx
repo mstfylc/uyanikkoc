@@ -46,7 +46,7 @@ export function Sidebar({ role }: SidebarProps) {
   const items = useMemo(() => {
     if (isYonetimCoach) {
       return [
-        { href: "/yonetim/dashboard", label: "Lisansim", icon: "ki-shield-tick" },
+        { href: "/yonetim/dashboard", label: "Lisansım", icon: "ki-shield-tick" },
         { href: "/yonetim/license", label: "Lisans & Kontrol", icon: "ki-chart-pie-simple" },
       ];
     }

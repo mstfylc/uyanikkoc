@@ -126,7 +126,7 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
         <UkStatCard
           icon="ki-star"
           tone="warning"
-          value={summary.motivationEnabled ? "Acik" : "Kapali"}
+          value={summary.motivationEnabled ? "Açık" : "Kapalı"}
           label="Motivasyon"
         />
       </div>

@@ -178,8 +178,8 @@ export function CoachAssignmentsPanel() {
       <div className="grid g-4">
         <UkStatCard icon="ki-notepad-edit" tone="primary" value={total} label="Atanan ödev" />
         <UkStatCard icon="ki-flag" tone="success" value={`${rate}%`} label="Tamamlanma" />
-        <UkStatCard icon="ki-chart-simple" tone="info" value={completed} label="Sonuc girilen" />
-        <UkStatCard icon="ki-information-2" tone="danger" value={overdue} label="Gecikmis" />
+        <UkStatCard icon="ki-chart-simple" tone="info" value={completed} label="Sonuç girilen" />
+        <UkStatCard icon="ki-information-2" tone="danger" value={overdue} label="Gecikmiş" />
       </div>
 
       <UkSection
@@ -191,7 +191,7 @@ export function CoachAssignmentsPanel() {
               ["all", "Tümü"],
               ["pending", "Bekleyen"],
               ["done", "Tamamlanan"],
-              ["result", "Sonuclu"],
+              ["result", "Sonuçlu"],
             ].map(([key, label]) => (
               <button
                 key={key}
