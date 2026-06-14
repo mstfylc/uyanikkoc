@@ -73,13 +73,13 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
     const resultButton = assignmentItem.getByRole("button", { name: "Sonuç Gir" });
     if (await resultButton.isVisible()) {
       await resultButton.click();
-      const resultModal = page.locator(".modal-panel").filter({ hasText: "Sonucu gir" });
+      const resultModal = page.locator(".modal-panel").filter({ hasText: /Sonuçu gir/i });
       await expect(resultModal).toBeVisible({ timeout: 15_000 });
       const inputs = resultModal.locator("input");
       await inputs.nth(0).fill("18");
       await inputs.nth(1).fill("4");
       await inputs.nth(2).fill("2");
-      await resultModal.getByRole("button", { name: "Sonucu Kaydet" }).click();
+      await resultModal.getByRole("button", { name: "Sonuçu Kaydet" }).click();
     } else {
       await assignmentItem.getByRole("button", { name: "Tamamla" }).click();
     }

@@ -33,3 +33,4 @@ Son güncelleme: 2026-06-14 (Codex muhafız `5cbfcf7` + görsel parite)
 - `components/demo-flow/*` kullanılmıyor (ölü kod); metinleri v2 grep kapanışı için düzeltildi.
 - `CoachAssignmentsPanel` / Akıllı Ödev modal için referans HTML ayrı dosya değil; kanıt = `coach-smart-odev.jsx` port + `.sm-*` / `.btn-smart` CSS + batch atama.
 - Codex `5cbfcf7`: `scripts/check-turkce.mjs` + `turkish-encoding.test.ts` + pre-commit hook; API fallback Türkçe + genişletilmiş Prisma seed.
+- **web-v6.0 kapanış (2026-06-14):** e2e 12/12; Türkçe muhafızı yeşil; `git tag web-v6.0`.

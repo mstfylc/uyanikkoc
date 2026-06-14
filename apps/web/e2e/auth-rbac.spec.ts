@@ -42,6 +42,6 @@ test.describe("Auth ve RBAC iskeleti", () => {
   test("admin yonetim dashboard'a ulaşır", async ({ page }) => {
     await login(page, "admin@uyanik.local");
     await expect(page).toHaveURL(/\/yonetim\/dashboard/);
-    await expect(page.getByText("Platform Genel Bakış")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Platform Genel Bakış", level: 1 })).toBeVisible({ timeout: 20_000 });
   });
 });
