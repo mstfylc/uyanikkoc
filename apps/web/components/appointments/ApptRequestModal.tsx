@@ -59,7 +59,7 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
     }
 
     setIsSubmitting(true);
-    await onSubmit({ day, slot, mode, topic: topic.trim() || "Genel gorusme" });
+    await onSubmit({ day, slot, mode, topic: topic.trim() || "Genel görüşme" });
     setIsSubmitting(false);
     setDone(true);
     setTimeout(() => {
@@ -83,7 +83,7 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
             <div>
               <h3 style={{ fontSize: 16, fontWeight: 800 }}>Randevu Iste</h3>
               <div className="muted" style={{ fontSize: 12.5 }}>
-                Kocunun musait saatlerinden sec
+                Koçunun müsait saatlerinden seç
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
         </div>
         <div className="modal-body" style={{ gap: 14 }}>
           <div className="field">
-            <label className="label">Gorusme turu</label>
+            <label className="label">Görüşme türü</label>
             <div className="seg" style={{ width: "fit-content" }}>
               {settings.allowOnline ? (
                 <button
@@ -118,7 +118,7 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
                   onClick={() => setMode("in_person")}
                 >
                   <KiIcon name="ki-people" size={15} />
-                  Yuz yuze
+                  Yüz yüze
                 </button>
               ) : null}
               {settings.allowPhone ? (
@@ -182,7 +182,7 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
         </div>
         <div className="modal-foot" style={{ justifyContent: "flex-end" }}>
           <button type="button" className="btn btn-ghost" onClick={onClose}>
-            Vazgec
+            Vazgeç
           </button>
           <button
             type="button"
@@ -192,7 +192,7 @@ export function ApptRequestModal({ open, onClose, settings, onSubmit }: ApptRequ
             style={{ opacity: valid ? 1 : 0.5 }}
           >
             <KiIcon name={done ? "ki-check" : "ki-send"} />
-            {done ? "Gonderildi" : isSubmitting ? "Gonderiliyor..." : "Talep Gonder"}
+            {done ? "Gönderildi" : isSubmitting ? "Gönderiliyor..." : "Talep Gönder"}
           </button>
         </div>
       </div>

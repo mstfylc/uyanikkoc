@@ -53,7 +53,7 @@ export function CoachRatingCard() {
       title="Koçunu Değerlendir"
       sub="Görüşlerin koçunun gelişimine yardımcı olur"
       action={
-        rating && !editing ? <UkBadge tone="success">Gonderildi</UkBadge> : null
+        rating && !editing ? <UkBadge tone="success">Gönderildi</UkBadge> : null
       }
     >
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 13 }}>
@@ -90,7 +90,7 @@ export function CoachRatingCard() {
               onClick={() => setEditing(true)}
             >
               <KiIcon name="ki-setting-2" size={14} />
-              Degerlendirmeni duzenle
+              Değerlendirmeni düzenle
             </button>
           </>
         ) : (
@@ -122,7 +122,7 @@ export function CoachRatingCard() {
                 style={{ opacity: stars ? 1 : 0.5 }}
               >
                 <KiIcon name="ki-send" size={16} />
-                {isSaving ? "Kaydediliyor..." : "Gonder"}
+                {isSaving ? "Kaydediliyor..." : "Gönder"}
               </button>
               {rating ? (
                 <button

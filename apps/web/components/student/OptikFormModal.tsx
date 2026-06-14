@@ -79,7 +79,7 @@ export function OptikFormModal({ open, exam, onClose, onSubmitted }: OptikFormMo
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError("Optik gonderilemedi.");
+      setError("Optik gönderilemedi.");
       return;
     }
 
@@ -219,7 +219,7 @@ export function OptikFormModal({ open, exam, onClose, onSubmitted }: OptikFormMo
           {result ? (
             <>
               <span className="muted" style={{ fontSize: 12, fontWeight: 600 }}>
-                Optik gonderildi
+                Optik gönderildi
               </span>
               <button type="button" className="btn btn-primary" onClick={onClose}>
                 <KiIcon name="ki-check" size={16} />
@@ -229,7 +229,7 @@ export function OptikFormModal({ open, exam, onClose, onSubmitted }: OptikFormMo
           ) : (
             <>
               <span className="muted" style={{ fontSize: 12, fontWeight: 600 }}>
-                {answered}/{exam.questionCount} isaretlendi
+                {answered}/{exam.questionCount} işaretlendi
               </span>
               <button
                 type="button"
@@ -239,7 +239,7 @@ export function OptikFormModal({ open, exam, onClose, onSubmitted }: OptikFormMo
                 style={{ opacity: answered ? 1 : 0.5 }}
               >
                 <KiIcon name="ki-send" size={16} />
-                {isSubmitting ? "Gonderiliyor..." : "Gonder"}
+                {isSubmitting ? "Gönderiliyor..." : "Gönder"}
               </button>
             </>
           )}

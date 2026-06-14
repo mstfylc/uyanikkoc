@@ -15,13 +15,13 @@ const ACCESS_META: Record<AdminAccess, { label: string; tone: "primary" | "info"
     label: "Tam yetki",
     tone: "primary",
     icon: "shield",
-    desc: "Tum ekranlar, lisans, faturalama, ekip ve ayarlar dahil her sey.",
+    desc: "Tüm ekranlar, lisans, faturalama, ekip ve ayarlar dahil her şey.",
   },
   support: {
     label: "Destek yetkilisi",
     tone: "info",
     icon: "message",
-    desc: "Destek & Sistem ve Demo & Uyelik taleplerini yonetir; diger ekranlarda salt goruntuleme.",
+    desc: "Destek & Sistem ve Demo & Üyelik taleplerini yönetir; diğer ekranlarda salt görüntüleme.",
   },
 };
 
@@ -29,9 +29,9 @@ function timeAgo(ts: number | null): string {
   if (!ts) return "-";
   const diff = Date.now() - ts;
   const h = Math.floor(diff / 3_600_000);
-  if (h < 1) return "az once";
-  if (h < 24) return `${h} saat once`;
-  return `${Math.floor(h / 24)} gun once`;
+  if (h < 1) return "az önce";
+  if (h < 24) return `${h} saat önce`;
+  return `${Math.floor(h / 24)} gün önce`;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -71,20 +71,20 @@ function IntegrationModal({ item, onClose }: { item: Integration; onClose: () =>
       account: isJotform ? "jotform: bağlı" : account,
       formName,
     });
-    toast(`${item.name} baglandi`, { icon: "ki-check-circle", tone: "success" });
+    toast(`${item.name} bağlandı`, { icon: "ki-check-circle", tone: "success" });
     onClose();
   }
 
   if (isWebhook) {
     return (
-      <Modal title="Web Formu (Webhook)" sub="Kendi sitendeki formu bu adrese bagla" width={540} onClose={onClose} foot={<button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={onClose}>Tamam</button>}>
+      <Modal title="Web Formu (Webhook)" sub="Kendi sitendeki formu bu adrese bağla" width={540} onClose={onClose} foot={<button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={onClose}>Tamam</button>}>
         <Field label="Webhook adresi (POST)">
           <input className="input" readOnly value={item.webhookUrl ?? ""} style={{ fontFamily: "monospace", fontSize: 12.5 }} />
         </Field>
         <div className="alert-strip">
           <span className="as-ic"><Icon name="bolt" size={18} /></span>
           <div style={{ flex: 1 }}>
-            <b style={{ fontSize: 13 }}>Form alanlari</b>
+            <b style={{ fontSize: 13 }}>Form alanları</b>
             <div className="muted" style={{ fontSize: 12, lineHeight: 1.5 }}>ad, e-posta, telefon, tip, plan ve not alanları Demo & Üyelikler sayfasına yeni talep olarak düşer.</div>
           </div>
         </div>
@@ -94,25 +94,25 @@ function IntegrationModal({ item, onClose }: { item: Integration; onClose: () =>
 
   return (
     <Modal
-      title={`${item.name} bagla`}
+      title={`${item.name} bağla`}
       sub={item.desc}
       width={500}
       onClose={onClose}
       foot={
         <>
-          <button type="button" className="btn btn-light" onClick={onClose}>Vazgec</button>
+          <button type="button" className="btn btn-light" onClick={onClose}>Vazgeç</button>
           <button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} disabled={!ok} onClick={() => void apply()}>
-            <Icon name="check" size={16} />Bagla
+            <Icon name="check" size={16} />Bağla
           </button>
         </>
       }
     >
       {isJotform ? (
-        <Field label="Jotform API anahtari"><input className="input" value={apiKey} onChange={(e) => setApiKey(e.target.value)} /></Field>
+        <Field label="Jotform API anahtarı"><input className="input" value={apiKey} onChange={(e) => setApiKey(e.target.value)} /></Field>
       ) : (
-        <Field label={item.id === "meta" ? "Reklam hesabi" : "Google Ads hesabi"}><input className="input" value={account} onChange={(e) => setAccount(e.target.value)} /></Field>
+        <Field label={item.id === "meta" ? "Reklam hesabı" : "Google Ads hesabı"}><input className="input" value={account} onChange={(e) => setAccount(e.target.value)} /></Field>
       )}
-      <Field label="Baglanacak form"><input className="input" value={formName} onChange={(e) => setFormName(e.target.value)} /></Field>
+      <Field label="Bağlanacak form"><input className="input" value={formName} onChange={(e) => setFormName(e.target.value)} /></Field>
       <div className="alert-strip">
         <span className="as-ic"><Icon name="bolt" size={18} /></span>
         <div style={{ flex: 1 }}><b style={{ fontSize: 13 }}>Otomatik aktarım</b><div className="muted" style={{ fontSize: 12 }}>Bu formdan gelen başvurular Demo & Üyelikler sayfasına düşer.</div></div>
@@ -131,7 +131,7 @@ function IntegrationCard({ item, editable, onManage, onDisconnect }: { item: Int
             <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
               <b style={{ fontSize: 15, fontWeight: 800 }}>{item.name}</b>
               <span className={`badge badge-${item.connected ? "success" : "muted"}`} style={{ height: 21, fontSize: 11 }}>
-                {item.connected ? <><span className="dot-live" />Bagli</> : "Bagli degil"}
+                {item.connected ? <><span className="dot-live" />Bağlı</> : "Bağlı değil"}
               </span>
             </div>
             <p className="muted" style={{ fontSize: 12.5, lineHeight: 1.45, marginTop: 5 }}>{item.desc}</p>
@@ -139,7 +139,7 @@ function IntegrationCard({ item, editable, onManage, onDisconnect }: { item: Int
         </div>
         {item.connected ? (
           <div className="stack" style={{ gap: 0, background: "var(--surface-2)", borderRadius: 12, padding: "4px 14px" }}>
-            <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Bagli form</span><b style={{ fontSize: 12.5 }}>{item.formName || "-"}</b></div>
+            <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Bağlı form</span><b style={{ fontSize: 12.5 }}>{item.formName || "-"}</b></div>
             <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Hesap</span><b style={{ fontSize: 12.5 }}>{item.account || "-"}</b></div>
             <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Son senkron</span><b className="tnum" style={{ fontSize: 12.5 }}>{timeAgo(item.lastSync)}</b></div>
             <div className="kpi-row" style={{ padding: "11px 0" }}><span className="muted" style={{ fontSize: 12.5 }}>Gelen başvuru</span><b className="tnum" style={{ fontSize: 13, color: "var(--primary-600)" }}>{item.leadCount}</b></div>
@@ -148,12 +148,12 @@ function IntegrationCard({ item, editable, onManage, onDisconnect }: { item: Int
         {editable ? (
           <div className="row" style={{ gap: 8, flexWrap: "wrap", borderTop: "1px solid var(--border)", paddingTop: 12 }}>
             <button type="button" className={item.connected ? "btn btn-light btn-sm" : "btn btn-primary btn-sm"} onClick={() => onManage(item)}>
-              <Icon name={item.connected ? "settings" : "plus"} size={14} />{item.connected ? "Yonet" : "Bagla"}
+              <Icon name={item.connected ? "settings" : "plus"} size={14} />{item.connected ? "Yönet" : "Bağla"}
             </button>
-            {item.connected && item.id !== "webhook" ? <button type="button" className="btn btn-ghost-danger btn-sm" style={{ marginLeft: "auto" }} onClick={() => onDisconnect(item)}><Icon name="alert" size={14} />Baglantiyi kes</button> : null}
+            {item.connected && item.id !== "webhook" ? <button type="button" className="btn btn-ghost-danger btn-sm" style={{ marginLeft: "auto" }} onClick={() => onDisconnect(item)}><Icon name="alert" size={14} />Bağlantıyı kes</button> : null}
           </div>
         ) : (
-          <div className="muted" style={{ borderTop: "1px solid var(--border)", paddingTop: 12, fontSize: 12 }}><Icon name="lock" size={13} /> Degisiklik icin tam yetki gerekir</div>
+          <div className="muted" style={{ borderTop: "1px solid var(--border)", paddingTop: 12, fontSize: 12 }}><Icon name="lock" size={13} /> Değişiklik için tam yetki gerekir</div>
         )}
       </div>
     </div>
@@ -184,13 +184,13 @@ export function SuperSettings() {
       {!editable ? (
         <div className="alert-strip">
           <span className="as-ic"><Icon name="lock" size={16} /></span>
-          <div style={{ flex: 1 }}><b style={{ fontSize: 13.5 }}>Salt goruntuleme</b><div className="muted" style={{ fontSize: 12 }}>Destek yetkilisi ayarlari goruntuleyebilir; degisiklik icin tam yetki gerekir.</div></div>
+          <div style={{ flex: 1 }}><b style={{ fontSize: 13.5 }}>Salt görüntüleme</b><div className="muted" style={{ fontSize: 12 }}>Destek yetkilisi ayarları görüntüleyebilir; değişiklik için tam yetki gerekir.</div></div>
         </div>
       ) : null}
 
       <div className="seg-tabs">
-        <button type="button" className={`seg-tab${tab === "team" ? " on" : ""}`} onClick={() => setTab("team")}><Icon name="users" size={16} />Ekip & Erisim<span className="tnum" style={{ marginLeft: 4, opacity: .6 }}>{snapshot.team.length}</span></button>
-        <button type="button" className={`seg-tab${tab === "sources" ? " on" : ""}`} onClick={() => setTab("sources")}><Icon name="bolt" size={16} />Basvuru Kaynaklari<span className="tnum" style={{ marginLeft: 4, opacity: .6 }}>{connected}</span></button>
+        <button type="button" className={`seg-tab${tab === "team" ? " on" : ""}`} onClick={() => setTab("team")}><Icon name="users" size={16} />Ekip & Erişim<span className="tnum" style={{ marginLeft: 4, opacity: .6 }}>{snapshot.team.length}</span></button>
+        <button type="button" className={`seg-tab${tab === "sources" ? " on" : ""}`} onClick={() => setTab("sources")}><Icon name="bolt" size={16} />Başvuru Kaynakları<span className="tnum" style={{ marginLeft: 4, opacity: .6 }}>{connected}</span></button>
       </div>
 
       {tab === "team" ? (
@@ -202,7 +202,7 @@ export function SuperSettings() {
           </div>
           <div className="card">
             <div className="card-head">
-              <div><h3>Super admin erişimi</h3><p className="sub">Panele erişebilecek kullanıcıları ve rollerini yönetin</p></div>
+              <div><h3>Süper admin erişimi</h3><p className="sub">Panele erişebilecek kullanıcıları ve rollerini yönetin</p></div>
               {editable ? <button type="button" className="btn btn-primary btn-sm" onClick={() => setInviteOpen(true)}><KiIcon name="ki-plus" />Kullanıcı davet et</button> : null}
             </div>
             <div className="card-body" style={{ padding: 0 }}>
@@ -211,10 +211,10 @@ export function SuperSettings() {
                   <UkAvatar name={member.name} size={38} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <b style={{ fontSize: 13.5, display: "block" }}>{member.name}{member.status === "invited" ? <span className="badge badge-info" style={{ height: 18, fontSize: 9.5, marginLeft: 7 }}>Davet edildi</span> : null}</b>
-                    <span className="muted" style={{ fontSize: 12 }}>{member.email} · {member.status === "invited" ? "henuz katilmadi" : `son giris ${timeAgo(member.lastActive)}`}</span>
+                    <span className="muted" style={{ fontSize: 12 }}>{member.email} · {member.status === "invited" ? "henüz katılmadı" : `son giriş ${timeAgo(member.lastActive)}`}</span>
                   </div>
                   {editable ? (
-                    <select className="input" style={{ width: 168, height: 36, fontSize: 12.5 }} value={member.access} onChange={(e) => void mutate({ kind: "setAdminAccess", memberId: member.id, access: e.target.value as AdminAccess }).then(() => toast("Rol guncellendi", { icon: "ki-shield-tick" }))}>
+                    <select className="input" style={{ width: 168, height: 36, fontSize: 12.5 }} value={member.access} onChange={(e) => void mutate({ kind: "setAdminAccess", memberId: member.id, access: e.target.value as AdminAccess }).then(() => toast("Rol güncellendi", { icon: "ki-shield-tick" }))}>
                       <option value="full">Tam yetki</option>
                       <option value="support">Destek yetkilisi</option>
                     </select>
@@ -227,7 +227,7 @@ export function SuperSettings() {
             </div>
           </div>
           <div className="card">
-            <div className="card-head"><div><h3>Roller ve yetkiler</h3><p className="sub">Tam yetki ve destek yetkilisi farklari</p></div></div>
+            <div className="card-head"><div><h3>Roller ve yetkiler</h3><p className="sub">Tam yetki ve destek yetkilisi farkları</p></div></div>
             <div className="card-body stack" style={{ gap: 12 }}>
               {Object.entries(ACCESS_META).map(([key, role]) => (
                 <div key={key} className="row" style={{ gap: 12, alignItems: "flex-start" }}>
@@ -241,9 +241,9 @@ export function SuperSettings() {
       ) : (
         <div className="stack">
           <div className="grid g-3">
-            <StatCard icon="bolt" tone="primary" value={`${connected}/${snapshot.integrations.length}`} label="Bagli kaynak" />
+            <StatCard icon="bolt" tone="primary" value={`${connected}/${snapshot.integrations.length}`} label="Bağlı kaynak" />
             <StatCard icon="users" tone="success" value={totalLeads} label="Toplam gelen başvuru" />
-            <StatCard icon="refresh" tone="info" value={snapshot.integrations.length - connected} label="Baglanabilir kaynak" />
+            <StatCard icon="refresh" tone="info" value={snapshot.integrations.length - connected} label="Bağlanabilir kaynak" />
           </div>
           <div className="alert-strip">
             <span className="as-ic"><Icon name="bell" size={16} /></span>
@@ -257,7 +257,7 @@ export function SuperSettings() {
 
       {inviteOpen ? (
         <InvitePersonDialog
-          title="Super admin ekibine davet et"
+          title="Süper admin ekibine davet et"
           roleMode="adminAccess"
           onClose={() => setInviteOpen(false)}
           onSubmit={({ name, email, value }) => void mutate({ kind: "inviteAdminMember", name, email, access: value as AdminAccess }).then(() => toast(`${name} davet edildi`, { icon: "ki-send", tone: "success" }))}
@@ -266,11 +266,11 @@ export function SuperSettings() {
       {manage ? <IntegrationModal item={manage} onClose={() => setManage(null)} /> : null}
       <ConfirmModal
         open={!!disconnect}
-        title="Baglantiyi kes?"
+        title="Bağlantıyı kes?"
         tone="danger"
         body={disconnect ? `${disconnect.name} bağlantısı kesilecek; bu kaynaktan yeni başvuru aktarımı duracak.` : ""}
-        confirmLabel="Baglantiyi kes"
-        onConfirm={() => { if (disconnect) void mutate({ kind: "disconnectIntegration", integrationId: disconnect.id }).then(() => toast("Baglanti kesildi", { icon: "ki-shield-cross", tone: "warning" })); }}
+        confirmLabel="Bağlantıyı kes"
+        onConfirm={() => { if (disconnect) void mutate({ kind: "disconnectIntegration", integrationId: disconnect.id }).then(() => toast("Bağlantı kesildi", { icon: "ki-shield-cross", tone: "warning" })); }}
         onClose={() => setDisconnect(null)}
       />
     </div>

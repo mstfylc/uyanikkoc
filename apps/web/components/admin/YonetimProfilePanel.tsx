@@ -91,7 +91,7 @@ export function YonetimProfilePanel() {
   }, [isBranch, org, role, session?.user?.email, session?.user?.name]);
 
   if (!role || (role !== "admin" && role !== "branch")) {
-    return <div className="card card-pad muted">Profil yukleniyor…</div>;
+    return <div className="card card-pad muted">Profil yükleniyor…</div>;
   }
 
   const tone = isBranch && org ? org.tone : ADMIN_DEFAULTS.tone;

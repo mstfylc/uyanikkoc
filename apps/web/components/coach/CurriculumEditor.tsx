@@ -216,7 +216,7 @@ export function CurriculumEditor({ curriculum, isSaving, onSave, onReset }: Curr
 
         <UkSection
           title={`${active} — Konu Gruplari`}
-          sub="Alt kirilimlari ve konulari duzenle"
+          sub="Alt kırılımları ve konuları düzenle"
           action={
             <button type="button" className="btn btn-primary btn-sm" disabled={isSaving} onClick={addGroup}>
               <KiIcon name="ki-plus" size={15} />
@@ -227,7 +227,7 @@ export function CurriculumEditor({ curriculum, isSaving, onSave, onReset }: Curr
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {groups.length === 0 ? (
               <p className="muted" style={{ fontSize: 13, textAlign: "center", padding: "24px 0" }}>
-                Bu derste henuz grup yok. &quot;Grup ekle&quot; ile baslayin.
+                Bu derste henüz grup yok. &quot;Grup ekle&quot; ile başlayın.
               </p>
             ) : (
               groups.map((group, groupIndex) => (

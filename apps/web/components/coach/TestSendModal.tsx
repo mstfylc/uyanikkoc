@@ -53,7 +53,7 @@ export function TestSendModal({ open, onClose, students, catalog, onSent }: Test
 
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
-      setError(data.error ?? "Test gonderilemedi.");
+      setError(data.error ?? "Test gönderilemedi.");
       return;
     }
 
@@ -78,9 +78,9 @@ export function TestSendModal({ open, onClose, students, catalog, onSent }: Test
               <KiIcon name="ki-star" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Test Gonder</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Test Gönder</h3>
               <div className="muted" style={{ fontSize: 12.5 }}>
-                Ogrenci ve test sec
+                Öğrenci ve test seç
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@ export function TestSendModal({ open, onClose, students, catalog, onSent }: Test
         <form onSubmit={handleSubmit} className="modal-body" style={{ gap: 14 }}>
           <div className="field">
             <label className="label" htmlFor="send-modal-student">
-              Ogrenci
+              Öğrenci
             </label>
             <select
               id="send-modal-student"
@@ -136,11 +136,11 @@ export function TestSendModal({ open, onClose, students, catalog, onSent }: Test
           ) : null}
           <div className="modal-foot" style={{ justifyContent: "flex-end", padding: 0 }}>
             <button type="button" className="btn btn-ghost" onClick={onClose}>
-              Vazgec
+              Vazgeç
             </button>
             <button type="submit" disabled={isSubmitting || !studentId || !testId} className="btn btn-primary">
               <KiIcon name={done ? "ki-check" : "ki-send"} />
-              {done ? "Gonderildi" : isSubmitting ? "Gonderiliyor..." : "Test gonder"}
+              {done ? "Gönderildi" : isSubmitting ? "Gönderiliyor..." : "Test gönder"}
             </button>
           </div>
         </form>

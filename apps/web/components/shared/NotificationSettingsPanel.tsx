@@ -51,13 +51,13 @@ export function NotificationSettingsPanel({ role, onSaved }: NotificationSetting
   }
 
   const activeCount = countActiveChannels(role, prefs);
-  const email = session?.user?.email ?? "hesabina";
+  const email = session?.user?.email ?? "hesabına";
 
   return (
     <div className="stack">
       <UkSection
         title="Bildirim Tercihleri"
-        sub="Hangi bildirimleri hangi kanaldan alacagini sec"
+        sub="Hangi bildirimleri hangi kanaldan alacağını seç"
         action={
           <button type="button" className="btn btn-primary btn-sm" onClick={commit}>
             <KiIcon name={saved ? "ki-check" : "ki-setting-2"} size={15} />
@@ -106,11 +106,11 @@ export function NotificationSettingsPanel({ role, onSaved }: NotificationSetting
         </div>
       </UkSection>
 
-      <UkSection title="Rahatsiz Etme Saatleri" sub="Bu aralikta uygulama ve SMS bildirimleri ertelenir">
+      <UkSection title="Rahatsız Etme Saatleri" sub="Bu aralıkta uygulama ve SMS bildirimleri ertelenir">
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <label className="renew-toggle">
             <div>
-              <b style={{ fontSize: 13.5 }}>Rahatsiz etme modu</b>
+              <b style={{ fontSize: 13.5 }}>Rahatsız etme modu</b>
               <div className="muted" style={{ fontSize: 12 }}>
                 Belirledigin saatlerde sessize alinir
               </div>
@@ -119,7 +119,7 @@ export function NotificationSettingsPanel({ role, onSaved }: NotificationSetting
               type="button"
               className={`switch${prefs.quiet.enabled ? " on" : ""}`}
               onClick={() => setQuiet({ enabled: !prefs.quiet.enabled })}
-              aria-label="Rahatsiz etme"
+              aria-label="Rahatsız etme"
             >
               <span />
             </button>
@@ -169,7 +169,7 @@ export function NotificationSettingsPanel({ role, onSaved }: NotificationSetting
         style={{ fontSize: 11.5, display: "flex", alignItems: "center", gap: 6, paddingLeft: 2 }}
       >
         <KiIcon name="ki-notification-on" size={13} />
-        {activeCount} kanal etkin · E-posta {email} adresine gonderilir.
+        {activeCount} kanal etkin · E-posta {email} adresine gönderilir.
       </div>
     </div>
   );

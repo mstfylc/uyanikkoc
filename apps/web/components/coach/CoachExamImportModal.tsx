@@ -61,21 +61,21 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
       const buffer = await file.arrayBuffer();
       const result = await parseDenemeXlsx(buffer, file.name);
       if (result.students.length === 0) {
-        throw new Error("Dosyada ogrenci satiri bulunamadi.");
+        throw new Error("Dosyada öğrenci satırı bulunamadı.");
       }
       setParsed(result);
       setExamName(result.name);
       setExamType(result.examType);
       setStage("preview");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Dosya okunamadi.");
+      setError(err instanceof Error ? err.message : "Dosya okunamadı.");
       setStage("error");
     }
   }
 
   async function submitExams(exams: ReturnType<typeof parseCsvExamImport>) {
     if (exams.length === 0) {
-      setError("Gecerli satir bulunamadi.");
+      setError("Geçerli satır bulunamadı.");
       return;
     }
 
@@ -90,7 +90,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
 
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
-      setError(data.error ?? "Import basarisiz.");
+      setError(data.error ?? "İçe aktarma başarısız.");
       return;
     }
 
@@ -109,7 +109,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
     });
 
     if (exams.length === 0) {
-      setError("Roster ile eslesen ogrenci bulunamadi.");
+      setError("Roster ile eşleşen öğrenci bulunamadı.");
       return;
     }
 
@@ -139,9 +139,9 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
               <KiIcon name="ki-chart-pie-simple" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Deneme Sonucu Ice Aktar</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Deneme Sonucu İçe Aktar</h3>
               <div className="muted" style={{ fontSize: 12.5 }}>
-                Excel (.xlsx) veya CSV ile toplu sonuc yukle
+                Excel (.xlsx) veya CSV ile toplu sonuç yükle
               </div>
             </div>
           </div>
@@ -170,9 +170,9 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
                 <span className="stat-icon tone-primary" style={{ width: 54, height: 54, borderRadius: 16 }}>
                   <KiIcon name="ki-plus" size={26} />
                 </span>
-                <div style={{ fontWeight: 700, fontSize: 14.5, marginTop: 4 }}>Excel dosyasini sec</div>
+                <div style={{ fontWeight: 700, fontSize: 14.5, marginTop: 4 }}>Excel dosyasını seç</div>
                 <div className="muted" style={{ fontSize: 12.5 }}>
-                  Sirali liste formati (OZDEBIR / OSYM TG) · D / Y / N sutunlari
+                  Sıralı liste formatı (ÖZDEBİR / ÖSYM TG) · D / Y / N sütunları
                 </div>
                 {stage === "error" && error ? (
                   <span className="badge badge-danger" style={{ marginTop: 8 }}>
@@ -189,7 +189,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
 
           {stage === "parsing" ? (
             <div style={{ padding: "40px 0", textAlign: "center", color: "var(--muted)", fontSize: 13.5 }}>
-              Dosya isleniyor...
+              Dosya işleniyor...
             </div>
           ) : null}
 
@@ -197,7 +197,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
             <>
               <div className="field">
                 <label className="label" htmlFor="import-exam-name">
-                  Deneme adi
+                  Deneme adı
                 </label>
                 <input
                   id="import-exam-name"
@@ -207,7 +207,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
                 />
               </div>
               <div className="field">
-                <label className="label">Sinav turu</label>
+                <label className="label">Sınav türü</label>
                 <div className="seg" style={{ width: "fit-content" }}>
                   {(["TYT", "AYT", "LGS"] as ResultExamType[]).map((type) => (
                     <button
@@ -222,7 +222,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
                 </div>
               </div>
               <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
-                <UkBadge tone="success">{parsed.students.length} ogrenci okundu</UkBadge>
+                <UkBadge tone="success">{parsed.students.length} öğrenci okundu</UkBadge>
                 <UkBadge tone="muted">{parsed.subjects.length} ders</UkBadge>
                 <UkBadge tone="primary">{parsed.examType} · Ort. {avg} net</UkBadge>
               </div>
@@ -233,7 +233,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
                       <tr>
                         <th>#</th>
                         <th>Ad Soyad</th>
-                        <th>Sube</th>
+                        <th>Şube</th>
                         {parsed.previewColumns.map((column) => (
                           <th key={column} style={{ textAlign: "center" }}>
                             {column}
@@ -276,7 +276,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
               </div>
               {parsed.students.length > 12 ? (
                 <div className="muted" style={{ fontSize: 11.5, textAlign: "center" }}>
-                  +{parsed.students.length - 12} ogrenci daha...
+                  +{parsed.students.length - 12} öğrenci daha...
                 </div>
               ) : null}
               {error ? (
@@ -290,11 +290,11 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
           {stage === "csv" ? (
             <form onSubmit={handleCsvImport} className="stack" style={{ gap: 12 }}>
               <p className="muted" style={{ fontSize: 12.5 }}>
-                Her satir: studentId,examType,label,takenAt,subject,correct,wrong
+                Her satır: studentId,examType,label,takenAt,subject,correct,wrong
               </p>
               <div className="field">
                 <label className="label" htmlFor="import-csv-text">
-                  CSV icerigi
+                  CSV içeriği
                 </label>
                 <textarea
                   id="import-csv-text"
@@ -314,7 +314,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
                   Geri
                 </button>
                 <button type="submit" disabled={isSubmitting} className="btn btn-primary">
-                  {isSubmitting ? "Aktariliyor..." : "CSV ice aktar"}
+                  {isSubmitting ? "Aktarılıyor..." : "CSV içe aktar"}
                 </button>
               </div>
             </form>
@@ -324,7 +324,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
         {stage === "preview" ? (
           <div className="modal-foot" style={{ justifyContent: "flex-end" }}>
             <button type="button" className="btn btn-ghost" onClick={onClose}>
-              Vazgec
+              Vazgeç
             </button>
             <button
               type="button"
@@ -333,7 +333,7 @@ export function CoachExamImportModal({ open, onClose, onImported, roster = [] }:
               onClick={() => void handleXlsxImport()}
             >
               <KiIcon name="ki-check-circle" />
-              {isSubmitting ? "Aktariliyor..." : `Ice Aktar (${parsed?.students.length ?? 0})`}
+              {isSubmitting ? "Aktarılıyor..." : `İçe Aktar (${parsed?.students.length ?? 0})`}
             </button>
           </div>
         ) : null}

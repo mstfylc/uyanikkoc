@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { AuthProvider } from "./providers";
 import "./globals.css";
 import "../styles/uk-design.css";
+import "../styles/odev-ata.css";
 
 export const dynamic = "force-dynamic";
 

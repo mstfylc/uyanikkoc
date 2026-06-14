@@ -11,7 +11,7 @@ export default function GlobalError({
       <body>
         <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 24 }}>
           <div style={{ maxWidth: 420, textAlign: "center" }}>
-            <h1 style={{ fontSize: 22, fontWeight: 800 }}>Bir hata olustu</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 800 }}>Bir hata oluştu</h1>
             <p style={{ marginTop: 10, color: "#64748b", lineHeight: 1.6 }}>
               Islem tamamlanamadi. Lutfen tekrar deneyin.
             </p>

@@ -143,7 +143,7 @@ export function NotificationBell({ role }: NotificationBellProps) {
               </div>
               {unreadCount > 0 ? (
                 <button type="button" className="link-btn" style={{ fontSize: 12 }} onClick={() => void markAllRead()}>
-                  Tumunu okundu isaretle
+                  Tümünü okundu işaretle
                 </button>
               ) : null}
             </div>
@@ -151,7 +151,7 @@ export function NotificationBell({ role }: NotificationBellProps) {
             <div className="notif-list">
               {isLoading ? (
                 <div style={{ padding: "36px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-                  Yukleniyor...
+                  Yükleniyor...
                 </div>
               ) : notifications.length === 0 ? (
                 <div style={{ padding: "36px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
@@ -160,7 +160,7 @@ export function NotificationBell({ role }: NotificationBellProps) {
                 </div>
               ) : (
                 <>
-                  {today.length > 0 ? <div className="notif-sec">Bugun</div> : null}
+                  {today.length > 0 ? <div className="notif-sec">Bugün</div> : null}
                   {today.map((notification) => (
                     <NotificationRow
                       key={notification.id}
@@ -169,7 +169,7 @@ export function NotificationBell({ role }: NotificationBellProps) {
                       onSelect={(item) => void markRead(item)}
                     />
                   ))}
-                  {earlier.length > 0 ? <div className="notif-sec">Daha once</div> : null}
+                  {earlier.length > 0 ? <div className="notif-sec">Daha önce</div> : null}
                   {earlier.map((notification) => (
                     <NotificationRow
                       key={notification.id}

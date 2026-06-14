@@ -121,7 +121,7 @@ export function CoachExamsPanel() {
           <div className="row" style={{ gap: 8 }}>
             <button type="button" className="btn btn-light" onClick={() => setManualOpen(true)}>
               <KiIcon name="ki-notepad-edit" size={16} />
-              Manuel Giris
+              Manuel Giriş
             </button>
             <button type="button" className="btn btn-primary" onClick={() => setImportOpen(true)}>
               <KiIcon name="ki-plus" size={16} />
@@ -134,7 +134,7 @@ export function CoachExamsPanel() {
       {isLoading ? (
         <div className="card">
           <div className="card-body muted" style={{ fontSize: 13 }}>
-            Yukleniyor...
+            Yükleniyor...
           </div>
         </div>
       ) : null}
@@ -149,15 +149,15 @@ export function CoachExamsPanel() {
               <KiIcon name="ki-chart-simple" size={24} />
             </span>
             <div style={{ flex: 1, minWidth: 220 }}>
-              <div style={{ fontSize: 15, fontWeight: 700 }}>Henuz ice aktarilmis deneme yok</div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>Henüz içe aktarılmış deneme yok</div>
               <div className="muted" style={{ fontSize: 13, marginTop: 3 }}>
-                Yayınevinden gelen sonuc Excel&apos;ini (.xlsx) yukleyerek veya CSV ile tum ogrencilerin
-                sonuclarini tek tikla isleyin.
+                Yayınevinden gelen sonuç Excel&apos;ini (.xlsx) yükleyerek veya CSV ile tüm öğrencilerin
+                sonuçlarını tek tıkla işleyin.
               </div>
             </div>
             <button type="button" className="btn btn-primary" onClick={() => setImportOpen(true)}>
               <KiIcon name="ki-plus" size={16} />
-              Sonuc Yukle
+              Sonuç Yükle
             </button>
           </div>
         </div>
@@ -186,9 +186,9 @@ export function CoachExamsPanel() {
               icon="ki-people"
               tone="primary"
               value={selectedSession.students.length}
-              label="Katilan ogrenci"
+              label="Katılan öğrenci"
             />
-            <UkStatCard icon="ki-flag" tone="info" value={classAverage} label="Sinif ortalamasi (net)" />
+            <UkStatCard icon="ki-flag" tone="info" value={classAverage} label="Sınıf ortalaması (net)" />
             <UkStatCard
               icon="ki-star"
               tone="success"
@@ -235,13 +235,13 @@ export function CoachExamsPanel() {
           </UkSection>
 
           <UkSection
-            title="Sirali Sonuc Listesi"
-            sub={`${selectedSession.name} · ${selectedSession.students.length} ogrenci`}
+            title="Sıralı Sonuç Listesi"
+            sub={`${selectedSession.name} · ${selectedSession.students.length} öğrenci`}
             action={
               <div className="searchbox" style={{ minWidth: 200, margin: 0, display: "flex" }}>
                 <KiIcon name="ki-magnifier" size={16} />
                 <input
-                  placeholder="Ogrenci / sube ara..."
+                  placeholder="Öğrenci / şube ara..."
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                 />
@@ -253,8 +253,8 @@ export function CoachExamsPanel() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Ogrenci</th>
-                    <th>Sube</th>
+                    <th>Öğrenci</th>
+                    <th>Şube</th>
                     {EXAM_CAT_ORDER.map((category) => (
                       <th key={category} style={{ textAlign: "center" }}>
                         {category}
@@ -319,8 +319,8 @@ export function CoachExamsPanel() {
       ) : null}
 
       <UkSection
-        title="Sinif Net Ortalamasi (gecmis)"
-        sub="Takip ettigin ogrencilerin deneme trendi"
+        title="Sınıf Net Ortalaması (geçmiş)"
+        sub="Takip ettiğin öğrencilerin deneme trendi"
         action={
           trendDelta != null && trendDelta >= 0 ? (
             <UkBadge tone="success">+{formatExamNet(trendDelta)} net</UkBadge>

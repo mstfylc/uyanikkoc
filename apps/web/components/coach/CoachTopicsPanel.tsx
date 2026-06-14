@@ -648,7 +648,7 @@ export function CoachTopicsPanel() {
                         />
                         <span style={{ fontWeight: 700, fontSize: 13.5 }}>{subject}</span>
                         <span className="muted" style={{ fontSize: 11 }}>
-                          {groups.length} kirilim
+                          {groups.length} kırılım
                         </span>
                         <div className="row" style={{ gap: 12, marginLeft: "auto" }}>
                           <span
@@ -1014,7 +1014,7 @@ export function CoachTopicsPanel() {
                 <b style={{ fontSize: 13.5, fontWeight: 700 }}>Ödev atandi</b>
                 <div className="muted" style={{ fontSize: 12 }}>
                   {assignedToast.konu} konu · {assignedToast.soru} soru{" "}
-                  {selectedStudent?.displayName.split(" ")[0]}&apos;e gonderildi
+                  {selectedStudent?.displayName.split(" ")[0]}&apos;e gönderildi
                   {assignedToast.due
                     ? ` · son tarih ${new Date(assignedToast.due).toLocaleDateString("tr-TR")}`
                     : ""}

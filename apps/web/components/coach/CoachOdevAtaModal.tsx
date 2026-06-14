@@ -4,12 +4,22 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { KiIcon } from "@/components/design/KiIcon";
-import { UkNumStepper } from "@/components/design/UkNumStepper";
-import { groupTargetKey, pickKaynak } from "@/lib/design/coach-topic-metrics";
-import { getStudentResources } from "@/lib/design/student-resources";
+import {
+  KAYNAK_TUR,
+  kaynakLabel,
+  katalogByLabel,
+  katalogList,
+  katalogPublishers,
+  sourcesForSubject,
+} from "@/lib/design/kaynak-catalog";
+import { groupTargetKey } from "@/lib/design/coach-topic-metrics";
 import { subjectColor } from "@/lib/design/subject-colors";
-import type { StudentSourceTracker } from "@/mocks/student-sources";
+import type { SourceStatus, StudentSourceTracker } from "@/mocks/student-sources";
 import type { CurriculumRecord } from "@uyanik/database";
+
+type OdevTypeKey = "soru" | "video" | "konu" | "test";
+
+type Recipient = { studentId: string; name: string };
 
 type CoachOdevAtaModalProps = {
   open: boolean;
@@ -17,13 +27,93 @@ type CoachOdevAtaModalProps = {
   studentId: string;
   studentName: string;
   curriculum: CurriculumRecord | null;
+  /** Toplu atama: verilirse "Kime" chip'leri görünür, çoklu öğrenciye atanır. */
+  roster?: Recipient[];
+  defaultAll?: boolean;
+  examType?: "YKS" | "LGS";
   initialSubject?: string | null;
   initialTopic?: string | null;
   onAssigned?: (summary: { konu: number; soru: number; due?: string }) => void;
 };
 
+const ODEV_TYPES: { key: OdevTypeKey; label: string; icon: string }[] = [
+  { key: "soru", label: "Soru Çözümü", icon: "ki-notepad-edit" },
+  { key: "video", label: "Video İzleme", icon: "ki-technology-2" },
+  { key: "konu", label: "Konu Çalışması", icon: "ki-book-open" },
+  { key: "test", label: "Deneme/Test", icon: "ki-chart-simple" },
+];
+
+const KAYNAK_DURUM: Record<SourceStatus, { label: string; tone: "muted" | "info" | "success" }> = {
+  beklemede: { label: "Beklemede", tone: "muted" },
+  aktif: { label: "Aktif", tone: "info" },
+  bitti: { label: "Tamamlandı", tone: "success" },
+};
+
+const DUR_COLOR: Record<"muted" | "info" | "success", string> = {
+  muted: "var(--faint)",
+  info: "var(--info)",
+  success: "var(--success)",
+};
+
 function topicKey(subject: string, topic: string): string {
   return `${subject}::${topic}`;
+}
+
+function norm(value: string): string {
+  return (value || "").toLocaleLowerCase("tr-TR");
+}
+
+/** Klavyeden yazılabilir + butonlu sayı girişi (oa-stepper). */
+function OaStepper({
+  value,
+  onChange,
+  step = 10,
+  min = 0,
+  max = 9999,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  step?: number;
+  min?: number;
+  max?: number;
+}) {
+  const [text, setText] = useState(String(value));
+  useEffect(() => {
+    setText(String(value));
+  }, [value]);
+
+  const commit = (raw: string | number) => {
+    let n = parseInt(String(raw).replace(/[^\d]/g, ""), 10);
+    if (Number.isNaN(n)) n = min;
+    n = Math.max(min, Math.min(max, n));
+    onChange(n);
+    setText(String(n));
+  };
+
+  return (
+    <div className="oa-stepper" onClick={(event) => event.stopPropagation()} role="presentation">
+      <button type="button" onClick={() => commit(value - step)} aria-label="Azalt">
+        −
+      </button>
+      <input
+        className="tnum"
+        value={text}
+        onChange={(event) => setText(event.target.value.replace(/[^\d]/g, ""))}
+        onBlur={(event) => commit(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            commit(event.currentTarget.value);
+            event.currentTarget.blur();
+          }
+        }}
+        inputMode="numeric"
+        aria-label="Hedef değeri"
+      />
+      <button type="button" onClick={() => commit(value + step)} aria-label="Artır">
+        +
+      </button>
+    </div>
+  );
 }
 
 export function CoachOdevAtaModal({
@@ -32,21 +122,34 @@ export function CoachOdevAtaModal({
   studentId,
   studentName,
   curriculum,
+  roster,
+  defaultAll,
+  examType,
   initialSubject,
   initialTopic,
   onAssigned,
 }: CoachOdevAtaModalProps) {
   const [mounted, setMounted] = useState(false);
   const subjects = useMemo(() => Object.keys(curriculum?.subjects ?? {}), [curriculum]);
+
+  const bulkRoster = roster ?? [];
+  const isBulk = bulkRoster.length > 0;
+  const examKey: "YKS" | "LGS" = examType === "LGS" ? "LGS" : "YKS";
+
   const [activeSubject, setActiveSubject] = useState("");
   const [selected, setSelected] = useState<Record<string, number>>({});
-  const [defaultSoru, setDefaultSoru] = useState(30);
-  const [unitType, setUnitType] = useState<"soru" | "test">("soru");
+  const [recipients, setRecipients] = useState<string[]>([]);
+  const [types, setTypes] = useState<OdevTypeKey[]>(["soru"]);
+  const [defSoru, setDefSoru] = useState(30);
+  const [defTest, setDefTest] = useState(5);
   const [note, setNote] = useState("");
   const [due, setDue] = useState("");
   const [done, setDone] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sourceBySubject, setSourceBySubject] = useState<Record<string, string>>({});
+  const [srcSearch, setSrcSearch] = useState("");
+  const [srcOpen, setSrcOpen] = useState(false);
+  const [srcPub, setSrcPub] = useState("Tümü");
   const [tracker, setTracker] = useState<StudentSourceTracker | null>(null);
 
   useEffect(() => {
@@ -57,47 +160,67 @@ export function CoachOdevAtaModal({
     if (!open) {
       return;
     }
-
     const firstSubject = initialSubject && subjects.includes(initialSubject) ? initialSubject : subjects[0] ?? "";
     setActiveSubject(firstSubject);
     setNote("");
     setDue("");
     setDone(false);
-    setDefaultSoru(30);
-    setUnitType("soru");
+    setTypes(["soru"]);
+    setDefSoru(30);
+    setDefTest(5);
     setSourceBySubject({});
+    setSrcSearch("");
+    setSrcPub("Tümü");
+    setSrcOpen(false);
     setTracker(null);
+    setRecipients(defaultAll ? bulkRoster.map((item) => item.studentId) : isBulk ? [] : [studentId]);
 
     if (initialSubject && initialTopic) {
       setSelected({ [topicKey(initialSubject, initialTopic)]: 30 });
     } else {
       setSelected({});
     }
-  }, [open, initialSubject, initialTopic, subjects]);
+  }, [open, initialSubject, initialTopic, subjects, studentId]);
+
+  const hasSoru = types.includes("soru");
+  const hasTest = types.includes("test");
+  const showCount = hasSoru || hasTest;
+  const unitSoru = hasSoru;
+  const unitLabel = unitSoru ? "soru" : "test";
+  const cStep = unitSoru ? 10 : 1;
+  const cMax = unitSoru ? 500 : 50;
+  const defCount = unitSoru ? defSoru : defTest;
+
+  const targets = isBulk ? recipients : [studentId];
+  const sourceStudentId = isBulk ? recipients[0] ?? bulkRoster[0]?.studentId ?? studentId : studentId;
 
   useEffect(() => {
-    if (!open || !studentId) {
+    if (!open || !sourceStudentId) {
       return;
     }
-
     let active = true;
     async function loadSources() {
-      const response = await fetch(`/api/coach/students/${studentId}/sources`, { credentials: "same-origin" });
+      const response = await fetch(`/api/coach/students/${sourceStudentId}/sources`, { credentials: "same-origin" });
       if (!active) return;
       if (response.ok) {
         const data = (await response.json()) as { tracker?: StudentSourceTracker };
         setTracker(data.tracker ?? null);
       }
     }
-
     void loadSources();
     return () => {
       active = false;
     };
-  }, [open, studentId]);
+  }, [open, sourceStudentId]);
 
   const selectedKeys = Object.keys(selected);
   const totalSoru = selectedKeys.reduce((sum, key) => sum + (selected[key] || 0), 0);
+
+  const toggleType = useCallback((key: OdevTypeKey) => {
+    setTypes((current) =>
+      current.includes(key) ? (current.length > 1 ? current.filter((item) => item !== key) : current) : [...current, key],
+    );
+  }, []);
 
   const toggleTopic = useCallback(
     (subject: string, topic: string) => {
@@ -107,12 +230,12 @@ export function CoachOdevAtaModal({
         if (next[key] != null) {
           delete next[key];
         } else {
-          next[key] = defaultSoru;
+          next[key] = defCount;
         }
         return next;
       });
     },
-    [defaultSoru],
+    [defCount],
   );
 
   const setSoru = useCallback((subject: string, topic: string, value: number) => {
@@ -126,7 +249,7 @@ export function CoachOdevAtaModal({
         for (const topic of topics) {
           const key = topicKey(subject, topic);
           if (selectAll) {
-            next[key] = next[key] ?? defaultSoru;
+            next[key] = next[key] ?? defCount;
           } else {
             delete next[key];
           }
@@ -134,7 +257,7 @@ export function CoachOdevAtaModal({
         return next;
       });
     },
-    [defaultSoru],
+    [defCount],
   );
 
   const subjSelCount = useCallback(
@@ -142,56 +265,72 @@ export function CoachOdevAtaModal({
     [selectedKeys],
   );
 
-  const sourceOptions = useMemo(() => {
-    if (!activeSubject) {
-      return [];
-    }
-    const owned = tracker?.items.map((item) => item.name) ?? [];
-    return [...new Set([...owned, ...getStudentResources(activeSubject).slice(0, 6)])];
-  }, [activeSubject, tracker]);
+  const toggleRecipient = useCallback((id: string) => {
+    setRecipients((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
+  }, []);
+
+  const studentItems = tracker?.items ?? [];
+  const srcPubOpts = useMemo(() => katalogPublishers({ exam: examKey, subject: activeSubject }), [examKey, activeSubject]);
+  const catalogHits = useMemo(
+    () => katalogList({ exam: examKey, subject: activeSubject, pub: srcPub === "Tümü" ? undefined : srcPub, q: srcSearch }),
+    [examKey, activeSubject, srcPub, srcSearch],
+  );
+
+  const studentForActive = studentItems.filter((item) => {
+    const k = katalogByLabel(item.name);
+    const subjOk = k ? k.s === activeSubject : true;
+    return subjOk && srcPub === "Tümü" && norm(item.name).includes(norm(srcSearch));
+  });
+  const studentNameSet = new Set(studentForActive.map((item) => item.name));
+  const myCustom = studentItems
+    .map((item) => item.name)
+    .filter((name) => !katalogByLabel(name) && srcPub === "Tümü" && norm(name).includes(norm(srcSearch)));
+
+  const activeSource = sourceBySubject[activeSubject] || "";
+  const activeItem = studentItems.find((item) => item.name === activeSource) ?? null;
+  const activeCat = activeSource ? katalogByLabel(activeSource) : null;
+
+  const allRecipientsOn = bulkRoster.length > 0 && recipients.length === bulkRoster.length;
 
   function sourceForSubject(subject: string): string {
     return (
       sourceBySubject[subject] ||
       tracker?.items.find((item) => item.status === "aktif")?.name ||
-      getStudentResources(subject)[0] ||
-      pickKaynak(subject, 0)
+      sourcesForSubject(subject)[0] ||
+      ""
     );
   }
 
   async function handleAssign() {
-    if (!studentId || selectedKeys.length === 0) {
+    if (selectedKeys.length === 0 || targets.length === 0) {
       return;
     }
+    const primary: OdevTypeKey = hasSoru ? "soru" : hasTest ? "test" : types[0]!;
+    const items = selectedKeys.map((key) => {
+      const [subject, topic] = key.split("::");
+      return {
+        subject,
+        topic,
+        source: sourceBySubject[subject!] || sourceForSubject(subject!),
+        count: selected[key] ?? defCount,
+        type: primary,
+        types,
+        note: note.trim() || undefined,
+        due: due || undefined,
+      };
+    });
 
     setIsSubmitting(true);
     try {
-      for (const key of selectedKeys) {
-        const [subject, title] = key.split("::");
-        const soruCount = selected[key] || defaultSoru;
-        const unitLabel = unitType === "test" ? "test" : "soru";
-        const source = sourceForSubject(subject);
-        const description = [note.trim(), `${soruCount} ${unitLabel}`, source ? `Kaynak: ${source}` : ""]
-          .filter(Boolean)
-          .join(" - ");
-        const response = await fetch("/api/coach/assignments", {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            studentId,
-            subject,
-            title,
-            type: "practice",
-            description,
-            dueDate: due || undefined,
-          }),
-        });
-        if (!response.ok) {
-          throw new Error("Ödev atanamadı");
-        }
+      const response = await fetch("/api/coach/assignments", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentIds: targets, items }),
+      });
+      if (!response.ok) {
+        throw new Error("Ödev atanamadı");
       }
-
       setDone(true);
       onAssigned?.({ konu: selectedKeys.length, soru: totalSoru, due: due || undefined });
       setTimeout(() => {
@@ -210,76 +349,303 @@ export function CoachOdevAtaModal({
   }
 
   const activeGroups = curriculum.subjects[activeSubject] ?? [];
+  const canAssign = selectedKeys.length > 0 && targets.length > 0;
 
   return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-panel" style={{ maxWidth: 800 }} onClick={(event) => event.stopPropagation()}>
-        <div className="modal-head">
-          <div className="row" style={{ gap: 9 }}>
-            <span className="stat-icon tone-primary" style={{ width: 36, height: 36 }}>
-              <KiIcon name="ki-notepad-edit" size={18} />
-            </span>
-            <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Ödev Ata</h3>
-              <div className="muted" style={{ fontSize: 12.5 }}>
-                {studentName} · derslere ve konulara soru ata
-              </div>
-            </div>
+    <div className="oa-overlay" onClick={onClose} role="presentation">
+      <div className="oa-sheet" onClick={(event) => event.stopPropagation()} role="presentation">
+        {/* header */}
+        <div className="oa-head">
+          <span className="ic">
+            <KiIcon name="ki-notepad-edit" size={19} />
+          </span>
+          <div className="tx">
+            <h3>{isBulk ? "Toplu Ödev Ata" : "Ödev Ata"}</h3>
+            <p>
+              {isBulk
+                ? `${recipients.length} öğrenci · derslere ve konulara ata`
+                : `${studentName} · derslere ve konulara ata`}
+            </p>
           </div>
-          <button
-            type="button"
-            className="icon-btn"
-            style={{ width: 36, height: 36 }}
-            onClick={onClose}
-            aria-label="Kapat"
-          >
+          <button type="button" className="oa-x" onClick={onClose} aria-label="Kapat">
             <KiIcon name="ki-plus" size={18} style={{ transform: "rotate(45deg)" }} />
           </button>
         </div>
 
-        <div className="modal-sub" style={{ flexDirection: "column", alignItems: "stretch", gap: 10 }}>
-          <div className="row" style={{ gap: 10, flexWrap: "wrap", marginLeft: "auto" }}>
-            <div className="seg" style={{ width: "fit-content" }}>
-              <button type="button" className={unitType === "soru" ? "on" : ""} onClick={() => setUnitType("soru")}>
-                Soru
-              </button>
-              <button type="button" className={unitType === "test" ? "on" : ""} onClick={() => setUnitType("test")}>
-                Test
+        {/* config */}
+        <div className="oa-config">
+          {isBulk ? (
+            <div className="oa-field">
+              <span className="oa-label">
+                Kime
+                <span className="sub">
+                  {recipients.length}/{bulkRoster.length}
+                </span>
+              </span>
+              <div className="oa-chips">
+                {bulkRoster.map((item) => {
+                  const on = recipients.includes(item.studentId);
+                  return (
+                    <button
+                      key={item.studentId}
+                      type="button"
+                      className={`oa-chip${on ? " on" : ""}`}
+                      onClick={() => toggleRecipient(item.studentId)}
+                    >
+                      <span className="tick">
+                        <KiIcon name="ki-check" size={11} />
+                      </span>
+                      {item.name}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                type="button"
+                className="oa-allbtn"
+                onClick={() => setRecipients(allRecipientsOn ? [] : bulkRoster.map((item) => item.studentId))}
+              >
+                {allRecipientsOn ? "Seçimi kaldır" : "Tümünü seç"}
               </button>
             </div>
-            <span className="muted" style={{ fontSize: 12, fontWeight: 700 }}>
-              Varsayılan {unitType === "test" ? "test" : "soru"}
-            </span>
-            <UkNumStepper value={defaultSoru} onChange={setDefaultSoru} step={unitType === "test" ? 1 : 10} min={0} max={500} size="sm" />
+          ) : null}
+
+          <div className="oa-field">
+            <span className="oa-label">Tür</span>
+            <div className="oa-chips">
+              {ODEV_TYPES.map((type) => (
+                <button
+                  key={type.key}
+                  type="button"
+                  className={`oa-chip${types.includes(type.key) ? " on" : ""}`}
+                  onClick={() => toggleType(type.key)}
+                >
+                  <span className="tick">
+                    <KiIcon name="ki-check" size={11} />
+                  </span>
+                  <KiIcon name={type.icon} size={14} />
+                  {type.label}
+                </button>
+              ))}
+            </div>
           </div>
-          <label className="field" style={{ display: "grid", gap: 6 }}>
-            <span className="label">
-              Kaynak <span className="muted" style={{ fontWeight: 600 }}>({activeSubject || "ders seç"})</span>
+
+          <div className="oa-field">
+            <span className="oa-label">
+              Kaynak<span className="sub">{activeSubject}</span>
             </span>
-            <select
-              className="select"
-              value={sourceBySubject[activeSubject] ?? ""}
-              onChange={(event) =>
-                setSourceBySubject((current) => ({ ...current, [activeSubject]: event.target.value }))
-              }
-              style={{ minWidth: 260 }}
-              disabled={!activeSubject}
-            >
-              <option value="">Otomatik - ogrencinin aktif kaynagi</option>
-              {sourceOptions.map((source) => {
-                const owned = tracker?.items.find((item) => item.name === source);
+            <div className="oa-srcwrap">
+              <button
+                type="button"
+                className="oa-srctrigger"
+                onClick={() => {
+                  setSrcOpen((value) => !value);
+                  setSrcSearch("");
+                }}
+              >
+                <KiIcon name="ki-book-open" size={15} style={{ color: "var(--muted)", flexShrink: 0 }} />
+                <span className={`lbl${activeSource ? "" : " ph"}`}>{activeSource || "Otomatik (derse göre)"}</span>
+                <KiIcon name="ki-down" size={15} style={{ color: "var(--faint)" }} />
+              </button>
+              {srcOpen ? (
+                <>
+                  <div style={{ position: "fixed", inset: 0, zIndex: 5 }} onClick={() => setSrcOpen(false)} role="presentation" />
+                  <div className="oa-pop">
+                    <div className="oa-popsearch">
+                      <KiIcon name="ki-magnifier" size={15} style={{ color: "var(--muted)" }} />
+                      <input
+                        autoFocus
+                        placeholder={`${activeSubject} kaynağı ara...`}
+                        value={srcSearch}
+                        onChange={(event) => setSrcSearch(event.target.value)}
+                      />
+                    </div>
+                    {srcPubOpts.length > 1 ? (
+                      <div className="oa-pubs">
+                        <button
+                          type="button"
+                          className={`oa-pub${srcPub === "Tümü" ? " on" : ""}`}
+                          onClick={() => setSrcPub("Tümü")}
+                        >
+                          Tümü
+                        </button>
+                        {srcPubOpts.map((pub) => (
+                          <button
+                            key={pub}
+                            type="button"
+                            className={`oa-pub${srcPub === pub ? " on" : ""}`}
+                            onClick={() => setSrcPub(pub)}
+                          >
+                            {pub}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
+                    <div className="oa-poplist">
+                      <button
+                        type="button"
+                        className="oa-srcitem"
+                        onClick={() => {
+                          setSourceBySubject((current) => ({ ...current, [activeSubject]: "" }));
+                          setSrcOpen(false);
+                        }}
+                      >
+                        <span className="ic" style={{ color: "var(--muted)" }}>
+                          <KiIcon name="ki-flash" size={14} />
+                        </span>
+                        <div className="body">
+                          <span className="t1">Otomatik (derse göre)</span>
+                          <span className="t2">öğrencinin kaynağına göre seçilir</span>
+                        </div>
+                      </button>
+
+                      {studentForActive.length > 0 || myCustom.filter((name) => !studentNameSet.has(name)).length > 0 ? (
+                        <div className="oa-grouphd">Öğrencide olanlar</div>
+                      ) : null}
+                      {studentForActive.map((item) => {
+                        const k = katalogByLabel(item.name);
+                        const tur = k ? KAYNAK_TUR[k.t] : null;
+                        const dur = KAYNAK_DURUM[item.status];
+                        const dcol = DUR_COLOR[dur.tone];
+                        return (
+                          <button
+                            key={item.name}
+                            type="button"
+                            className={`oa-srcitem${activeSource === item.name ? " on" : ""}`}
+                            onClick={() => {
+                              setSourceBySubject((current) => ({ ...current, [activeSubject]: item.name }));
+                              setSrcOpen(false);
+                            }}
+                          >
+                            <span className="ic" style={{ color: "var(--primary)" }}>
+                              <KiIcon name={tur ? tur.icon : "ki-book-open"} size={14} />
+                            </span>
+                            <div className="body">
+                              <span className="t1">{k ? k.n : item.name}</span>
+                              <span className="t2">
+                                {k ? `${k.p} · ` : "Özel · "}
+                                <span style={{ color: dcol, fontWeight: 700 }}>
+                                  {dur.label} · %{item.progress}
+                                </span>
+                              </span>
+                            </div>
+                            <span className="mini">
+                              <span style={{ width: `${item.progress}%`, background: dcol }} />
+                            </span>
+                          </button>
+                        );
+                      })}
+                      {myCustom
+                        .filter((name) => !studentNameSet.has(name))
+                        .map((name) => (
+                          <button
+                            key={name}
+                            type="button"
+                            className={`oa-srcitem${activeSource === name ? " on" : ""}`}
+                            onClick={() => {
+                              setSourceBySubject((current) => ({ ...current, [activeSubject]: name }));
+                              setSrcOpen(false);
+                            }}
+                          >
+                            <span className="ic" style={{ color: "var(--faint)" }}>
+                              <KiIcon name="ki-book-open" size={14} />
+                            </span>
+                            <div className="body">
+                              <span className="t1">{name}</span>
+                              <span className="t2">özel kaynak</span>
+                            </div>
+                          </button>
+                        ))}
+
+                      {catalogHits.filter((entry) => !studentNameSet.has(kaynakLabel(entry))).length > 0 ? (
+                        <div className="oa-grouphd">
+                          Katalog · {catalogHits.filter((entry) => !studentNameSet.has(kaynakLabel(entry))).length}
+                        </div>
+                      ) : null}
+                      {catalogHits
+                        .filter((entry) => !studentNameSet.has(kaynakLabel(entry)))
+                        .slice(0, 60)
+                        .map((entry) => {
+                          const label = kaynakLabel(entry);
+                          const tur = KAYNAK_TUR[entry.t];
+                          return (
+                            <button
+                              key={entry.id}
+                              type="button"
+                              className={`oa-srcitem${activeSource === label ? " on" : ""}`}
+                              onClick={() => {
+                                setSourceBySubject((current) => ({ ...current, [activeSubject]: label }));
+                                setSrcOpen(false);
+                              }}
+                            >
+                              <span className="ic" style={{ color: "var(--primary)" }}>
+                                <KiIcon name={tur.icon} size={14} />
+                              </span>
+                              <div className="body">
+                                <span className="t1">{entry.n}</span>
+                                <span className="t2">
+                                  {entry.p} · {tur.short} ·{" "}
+                                  {entry.q && entry.q > 0 ? `${entry.q.toLocaleString("tr-TR")} soru` : "Konu anlatımı"}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      {catalogHits.length === 0 && studentForActive.length === 0 && myCustom.length === 0 ? (
+                        <div className="oa-popempty">Sonuç yok</div>
+                      ) : null}
+                    </div>
+                  </div>
+                </>
+              ) : null}
+            </div>
+            {showCount ? (
+              <div className="oa-default">
+                <span>Varsayılan {unitLabel}</span>
+                {unitSoru ? (
+                  <OaStepper value={defSoru} onChange={setDefSoru} step={10} min={0} max={500} />
+                ) : (
+                  <OaStepper value={defTest} onChange={setDefTest} step={1} min={0} max={50} />
+                )}
+              </div>
+            ) : null}
+          </div>
+
+          {activeSource
+            ? (() => {
+                const dur = activeItem ? KAYNAK_DURUM[activeItem.status] : null;
+                const dcol = dur ? DUR_COLOR[dur.tone] : "var(--muted)";
                 return (
-                  <option key={source} value={source}>
-                    {owned ? `${source} (%${owned.progress} - ${owned.status})` : source}
-                  </option>
+                  <div className="oa-srcinfo">
+                    <KiIcon name="ki-book-open" size={14} style={{ color: "var(--primary)", flexShrink: 0 }} />
+                    <span className="nm">{activeSource}</span>
+                    {activeCat ? (
+                      <span className="sb">
+                        {activeCat.q && activeCat.q > 0 ? `${activeCat.q.toLocaleString("tr-TR")} soru` : "Konu anlatımı"}
+                      </span>
+                    ) : null}
+                    {activeItem ? (
+                      <span className="st" style={{ color: dcol }}>
+                        {dur?.label} · %{activeItem.progress}
+                        <span className="prog">
+                          <span style={{ width: `${activeItem.progress}%`, background: dcol }} />
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="warn">
+                        <KiIcon name="ki-information-2" size={12} />
+                        öğrencinin listesinde yok
+                      </span>
+                    )}
+                  </div>
                 );
-              })}
-            </select>
-          </label>
+              })()
+            : null}
         </div>
 
-        <div className="modal-body ata-body">
-          <div className="ata-rail">
+        {/* main: ders rayı + konu seçimi */}
+        <div className="oa-main">
+          <div className="oa-rail">
             {subjects.map((subject) => {
               const color = subjectColor(subject);
               const on = activeSubject === subject;
@@ -288,18 +654,19 @@ export function CoachOdevAtaModal({
                 <button
                   key={subject}
                   type="button"
-                  className={`ata-subj${on ? " on" : ""}`}
-                  onClick={() => setActiveSubject(subject)}
+                  className={`oa-subj${on ? " on" : ""}`}
+                  onClick={() => {
+                    setActiveSubject(subject);
+                    setSrcPub("Tümü");
+                    setSrcSearch("");
+                  }}
                 >
-                  <span
-                    className="swatch"
-                    style={{ width: 10, height: 10, borderRadius: 4, background: color, flexShrink: 0 }}
-                  />
-                  <span className="ata-subj-name" style={{ color: on ? color : "var(--text)" }}>
+                  <span className="sw" style={{ background: color }} />
+                  <span className="nm" style={{ color: on ? color : "var(--text)" }}>
                     {subject}
                   </span>
                   {count > 0 ? (
-                    <span className="nav-count tnum" style={{ minWidth: 18, height: 18, fontSize: 10.5 }}>
+                    <span className="ct" style={{ background: color }}>
                       {count}
                     </span>
                   ) : (
@@ -310,83 +677,68 @@ export function CoachOdevAtaModal({
             })}
           </div>
 
-          <div className="ata-detail">
-            <div className="between" style={{ marginBottom: 4 }}>
-              <span className="row" style={{ gap: 8 }}>
-                <span
-                  className="swatch"
-                  style={{
-                    width: 11,
-                    height: 11,
-                    borderRadius: 4,
-                    background: subjectColor(activeSubject),
-                  }}
-                />
-                <b style={{ fontSize: 14 }}>{activeSubject}</b>
-                <span className="muted" style={{ fontSize: 12 }}>
-                  {activeGroups.length} grup
-                </span>
-              </span>
+          <div className="oa-topics">
+            <div className="oa-topics-head">
+              <span className="sw" style={{ background: subjectColor(activeSubject) }} />
+              <b>{activeSubject}</b>
+              <span>{activeGroups.length} grup</span>
             </div>
-
             {activeGroups.map((group) => {
               const allOn = group.topics.length > 0 && group.topics.every((topic) => selected[topicKey(activeSubject, topic)] != null);
               const someOn = group.topics.some((topic) => selected[topicKey(activeSubject, topic)] != null);
               return (
-                <div className="grp" key={groupTargetKey(activeSubject, group.name)}>
+                <div className="oa-grp" key={groupTargetKey(activeSubject, group.name)}>
                   <button
                     type="button"
-                    className="grp-head"
-                    style={{ width: "100%", border: "none", background: "none", textAlign: "left", cursor: "pointer" }}
+                    className="oa-grp-head"
                     onClick={() => toggleGroup(activeSubject, group.topics, !allOn)}
                   >
-                    <span className={`chk sm${allOn ? " done" : someOn ? " part" : ""}`}>
+                    <span className={`oa-chk${allOn ? " on" : someOn ? " part" : ""}`}>
                       <KiIcon name={allOn ? "ki-check" : "ki-plus"} size={12} />
                     </span>
-                    <span style={{ fontWeight: 700, fontSize: 12.5 }}>{group.name}</span>
-                    <span className="muted" style={{ fontSize: 11 }}>
-                      {group.topics.length} konu
-                    </span>
-                    <span className="muted" style={{ fontSize: 11, marginLeft: "auto" }}>
-                      {allOn ? "tümünü kaldır" : "tümünü seç"}
-                    </span>
+                    <span className="nm">{group.name}</span>
+                    <span className="ct">{group.topics.length} konu</span>
+                    <span className="act">{allOn ? "tümünü kaldır" : "tümünü seç"}</span>
                   </button>
-                  <div className="grp-topics">
+                  <div className="oa-grp-topics">
                     {group.topics.map((topic) => {
                       const on = selected[topicKey(activeSubject, topic)] != null;
                       return (
                         <div
                           key={topic}
-                          className={`pick-row${on ? " on" : ""}`}
+                          className={`oa-topic${on ? " on" : ""}`}
                           onClick={() => toggleTopic(activeSubject, topic)}
                           onKeyDown={() => undefined}
                           role="presentation"
                         >
-                          <button
-                            type="button"
-                            className={`chk sm${on ? " done" : ""}`}
-                            aria-label="Konu seç"
+                          <span
+                            className={`oa-chk${on ? " on" : ""}`}
                             onClick={(event) => {
                               event.stopPropagation();
                               toggleTopic(activeSubject, topic);
                             }}
+                            role="presentation"
                           >
                             <KiIcon name="ki-check" size={12} />
-                          </button>
-                          <span style={{ fontSize: 13, fontWeight: on ? 700 : 500, flex: 1 }}>{topic}</span>
+                          </span>
+                          <span className="nm">{topic}</span>
                           {on ? (
-                            <UkNumStepper
-                              value={selected[topicKey(activeSubject, topic)]}
-                              onChange={(value) => setSoru(activeSubject, topic, value)}
-                              step={10}
-                              min={0}
-                              max={500}
-                              size="sm"
-                            />
+                            showCount ? (
+                              <OaStepper
+                                value={selected[topicKey(activeSubject, topic)]!}
+                                onChange={(value) => setSoru(activeSubject, topic, value)}
+                                step={cStep}
+                                min={0}
+                                max={cMax}
+                              />
+                            ) : (
+                              <span className="badge badge-success" style={{ height: 22 }}>
+                                <KiIcon name="ki-check" size={12} />
+                                seçildi
+                              </span>
+                            )
                           ) : (
-                            <span className="muted" style={{ fontSize: 11.5 }}>
-                              seç
-                            </span>
+                            <span className="pickhint">seç</span>
                           )}
                         </div>
                       );
@@ -398,55 +750,36 @@ export function CoachOdevAtaModal({
           </div>
         </div>
 
-        <div className="modal-foot" style={{ flexWrap: "wrap" }}>
-          <input
-            className="input"
-            style={{ flex: "1 1 180px" }}
-            placeholder="Not ekle (opsiyonel)"
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-          />
-          <label className="ata-date" title="Bitis tarihi (opsiyonel)">
-            <KiIcon name="ki-calendar" size={16} style={{ color: "var(--muted)", flexShrink: 0 }} />
+        {/* footer */}
+        <div className="oa-foot">
+          <div className="oa-note">
+            <KiIcon name="ki-message-text" size={15} style={{ color: "var(--muted)", flexShrink: 0 }} />
+            <input placeholder="Not ekle (opsiyonel)" value={note} onChange={(event) => setNote(event.target.value)} />
+          </div>
+          <label className="oa-date" title="Bitiş tarihi (opsiyonel)">
+            <KiIcon name="ki-calendar" size={15} style={{ color: "var(--muted)", flexShrink: 0 }} />
             <input type="date" value={due} onChange={(event) => setDue(event.target.value)} />
             {due ? (
-              <button
-                type="button"
-                onClick={() => setDue("")}
-                aria-label="Tarihi temizle"
-                style={{
-                  border: "none",
-                  background: "none",
-                  color: "var(--faint)",
-                  display: "grid",
-                  placeItems: "center",
-                  cursor: "pointer",
-                }}
-              >
-                <KiIcon name="ki-plus" size={14} style={{ transform: "rotate(45deg)" }} />
+              <button type="button" className="clear" onClick={() => setDue("")} aria-label="Tarihi temizle">
+                <KiIcon name="ki-plus" size={13} style={{ transform: "rotate(45deg)" }} />
               </button>
             ) : null}
           </label>
-          <div className="row" style={{ gap: 14, flexShrink: 0, marginLeft: "auto" }}>
-            <div style={{ textAlign: "right", lineHeight: 1.2 }}>
-              <div className="tnum" style={{ fontSize: 15, fontWeight: 800 }}>
-                {selectedKeys.length} konu · {totalSoru} {unitType === "test" ? "test" : "soru"}
-              </div>
-              <div className="muted" style={{ fontSize: 11 }}>
-                atanacak
-              </div>
+          <div className="oa-summary">
+            <div className="big tnum">
+              {selectedKeys.length} konu{showCount ? ` · ${totalSoru} ${unitLabel}` : ""}
             </div>
-            <button
-              type="button"
-              className="btn btn-primary"
-              disabled={selectedKeys.length === 0 || isSubmitting}
-              onClick={() => void handleAssign()}
-              style={{ opacity: selectedKeys.length === 0 ? 0.5 : 1 }}
-            >
-              <KiIcon name={done ? "ki-check" : "ki-send"} />
-              {done ? "Atandı!" : isSubmitting ? "Atanıyor..." : "Ödevi Ata"}
-            </button>
+            <div className="sm">atanacak</div>
           </div>
+          <button
+            type="button"
+            className={`oa-assign${done ? " done" : ""}`}
+            disabled={!canAssign || isSubmitting}
+            onClick={() => void handleAssign()}
+          >
+            <KiIcon name={done ? "ki-check" : "ki-send"} size={16} />
+            {done ? "Atandı!" : isBulk ? `${recipients.length} Öğrenciye Ata` : "Ödevi Ata"}
+          </button>
         </div>
       </div>
     </div>,

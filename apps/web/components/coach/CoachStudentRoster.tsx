@@ -39,7 +39,7 @@ export function CoachStudentRoster() {
     ]);
 
     if (!studentsResponse.ok) {
-      setError("Ogrenci listesi yuklenemedi.");
+      setError("Öğrenci listesi yüklenemedi.");
       setIsLoading(false);
       return;
     }
@@ -91,20 +91,20 @@ export function CoachStudentRoster() {
   return (
     <div className="stack rise" data-testid="coach-student-roster">
       <UkPageHead
-        title="Ogrencilerim"
-        sub="Takip ettigin tum ogrenciler"
+        title="Öğrencilerim"
+        sub="Takip ettiğin tüm öğrenciler"
         actions={
           <button type="button" className="btn btn-primary" onClick={() => setAddModalOpen(true)}>
             <KiIcon name="ki-plus" />
-            Ogrenci ekle
+            Öğrenci ekle
           </button>
         }
       />
       <div className="grid g-4">
-        <UkStatCard icon="ki-people" tone="primary" value={rows.length} label="Aktif ogrenci" />
+        <UkStatCard icon="ki-people" tone="primary" value={rows.length} label="Aktif öğrenci" />
         <UkStatCard icon="ki-chart-pie-simple" tone="success" value={`${avg}%`} label="Ortalama tamamlama" />
-        <UkStatCard icon="ki-information-2" tone="danger" value={atRisk} label="Risk altinda" />
-        <UkStatCard icon="ki-star" tone="warning" value={excellent} label="Mukemmel" />
+        <UkStatCard icon="ki-information-2" tone="danger" value={atRisk} label="Risk altında" />
+        <UkStatCard icon="ki-star" tone="warning" value={excellent} label="Mükemmel" />
       </div>
       <CoachStudentsTable rows={rows} isLoading={isLoading} />
       <CoachAddStudentModal
@@ -122,7 +122,7 @@ export function CoachStudentRoster() {
                 <KiIcon name="ki-check-circle" size={18} />
               </span>
               <div>
-                <b style={{ fontSize: 13.5, fontWeight: 700 }}>Ogrenci eklendi</b>
+                <b style={{ fontSize: 13.5, fontWeight: 700 }}>Öğrenci eklendi</b>
                 <div className="muted" style={{ fontSize: 12 }}>
                   {toast}
                 </div>

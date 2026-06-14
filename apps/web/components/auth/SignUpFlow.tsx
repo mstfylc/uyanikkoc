@@ -56,7 +56,7 @@ export function SignUpFlow() {
         <div className="auth-card">
           {step === "role" ? (
             <>
-              <h1 style={{ fontSize: 23, fontWeight: 800, marginBottom: 16 }}>Rolunu sec</h1>
+              <h1 style={{ fontSize: 23, fontWeight: 800, marginBottom: 16 }}>Rolünü seç</h1>
               <div className="seg" style={{ width: "100%", marginBottom: 18 }}>
                 {(["student", "coach"] as SignUpRole[]).map((item) => (
                   <button
@@ -132,7 +132,7 @@ export function SignUpFlow() {
           {step === "verify" ? (
             <>
               <h1 style={{ fontSize: 23, fontWeight: 800, marginBottom: 8 }}>Kod doğrulama</h1>
-              <p className="muted" style={{ fontSize: 13, marginBottom: 16 }}>{email || phone} adresine kod gonderildi (demo).</p>
+              <p className="muted" style={{ fontSize: 13, marginBottom: 16 }}>{email || phone} adresine kod gönderildi (demo).</p>
               <input
                 className="input tnum"
                 inputMode="numeric"

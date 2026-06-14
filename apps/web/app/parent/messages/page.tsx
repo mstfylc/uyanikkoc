@@ -8,10 +8,10 @@ export default function ParentMessagesPage() {
       apiBase="/api/parent/messages"
       selfRole="PARENT"
       title="Mesajlar"
-      subtitle="Koc ve gruplar"
+      subtitle="Koç ve gruplar"
       testId="parent-messages-panel"
       enableGroupTabs
-      dmSectionLabel="Kocun"
+      dmSectionLabel="Koçun"
     />
   );
 }

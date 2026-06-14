@@ -50,7 +50,7 @@ export function CoachAddStudentModal({ open, onClose, onAdded }: CoachAddStudent
 
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
-      setError(data.error ?? "Ogrenci eklenemedi.");
+      setError(data.error ?? "Öğrenci eklenemedi.");
       return;
     }
 
@@ -71,9 +71,9 @@ export function CoachAddStudentModal({ open, onClose, onAdded }: CoachAddStudent
               <KiIcon name="ki-people" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Ogrenci Ekle</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Öğrenci Ekle</h3>
               <div className="muted" style={{ fontSize: 12.5 }}>
-                Yeni ogrenciyi kadrona ekle
+                Yeni öğrenciyi kadrona ekle
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@ export function CoachAddStudentModal({ open, onClose, onAdded }: CoachAddStudent
               className="input"
               value={displayName}
               onChange={(event) => setDisplayName(event.target.value)}
-              placeholder="Ogrenci adi"
+              placeholder="Öğrenci adı"
             />
           </div>
           <div className="field">
@@ -120,14 +120,14 @@ export function CoachAddStudentModal({ open, onClose, onAdded }: CoachAddStudent
           ) : null}
           <div className="modal-foot" style={{ justifyContent: "flex-end", padding: 0 }}>
             <button type="button" className="btn btn-ghost" onClick={onClose}>
-              Vazgec
+              Vazgeç
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !displayName.trim() || !email.trim()}
               className="btn btn-primary"
             >
-              {isSubmitting ? "Ekleniyor..." : "Ogrenci ekle"}
+              {isSubmitting ? "Ekleniyor..." : "Öğrenci ekle"}
             </button>
           </div>
         </form>

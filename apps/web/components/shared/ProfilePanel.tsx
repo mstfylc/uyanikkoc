@@ -27,7 +27,7 @@ const ROLE_LABELS: Record<ProfilePanelProps["role"], string> = {
 };
 
 const ROLE_SUB: Record<ProfilePanelProps["role"], string> = {
-  student: "11. Sinif · Sayisal",
+  student: "11. Sınıf · Sayısal",
   coach: "YKS & LGS Koçu",
   parent: "Veli · Elif'in annesi",
 };
@@ -41,12 +41,12 @@ function roleSub(role: ProfilePanelProps["role"], email?: string | null): string
 
 const ROLE_STATS: Record<ProfilePanelProps["role"], Array<{ icon: string; text: string }>> = {
   coach: [
-    { icon: "ki-people", text: "18 ogrenci" },
+    { icon: "ki-people", text: "18 öğrenci" },
     { icon: "ki-chart-simple", text: "%74 ort. tamamlama" },
     { icon: "ki-calendar", text: "Üye: Eyl 2024" },
   ],
   student: [
-    { icon: "ki-book", text: "11. Sinif · Sayisal" },
+    { icon: "ki-book", text: "11. Sınıf · Sayısal" },
     { icon: "ki-chart-simple", text: "Hedef: YKS 2026" },
     { icon: "ki-flame", text: "12 gun seri" },
   ],

@@ -163,7 +163,7 @@ export function BillingAddCardModal({ open, onClose, onSaved }: BillingAddCardMo
         </div>
         <div className="modal-foot">
           <button type="button" className="btn btn-light" onClick={onClose}>
-            Vazgec
+            Vazgeç
           </button>
           <button
             type="button"

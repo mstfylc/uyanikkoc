@@ -16,7 +16,7 @@ type SubjectRow = {
 const EXAM_TYPES: ResultExamType[] = ["TYT", "AYT", "LGS"];
 
 const DEFAULT_SUBJECTS: SubjectRow[] = [
-  { subjectName: "Turkce", correct: "", wrong: "" },
+  { subjectName: "Türkçe", correct: "", wrong: "" },
   { subjectName: "Matematik", correct: "", wrong: "" },
   { subjectName: "Fen", correct: "", wrong: "" },
   { subjectName: "Sosyal", correct: "", wrong: "" },
@@ -68,7 +68,7 @@ export function CoachExamEntryForm() {
       .filter((row) => row.subjectName && !Number.isNaN(row.correct) && !Number.isNaN(row.wrong));
 
     if (parsedSubjects.length === 0) {
-      setError("En az bir ders satiri gerekli.");
+      setError("En az bir ders satırı gerekli.");
       return;
     }
 
@@ -99,9 +99,9 @@ export function CoachExamEntryForm() {
 
   return (
     <div className="stack rise">
-      <UkPageHead title="Deneme Girisi" sub="Ogrenci adina TYT/AYT/LGS sonucu kaydet" />
+      <UkPageHead title="Deneme Girişi" sub="Öğrenci adına TYT/AYT/LGS sonucu kaydet" />
 
-      <UkSection title="Manuel sonuc">
+      <UkSection title="Manuel sonuç">
         <form
           onSubmit={handleSubmit}
           data-testid="coach-exam-entry-form"
@@ -111,7 +111,7 @@ export function CoachExamEntryForm() {
           <div className="grid g-2">
             <div className="field">
               <label className="label" htmlFor="studentId">
-                Ogrenci
+                Öğrenci
               </label>
               <select
                 id="studentId"
@@ -129,7 +129,7 @@ export function CoachExamEntryForm() {
 
             <div className="field">
               <label className="label" htmlFor="examType">
-                Sinav turu
+                Sınav türü
               </label>
               <select
                 id="examType"
@@ -176,7 +176,7 @@ export function CoachExamEntryForm() {
 
           <div>
             <p className="label" style={{ marginBottom: 10 }}>
-              Ders satirlari
+              Ders satırları
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {subjects.map((row, index) => (
@@ -189,7 +189,7 @@ export function CoachExamEntryForm() {
                   <input
                     type="number"
                     min={0}
-                    placeholder="Dogru"
+                    placeholder="Doğru"
                     value={row.correct}
                     onChange={(event) => updateSubject(index, "correct", event.target.value)}
                     className="input"
@@ -197,7 +197,7 @@ export function CoachExamEntryForm() {
                   <input
                     type="number"
                     min={0}
-                    placeholder="Yanlis"
+                    placeholder="Yanlış"
                     value={row.wrong}
                     onChange={(event) => updateSubject(index, "wrong", event.target.value)}
                     className="input"

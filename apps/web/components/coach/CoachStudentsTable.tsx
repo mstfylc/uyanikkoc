@@ -70,15 +70,15 @@ export function CoachStudentsTable({ rows, isLoading }: CoachStudentsTableProps)
 
   return (
     <UkSection
-      title="Ogrencilerim"
-      sub={`${rows.length} aktif ogrenci`}
+      title="Öğrencilerim"
+      sub={`${rows.length} aktif öğrenci`}
       action={
         <div className="filters">
           <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>
-            Tumu
+            Tümü
           </button>
           <button type="button" className={filter === "risk" ? "on" : ""} onClick={() => setFilter("risk")}>
-            Risk altinda
+            Risk altında
           </button>
         </div>
       }
@@ -86,7 +86,7 @@ export function CoachStudentsTable({ rows, isLoading }: CoachStudentsTableProps)
       <div className="card-body" style={{ padding: 0 }}>
         {isLoading ? (
           <p className="muted" style={{ padding: 20, fontSize: 13 }}>
-            Yukleniyor...
+            Yükleniyor...
           </p>
         ) : (
           <table className="tbl">
@@ -94,7 +94,7 @@ export function CoachStudentsTable({ rows, isLoading }: CoachStudentsTableProps)
               <tr>
                 <th>
                   <button type="button" className="th-sort" onClick={() => toggleSort("name")}>
-                    Ogrenci{sortIcon("name")}
+                    Öğrenci{sortIcon("name")}
                   </button>
                 </th>
                 <th>
@@ -123,7 +123,7 @@ export function CoachStudentsTable({ rows, isLoading }: CoachStudentsTableProps)
               {shown.length === 0 ? (
                 <tr>
                   <td colSpan={5} style={{ padding: 20, color: "var(--muted)" }}>
-                    Ogrenci bulunamadi.
+                    Öğrenci bulunamadı.
                   </td>
                 </tr>
               ) : (

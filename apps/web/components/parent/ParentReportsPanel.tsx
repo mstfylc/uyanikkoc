@@ -41,7 +41,7 @@ export function ParentReportsPanel() {
             </p>
           ) : reports.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Henuz onayli rapor yok.
+              Henüz onaylı rapor yok.
             </p>
           ) : (
             reports.map((report) => (
@@ -62,7 +62,7 @@ export function ParentReportsPanel() {
                     <span className="d">Çalışma: {report.detail.hours} saat</span>
                   </div>
                 </div>
-                <UkBadge tone="success">Onaylandi</UkBadge>
+                <UkBadge tone="success">Onaylandı</UkBadge>
               </button>
             ))
           )}

@@ -18,7 +18,7 @@ export function ExamImportPanel() {
 
     const exams = parseCsvExamImport(csvText);
     if (exams.length === 0) {
-      setError("Gecerli satir bulunamadi. Format: studentId,examType,label,takenAt,subject,correct,wrong");
+      setError("Geçerli satır bulunamadı. Format: studentId,examType,label,takenAt,subject,correct,wrong");
       return;
     }
 
@@ -33,7 +33,7 @@ export function ExamImportPanel() {
 
     if (!response.ok) {
       const data = (await response.json()) as { error?: string };
-      setError(data.error ?? "Import basarisiz.");
+      setError(data.error ?? "İçe aktarma başarısız.");
       return;
     }
 
@@ -43,7 +43,7 @@ export function ExamImportPanel() {
   }
 
   return (
-    <UkSection title="CSV ice aktar" sub="Toplu deneme sonucu yukle">
+    <UkSection title="CSV içe aktar" sub="Toplu deneme sonucu yükle">
       <form
         onSubmit={handleImport}
         data-testid="exam-import-panel"

@@ -9,6 +9,7 @@ import { UkBadge } from "@/components/design/UkBadge";
 import { UkPageHead } from "@/components/design/UkPageHead";
 import { UkSection } from "@/components/design/UkSection";
 import { UkStatCard } from "@/components/design/UkStatCard";
+import { CoachOdevAtaModal } from "@/components/coach/CoachOdevAtaModal";
 import { SmartOdevModal } from "@/components/coach/SmartOdevModal";
 import { StudentResourcesCard } from "@/components/student/StudentResourcesCard";
 import {
@@ -19,7 +20,7 @@ import {
   isAssignmentOpen,
 } from "@/lib/assignment-labels";
 import { subjectColor } from "@/lib/design/subject-colors";
-import type { AssignmentPriority, AssignmentStatus, AssignmentType, CoachRosterEntry } from "@uyanik/database";
+import type { AssignmentPriority, AssignmentStatus, AssignmentType, CoachRosterEntry, CurriculumRecord } from "@uyanik/database";
 
 type AssignmentItem = {
   id: string;
@@ -50,16 +51,19 @@ function weekIdForDate(iso: string): string {
 export function CoachAssignmentsPanel() {
   const [assignments, setAssignments] = useState<AssignmentItem[]>([]);
   const [students, setStudents] = useState<CoachRosterEntry[]>([]);
+  const [curriculum, setCurriculum] = useState<CurriculumRecord | null>(null);
   const [week, setWeek] = useState("w0");
   const [filter, setFilter] = useState<"all" | "pending" | "done" | "result">("all");
   const [studentFilter, setStudentFilter] = useState("all");
   const [smartOpen, setSmartOpen] = useState(false);
+  const [odevOpen, setOdevOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const [assignmentsResponse, studentsResponse] = await Promise.all([
+    const [assignmentsResponse, studentsResponse, curriculumResponse] = await Promise.all([
       fetch("/api/coach/assignments", { credentials: "same-origin" }),
       fetch("/api/coach/students", { credentials: "same-origin" }),
+      fetch("/api/coach/curriculum", { credentials: "same-origin" }),
     ]);
 
     if (assignmentsResponse.ok) {
@@ -69,6 +73,10 @@ export function CoachAssignmentsPanel() {
     if (studentsResponse.ok) {
       const data = (await studentsResponse.json()) as { students: CoachRosterEntry[] };
       setStudents(data.students);
+    }
+    if (curriculumResponse.ok) {
+      const data = (await curriculumResponse.json()) as { curriculum: CurriculumRecord };
+      setCurriculum(data.curriculum);
     }
     setIsLoading(false);
   }, []);
@@ -110,6 +118,7 @@ export function CoachAssignmentsPanel() {
   const rate = total ? Math.round((completed / total) * 100) : 0;
   const overdue = inWeek.filter((item) => isAssignmentOpen(item) && item.dueDate && new Date(item.dueDate) < new Date()).length;
   const smartStudent = students.find((student) => student.studentId === studentFilter) ?? students[0] ?? null;
+  const selectedStudent = students.find((student) => student.studentId === studentFilter) ?? null;
 
   return (
     <div className="stack rise" data-testid="coach-assignments-panel">
@@ -133,12 +142,17 @@ export function CoachAssignmentsPanel() {
             </select>
             <button type="button" className="btn btn-light btn-sm" disabled={!smartStudent} onClick={() => setSmartOpen(true)}>
               <KiIcon name="ki-abstract-26" size={16} />
-              SmartOdev
+              Akıllı Ödev
             </button>
-            <Link href="/coach/assignments/create" className="btn btn-primary btn-sm">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={students.length === 0 || !curriculum}
+              onClick={() => setOdevOpen(true)}
+            >
               <KiIcon name="ki-plus" size={16} />
               Yeni ödev
-            </Link>
+            </button>
           </div>
         }
       />
@@ -280,6 +294,23 @@ export function CoachAssignmentsPanel() {
           studentId={smartStudent.studentId}
           studentName={smartStudent.displayName}
           onClose={() => setSmartOpen(false)}
+          onAssigned={() => void load()}
+        />
+      ) : null}
+
+      {curriculum ? (
+        <CoachOdevAtaModal
+          open={odevOpen}
+          onClose={() => setOdevOpen(false)}
+          curriculum={curriculum}
+          studentId={selectedStudent?.studentId ?? students[0]?.studentId ?? ""}
+          studentName={selectedStudent?.displayName ?? students[0]?.displayName ?? "Öğrenci"}
+          roster={
+            studentFilter === "all"
+              ? students.map((student) => ({ studentId: student.studentId, name: student.displayName }))
+              : undefined
+          }
+          defaultAll={studentFilter === "all"}
           onAssigned={() => void load()}
         />
       ) : null}

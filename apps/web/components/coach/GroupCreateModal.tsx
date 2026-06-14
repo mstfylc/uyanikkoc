@@ -50,7 +50,7 @@ export function GroupCreateModal({ open, students, onClose, onCreated }: GroupCr
       .map((email) => USER_ID_BY_EMAIL[email])
       .filter(Boolean);
     if (!name.trim() || memberUserIds.length === 0) {
-      setError("Grup adi ve en az bir uye gerekli.");
+      setError("Grup adı ve en az bir üye gerekli.");
       return;
     }
 
@@ -65,7 +65,7 @@ export function GroupCreateModal({ open, students, onClose, onCreated }: GroupCr
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError("Grup olusturulamadi.");
+      setError("Grup oluşturulamadı.");
       return;
     }
 
@@ -86,8 +86,8 @@ export function GroupCreateModal({ open, students, onClose, onCreated }: GroupCr
               <KiIcon name="ki-people" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Grup olustur</h3>
-              <div className="muted" style={{ fontSize: 12.5 }}>Ogrenci ve velileri gruba ekle</div>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Grup oluştur</h3>
+              <div className="muted" style={{ fontSize: 12.5 }}>Öğrenci ve velileri gruba ekle</div>
             </div>
           </div>
           <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">
@@ -97,12 +97,12 @@ export function GroupCreateModal({ open, students, onClose, onCreated }: GroupCr
 
         <form onSubmit={handleSubmit} className="modal-body" style={{ gap: 14 }}>
           <div className="field">
-            <label className="label">Grup adi</label>
-            <input className="input" value={name} onChange={(event) => setName(event.target.value)} placeholder="Orn. TYT Hazirlik" />
+            <label className="label">Grup adı</label>
+            <input className="input" value={name} onChange={(event) => setName(event.target.value)} placeholder="Örn. TYT Hazırlık" />
           </div>
 
           <div className="field">
-            <label className="label">Uyeler</label>
+            <label className="label">Üyeler</label>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {students.map((student) => (
                 <label key={student.studentId} className="row" style={{ gap: 10, cursor: "pointer" }}>
@@ -122,10 +122,10 @@ export function GroupCreateModal({ open, students, onClose, onCreated }: GroupCr
 
           <div className="modal-foot" style={{ justifyContent: "flex-end", gap: 10 }}>
             <button type="button" className="btn btn-light" onClick={onClose}>
-              Iptal
+              İptal
             </button>
             <button type="submit" disabled={isSubmitting} className="btn btn-primary">
-              {isSubmitting ? "Olusturuluyor..." : "Grup olustur"}
+              {isSubmitting ? "Oluşturuluyor..." : "Grup oluştur"}
             </button>
           </div>
         </form>

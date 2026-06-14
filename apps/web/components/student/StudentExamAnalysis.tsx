@@ -237,10 +237,10 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
             <table className="tbl">
               <thead>
                 <tr>
-                  <th>Oncelik</th>
+                  <th>Öncelik</th>
                   <th>Ders</th>
                   <th>Konu</th>
-                  <th>Basari %</th>
+                  <th>Başarı %</th>
                 </tr>
               </thead>
               <tbody>
@@ -248,7 +248,7 @@ export function StudentExamAnalysis({ exams, selected, onSelect }: StudentExamAn
                   <tr key={`${row.subject}-${index}`}>
                     <td>
                       <UkBadge tone={row.priority === 1 ? "danger" : row.priority === 2 ? "warning" : "info"}>
-                        {row.priority}. oncelik
+                        {row.priority}. öncelik
                       </UkBadge>
                     </td>
                     <td>{row.subject}</td>

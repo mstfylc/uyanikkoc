@@ -66,7 +66,7 @@ export function ParentExamsPanel() {
         <UkPageHead title="Deneme Sonuclari" sub={childName} />
         <div className="card">
           <div className="card-pad" style={{ padding: 40, textAlign: "center", color: "var(--muted)", fontSize: 13.5 }}>
-            Henuz aciklanmis deneme sonucu yok.
+            Henüz açıklanmış deneme sonucu yok.
           </div>
         </div>
       </div>

@@ -25,14 +25,14 @@ type AppointmentsPanelProps = {
 
 const STATUS_LABELS: Record<AppointmentStatus, { label: string; tone: "warning" | "success" | "danger" | "muted" }> = {
   pending: { label: "Bekliyor", tone: "warning" },
-  approved: { label: "Onaylandi", tone: "success" },
+  approved: { label: "Onaylandı", tone: "success" },
   rejected: { label: "Reddedildi", tone: "danger" },
-  cancelled: { label: "Iptal", tone: "muted" },
+  cancelled: { label: "İptal", tone: "muted" },
 };
 
 const MODE_LABELS: Record<AppointmentMode, string> = {
   online: "Online",
-  in_person: "Yuz yuze",
+  in_person: "Yüz yüze",
   phone: "Telefon",
 };
 
@@ -600,7 +600,7 @@ function CoachAppointmentsView() {
               icon="ki-people"
               tone="primary"
               value={approved.filter((item) => item.mode === "in_person").length}
-              label="Yuz yuze"
+              label="Yüz yüze"
             />
           </div>
 
@@ -624,7 +624,7 @@ function CoachAppointmentsView() {
             </UkSection>
           ) : null}
 
-          <UkSection title="Yaklasan Randevular" sub={`${approved.length} onayli`}>
+          <UkSection title="Yaklaşan Randevular" sub={`${approved.length} onaylı`}>
             <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {isLoading ? (
                 <p className="muted" style={{ fontSize: 13 }}>

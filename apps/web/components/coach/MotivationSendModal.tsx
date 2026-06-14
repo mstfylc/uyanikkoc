@@ -96,7 +96,7 @@ export function MotivationSendModal({ open, onClose, onSent }: MotivationSendMod
     setIsSending(false);
 
     if (!response.ok) {
-      setError("Motivasyon gonderilemedi.");
+      setError("Motivasyon gönderilemedi.");
       return;
     }
 
@@ -122,8 +122,8 @@ export function MotivationSendModal({ open, onClose, onSent }: MotivationSendMod
               <KiIcon name="ki-heart" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Motivasyon Gonder</h3>
-              <div className="muted" style={{ fontSize: 12 }}>Ogrencilerine moral ve hatirlatma yolla</div>
+              <h3 style={{ fontSize: 15.5, fontWeight: 800 }}>Motivasyon Gönder</h3>
+              <div className="muted" style={{ fontSize: 12 }}>Öğrencilerine moral ve hatırlatma yolla</div>
             </div>
           </div>
           <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">
@@ -136,13 +136,13 @@ export function MotivationSendModal({ open, onClose, onSent }: MotivationSendMod
             <label className="label">Kime</label>
             <div className="seg" style={{ width: "fit-content", flexWrap: "wrap" }}>
               <button type="button" className={mode === "all" ? "on" : ""} onClick={() => setMode("all")}>
-                Tum ogrenciler
+                Tüm öğrenciler
               </button>
               <button type="button" className={mode === "group" ? "on" : ""} onClick={() => setMode("group")}>
                 Grup
               </button>
               <button type="button" className={mode === "pick" ? "on" : ""} onClick={() => setMode("pick")}>
-                Ogrenci sec
+                Öğrenci seç
               </button>
             </div>
           </div>
@@ -240,7 +240,7 @@ export function MotivationSendModal({ open, onClose, onSent }: MotivationSendMod
               style={{ marginLeft: "auto", opacity: valid ? 1 : 0.5 }}
             >
               <KiIcon name="ki-send" size={16} />
-              {isSending ? "Gonderiliyor..." : "Gonder"}
+              {isSending ? "Gönderiliyor..." : "Gönder"}
             </button>
           </div>
         </form>

@@ -228,7 +228,7 @@ export function MessagesPanel({
         </p>
       ) : threads.length === 0 ? (
         <p className="muted" style={{ fontSize: 13 }}>
-          Henuz mesaj yok.
+          Henüz mesaj yok.
         </p>
       ) : (
         <div className="card" style={{ overflow: "hidden" }}>
@@ -321,7 +321,7 @@ export function MessagesPanel({
                               ? "Koç"
                               : message.senderRole === "PARENT"
                                 ? "Veli"
-                                : "Ogrenci"}
+                                : "Öğrenci"}
                           </div>
                         ) : null}
                         <div

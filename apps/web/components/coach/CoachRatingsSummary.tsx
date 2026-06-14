@@ -25,8 +25,8 @@ export function CoachRatingsSummary() {
 
   return (
     <UkSection
-      title="Ogrenci Geri Bildirimleri"
-      sub={`${summary.count} ogrenci degerlendirmesi`}
+      title="Öğrenci Geri Bildirimleri"
+      sub={`${summary.count} öğrenci değerlendirmesi`}
       action={
         <div className="row" style={{ gap: 8 }}>
           <StarRating value={summary.average} size={15} />
@@ -39,15 +39,15 @@ export function CoachRatingsSummary() {
       <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {summary.count === 0 ? (
           <div style={{ padding: "20px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-            Henuz degerlendirme yok.
+            Henüz değerlendirme yok.
           </div>
         ) : (
           summary.ratings.map((row) => (
             <div key={row.id} className="lrow" style={{ alignItems: "flex-start" }}>
-              <UkAvatar name={row.studentName ?? "Ogrenci"} size={36} />
+              <UkAvatar name={row.studentName ?? "Öğrenci"} size={36} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="between">
-                  <b style={{ fontSize: 13, fontWeight: 700 }}>{row.studentName ?? "Ogrenci"}</b>
+                  <b style={{ fontSize: 13, fontWeight: 700 }}>{row.studentName ?? "Öğrenci"}</b>
                   <StarRating value={row.stars} size={13} />
                 </div>
                 {row.comment ? (

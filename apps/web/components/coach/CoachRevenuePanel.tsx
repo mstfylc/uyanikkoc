@@ -16,9 +16,9 @@ import type { CoachRevenueView } from "@/mocks/coach-revenue";
 type Filter = "all" | "paid" | "due";
 
 const PLAN_NAMES: Record<string, string> = {
-  standart: "Standart Kocluk",
-  plus: "Plus Kocluk",
-  vip: "VIP Kocluk",
+  standart: "Standart Koçluk",
+  plus: "Plus Koçluk",
+  vip: "VIP Koçluk",
 };
 
 export function CoachRevenuePanel() {
@@ -53,23 +53,23 @@ export function CoachRevenuePanel() {
   }, [filter, subscribers, overdue]);
 
   function exportCsv() {
-    const rows = [["Ogrenci", "Veli", "Plan", "Donem", "Aylik", "Durum", "Sonraki"]];
+    const rows = [["Öğrenci", "Veli", "Plan", "Dönem", "Aylık", "Durum", "Sonraki"]];
     subscribers.forEach((item) => {
       rows.push([
         item.studentName,
         item.parentName,
         PLAN_NAMES[item.planId] ?? item.planId,
-        item.cycle === "annual" ? "Yillik" : "Aylik",
+        item.cycle === "annual" ? "Yıllık" : "Aylık",
         String(item.monthlyAmount),
-        item.status === "paid" ? "Odendi" : item.status === "pending" ? "Bekliyor" : "Basarisiz",
-        item.nextDays < 0 ? `${-item.nextDays} gun gecikti` : `${item.nextDays} gun`,
+        item.status === "paid" ? "Ödendi" : item.status === "pending" ? "Bekliyor" : "Başarısız",
+        item.nextDays < 0 ? `${-item.nextDays} gün gecikti` : `${item.nextDays} gün`,
       ]);
     });
     downloadTextFile("sube-tahsilat.csv", rows.map((row) => row.join(",")).join("\n"));
   }
 
   if (isLoading) {
-    return <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>;
+    return <p className="muted" style={{ fontSize: 13 }}>Yükleniyor...</p>;
   }
 
   return (
@@ -124,26 +124,26 @@ export function CoachRevenuePanel() {
                   {formatTRY(view?.platformFee ?? 0)}
                 </b>
                 <span className="muted" style={{ fontSize: 12 }}>
-                  /ay · {view?.studentCapacity ?? 50} ogrenciye kadar
+                  /ay · {view?.studentCapacity ?? 50} öğrenciye kadar
                 </span>
               </div>
             </div>
             <div className="plat-rows">
               <div className="plat-row">
-                <span className="muted">Kullanim</span>
+                <span className="muted">Kullanım</span>
                 <b>
-                  {subscribers.length} / {view?.studentCapacity ?? 50} ogrenci
+                  {subscribers.length} / {view?.studentCapacity ?? 50} öğrenci
                 </b>
               </div>
               <div className="plat-meter">
                 <span style={{ width: `${(subscribers.length / (view?.studentCapacity ?? 50)) * 100}%` }} />
               </div>
               <div className="plat-row">
-                <span className="muted">Sonraki odeme</span>
+                <span className="muted">Sonraki ödeme</span>
                 <b>1 Temmuz 2026</b>
               </div>
               <div className="plat-row">
-                <span className="muted">Odeme yontemi</span>
+                <span className="muted">Ödeme yöntemi</span>
                 <b className="row" style={{ gap: 6 }}>
                   <CardBrandBadge brand="mastercard" size="sm" /> •5571
                 </b>
@@ -151,22 +151,22 @@ export function CoachRevenuePanel() {
             </div>
             <button type="button" className="btn btn-outline" style={{ width: "100%" }}>
               <KiIcon name="ki-arrow-up" size={15} />
-              Kapasiteyi yukselt
+              Kapasiteyi yükselt
             </button>
           </div>
         </UkSection>
       </div>
 
       <UkSection
-        title="Ogrenci Tahsilatlari"
-        sub="Abonelik bazinda tahsilat durumu"
+        title="Öğrenci Tahsilatları"
+        sub="Abonelik bazında tahsilat durumu"
         action={
           <div className="seg" style={{ width: "fit-content" }}>
             <button type="button" className={filter === "all" ? "on" : ""} onClick={() => setFilter("all")}>
-              Tumu
+              Tümü
             </button>
             <button type="button" className={filter === "paid" ? "on" : ""} onClick={() => setFilter("paid")}>
-              Odendi
+              Ödendi
             </button>
             <button type="button" className={filter === "due" ? "on" : ""} onClick={() => setFilter("due")}>
               Bekleyen
@@ -178,10 +178,10 @@ export function CoachRevenuePanel() {
           <table className="tbl" style={{ minWidth: 680 }}>
             <thead>
               <tr>
-                <th>Ogrenci</th>
+                <th>Öğrenci</th>
                 <th>Veli</th>
                 <th>Plan</th>
-                <th style={{ textAlign: "right" }}>Aylik</th>
+                <th style={{ textAlign: "right" }}>Aylık</th>
                 <th style={{ textAlign: "center" }}>Sonraki</th>
                 <th style={{ textAlign: "center" }}>Durum</th>
                 <th />
@@ -190,7 +190,7 @@ export function CoachRevenuePanel() {
             <tbody>
               {list.map((item) => {
                 const tone = item.status === "paid" ? "success" : item.status === "pending" ? "warning" : "danger";
-                const label = item.status === "paid" ? "Odendi" : item.status === "pending" ? "Yaklasiyor" : "Basarisiz";
+                const label = item.status === "paid" ? "Ödendi" : item.status === "pending" ? "Yaklaşıyor" : "Başarısız";
                 const overdueDays = item.nextDays < 0;
                 return (
                   <tr key={item.studentName}>
@@ -210,7 +210,7 @@ export function CoachRevenuePanel() {
                         <span className="plan-dot" style={{ background: planColor(item.planId) }} />
                         <span style={{ fontSize: 12.5, fontWeight: 600 }}>{PLAN_NAMES[item.planId] ?? item.planId}</span>
                         <span className="muted" style={{ fontSize: 11 }}>
-                          {item.cycle === "annual" ? "Yillik" : "Aylik"}
+                          {item.cycle === "annual" ? "Yıllık" : "Aylık"}
                         </span>
                       </div>
                     </td>
@@ -228,7 +228,7 @@ export function CoachRevenuePanel() {
                           fontWeight: overdueDays ? 700 : 500,
                         }}
                       >
-                        {overdueDays ? `${-item.nextDays} gun gecikti` : `${item.nextDays} gun`}
+                        {overdueDays ? `${-item.nextDays} gün gecikti` : `${item.nextDays} gün`}
                       </span>
                     </td>
                     <td style={{ textAlign: "center" }}>
@@ -250,7 +250,7 @@ export function CoachRevenuePanel() {
                           }
                         >
                           <KiIcon name={reminded.has(item.studentName) ? "ki-check" : "ki-send"} size={14} />
-                          {reminded.has(item.studentName) ? "Hatirlatildi" : "Hatirlat"}
+                          {reminded.has(item.studentName) ? "Hatırlatıldı" : "Hatırlat"}
                         </button>
                       ) : (
                         <button
@@ -263,13 +263,13 @@ export function CoachRevenuePanel() {
                             downloadTextFile(
                               `makbuz-${item.studentName.replace(/\s/g, "-")}.txt`,
                               [
-                                "UYANIK KOC — TAHSILAT MAKBUZU",
+                                "UYANIK KOÇ — TAHSİLAT MAKBUZU",
                                 "",
-                                `Ogrenci: ${item.studentName}`,
+                                `Öğrenci: ${item.studentName}`,
                                 `Veli: ${item.parentName}`,
                                 `Plan: ${PLAN_NAMES[item.planId] ?? item.planId}`,
-                                `Aylik tutar: ${formatTRY(item.monthlyAmount)}`,
-                                "Durum: Odendi",
+                                `Aylık tutar: ${formatTRY(item.monthlyAmount)}`,
+                                "Durum: Ödendi",
                               ].join("\n"),
                             )
                           }

@@ -345,7 +345,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
                   className={theme === choice ? "on" : ""}
                   onClick={() => handleThemeChange(choice)}
                 >
-                  {choice === "light" ? "Acik" : choice === "dark" ? "Koyu" : "Sistem"}
+                  {choice === "light" ? "Açık" : choice === "dark" ? "Koyu" : "Sistem"}
                 </button>
               ))}
             </div>
@@ -361,7 +361,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div className="grid g-2" style={{ gap: 12 }}>
               <div className="field">
-                <label className="label">Mevcut sifre</label>
+                <label className="label">Mevcut şifre</label>
                 <input
                   className="input"
                   type="password"
@@ -370,7 +370,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
                 />
               </div>
               <div className="field">
-                <label className="label">Yeni sifre</label>
+                <label className="label">Yeni şifre</label>
                 <input
                   className="input"
                   type="password"
@@ -380,7 +380,7 @@ export function SettingsPanel({ role }: SettingsPanelProps) {
               </div>
             </div>
             <div className="field">
-              <label className="label">Yeni sifre (tekrar)</label>
+              <label className="label">Yeni şifre (tekrar)</label>
               <input
                 className="input"
                 type="password"

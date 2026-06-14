@@ -15,7 +15,7 @@ type SubjectRow = {
 const EXAM_TYPES: ResultExamType[] = ["TYT", "AYT", "LGS"];
 
 const DEFAULT_SUBJECTS: SubjectRow[] = [
-  { subjectName: "Turkce", correct: "", wrong: "" },
+  { subjectName: "Türkçe", correct: "", wrong: "" },
   { subjectName: "Matematik", correct: "", wrong: "" },
   { subjectName: "Fen", correct: "", wrong: "" },
   { subjectName: "Sosyal", correct: "", wrong: "" },
@@ -80,7 +80,7 @@ export function CoachExamManualModal({ open, onClose, onSaved }: CoachExamManual
       .filter((row) => row.subjectName && !Number.isNaN(row.correct) && !Number.isNaN(row.wrong));
 
     if (parsedSubjects.length === 0) {
-      setError("En az bir ders satiri gerekli.");
+      setError("En az bir ders satırı gerekli.");
       return;
     }
 
@@ -119,9 +119,9 @@ export function CoachExamManualModal({ open, onClose, onSaved }: CoachExamManual
       <div className="modal-panel" style={{ maxWidth: 640 }} onClick={(event) => event.stopPropagation()}>
         <div className="modal-head">
           <div>
-            <h3 style={{ fontSize: 16, fontWeight: 800 }}>Manuel deneme girisi</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 800 }}>Manuel deneme girişi</h3>
             <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>
-              Tek ogrenci icin TYT/AYT/LGS sonucu kaydet
+              Tek öğrenci için TYT/AYT/LGS sonucu kaydet
             </div>
           </div>
           <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">
@@ -132,7 +132,7 @@ export function CoachExamManualModal({ open, onClose, onSaved }: CoachExamManual
           <div className="grid g-2">
             <div className="field">
               <label className="label" htmlFor="manual-studentId">
-                Ogrenci
+                Öğrenci
               </label>
               <select
                 id="manual-studentId"
@@ -149,7 +149,7 @@ export function CoachExamManualModal({ open, onClose, onSaved }: CoachExamManual
             </div>
             <div className="field">
               <label className="label" htmlFor="manual-examType">
-                Sinav turu
+                Sınav türü
               </label>
               <select
                 id="manual-examType"
@@ -195,7 +195,7 @@ export function CoachExamManualModal({ open, onClose, onSaved }: CoachExamManual
 
           <div>
             <p className="label" style={{ marginBottom: 10 }}>
-              Ders satirlari
+              Ders satırları
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {subjects.map((row, index) => (
@@ -208,7 +208,7 @@ export function CoachExamManualModal({ open, onClose, onSaved }: CoachExamManual
                   <input
                     type="number"
                     min={0}
-                    placeholder="Dogru"
+                    placeholder="Doğru"
                     value={row.correct}
                     onChange={(event) => updateSubject(index, "correct", event.target.value)}
                     className="input"
@@ -216,7 +216,7 @@ export function CoachExamManualModal({ open, onClose, onSaved }: CoachExamManual
                   <input
                     type="number"
                     min={0}
-                    placeholder="Yanlis"
+                    placeholder="Yanlış"
                     value={row.wrong}
                     onChange={(event) => updateSubject(index, "wrong", event.target.value)}
                     className="input"
@@ -234,7 +234,7 @@ export function CoachExamManualModal({ open, onClose, onSaved }: CoachExamManual
 
           <div className="row" style={{ gap: 10, justifyContent: "flex-end" }}>
             <button type="button" className="btn btn-light" onClick={onClose}>
-              Iptal
+              İptal
             </button>
             <button type="submit" disabled={isSubmitting} className="btn btn-primary">
               {isSubmitting ? "Kaydediliyor..." : "Kaydet"}

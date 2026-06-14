@@ -69,16 +69,16 @@ export function CoachTestsPanel() {
     <div className="stack rise" data-testid="coach-tests-panel">
       <UkPageHead
         title="Envanter ve Testler"
-        sub="Psikolojik testleri ogrencilere gonder"
+        sub="Psikolojik testleri öğrencilere gönder"
         actions={
           <div className="row" style={{ gap: 8 }}>
             <button type="button" className="btn btn-light" onClick={() => setBuilderOpen(true)}>
               <KiIcon name="ki-notepad-edit" />
-              Test olustur
+              Test oluştur
             </button>
             <button type="button" className="btn btn-primary" onClick={() => setSendModalOpen(true)}>
               <KiIcon name="ki-send" />
-              Test gonder
+              Test gönder
             </button>
           </div>
         }
@@ -86,7 +86,7 @@ export function CoachTestsPanel() {
 
       <div className="grid g-4">
         <UkStatCard icon="ki-star" tone="primary" value={catalog.length} label="Test katalogu" />
-        <UkStatCard icon="ki-send" tone="info" value={assignments.length} label="Gonderilen test" />
+        <UkStatCard icon="ki-send" tone="info" value={assignments.length} label="Gönderilen test" />
         <UkStatCard icon="ki-check-circle" tone="success" value={completed} label="Tamamlanan" />
         <UkStatCard icon="ki-time" tone="warning" value={pending} label="Bekleyen" />
       </div>
@@ -95,7 +95,7 @@ export function CoachTestsPanel() {
         <div className="card-body grid g-4">
           {isLoading ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Yukleniyor...
+              Yükleniyor...
             </p>
           ) : (
             catalog.map((test) => (
@@ -118,11 +118,11 @@ export function CoachTestsPanel() {
         </div>
       </UkSection>
 
-      <UkSection title="Gonderilen testler" sub={`${assignments.length} atama`}>
+      <UkSection title="Gönderilen testler" sub={`${assignments.length} atama`}>
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {assignments.length === 0 ? (
             <p className="muted" style={{ fontSize: 13 }}>
-              Henuz test gonderilmedi.
+              Henüz test gönderilmedi.
             </p>
           ) : (
             assignments.map((assignment) => {
@@ -141,7 +141,7 @@ export function CoachTestsPanel() {
                     </div>
                     <div className="lr-meta" style={{ marginBottom: 8 }}>
                       <UkBadge tone={assignment.status === "completed" ? "success" : "warning"}>
-                        {assignment.status === "completed" ? "Tamamlandi" : "Bekliyor"}
+                        {assignment.status === "completed" ? "Tamamlandı" : "Bekliyor"}
                       </UkBadge>
                       {assignment.band ? <span className="d">{assignment.band}</span> : null}
                     </div>
@@ -154,7 +154,7 @@ export function CoachTestsPanel() {
                           onChange={(event) =>
                             setNoteDrafts((current) => ({ ...current, [assignment.id]: event.target.value }))
                           }
-                          placeholder="Koc notu"
+                          placeholder="Koç notu"
                           autoFocus
                         />
                         <button
@@ -169,7 +169,7 @@ export function CoachTestsPanel() {
                           className="btn btn-light btn-sm"
                           onClick={() => setEditingNoteId(null)}
                         >
-                          Iptal
+                          İptal
                         </button>
                       </div>
                     ) : (
@@ -186,7 +186,7 @@ export function CoachTestsPanel() {
                         }}
                       >
                         <KiIcon name="ki-notepad-edit" size={14} />
-                        {assignment.coachNote?.trim() ? assignment.coachNote : "Koc notu ekle..."}
+                        {assignment.coachNote?.trim() ? assignment.coachNote : "Koç notu ekle..."}
                       </button>
                     )}
                   </div>

@@ -90,17 +90,17 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
   }
 
   if (isLoading) {
-    return <p className="muted" style={{ fontSize: 13 }}>Yukleniyor...</p>;
+    return <p className="muted" style={{ fontSize: 13 }}>Yükleniyor...</p>;
   }
 
   if (!summary) {
-    return <p className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>Ogrenci bulunamadi.</p>;
+    return <p className="badge badge-danger" style={{ height: "auto", padding: "10px 12px" }}>Öğrenci bulunamadı.</p>;
   }
 
   return (
     <div className="stack rise" data-testid="coach-student-detail">
       <UkPageHead
-        title="Ogrenci Detay"
+        title="Öğrenci Detay"
         sub={studentId}
         actions={
           <Link href="/coach/dashboard" className="btn btn-light btn-sm">
@@ -110,7 +110,7 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
       />
 
       <div className="grid g-4">
-        <UkStatCard icon="ki-notepad-edit" tone="primary" value={summary.assignments.length} label="Toplam odev" />
+        <UkStatCard icon="ki-notepad-edit" tone="primary" value={summary.assignments.length} label="Toplam ödev" />
         <UkStatCard
           icon="ki-book-open"
           tone="info"
@@ -188,14 +188,14 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
           </div>
         </UkSection>
 
-        <UkSection title="Motivasyon gonder" sub="Ogrenciye gunluk not">
+        <UkSection title="Motivasyon gönder" sub="Öğrenciye günlük not">
           <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <textarea
               className="input"
               rows={3}
               value={motivationMessage}
               onChange={(event) => setMotivationMessage(event.target.value)}
-              placeholder="Kisa bir motivasyon mesaji yaz..."
+              placeholder="Kısa bir motivasyon mesajı yaz..."
             />
             <button
               type="button"
@@ -203,13 +203,13 @@ export function CoachStudentDetail({ studentId }: CoachStudentDetailProps) {
               disabled={motivationSending || motivationMessage.trim().length < 3}
               onClick={() => void sendMotivation()}
             >
-              {motivationSending ? "Gonderiliyor..." : "Gonder"}
+              {motivationSending ? "Gönderiliyor..." : "Gönder"}
             </button>
           </div>
         </UkSection>
       </div>
 
-      <UkSection title="Son odevler">
+      <UkSection title="Son ödevler">
         <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {summary.assignments.slice(0, 5).map((assignment) => (
             <div key={assignment.id} className="lrow">

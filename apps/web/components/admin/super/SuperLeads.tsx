@@ -16,26 +16,26 @@ const DAY = 86_400_000;
 
 const STATUS_META: Record<DemoRequestStatus, { tone: string; label: string }> = {
   new: { tone: "warning", label: "Yeni talep" },
-  contacted: { tone: "info", label: "Iletisime gecildi" },
-  scheduled: { tone: "primary", label: "Demo planlandi" },
-  converted: { tone: "success", label: "Satisa dondu" },
-  lost: { tone: "muted", label: "Kayip" },
+  contacted: { tone: "info", label: "İletişime geçildi" },
+  scheduled: { tone: "primary", label: "Demo planlandı" },
+  converted: { tone: "success", label: "Satışa döndü" },
+  lost: { tone: "muted", label: "Kayıp" },
 };
 
 const STATUS_FLOW: DemoRequestStatus[] = ["new", "contacted", "scheduled", "converted"];
 const SIGNUP_META = {
-  new: { tone: "success", label: "Yeni uyelik" },
+  new: { tone: "success", label: "Yeni üyelik" },
   renewal: { tone: "info", label: "Yenileme" },
-  upgrade: { tone: "primary", label: "Yukseltme" },
-  trial: { tone: "warning", label: "Ucretsiz deneme" },
+  upgrade: { tone: "primary", label: "Yükseltme" },
+  trial: { tone: "warning", label: "Ücretsiz deneme" },
 } as const;
 
 function timeAgo(ts: number): string {
   const diff = Date.now() - ts;
   const h = Math.floor(diff / 3_600_000);
-  if (h < 1) return "az once";
-  if (h < 24) return `${h} saat once`;
-  return `${Math.floor(h / 24)} gun once`;
+  if (h < 1) return "az önce";
+  if (h < 24) return `${h} saat önce`;
+  return `${Math.floor(h / 24)} gün önce`;
 }
 
 function fmtDateTime(ts: number): string {
@@ -90,33 +90,33 @@ function AddDemoModal({ onClose }: { onClose: () => void }) {
       onClose={onClose}
       foot={
         <>
-          <button type="button" className="btn btn-light" onClick={onClose}>Vazgec</button>
+          <button type="button" className="btn btn-light" onClick={onClose}>Vazgeç</button>
           <button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} disabled={!name.trim()} onClick={() => void apply()}>
             <Icon name="plus" size={16} />Talep ekle
           </button>
         </>
       }
     >
-      <Field label="Talep turu">
+      <Field label="Talep türü">
         <div className="seg" style={{ width: "100%" }}>
           <button type="button" className={requestKind === "org" ? "on" : ""} style={{ flex: 1 }} onClick={() => { setRequestKind("org"); setPlanId("pro"); }}>Kurum / Franchise</button>
           <button type="button" className={requestKind === "coach" ? "on" : ""} style={{ flex: 1 }} onClick={() => { setRequestKind("coach"); setPlanId("c-pro"); }}>Bireysel koç</button>
         </div>
       </Field>
-      <Field label={requestKind === "org" ? "Kurum adi" : "Ad soyad"}><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></Field>
+      <Field label={requestKind === "org" ? "Kurum adı" : "Ad soyad"}><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></Field>
       <div className="grid g-2" style={{ gap: 12 }}>
         <Field label="E-posta"><input className="input" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
         <Field label="Telefon"><input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
       </div>
       <div className="grid g-2" style={{ gap: 12 }}>
-        <Field label="Sehir"><input className="input" value={city} onChange={(e) => setCity(e.target.value)} /></Field>
+        <Field label="Şehir"><input className="input" value={city} onChange={(e) => setCity(e.target.value)} /></Field>
         <Field label="Kaynak">
           <select className="input" value={source} onChange={(e) => setSource(e.target.value)}>
             {["Telefon", "Web sitesi", "Instagram", "Google reklam", "Jotform", "Referans", "Fuar / etkinlik"].map((item) => <option key={item}>{item}</option>)}
           </select>
         </Field>
       </div>
-      <Field label="Ilgilenilen plan">
+      <Field label="İlgilenilen plan">
         <select className="input" value={planId} onChange={(e) => setPlanId(e.target.value as OrgPlanId | CoachPlanId)}>
           {plans.map((plan) => <option key={plan.id} value={plan.id}>{plan.name}</option>)}
         </select>
@@ -152,9 +152,9 @@ function LeadDetailModal({ lead, onClose }: { lead: DemoRequest; onClose: () => 
       foot={
         <>
           {lead.status === "lost" ? (
-            <button type="button" className="btn btn-light" onClick={() => void setStatus("contacted")}><Icon name="refresh" size={16} />Yeniden ac</button>
+            <button type="button" className="btn btn-light" onClick={() => void setStatus("contacted")}><Icon name="refresh" size={16} />Yeniden aç</button>
           ) : (
-            <button type="button" className="btn btn-light" onClick={() => setShowLost(true)}><Icon name="alert" size={16} />Kayip olarak isaretle</button>
+            <button type="button" className="btn btn-light" onClick={() => setShowLost(true)}><Icon name="alert" size={16} />Kayıp olarak işaretle</button>
           )}
           <button type="button" className="btn btn-primary" style={{ marginLeft: "auto" }} onClick={onClose}>Kapat</button>
         </>
@@ -167,7 +167,7 @@ function LeadDetailModal({ lead, onClose }: { lead: DemoRequest; onClose: () => 
       </div>
 
       <div>
-        <div className="muted" style={{ fontSize: 11.5, fontWeight: 800, marginBottom: 12, textTransform: "uppercase" }}>Asama - tiklayarak ilerlet</div>
+        <div className="muted" style={{ fontSize: 11.5, fontWeight: 800, marginBottom: 12, textTransform: "uppercase" }}>Aşama - tıklayarak ilerlet</div>
         <div className="grid g-4" style={{ gap: 10 }}>
           {STATUS_FLOW.map((status) => {
             const idx = STATUS_FLOW.indexOf(status);
@@ -192,17 +192,17 @@ function LeadDetailModal({ lead, onClose }: { lead: DemoRequest; onClose: () => 
           value={toLocalInput(lead.scheduledAt)}
           onChange={(e) => void mutate({ kind: "setDemoSchedule", requestId: lead.id, scheduledAt: e.target.value ? new Date(e.target.value).getTime() : null })}
         />
-        {lead.scheduledAt ? <span className="muted" style={{ fontSize: 12, marginTop: 6 }}>{fmtDateTime(lead.scheduledAt)} olarak planlandi</span> : null}
+        {lead.scheduledAt ? <span className="muted" style={{ fontSize: 12, marginTop: 6 }}>{fmtDateTime(lead.scheduledAt)} olarak planlandı</span> : null}
       </Field>
 
       <div>
-        <div className="muted" style={{ fontSize: 11.5, fontWeight: 800, marginBottom: 9, textTransform: "uppercase" }}>Gorusme notlari</div>
+        <div className="muted" style={{ fontSize: 11.5, fontWeight: 800, marginBottom: 9, textTransform: "uppercase" }}>Görüşme notları</div>
         <div className="row" style={{ alignItems: "flex-start", gap: 8, marginBottom: 12 }}>
           <textarea className="input" rows={2} value={note} onChange={(e) => setNote(e.target.value)} style={{ flex: 1 }} />
           <button type="button" className="btn btn-primary" disabled={!note.trim()} onClick={() => { void addNote(note.trim()); setNote(""); }}><Icon name="plus" size={16} />Ekle</button>
         </div>
         <div className="stack" style={{ gap: 9 }}>
-          {lead.notes.length === 0 ? <p className="muted" style={{ fontSize: 12.5 }}>Henuz not yok.</p> : lead.notes.map((item) => (
+          {lead.notes.length === 0 ? <p className="muted" style={{ fontSize: 12.5 }}>Henüz not yok.</p> : lead.notes.map((item) => (
             <div key={item.id} className="card" style={{ padding: 12 }}>
               <div className="between">
                 <b style={{ fontSize: 12.5 }}>{item.author}</b>
@@ -219,13 +219,13 @@ function LeadDetailModal({ lead, onClose }: { lead: DemoRequest; onClose: () => 
 
       {showLost ? (
         <Modal
-          title="Kayip olarak isaretle"
+          title="Kayıp olarak işaretle"
           sub={lead.name}
           width={460}
           onClose={() => setShowLost(false)}
           foot={
             <>
-              <button type="button" className="btn btn-light" onClick={() => setShowLost(false)}>Vazgec</button>
+              <button type="button" className="btn btn-light" onClick={() => setShowLost(false)}>Vazgeç</button>
               <button
                 type="button"
                 className="btn btn-danger"
@@ -233,18 +233,18 @@ function LeadDetailModal({ lead, onClose }: { lead: DemoRequest; onClose: () => 
                 disabled={!lostReason.trim()}
                 onClick={() => {
                   void (async () => {
-                    await addNote(`Kayip nedeni: ${lostReason.trim()}`);
+                    await addNote(`Kayıp nedeni: ${lostReason.trim()}`);
                     await setStatus("lost");
                   })();
                   setShowLost(false);
                 }}
               >
-                <Icon name="alert" size={16} />Kayip olarak isaretle
+                <Icon name="alert" size={16} />Kayıp olarak işaretle
               </button>
             </>
           }
         >
-          <Field label="Kayip nedeni (zorunlu)">
+          <Field label="Kayıp nedeni (zorunlu)">
             <textarea className="input" rows={3} value={lostReason} onChange={(e) => setLostReason(e.target.value)} autoFocus />
           </Field>
         </Modal>
@@ -260,28 +260,28 @@ function LostReasonModal({ lead, onClose }: { lead: DemoRequest; onClose: () => 
   async function apply() {
     const text = reason.trim();
     if (!text) return;
-    await mutate({ kind: "addDemoNote", requestId: lead.id, text: `Kayip nedeni: ${text}`, author: "Platform Ekibi" });
+    await mutate({ kind: "addDemoNote", requestId: lead.id, text: `Kayıp nedeni: ${text}`, author: "Platform Ekibi" });
     await mutate({ kind: "setDemoStatus", requestId: lead.id, status: "lost" });
-    toast(`${lead.name} kayip olarak isaretlendi`, { icon: "ki-shield-cross", tone: "warning" });
+    toast(`${lead.name} kayıp olarak işaretlendi`, { icon: "ki-shield-cross", tone: "warning" });
     onClose();
   }
 
   return (
     <Modal
-      title="Kayip olarak isaretle"
+      title="Kayıp olarak işaretle"
       sub={lead.name}
       width={460}
       onClose={onClose}
       foot={
         <>
-          <button type="button" className="btn btn-light" onClick={onClose}>Vazgec</button>
+          <button type="button" className="btn btn-light" onClick={onClose}>Vazgeç</button>
           <button type="button" className="btn btn-danger" style={{ marginLeft: "auto" }} disabled={!reason.trim()} onClick={() => void apply()}>
-            <Icon name="alert" size={16} />Kayip olarak isaretle
+            <Icon name="alert" size={16} />Kayıp olarak işaretle
           </button>
         </>
       }
     >
-      <Field label="Kayip nedeni (zorunlu)">
+      <Field label="Kayıp nedeni (zorunlu)">
         <textarea className="input" rows={3} value={reason} onChange={(e) => setReason(e.target.value)} autoFocus />
       </Field>
     </Modal>
@@ -326,8 +326,8 @@ function DemoCard({ lead, onOpen, onLost }: { lead: DemoRequest; onOpen: () => v
         <div className="row" style={{ gap: 8, flexWrap: "wrap", borderTop: "1px solid var(--border)", paddingTop: 12 }}>
           {next ? <button type="button" className="btn btn-primary btn-sm" onClick={() => void advance()}><Icon name="check" size={14} />{STATUS_META[next].label}</button> : null}
           <button type="button" className="btn btn-light btn-sm" onClick={onOpen}><Icon name="notebook" size={14} />Detay & notlar</button>
-          {lead.status === "lost" ? <button type="button" className="btn btn-light btn-sm" onClick={() => void mutate({ kind: "setDemoStatus", requestId: lead.id, status: "contacted" })}><Icon name="refresh" size={14} />Yeniden ac</button> : null}
-          {lead.status !== "lost" && lead.status !== "converted" ? <button type="button" className="btn btn-light btn-sm" onClick={onLost}><Icon name="alert" size={14} />Kayip</button> : null}
+          {lead.status === "lost" ? <button type="button" className="btn btn-light btn-sm" onClick={() => void mutate({ kind: "setDemoStatus", requestId: lead.id, status: "contacted" })}><Icon name="refresh" size={14} />Yeniden aç</button> : null}
+          {lead.status !== "lost" && lead.status !== "converted" ? <button type="button" className="btn btn-light btn-sm" onClick={onLost}><Icon name="alert" size={14} />Kayıp</button> : null}
           <button type="button" className="btn btn-ghost-danger btn-sm" style={{ marginLeft: "auto" }} onClick={() => void mutate({ kind: "deleteDemoRequest", requestId: lead.id })}>
             <Icon name="plus" size={14} style={{ transform: "rotate(45deg)" }} />
           </button>
@@ -375,13 +375,13 @@ export function SuperLeads() {
   function exportRows() {
     if (tab === "demo") {
       downloadCSV("demo-talepleri.csv", [
-        ["Ad", "Tur", "Sehir", "Plan", "Kaynak", "Durum", "E-posta", "Telefon", "Tarih"],
+        ["Ad", "Tür", "Şehir", "Plan", "Kaynak", "Durum", "E-posta", "Telefon", "Tarih"],
         ...data.demoRequests.map((item) => [item.name, item.kind, item.city, planName(item), item.source, STATUS_META[item.status].label, item.email, item.phone, fmtShort(item.requestedAt)]),
       ]);
       return;
     }
     downloadCSV("yeni-uyelikler.csv", [
-      ["Uye", "Tur", "Sehir", "Plan", "Islem", "Tutar", "Yontem", "Tarih"],
+      ["Üye", "Tür", "Şehir", "Plan", "İşlem", "Tutar", "Yöntem", "Tarih"],
       ...data.signups.map((item) => [item.name, item.kind, item.city, planName(item), SIGNUP_META[item.type].label, item.amount, item.method, fmtShort(item.at)]),
     ]);
   }
@@ -389,8 +389,8 @@ export function SuperLeads() {
   return (
     <div className="stack rise">
       <UkPageHead
-        title="Demo & Uyelik Takibi"
-        sub="Gelen demo taleplerini takip et, yeni uyelik ve satin almalari izle"
+        title="Demo & Üyelik Takibi"
+        sub="Gelen demo taleplerini takip et, yeni üyelik ve satın almaları izle"
         actions={
           <>
             <button type="button" className="btn btn-light" onClick={exportRows}><KiIcon name="ki-exit-down" />CSV indir</button>
@@ -400,15 +400,15 @@ export function SuperLeads() {
       />
 
       <div className="grid g-4">
-        <StatCard icon="clock" tone="warning" value={data.open} label="Acik demo talebi" delta={`${data.newCount} yeni`} />
-        <StatCard icon="users" tone="success" value={data.newMembers} label="Yeni uyelik (30 gun)" />
-        <StatCard icon="banknote" tone="primary" value={tl(data.revenue)} label="Satin alma (30 gun)" />
-        <StatCard icon="trend" tone="info" value={`%${data.convRate}`} label="Demo donusum orani" />
+        <StatCard icon="clock" tone="warning" value={data.open} label="Açık demo talebi" delta={`${data.newCount} yeni`} />
+        <StatCard icon="users" tone="success" value={data.newMembers} label="Yeni üyelik (30 gün)" />
+        <StatCard icon="banknote" tone="primary" value={tl(data.revenue)} label="Satın alma (30 gün)" />
+        <StatCard icon="trend" tone="info" value={`%${data.convRate}`} label="Demo dönüşüm oranı" />
       </div>
 
       <div className="seg-tabs">
         <button type="button" className={`seg-tab${tab === "demo" ? " on" : ""}`} onClick={() => setTab("demo")}><Icon name="clipboard" size={16} />Demo talepleri<span className="tnum" style={{ marginLeft: 4, opacity: .6 }}>{data.demoRequests.length}</span></button>
-        <button type="button" className={`seg-tab${tab === "signup" ? " on" : ""}`} onClick={() => setTab("signup")}><Icon name="card" size={16} />Yeni uyelik & satin alma<span className="tnum" style={{ marginLeft: 4, opacity: .6 }}>{data.signups.length}</span></button>
+        <button type="button" className={`seg-tab${tab === "signup" ? " on" : ""}`} onClick={() => setTab("signup")}><Icon name="card" size={16} />Yeni üyelik & satın alma<span className="tnum" style={{ marginLeft: 4, opacity: .6 }}>{data.signups.length}</span></button>
       </div>
 
       {tab === "demo" ? (
@@ -416,14 +416,14 @@ export function SuperLeads() {
           <div className="stack">
             <div className="between" style={{ flexWrap: "wrap", gap: 10 }}>
               <div className="seg">
-                {([{ key: "all", label: "Tumu" }, { key: "new", label: "Yeni" }, { key: "contacted", label: "Iletisimde" }, { key: "scheduled", label: "Planlandi" }, { key: "converted", label: "Dondu" }, { key: "lost", label: "Kayip" }] as const).map((item) => (
+                {([{ key: "all", label: "Tümü" }, { key: "new", label: "Yeni" }, { key: "contacted", label: "İletişimde" }, { key: "scheduled", label: "Planlandı" }, { key: "converted", label: "Döndü" }, { key: "lost", label: "Kayıp" }] as const).map((item) => (
                   <button key={item.key} type="button" className={status === item.key ? "on" : ""} onClick={() => setStatus(item.key)}> {item.label}</button>
                 ))}
               </div>
               <div className="searchbox" style={{ maxWidth: 260 }}><Icon name="search" size={17} /><input placeholder="Talep ara..." value={query} onChange={(e) => setQuery(e.target.value)} /></div>
             </div>
             <div className="stack">{visible.map((lead) => <DemoCard key={lead.id} lead={lead} onOpen={() => setOpenId(lead.id)} onLost={() => setLostId(lead.id)} />)}</div>
-            {visible.length === 0 ? <EmptyState icon="clipboard" title="Talep bulunamadi" sub="Filtre veya aramayi degistir" /> : null}
+            {visible.length === 0 ? <EmptyState icon="clipboard" title="Talep bulunamadı" sub="Filtre veya aramayı değiştir" /> : null}
           </div>
           <div className="stack">
             <div className="card">
@@ -444,10 +444,10 @@ export function SuperLeads() {
         </div>
       ) : (
         <div className="card">
-          <div className="card-head"><div><h3>Son uyelikler & satin almalar</h3><p className="sub">{data.signups.length} islem · {tl(data.revenue)}</p></div></div>
+          <div className="card-head"><div><h3>Son üyelikler & satın almalar</h3><p className="sub">{data.signups.length} işlem · {tl(data.revenue)}</p></div></div>
           <div className="card-body" style={{ padding: 0, overflowX: "auto" }}>
             <table className="tbl" style={{ minWidth: 760 }}>
-              <thead><tr><th>Uye</th><th>Plan</th><th>Islem</th><th>Yontem</th><th>Tarih</th><th style={{ textAlign: "right" }}>Tutar</th></tr></thead>
+              <thead><tr><th>Üye</th><th>Plan</th><th>İşlem</th><th>Yöntem</th><th>Tarih</th><th style={{ textAlign: "right" }}>Tutar</th></tr></thead>
               <tbody>
                 {data.signups.slice().sort((a, b) => b.at - a.at).map((item) => {
                   const meta = SIGNUP_META[item.type];

@@ -166,7 +166,7 @@ function BarChart({ values }: { values: number[] }) {
   const peak = Math.max(...values);
 
   return (
-    <div className="chart" aria-label="Deneme basari grafigi">
+    <div className="chart" aria-label="Deneme başarı grafiği">
       {values.map((value, index) => (
         <div key={`${value}-${index}`} className={`col ${value === peak ? "peak" : ""}`}>
           <div className="track">

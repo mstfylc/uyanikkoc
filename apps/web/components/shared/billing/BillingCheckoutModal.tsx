@@ -177,7 +177,7 @@ export function BillingCheckoutModal({
               Bankana yönlendiriliyorsun. Telefonuna gelen tek kullanımlık şifreyle ödemeyi onayla.
             </p>
             <div className="co-bankbar">
-              <span className="co-bankdot" /> Guvenli baglanti kuruldu…
+              <span className="co-bankdot" /> Güvenli bağlantı kuruldu…
             </div>
           </div>
         ) : stage === "done" ? (
@@ -185,7 +185,7 @@ export function BillingCheckoutModal({
             <div className="co-ok">
               <KiIcon name="ki-check" size={34} />
             </div>
-            <h3>Odeme basarili</h3>
+            <h3>Ödeme başarılı</h3>
             <p className="muted">
               {plan.name} ({cycle === "annual" ? "Yıllık" : "Aylık"}) aboneliğin aktif. Makbuzun fatura geçmişine
               eklendi.
@@ -199,7 +199,7 @@ export function BillingCheckoutModal({
                   <KiIcon name="ki-lock" size={18} />
                 </span>
                 <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 800 }}>Guvenli Odeme</h3>
+                  <h3 style={{ fontSize: 16, fontWeight: 800 }}>Güvenli Ödeme</h3>
                   <div className="muted" style={{ fontSize: 12 }}>256-bit SSL · iyzico altyapisi</div>
                 </div>
               </div>
@@ -213,7 +213,7 @@ export function BillingCheckoutModal({
                 {methods.length > 0 ? (
                   <div className="co-tabs">
                     <button type="button" className={!useNew ? "on" : ""} onClick={() => setUseNew(false)}>
-                      Kayitli kart
+                      Kayıtlı kart
                     </button>
                     <button type="button" className={useNew ? "on" : ""} onClick={() => setUseNew(true)}>
                       Yeni kart
@@ -318,7 +318,7 @@ export function BillingCheckoutModal({
                           {option.rate > 0 ? (
                             <span className="co-tk-fark">+%{Math.round(option.rate * 100)} vade farki</span>
                           ) : (
-                            <span className="co-tk-fark ok">vade farksiz</span>
+                            <span className="co-tk-fark ok">vade farksız</span>
                           )}
                         </button>
                       );

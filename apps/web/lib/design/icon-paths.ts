@@ -109,6 +109,7 @@ export const KI_ICON_MAP: Record<string, UkIconName> = {
   "ki-exit-down": "download",
   "ki-entrance-right": "chevronRight",
   "ki-right": "chevronRight",
+  "ki-down": "chevronDown",
   "ki-arrow-right": "chevronRight",
   "ki-arrow-up": "arrowUp",
   "ki-arrow-down": "arrowDown",

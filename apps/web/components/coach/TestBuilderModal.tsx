@@ -46,11 +46,11 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!name.trim()) {
-      setError("Test adi gerekli.");
+      setError("Test adı gerekli.");
       return;
     }
     if (questions.some((q) => !q.text.trim())) {
-      setError("Tum sorulara metin girin.");
+      setError("Tüm sorulara metin girin.");
       return;
     }
 
@@ -66,14 +66,14 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
         questions: questions.map(({ text, kind, options }) => ({
           text: text.trim(),
           kind,
-          options: kind === "choice" ? (options ?? ["Evet", "Hayir"]) : undefined,
+          options: kind === "choice" ? (options ?? ["Evet", "Hayır"]) : undefined,
         })),
       }),
     });
     setIsSubmitting(false);
 
     if (!response.ok) {
-      setError("Test olusturulamadi.");
+      setError("Test oluşturulamadı.");
       return;
     }
 
@@ -98,8 +98,8 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
               <KiIcon name="ki-notepad-edit" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Ozel test olustur</h3>
-              <div className="muted" style={{ fontSize: 12.5 }}>Likert, evet/hayir, olcek veya secenekli sorular</div>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Özel test oluştur</h3>
+              <div className="muted" style={{ fontSize: 12.5 }}>Likert, evet/hayır, ölçek veya seçenekli sorular</div>
             </div>
           </div>
           <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">
@@ -113,11 +113,11 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
           style={{ gap: 14, overflowY: "auto", flex: 1, display: "flex", flexDirection: "column" }}
         >
           <div className="field">
-            <label className="label">Test adi</label>
+            <label className="label">Test adı</label>
             <input className="input" value={name} onChange={(event) => setName(event.target.value)} />
           </div>
           <div className="field">
-            <label className="label">Aciklama</label>
+            <label className="label">Açıklama</label>
             <input className="input" value={desc} onChange={(event) => setDesc(event.target.value)} />
           </div>
 
@@ -152,9 +152,9 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
                 }
               >
                 <option value="likert">Likert (1-5)</option>
-                <option value="yesno">Evet / Hayir</option>
-                <option value="scale">Olcek (0-10)</option>
-                <option value="choice">Coktan secmeli</option>
+                <option value="yesno">Evet / Hayır</option>
+                <option value="scale">Ölçek (0-10)</option>
+                <option value="choice">Çoktan seçmeli</option>
               </select>
               {question.kind === "choice" ? (
                 <input
@@ -165,7 +165,7 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
                       options: event.target.value.split(",").map((item) => item.trim()).filter(Boolean),
                     })
                   }
-                  placeholder="Secenekler (virgul ile)"
+                  placeholder="Seçenekler (virgül ile)"
                 />
               ) : null}
             </div>
@@ -180,10 +180,10 @@ export function TestBuilderModal({ open, onClose, onCreated }: TestBuilderModalP
 
           <div className="modal-foot" style={{ justifyContent: "flex-end", gap: 10 }}>
             <button type="button" className="btn btn-light" onClick={onClose}>
-              Iptal
+              İptal
             </button>
             <button type="submit" disabled={isSubmitting} className="btn btn-primary">
-              {isSubmitting ? "Kaydediliyor..." : "Testi olustur"}
+              {isSubmitting ? "Kaydediliyor..." : "Testi oluştur"}
             </button>
           </div>
         </form>

@@ -45,7 +45,7 @@ export function CoachSchoolScheduleModal({
 
   const body = !schedule?.attendsSchool ? (
     <div style={{ padding: 20, textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-      Ogrenci okula gitmiyor / tam zamanli hazirlaniyor.
+      Öğrenci okula gitmiyor / tam zamanlı hazırlanıyor.
     </div>
   ) : (
     <div style={{ overflowX: "auto" }}>

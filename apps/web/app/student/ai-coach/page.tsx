@@ -92,7 +92,7 @@ export default function StudentAiCoachPage() {
           <KiIcon name="ki-technology-2" size={38} />
         </span>
         <div style={{ flex: 1, minWidth: 240 }}>
-          <h2 style={{ fontSize: 24 }}>Senin icin dusunen bir koc</h2>
+          <h2 style={{ fontSize: 24 }}>Senin için düşünen bir koç</h2>
           <p style={{ marginTop: 8, maxWidth: 560 }}>
             Uyanık AI Koç; netlerini, ödevlerini ve çalışma alışkanlıklarını analiz ederek sana özel öneriler ve program çıkaracak. Beta erişimi için sıraya gir.
           </p>

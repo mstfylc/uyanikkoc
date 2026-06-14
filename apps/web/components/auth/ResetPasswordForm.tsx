@@ -43,13 +43,13 @@ export function ResetPasswordForm() {
           <div style={{ marginBottom: 22 }}>
             <h1 style={{ fontSize: 23, fontWeight: 800 }}>Şifre sıfırla</h1>
             <p className="muted" style={{ fontSize: 13.5, marginTop: 4 }}>
-              Yeni sifren en az 6 karakter olmali.
+              Yeni şifren en az 6 karakter olmalı.
             </p>
           </div>
 
           <div className="field" style={{ marginBottom: 14 }}>
             <label className="label" htmlFor="new-password">
-              Yeni sifre
+              Yeni şifre
             </label>
             <input
               id="new-password"

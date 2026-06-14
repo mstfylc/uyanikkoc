@@ -171,9 +171,9 @@ export function ParentDashboard() {
           icon="ki-chart-line-up"
           tone="primary"
           value={latestReport ? `${latestReport.netDelta > 0 ? "+" : ""}${latestReport.netDelta}` : "-"}
-          label="Son rapor net degisimi"
+          label="Son rapor net değişimi"
         />
-        <StatCard icon="ki-calendar" tone="info" value={upcomingAppointment ? "1" : "0"} label="Yaklasan randevu" />
+        <StatCard icon="ki-calendar" tone="info" value={upcomingAppointment ? "1" : "0"} label="Yaklaşan randevu" />
       </div>
 
       <div className="grid col-main">
@@ -232,7 +232,7 @@ export function ParentDashboard() {
                 </div>
               ) : (
                 <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>
-                  Henuz onayli rapor yok.
+                  Henüz onaylı rapor yok.
                 </div>
               )}
               <Link href="/parent/reports" className="btn btn-light btn-sm" style={{ alignSelf: "flex-start" }}>
@@ -242,7 +242,7 @@ export function ParentDashboard() {
             </div>
           </UkSection>
 
-          <UkSection title="Yaklasan Randevu">
+          <UkSection title="Yaklaşan Randevu">
             <div className="card-body">
               {upcomingAppointment ? (
                 <div className="lrow" style={{ cursor: "default" }}>
@@ -256,11 +256,11 @@ export function ParentDashboard() {
                     </div>
                   </div>
                   <UkBadge tone={upcomingAppointment.status === "approved" ? "success" : "warning"}>
-                    {upcomingAppointment.status === "approved" ? "Onayli" : "Bekliyor"}
+                    {upcomingAppointment.status === "approved" ? "Onaylı" : "Bekliyor"}
                   </UkBadge>
                 </div>
               ) : (
-                <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Onayli randevu yok.</div>
+                <div style={{ padding: "10px 0", textAlign: "center", color: "var(--muted)", fontSize: 13 }}>Onaylı randevu yok.</div>
               )}
             </div>
           </UkSection>
@@ -270,8 +270,8 @@ export function ParentDashboard() {
       <div className="card" data-testid="parent-weekly-comment">
         <div className="card-head">
           <div>
-            <h3>Haftalik Yorum</h3>
-            <p className="sub">Bu haftanin kisa gelisim yorumu</p>
+            <h3>Haftalık Yorum</h3>
+            <p className="sub">Bu haftanın kısa gelişim yorumu</p>
           </div>
           <Link href="/parent/messages" className="btn btn-primary btn-sm">
             <KiIcon name="ki-message-text" />

@@ -48,7 +48,7 @@ const TABS: Array<{ key: BillingTab; label: string; icon: string }> = [
   { key: "sub", label: "Aboneliğim", icon: "ki-star" },
   { key: "plans", label: "Paketler", icon: "ki-flash" },
   { key: "invoices", label: "Faturalar", icon: "ki-receipt-square" },
-  { key: "methods", label: "Odeme Yontemleri", icon: "ki-wallet" },
+  { key: "methods", label: "Ödeme Yöntemleri", icon: "ki-wallet" },
 ];
 
 export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
@@ -199,7 +199,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                         <span className="per muted">
                           /ay
                           {pricingCycle === "annual" ? (
-                            <span className="tnum"> · yillik {formatTRY(item.annual)}</span>
+                            <span className="tnum"> · yıllık {formatTRY(item.annual)}</span>
                           ) : null}
                         </span>
                       </div>
@@ -233,7 +233,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                           style={{ width: "100%" }}
                           onClick={() => openCheckout(item.id, pricingCycle)}
                         >
-                          {item.name} Sec
+                          {item.name} Seç
                           <KiIcon name="ki-right" size={16} />
                         </button>
                       )}
@@ -266,7 +266,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                       <span className="plan-dot" style={{ background: planColor(activePlan.id), width: 12, height: 12 }} />
                       <h2 style={{ fontSize: 22, fontWeight: 800 }}>{activePlan.name}</h2>
                       {canceled ? (
-                        <UkBadge tone="danger">Iptal edildi</UkBadge>
+                        <UkBadge tone="danger">İptal edildi</UkBadge>
                       ) : (
                         <UkBadge tone="success">
                           <span className="dot-live" />
@@ -328,7 +328,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                     </button>
                   </div>
                 ) : (
-                  <UkSection title="Plan & Yenileme" sub="Planini yukselt veya yenilemeyi yonet">
+                  <UkSection title="Plan & Yenileme" sub="Planını yükselt veya yenilemeyi yönet">
                     <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                       <label className="renew-toggle">
                         <div>
@@ -350,7 +350,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                       <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
                         <button type="button" className="btn btn-outline" onClick={() => setTab("plans")}>
                           <KiIcon name="ki-arrow-up" size={16} />
-                          Plani Degistir / Yukselt
+                          Planı Değiştir / Yükselt
                         </button>
                         {subscription.cycle === "monthly" ? (
                           <button
@@ -406,7 +406,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                         <th>Fatura No</th>
                         <th>Tarih</th>
                         <th>Plan</th>
-                        <th>Yontem</th>
+                        <th>Yöntem</th>
                         <th style={{ textAlign: "right" }}>Tutar</th>
                         <th style={{ textAlign: "center" }}>Durum</th>
                         <th />
@@ -416,7 +416,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                       {invoices.length === 0 ? (
                         <tr>
                           <td colSpan={7} className="muted" style={{ padding: 20, textAlign: "center" }}>
-                            Henuz fatura yok.
+                            Henüz fatura yok.
                           </td>
                         </tr>
                       ) : (
@@ -498,7 +498,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
           {tab === "methods" ? (
             <div className="stack" style={{ gap: 14 }}>
               <UkSection
-                title="Kayitli Kartlar"
+                title="Kayıtlı Kartlar"
                 sub="Yenilemeler ve yeni ödemeler için kullanılır"
                 action={
                   <button type="button" className="btn btn-primary btn-sm" onClick={() => setAddCardOpen(true)}>
@@ -511,7 +511,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                   {methods.length === 0 ? (
                     <button type="button" onClick={() => setAddCardOpen(true)} className="dropzone" style={{ padding: "28px 24px" }}>
                       <KiIcon name="ki-wallet" size={26} style={{ color: "var(--faint)" }} />
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-2)" }}>Kayitli kart yok</div>
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--text-2)" }}>Kayıtlı kart yok</div>
                       <div className="muted" style={{ fontSize: 12 }}>
                         Hızlı ödeme için bir <b style={{ color: "var(--primary-600)" }}>kart ekle</b>
                       </div>
@@ -553,7 +553,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                   )}
                   <div className="pm-secure">
                     <KiIcon name="ki-lock" size={14} />
-                    Kart bilgilerin uygulamada saklanmaz; iyzico guvenli kasasinda tutulur.
+                    Kart bilgilerin uygulamada saklanmaz; iyzico güvenli kasasında tutulur.
                   </div>
                 </div>
               </UkSection>
@@ -604,7 +604,7 @@ export function BillingPanel({ role, embedded = false }: BillingPanelProps) {
                       setConfirmCancel(false);
                     }}
                   >
-                    Iptali Onayla
+                    İptali Onayla
                   </button>
                 </div>
               </div>

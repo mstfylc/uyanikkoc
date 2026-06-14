@@ -3,9 +3,9 @@ import Link from "next/link";
 const REASON_COPY: Record<string, string> = {
   missing_owner: "Hesabınız için lisans sahibi bilgisi bulunamadı.",
   not_found: "Hesabınıza bağlı aktif bir lisans bulunamadı.",
-  inactive_status: "Lisansiniz aktif durumda degil.",
-  expired: "Lisans sureniz dolmus.",
-  role_not_licensed: "Bu rol icin yonetim lisansi tanimli degil.",
+  inactive_status: "Lisansınız aktif durumda değil.",
+  expired: "Lisans süreniz dolmuş.",
+  role_not_licensed: "Bu rol için yönetim lisansı tanımlı değil.",
 };
 
 export default async function LicenseAccessDeniedPage({
@@ -24,15 +24,15 @@ export default async function LicenseAccessDeniedPage({
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Lisans erişimi yok</h1>
             <p className="muted" style={{ fontSize: 14, lineHeight: 1.6 }}>
-              {body} Yonetim alanina devam etmek icin lisans durumunu kontrol edin veya yetkili hesapla giris yapin.
+              {body} Yönetim alanına devam etmek için lisans durumunu kontrol edin veya yetkili hesapla giriş yapın.
             </p>
           </div>
           <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
             <Link className="btn btn-primary" href="/coach/license">
-              Lisansimi kontrol et
+              Lisansımı kontrol et
             </Link>
             <Link className="btn btn-light" href="/login?role=coach">
-              Farkli hesapla gir
+              Farklı hesapla gir
             </Link>
           </div>
         </div>

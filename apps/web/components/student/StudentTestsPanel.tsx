@@ -274,7 +274,7 @@ export function StudentTestsPanel() {
                       İptal
                     </button>
                     <button type="submit" disabled={isSubmitting} className="btn btn-primary">
-                      {isSubmitting ? "Gonderiliyor..." : "Testi tamamla"}
+                      {isSubmitting ? "Gönderiliyor..." : "Testi tamamla"}
                     </button>
                   </div>
                 </form>

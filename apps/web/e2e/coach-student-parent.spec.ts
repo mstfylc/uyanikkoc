@@ -16,7 +16,8 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
   test("koç giriş yapıp ödev ekranına ulaşır", async ({ page }) => {
     await login(page, "coach@uyanik.local");
     await page.goto("/coach/assignments/create");
-    await expect(page.getByLabel("Baslik *")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Toplu Ödev Ata" })).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator(".oa-sheet")).toBeVisible();
   });
 
   test("öğrenci giriş yapıp ödev listesini görür", async ({ page }) => {
@@ -38,17 +39,20 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
   });
 
   test("koç ödev oluşturur, öğrenci görür ve tamamlar", async ({ page }) => {
-    const assignmentTitle = `E2E Ödev ${Date.now()}`;
-
     await login(page, "coach@uyanik.local");
     await page.goto("/coach/assignments/create");
-    await expect(page.getByLabel("Baslik *")).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByRole("button", { name: "Odevi kaydet" })).toBeEnabled({ timeout: 20_000 });
-    await page.fill("#title", assignmentTitle);
-    await page.click('button[type="submit"]');
-    await expect(page.getByTestId("created-assignment")).toContainText(assignmentTitle, {
-      timeout: 15_000,
-    });
+    const modal = page.locator(".oa-sheet");
+    await expect(modal.getByRole("heading", { name: "Toplu Ödev Ata" })).toBeVisible({ timeout: 20_000 });
+
+    const firstTopic = modal.locator(".oa-topic .nm").first();
+    await expect(firstTopic).toBeVisible({ timeout: 15_000 });
+    const assignmentTitle = (await firstTopic.textContent())?.trim() ?? "";
+    expect(assignmentTitle.length).toBeGreaterThan(0);
+
+    await firstTopic.click();
+    await expect(modal.getByRole("button", { name: /Öğrenciye Ata/ })).toBeEnabled({ timeout: 10_000 });
+    await modal.getByRole("button", { name: /Öğrenciye Ata/ }).click();
+    await page.waitForURL(/\/coach\/assignments/, { timeout: 20_000 });
 
     await login(page, "student@uyanik.local");
     await page.goto("/student/assignments");

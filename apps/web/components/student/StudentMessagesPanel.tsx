@@ -8,7 +8,7 @@ export function StudentMessagesPanel() {
       apiBase="/api/student/messages"
       selfRole="STUDENT"
       title="Mesajlar"
-      subtitle="Koc ve gruplar"
+      subtitle="Koç ve gruplar"
       testId="student-messages-panel"
       enableGroupTabs
       dmSectionLabel="Kocun"

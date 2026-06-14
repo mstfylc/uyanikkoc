@@ -89,7 +89,7 @@ export function SmartOdevModal({ open, studentId, studentName, onClose, onAssign
               <KiIcon name="ki-abstract-26" size={18} />
             </span>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 800 }}>SmartOdev</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 800 }}>Akıllı Ödev Sistemi</h3>
               <div className="muted" style={{ fontSize: 12.5 }}>{studentName}</div>
             </div>
           </div>
@@ -119,7 +119,7 @@ export function SmartOdevModal({ open, studentId, studentName, onClose, onAssign
                 <KiIcon name="ki-information-2" size={18} style={{ color: "var(--primary-600)", flexShrink: 0 }} />
                 <div style={{ fontSize: 13 }}>
                   Kaynak: {preview.source} - Konu: {preview.topic}
-                  {preview.overdueAlert ? " - tekrar oncelikli" : ""}
+                  {preview.overdueAlert ? " - tekrar öncelikli" : ""}
                 </div>
               </div>
               <div className="grid g-4">
@@ -131,15 +131,15 @@ export function SmartOdevModal({ open, studentId, studentName, onClose, onAssign
               </div>
             </>
           ) : (
-            <p className="muted" style={{ fontSize: 13 }}>Oneri uretilemedi.</p>
+            <p className="muted" style={{ fontSize: 13 }}>Öneri üretilemedi.</p>
           )}
         </div>
 
         <div className="modal-foot">
-          <button type="button" className="btn btn-light" onClick={onClose}>Vazgec</button>
+          <button type="button" className="btn btn-light" onClick={onClose}>Vazgeç</button>
           <button type="button" className="btn btn-primary" disabled={!preview || isAssigning} onClick={() => void assign()}>
             <KiIcon name="ki-send" />
-            {isAssigning ? "Ataniyor..." : "Odevi Ata"}
+            {isAssigning ? "Atanıyor..." : "Ödevi Ata"}
           </button>
         </div>
       </div>

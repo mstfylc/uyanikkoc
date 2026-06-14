@@ -41,7 +41,7 @@ export function ParentReportDetailModal({ open, report, onClose }: ParentReportD
               {report.studentName} · {report.week}
             </h3>
             <div className="muted" style={{ fontSize: 12.5 }}>
-              Haftalik gelisim raporu
+              Haftalık gelişim raporu
             </div>
           </div>
           <button type="button" className="icon-btn" style={{ width: 36, height: 36 }} onClick={onClose} aria-label="Kapat">
@@ -58,13 +58,13 @@ export function ParentReportDetailModal({ open, report, onClose }: ParentReportD
               </div>
             </div>
             <div className="card card-pad">
-              <div className="muted" style={{ fontSize: 11.5 }}>Net degisimi</div>
+              <div className="muted" style={{ fontSize: 11.5 }}>Net değişimi</div>
               <div className="tnum" style={{ fontSize: 22, fontWeight: 800 }}>
                 {report.netDelta}
               </div>
             </div>
             <div className="card card-pad">
-              <div className="muted" style={{ fontSize: 11.5 }}>Calisma saati</div>
+              <div className="muted" style={{ fontSize: 11.5 }}>Çalışma saati</div>
               <div className="tnum" style={{ fontSize: 22, fontWeight: 800 }}>
                 {detail.hours}s
               </div>
@@ -72,9 +72,9 @@ export function ParentReportDetailModal({ open, report, onClose }: ParentReportD
           </div>
 
           <div>
-            <div className="label" style={{ marginBottom: 8 }}>Odev durumu</div>
+            <div className="label" style={{ marginBottom: 8 }}>Ödev durumu</div>
             <UkBadge tone="primary">
-              {detail.assignDone}/{detail.assignTotal} odev tamamlandi
+              {detail.assignDone}/{detail.assignTotal} ödev tamamlandı
             </UkBadge>
           </div>
 

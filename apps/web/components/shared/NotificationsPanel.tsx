@@ -12,9 +12,9 @@ type NotificationsPanelProps = {
 };
 
 const ROLE_SUB: Record<NotificationsPanelProps["role"], string> = {
-  student: "Odev hatirlatmalari ve guncellemeler",
-  coach: "Ogrenci aksiyonlari, sistem ve kocluk guncellemeleri",
-  parent: "Odev hatirlatmalari ve cocuk guncellemeleri",
+  student: "Ödev hatırlatmaları ve güncellemeler",
+  coach: "Öğrenci aksiyonları, sistem ve koçluk güncellemeleri",
+  parent: "Ödev hatırlatmaları ve çocuk güncellemeleri",
 };
 
 export function NotificationsPanel({ role }: NotificationsPanelProps) {
@@ -71,7 +71,7 @@ export function NotificationsPanel({ role }: NotificationsPanelProps) {
           unreadCount > 0 ? (
             <button type="button" className="btn btn-light btn-sm" onClick={() => void markAllRead()}>
               <KiIcon name="ki-check" size={14} />
-              Tumunu okundu yap
+              Tümünü okundu yap
             </button>
           ) : null
         }
