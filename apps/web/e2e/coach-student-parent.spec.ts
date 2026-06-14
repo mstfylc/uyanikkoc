@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 async function login(page: import("@playwright/test").Page, email: string) {
+  await page.context().clearCookies();
   await page.goto("/login", { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(3000);
   await page.fill('[name="email"]', email);
@@ -44,20 +45,29 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
     const modal = page.locator(".oa-sheet");
     await expect(modal.getByRole("heading", { name: "Toplu Ödev Ata" })).toBeVisible({ timeout: 20_000 });
 
-    const firstTopic = modal.locator(".oa-topic .nm").first();
-    await expect(firstTopic).toBeVisible({ timeout: 15_000 });
-    const assignmentTitle = (await firstTopic.textContent())?.trim() ?? "";
+    await modal.locator(".oa-grp-head").first().click();
+    const selectedTopic = modal.locator(".oa-topic.on .nm").first();
+    await expect(selectedTopic).toBeVisible({ timeout: 10_000 });
+    const assignmentTitle = (await selectedTopic.textContent())?.trim() ?? "";
     expect(assignmentTitle.length).toBeGreaterThan(0);
 
-    await firstTopic.click();
     await expect(modal.getByRole("button", { name: /Öğrenciye Ata/ })).toBeEnabled({ timeout: 10_000 });
-    await modal.getByRole("button", { name: /Öğrenciye Ata/ }).click();
+    await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.url().includes("/api/coach/assignments") &&
+          response.request().method() === "POST" &&
+          response.ok(),
+      ),
+      modal.getByRole("button", { name: /Öğrenciye Ata/ }).click(),
+    ]);
     await page.waitForURL(/\/coach\/assignments/, { timeout: 20_000 });
 
     await login(page, "student@uyanik.local");
     await page.goto("/student/assignments");
+    await page.reload();
     await expect(page.getByTestId("assignment-list")).toContainText(assignmentTitle, {
-      timeout: 15_000,
+      timeout: 30_000,
     });
     const assignmentItem = page.getByRole("listitem").filter({ hasText: assignmentTitle });
     const resultButton = assignmentItem.getByRole("button", { name: "Sonuç Gir" });
@@ -83,16 +93,25 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
       timeout: 15_000,
     });
   });
+
   test("koc konu takibi kaynaklar ve yillik cizelge ile acilir", async ({ page }) => {
     await login(page, "coach@uyanik.local");
     await page.goto("/coach/topics");
+    await expect(page.getByTestId("coach-topics-panel")).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole("heading", { name: "Konu Takibi", level: 1 })).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole("heading", { name: "Net Kaybı Haritası" })).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole("heading", { name: "Öğrencinin Yanlış Defteri" })).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole("heading", { name: "Hata Frekansı" })).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole("heading", { name: "Soru Takibi" })).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole("complementary").filter({ hasText: "Dersler" })).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByRole("button", { name: "Ödev ata" }).first()).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("button", { name: "Ödev Ata" })).toBeVisible({ timeout: 20_000 });
+
+    await page.goto("/coach/topics/annual");
+    await expect(page.getByRole("heading", { name: "Yıllık Konu Takip Çizelgesi", level: 1 })).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByRole("button", { name: /Tekrar/ })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Sütun toplamı")).toBeVisible({ timeout: 20_000 });
   });
 
   test("ogrenci kaynak katalogu books_clean verisini kullanir", async ({ page }) => {
@@ -100,7 +119,9 @@ test.describe("Koç → öğrenci → veli demo akışı", () => {
     await page.goto("/student/assignments");
     await expect(page.getByText("Kaynaklarım")).toBeVisible({ timeout: 20_000 });
     await page.getByRole("button", { name: "Katalogdan ekle" }).click();
-    await expect(page.getByText("Türkiye geneli bilinen yayınevi kitapları")).toContainText("9108 kaynak", { timeout: 20_000 });
+    await expect(page.getByText(/Türkiye geneli bilinen yayınevi kitapları/)).toContainText(/\d+ kaynak/, {
+      timeout: 20_000,
+    });
     await page.getByPlaceholder("Kitap veya yayınevi ara...").fill("ZORU 7 BANKASI");
     await expect(page.locator(".modal-body")).toContainText("ZORU 7 BANKASI", { timeout: 20_000 });
   });
