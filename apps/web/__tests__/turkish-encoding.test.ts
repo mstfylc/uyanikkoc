@@ -11,12 +11,16 @@
  */
 import { describe, it, expect } from "vitest";
 import { readdirSync, statSync, readFileSync } from "node:fs";
-import { join, extname } from "node:path";
+import { dirname, extname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const WEB_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const REPO_ROOT = resolve(WEB_ROOT, "../..");
 
 const ROOTS = [
-  "app",
-  "components",
-  "../../packages/database/prisma/seed.ts",
+  resolve(WEB_ROOT, "app"),
+  resolve(WEB_ROOT, "components"),
+  resolve(REPO_ROOT, "packages/database/prisma/seed.ts"),
 ];
 
 const FORBIDDEN: RegExp[] = [
@@ -68,13 +72,15 @@ function collectFiles(): string[] {
 describe("Türkçe karakter muhafızı", () => {
   it("görünen metinlerde ASCII-Türkçe (diakritiksiz) kelime YOK", () => {
     const violations: string[] = [];
-    for (const file of collectFiles()) {
+    const files = collectFiles();
+    expect(files.length).toBeGreaterThan(0);
+    for (const file of files) {
       const lines = readFileSync(file, "utf8").split("\n");
       lines.forEach((raw, i) => {
         const line = sanitize(raw);
         for (const rx of FORBIDDEN) {
           const m = rx.exec(line);
-          if (m) violations.push(`${file}:${i + 1}  →  "${m[0]}"  (satır: ${raw.trim().slice(0, 90)})`);
+          if (m) violations.push(`${relative(REPO_ROOT, file)}:${i + 1}  →  "${m[0]}"  (satır: ${raw.trim().slice(0, 90)})`);
         }
       });
     }

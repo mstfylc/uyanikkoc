@@ -7,9 +7,13 @@
  * Eşleşme varsa exit code 1 (commit/CI durur).
  */
 import { readdirSync, statSync, readFileSync } from "node:fs";
-import { join, extname } from "node:path";
+import { dirname, extname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const ROOTS = ["apps/web/app", "apps/web/components", "packages/database/prisma/seed.ts"];
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const ROOTS = ["apps/web/app", "apps/web/components", "packages/database/prisma/seed.ts"].map((root) =>
+  resolve(REPO_ROOT, root),
+);
 
 const FORBIDDEN = [
   /\bOgrenci/, /\bOgrenciler/, /\bOdev\b/, /\bGorev/, /\bAciklama/, /\bBaslik/,
@@ -48,6 +52,11 @@ for (const root of ROOTS) {
   try { const st = statSync(root); st.isDirectory() ? walk(root, files) : files.push(root); } catch {}
 }
 
+if (files.length === 0) {
+  console.error("Türkçe muhafızı hiç dosya taramadı; ROOTS yollarını kontrol et.");
+  process.exit(1);
+}
+
 const violations = [];
 for (const file of files) {
   const lines = readFileSync(file, "utf8").split("\n");
@@ -55,7 +64,7 @@ for (const file of files) {
     const line = sanitize(raw);
     for (const rx of FORBIDDEN) {
       const m = rx.exec(line);
-      if (m) violations.push(`${file}:${i + 1}  ->  "${m[0]}"  | ${raw.trim().slice(0, 90)}`);
+      if (m) violations.push(`${relative(REPO_ROOT, file)}:${i + 1}  ->  "${m[0]}"  | ${raw.trim().slice(0, 90)}`);
     }
   });
 }
