@@ -599,6 +599,7 @@ async function seedRichDemoData() {
   await seedRichExtraExams();
   await seedLiveDemoCoachRosterMirror();
   await deleteLegacyLocalCoachForLiveDemo();
+  await applyLiveDemoParentScope();
 }
 
 async function seedRichAssignments() {
@@ -1562,6 +1563,39 @@ async function deleteLegacyLocalCoachForLiveDemo() {
   }
 
   await prisma.user.deleteMany({ where: { email: "coach@uyanik.local" } });
+}
+
+async function applyLiveDemoParentScope() {
+  const liveDemoParent = await prisma.user.findUnique({
+    where: { email: "demo.veli@uyanikkoc.com" },
+    include: { parentProfile: true },
+  });
+  const liveDemoParentId = liveDemoParent?.parentProfile?.id;
+  if (!liveDemoParentId) {
+    return;
+  }
+
+  const visibleStudentIds = ["student_001", "student_002"];
+  await prisma.studentProfile.updateMany({
+    where: { id: { in: visibleStudentIds } },
+    data: { parentId: liveDemoParentId },
+  });
+  await prisma.studentProfile.updateMany({
+    where: { id: { notIn: visibleStudentIds } },
+    data: { parentId: null },
+  });
+  await prisma.parentReport.updateMany({
+    where: { studentId: { in: visibleStudentIds } },
+    data: { parentId: liveDemoParentId },
+  });
+  await prisma.parentReport.updateMany({
+    where: { studentId: { notIn: visibleStudentIds } },
+    data: { parentId: null },
+  });
+  await prisma.notification.updateMany({
+    where: { parentId: { not: liveDemoParentId } },
+    data: { parentId: null },
+  });
 }
 
 async function seedRichBillingAndSupport() {
