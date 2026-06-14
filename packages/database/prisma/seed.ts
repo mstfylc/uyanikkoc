@@ -1562,7 +1562,15 @@ async function deleteLegacyLocalCoachForLiveDemo() {
     return;
   }
 
-  await prisma.user.deleteMany({ where: { email: "coach@uyanik.local" } });
+  await prisma.user.updateMany({
+    where: { email: "coach@uyanik.local", status: { not: "deleted" } },
+    data: {
+      status: "deleted",
+      deletedAt: new Date(),
+      deleteReason: "live demo account replaced by demo.koc@uyanikkoc.com",
+      restoreUntil: daysFromNow(90),
+    },
+  });
 }
 
 async function applyLiveDemoParentScope() {

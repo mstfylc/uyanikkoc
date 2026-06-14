@@ -15,6 +15,12 @@ enum DbRole {
   ORG_ADMIN
 }
 
+enum UserStatus {
+  active
+  suspended
+  deleted
+}
+
 enum AssignmentType {
   homework
   exam_prep
@@ -115,6 +121,11 @@ model User {
   phone          String?
   passwordHash   String
   role           DbRole
+  status         UserStatus      @default(active)
+  deletedAt      DateTime?
+  deletedById    String?
+  deleteReason   String?
+  restoreUntil   DateTime?
   organizationId String
   branchId       String
   organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -131,6 +142,8 @@ model User {
   deviceTokens   DeviceToken[]
 
   @@index([organizationId, branchId])
+  @@index([status])
+  @@index([deletedAt])
   @@map("users")
 }
 
@@ -215,7 +228,7 @@ model StudentProfile {
   userId            String       @unique
   parentId          String?
   motivationEnabled Boolean      @default(true)
-  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User         @relation(fields: [userId], references: [id], onDelete: Restrict)
   parent            ParentProfile? @relation(fields: [parentId], references: [id], onDelete: SetNull)
   assignments       Assignment[] @relation("StudentAssignments")
   subjects          Subject[]
@@ -246,7 +259,7 @@ model StudentProfile {
 model CoachProfile {
   id          String               @id
   userId      String               @unique
-  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Restrict)
   assignments Assignment[]         @relation("CoachAssignments")
   templates   AssignmentTemplate[]
   students    CoachStudent[]
@@ -270,7 +283,7 @@ model CoachProfile {
 model ParentProfile {
   id            String           @id
   userId        String           @unique
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User             @relation(fields: [userId], references: [id], onDelete: Restrict)
   children      StudentProfile[]
   assignments   Assignment[]
   notifications Notification[]

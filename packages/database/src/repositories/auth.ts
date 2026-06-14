@@ -32,6 +32,9 @@ export async function findUserByEmail(email: string): Promise<AuthUserRecord | n
   if (!user) {
     return null;
   }
+  if (user.status !== "active" || user.deletedAt) {
+    return null;
+  }
 
   return {
     id: user.id,
@@ -59,6 +62,9 @@ export async function findUserById(id: string): Promise<AuthUserRecord | null> {
   });
 
   if (!user) {
+    return null;
+  }
+  if (user.status !== "active" || user.deletedAt) {
     return null;
   }
 
@@ -285,10 +291,10 @@ export async function createPasswordResetToken(input: {
 }): Promise<{ userId: string; email: string } | null> {
   const user = await prisma.user.findUnique({
     where: { email: input.email },
-    select: { id: true, email: true },
+    select: { id: true, email: true, status: true, deletedAt: true },
   });
 
-  if (!user) {
+  if (!user || user.status !== "active" || user.deletedAt) {
     return null;
   }
 
@@ -311,9 +317,10 @@ export async function resetPasswordWithToken(input: {
   const now = input.now ?? new Date();
   const token = await prisma.passwordResetToken.findUnique({
     where: { tokenHash: input.tokenHash },
+    include: { user: { select: { status: true, deletedAt: true } } },
   });
 
-  if (!token || token.usedAt || token.expiresAt <= now) {
+  if (!token || token.usedAt || token.expiresAt <= now || token.user.status !== "active" || token.user.deletedAt) {
     return false;
   }
 
@@ -337,10 +344,10 @@ export async function updateUserPasswordById(input: {
 }): Promise<boolean> {
   const user = await prisma.user.findUnique({
     where: { id: input.userId },
-    select: { id: true },
+    select: { id: true, status: true, deletedAt: true },
   });
 
-  if (!user) {
+  if (!user || user.status !== "active" || user.deletedAt) {
     return false;
   }
 
@@ -359,10 +366,10 @@ export async function updateUserEmailById(input: {
   const normalizedEmail = input.email.trim().toLowerCase();
   const user = await prisma.user.findUnique({
     where: { id: input.userId },
-    select: { id: true },
+    select: { id: true, status: true, deletedAt: true },
   });
 
-  if (!user) {
+  if (!user || user.status !== "active" || user.deletedAt) {
     return "not_found";
   }
 
@@ -381,4 +388,43 @@ export async function updateUserEmailById(input: {
   });
 
   return "updated";
+}
+
+export async function softDeleteUserById(input: {
+  userId: string;
+  deletedById?: string | null;
+  reason?: string | null;
+  now?: Date;
+  retentionDays?: number;
+}): Promise<boolean> {
+  const now = input.now ?? new Date();
+  const retentionDays = input.retentionDays ?? 90;
+  const restoreUntil = new Date(now.getTime() + retentionDays * 24 * 60 * 60 * 1000);
+  const result = await prisma.user.updateMany({
+    where: { id: input.userId, status: { not: "deleted" } },
+    data: {
+      status: "deleted",
+      deletedAt: now,
+      deletedById: input.deletedById ?? null,
+      deleteReason: input.reason ?? null,
+      restoreUntil,
+    },
+  });
+
+  return result.count > 0;
+}
+
+export async function restoreUserById(userId: string): Promise<boolean> {
+  const result = await prisma.user.updateMany({
+    where: { id: userId, status: "deleted" },
+    data: {
+      status: "active",
+      deletedAt: null,
+      deletedById: null,
+      deleteReason: null,
+      restoreUntil: null,
+    },
+  });
+
+  return result.count > 0;
 }
