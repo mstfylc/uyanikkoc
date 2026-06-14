@@ -46,6 +46,12 @@ vi.mock("../../../packages/database/src/client", () => ({
   },
 }));
 
+vi.mock("@uyanik/database", () => ({
+  authRepository: {
+    purgeExpiredAuthArtifacts,
+  },
+}));
+
 describe("token cleanup", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -93,13 +99,6 @@ describe("token cleanup", () => {
   });
 
   it("runs the worker cleanup job through the auth repository", async () => {
-    vi.resetModules();
-    vi.doMock("@uyanik/database", () => ({
-      authRepository: {
-        purgeExpiredAuthArtifacts,
-      },
-    }));
-
     const { runTokenCleanupJob } = await import("../../../apps/worker/src/jobs/token-cleanup");
     const now = new Date("2026-06-13T12:00:00.000Z");
 
@@ -112,7 +111,5 @@ describe("token cleanup", () => {
       otpChallenges: 5,
       total: 10,
     });
-
-    vi.doUnmock("@uyanik/database");
   });
 });
